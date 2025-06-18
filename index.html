@@ -3,248 +3,735 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>JomBro - Malaysian Social App</title>
+    <title>JomBro - "bro kang tau Lai liau!"</title>
+    <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Lucide Icons (Simplified) -->
+    <script>
+        // Simple icon components
+        window.LucideIcons = {
+            Home: () => React.createElement('svg', {className: 'w-6 h-6', fill: 'none', stroke: 'currentColor', viewBox: '0 0 24 24'}, 
+                React.createElement('path', {strokeLinecap: 'round', strokeLinejoin: 'round', strokeWidth: 2, d: 'm3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z'}),
+                React.createElement('polyline', {strokeLinecap: 'round', strokeLinejoin: 'round', strokeWidth: 2, points: '9,22 9,12 15,12 15,22'})
+            ),
+            Users: () => React.createElement('svg', {className: 'w-6 h-6', fill: 'none', stroke: 'currentColor', viewBox: '0 0 24 24'}, 
+                React.createElement('path', {strokeLinecap: 'round', strokeLinejoin: 'round', strokeWidth: 2, d: 'M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2'}),
+                React.createElement('circle', {strokeLinecap: 'round', strokeLinejoin: 'round', strokeWidth: 2, cx: 9, cy: 7, r: 4}),
+                React.createElement('path', {strokeLinecap: 'round', strokeLinejoin: 'round', strokeWidth: 2, d: 'm23 21-3.5-3.5a2 2 0 0 0-3 0L13 21'})
+            ),
+            MessageSquare: () => React.createElement('svg', {className: 'w-6 h-6', fill: 'none', stroke: 'currentColor', viewBox: '0 0 24 24'}, 
+                React.createElement('path', {strokeLinecap: 'round', strokeLinejoin: 'round', strokeWidth: 2, d: 'M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z'})
+            ),
+            Bell: () => React.createElement('svg', {className: 'w-6 h-6', fill: 'none', stroke: 'currentColor', viewBox: '0 0 24 24'}, 
+                React.createElement('path', {strokeLinecap: 'round', strokeLinejoin: 'round', strokeWidth: 2, d: 'M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9'}),
+                React.createElement('path', {strokeLinecap: 'round', strokeLinejoin: 'round', strokeWidth: 2, d: 'M13.73 21a2 2 0 0 1-3.46 0'})
+            ),
+            Search: () => React.createElement('svg', {className: 'w-5 h-5', fill: 'none', stroke: 'currentColor', viewBox: '0 0 24 24'}, 
+                React.createElement('circle', {strokeLinecap: 'round', strokeLinejoin: 'round', strokeWidth: 2, cx: 11, cy: 11, r: 8}),
+                React.createElement('path', {strokeLinecap: 'round', strokeLinejoin: 'round', strokeWidth: 2, d: 'M21 21l-4.35-4.35'})
+            ),
+            Menu: () => React.createElement('svg', {className: 'w-6 h-6', fill: 'none', stroke: 'currentColor', viewBox: '0 0 24 24'}, 
+                React.createElement('line', {strokeLinecap: 'round', strokeLinejoin: 'round', strokeWidth: 2, x1: 4, y1: 6, x2: 20, y2: 6}),
+                React.createElement('line', {strokeLinecap: 'round', strokeLinejoin: 'round', strokeWidth: 2, x1: 4, y1: 12, x2: 20, y2: 12}),
+                React.createElement('line', {strokeLinecap: 'round', strokeLinejoin: 'round', strokeWidth: 2, x1: 4, y1: 18, x2: 20, y2: 18})
+            ),
+            Plus: () => React.createElement('svg', {className: 'w-3 h-3', fill: 'none', stroke: 'currentColor', viewBox: '0 0 24 24'}, 
+                React.createElement('line', {strokeLinecap: 'round', strokeLinejoin: 'round', strokeWidth: 2, x1: 12, y1: 5, x2: 12, y2: 19}),
+                React.createElement('line', {strokeLinecap: 'round', strokeLinejoin: 'round', strokeWidth: 2, x1: 5, y1: 12, x2: 19, y2: 12})
+            ),
+            ThumbsUp: () => React.createElement('svg', {className: 'w-5 h-5', fill: 'none', stroke: 'currentColor', viewBox: '0 0 24 24'}, 
+                React.createElement('path', {strokeLinecap: 'round', strokeLinejoin: 'round', strokeWidth: 2, d: 'M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3zM7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3'})
+            ),
+            MessageCircle: () => React.createElement('svg', {className: 'w-5 h-5', fill: 'none', stroke: 'currentColor', viewBox: '0 0 24 24'}, 
+                React.createElement('path', {strokeLinecap: 'round', strokeLinejoin: 'round', strokeWidth: 2, d: 'M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z'})
+            ),
+            Share: () => React.createElement('svg', {className: 'w-5 h-5', fill: 'none', stroke: 'currentColor', viewBox: '0 0 24 24'}, 
+                React.createElement('path', {strokeLinecap: 'round', strokeLinejoin: 'round', strokeWidth: 2, d: 'M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 1 1 0-2.684m0 2.684 6.632 3.316m-6.632-6 6.632-3.316m0 0a3 3 0 1 1 5.368-2.684 3 3 0 0 1-5.368 2.684zm0 9.316a3 3 0 1 1 5.368 2.684 3 3 0 0 1-5.368-2.684z'})
+            ),
+            Camera: () => React.createElement('svg', {className: 'w-5 h-5', fill: 'none', stroke: 'currentColor', viewBox: '0 0 24 24'}, 
+                React.createElement('path', {strokeLinecap: 'round', strokeLinejoin: 'round', strokeWidth: 2, d: 'M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z'}),
+                React.createElement('circle', {strokeLinecap: 'round', strokeLinejoin: 'round', strokeWidth: 2, cx: 12, cy: 13, r: 5})
+            ),
+            Video: () => React.createElement('svg', {className: 'w-5 h-5', fill: 'none', stroke: 'currentColor', viewBox: '0 0 24 24'}, 
+                React.createElement('polygon', {strokeLinecap: 'round', strokeLinejoin: 'round', strokeWidth: 2, points: '23,7 16,12 23,17 23,7'}),
+                React.createElement('rect', {strokeLinecap: 'round', strokeLinejoin: 'round', strokeWidth: 2, x: 1, y: 5, width: 15, height: 14, rx: 2, ry: 2})
+            ),
+            Smile: () => React.createElement('svg', {className: 'w-5 h-5', fill: 'none', stroke: 'currentColor', viewBox: '0 0 24 24'}, 
+                React.createElement('circle', {strokeLinecap: 'round', strokeLinejoin: 'round', strokeWidth: 2, cx: 12, cy: 12, r: 10}),
+                React.createElement('path', {strokeLinecap: 'round', strokeLinejoin: 'round', strokeWidth: 2, d: 'M8 14s1.5 2 4 2 4-2 4-2'}),
+                React.createElement('line', {strokeLinecap: 'round', strokeLinejoin: 'round', strokeWidth: 2, x1: 9, y1: 9, x2: 9.01, y2: 9}),
+                React.createElement('line', {strokeLinecap: 'round', strokeLinejoin: 'round', strokeWidth: 2, x1: 15, y1: 9, x2: 15.01, y2: 9})
+            ),
+            Globe: () => React.createElement('svg', {className: 'w-3 h-3', fill: 'none', stroke: 'currentColor', viewBox: '0 0 24 24'}, 
+                React.createElement('circle', {strokeLinecap: 'round', strokeLinejoin: 'round', strokeWidth: 2, cx: 12, cy: 12, r: 10}),
+                React.createElement('line', {strokeLinecap: 'round', strokeLinejoin: 'round', strokeWidth: 2, x1: 2, y1: 12, x2: 22, y2: 12}),
+                React.createElement('path', {strokeLinecap: 'round', strokeLinejoin: 'round', strokeWidth: 2, d: 'M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z'})
+            ),
+            MoreHorizontal: () => React.createElement('svg', {className: 'w-5 h-5', fill: 'none', stroke: 'currentColor', viewBox: '0 0 24 24'}, 
+                React.createElement('circle', {strokeLinecap: 'round', strokeLinejoin: 'round', strokeWidth: 2, cx: 12, cy: 12, r: 1}),
+                React.createElement('circle', {strokeLinecap: 'round', strokeLinejoin: 'round', strokeWidth: 2, cx: 19, cy: 12, r: 1}),
+                React.createElement('circle', {strokeLinecap: 'round', strokeLinejoin: 'round', strokeWidth: 2, cx: 5, cy: 12, r: 1})
+            )
+        };
+    </script>
+    
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
-            background: linear-gradient(135deg, #FEF3C7 0%, #FDE68A 50%, #F59E0B 100%);
-            min-height: 100vh;
+            margin: 0;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            background-color: #f3f4f6;
+        }
+        
+        .loading {
             display: flex;
-            align-items: center;
             justify-content: center;
-            padding: 20px;
-        }
-        
-        .container {
-            background: white;
-            padding: 3rem;
-            border-radius: 20px;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.15);
-            text-align: center;
-            max-width: 600px;
-            width: 100%;
-        }
-        
-        .logo {
-            font-size: 4rem;
-            font-weight: bold;
-            color: #D97706;
-            margin-bottom: 1rem;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
-        }
-        
-        .tagline {
-            color: #6B7280;
-            font-style: italic;
-            font-size: 1.3rem;
-            margin-bottom: 2rem;
-        }
-        
-        .success {
-            background: #D1FAE5;
-            color: #059669;
-            padding: 1rem;
-            border-radius: 10px;
-            margin-bottom: 2rem;
-            font-weight: bold;
-            font-size: 1.2rem;
-        }
-        
-        .button {
-            background: #D97706;
-            color: white;
-            padding: 1rem 2rem;
-            border: none;
-            border-radius: 50px;
-            font-size: 1.1rem;
-            font-weight: bold;
-            cursor: pointer;
-            transition: all 0.3s;
-            margin: 1rem 0;
-            display: inline-block;
-            text-decoration: none;
-        }
-        
-        .button:hover {
-            background: #B45309;
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
-        }
-        
-        .features {
-            margin-top: 2rem;
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 1rem;
-            text-align: left;
-        }
-        
-        .feature {
-            background: #FEF3C7;
-            padding: 1rem;
-            border-radius: 10px;
-            display: flex;
             align-items: center;
-            transition: transform 0.3s;
+            height: 100vh;
+            font-size: 1.2rem;
+            color: #EAB308;
         }
         
-        .feature:hover {
-            transform: translateY(-2px);
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
         }
         
-        .emoji {
-            font-size: 2rem;
-            margin-right: 1rem;
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
         }
         
-        .footer {
-            margin-top: 2rem;
-            color: #6B7280;
-            font-size: 0.9rem;
-            line-height: 1.5;
+        ::-webkit-scrollbar-thumb {
+            background: #EAB308;
+            border-radius: 4px;
         }
         
-        .stats {
-            display: flex;
-            justify-content: space-around;
-            margin: 2rem 0;
-            background: #F3F4F6;
-            padding: 1rem;
-            border-radius: 10px;
-        }
-        
-        .stat {
-            text-align: center;
-        }
-        
-        .stat-number {
-            font-size: 1.5rem;
-            font-weight: bold;
-            color: #D97706;
-        }
-        
-        .stat-label {
-            font-size: 0.9rem;
-            color: #6B7280;
-        }
-
-        @media (max-width: 600px) {
-            .container {
-                padding: 2rem 1rem;
-            }
-            
-            .logo {
-                font-size: 3rem;
-            }
-            
-            .features {
-                grid-template-columns: 1fr;
-            }
-            
-            .stats {
-                flex-direction: column;
-                gap: 1rem;
-            }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #D97706;
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <div class="logo">JomBro</div>
-        <div class="tagline">"bro kang tau Lai liau!"</div>
-        
-        <div class="success">
-            🎉 Successfully Deployed! 🎉<br>
-            Your Malaysian Social App is Live!
-        </div>
-        
-        <button class="button" onclick="showAlert()">
-            Apa lu fikir? Share lah bro!
-        </button>
-        
-        <div class="stats">
-            <div class="stat">
-                <div class="stat-number">🚀</div>
-                <div class="stat-label">Live & Working</div>
-            </div>
-            <div class="stat">
-                <div class="stat-number">📱</div>
-                <div class="stat-label">Mobile Ready</div>
-            </div>
-            <div class="stat">
-                <div class="stat-number">🇲🇾</div>
-                <div class="stat-label">Made in Malaysia</div>
-            </div>
-        </div>
-        
-        <div class="features">
-            <div class="feature">
-                <span class="emoji">🚴‍♀️</span>
-                <div>
-                    <strong>Cycling Adventures</strong><br>
-                    Share your Putrajaya rides
-                </div>
-            </div>
-            
-            <div class="feature">
-                <span class="emoji">🍣</span>
-                <div>
-                    <strong>Family Moments</strong><br>
-                    Food trips with loved ones
-                </div>
-            </div>
-            
-            <div class="feature">
-                <span class="emoji">🏗️</span>
-                <div>
-                    <strong>Home Projects</strong><br>
-                    Renovation updates
-                </div>
-            </div>
-            
-            <div class="feature">
-                <span class="emoji">💇‍♀️</span>
-                <div>
-                    <strong>Beauty Studios</strong><br>
-                    DAMDA promotions
-                </div>
-            </div>
-        </div>
-        
-        <div class="footer">
-            <strong>Congratulations!</strong> Your JomBro Facebook clone has been successfully deployed!<br>
-            📱 Works on mobile • 💻 Works on desktop • 🌐 Accessible worldwide
-            <br><br>
-            <small>Built with ❤️ using HTML, CSS & Malaysian spirit!</small>
+    <noscript>You need to enable JavaScript to run this app.</noscript>
+    <div id="root">
+        <div class="loading">
+            <div>Loading JomBro... 🚀</div>
         </div>
     </div>
+    
+    <script type="text/babel">
+        const { useState, useEffect } = React;
+        const { 
+            Home, Users, MessageSquare, Bell, Menu, Search, Plus, Globe, 
+            MoreHorizontal, ThumbsUp, MessageCircle, Share, Video, Camera, Smile 
+        } = window.LucideIcons;
 
-    <script>
-        function showAlert() {
-            alert('Wah! Post feature coming soon lah bro! 🚀\n\nYour JomBro app is working perfectly!\n\n✅ Deployed successfully\n✅ Mobile responsive\n✅ Ready for users');
-        }
-        
-        // Add some interactive effects
-        document.addEventListener('DOMContentLoaded', function() {
-            console.log('🎉 JomBro loaded successfully!');
-            
-            // Add click effects to features
-            const features = document.querySelectorAll('.feature');
-            features.forEach(feature => {
-                feature.addEventListener('click', function() {
-                    this.style.transform = 'scale(0.95)';
-                    setTimeout(() => {
-                        this.style.transform = 'translateY(-2px)';
-                    }, 150);
-                });
+        const JomBroApp = () => {
+            const [activeTab, setActiveTab] = useState('home');
+            const [showProfile, setShowProfile] = useState(false);
+            const [showPostModal, setShowPostModal] = useState(false);
+            const [newPost, setNewPost] = useState('');
+            const [posts, setPosts] = useState([
+                {
+                    id: 1,
+                    user: {
+                        name: '不想早起的大罗',
+                        avatar: 'https://images.unsplash.com/photo-1494790108755-2616b612b469?w=100&h=100&fit=crop&crop=face',
+                        verified: true
+                    },
+                    time: '1 jam lepas',
+                    content: 'Wah today cycle around Putrajaya! 🚴‍♀️ Weather cantik gila, perfect for outdoor activities. Siapa-siapa nak join next time? 💪 #CyclingLife #Putrajaya',
+                    image: 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=600&h=400&fit=crop',
+                    likes: 68,
+                    comments: 12,
+                    shares: 4,
+                    privacy: 'public',
+                    reactions: [
+                        { type: '👍', count: 45 },
+                        { type: '❤️', count: 18 },
+                        { type: '💪', count: 5 }
+                    ]
+                },
+                {
+                    id: 2,
+                    user: {
+                        name: 'Ahmad Fitness Studio',
+                        avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&h=100&fit=crop&crop=face',
+                        verified: false
+                    },
+                    time: '3 jam lepas',
+                    content: 'Baru renovate studio kami! 💇‍♀️ Modern minimalist design dengan equipment terbaru. STUDIO DAMDA - Your beauty destination! Book appointment sekarang! ✨',
+                    image: 'https://images.unsplash.com/photo-1560066984-138dadb4c035?w=600&h=400&fit=crop',
+                    likes: 234,
+                    comments: 34,
+                    shares: 18,
+                    privacy: 'public',
+                    reactions: [
+                        { type: '👍', count: 156 },
+                        { type: '💕', count: 65 },
+                        { type: '✨', count: 13 }
+                    ]
+                },
+                {
+                    id: 3,
+                    user: {
+                        name: 'Shopping Mall KL',
+                        avatar: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=100&h=100&fit=crop&crop=face',
+                        verified: true
+                    },
+                    time: '5 jam lepas',
+                    content: 'Family day out at the mall! 🛒 Ada banyak kedai baru including R Pharmacy, Ai-Cha ice cream & OSUMO! Perfect spot untuk weekend family time 👨‍👩‍👧‍👦',
+                    image: 'https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=600&h=400&fit=crop',
+                    likes: 89,
+                    comments: 21,
+                    shares: 7,
+                    privacy: 'public',
+                    reactions: [
+                        { type: '❤️', count: 52 },
+                        { type: '😊', count: 28 },
+                        { type: '👍', count: 9 }
+                    ]
+                },
+                {
+                    id: 4,
+                    user: {
+                        name: 'Home Renovation Pro',
+                        avatar: 'https://images.unsplash.com/photo-1519244703995-f4e0f30006d5?w=100&h=100&fit=crop&crop=face',
+                        verified: false
+                    },
+                    time: '1 hari lepas',
+                    content: 'Major renovation project ongoing! 🏗️ Tengah transform living space ni jadi modern concept. Progress power gila! Stay tuned for before & after shots! 💪',
+                    image: 'https://images.unsplash.com/photo-1581858726788-75bc0f6a952d?w=600&h=400&fit=crop',
+                    likes: 145,
+                    comments: 28,
+                    shares: 15,
+                    privacy: 'public',
+                    reactions: [
+                        { type: '👍', count: 98 },
+                        { type: '🔥', count: 35 },
+                        { type: '💪', count: 12 }
+                    ]
+                },
+                {
+                    id: 5,
+                    user: {
+                        name: 'Family Adventures',
+                        avatar: 'https://images.unsplash.com/photo-1494790108755-2616b612b469?w=100&h=100&fit=crop&crop=face',
+                        verified: false
+                    },
+                    time: '2 hari lepas',
+                    content: 'Sushi date with the family! 🍣 Anak-anak pun suka gila dengan sushi here. Even our doggy Bello ikut sekali dalam stroller! Family bonding time yang terbaik ❤️ #FamilyTime #SushiLover',
+                    image: 'https://images.unsplash.com/photo-1579584425555-c3ce17fd4351?w=600&h=400&fit=crop',
+                    likes: 102,
+                    comments: 18,
+                    shares: 3,
+                    privacy: 'friends',
+                    reactions: [
+                        { type: '❤️', count: 67 },
+                        { type: '😍', count: 28 },
+                        { type: '🍣', count: 7 }
+                    ]
+                }
+            ]);
+
+            const [stories] = useState([
+                {
+                    id: 1,
+                    user: 'Your Story',
+                    avatar: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=100&h=100&fit=crop&crop=face',
+                    isOwn: true
+                },
+                {
+                    id: 2,
+                    user: 'Rajesh',
+                    avatar: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=100&h=100&fit=crop&crop=face',
+                    hasStory: true
+                },
+                {
+                    id: 3,
+                    user: 'Mei Ling',
+                    avatar: 'https://images.unsplash.com/photo-1544725176-7c40e5a71c5e?w=100&h=100&fit=crop&crop=face',
+                    hasStory: true
+                },
+                {
+                    id: 4,
+                    user: 'Ahmad',
+                    avatar: 'https://images.unsplash.com/photo-1519244703995-f4e0f30006d5?w=100&h=100&fit=crop&crop=face',
+                    hasStory: true
+                },
+                {
+                    id: 5,
+                    user: 'Siti',
+                    avatar: 'https://images.unsplash.com/photo-1494790108755-2616b612b469?w=100&h=100&fit=crop&crop=face',
+                    hasStory: true
+                }
+            ]);
+
+            const [user] = useState({
+                name: 'John Doe',
+                avatar: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=100&h=100&fit=crop&crop=face'
             });
-        });
+
+            const handleLike = (postId) => {
+                setPosts(posts.map(post => 
+                    post.id === postId 
+                        ? { ...post, likes: post.likes + 1 }
+                        : post
+                ));
+            };
+
+            const handleCreatePost = () => {
+                if (newPost.trim()) {
+                    const post = {
+                        id: posts.length + 1,
+                        user: {
+                            name: user.name,
+                            avatar: user.avatar,
+                            verified: false
+                        },
+                        time: 'now',
+                        content: newPost,
+                        image: null,
+                        likes: 0,
+                        comments: 0,
+                        shares: 0,
+                        privacy: 'public',
+                        reactions: []
+                    };
+                    setPosts([post, ...posts]);
+                    setNewPost('');
+                    setShowPostModal(false);
+                }
+            };
+
+            // Story Component
+            const StoryCard = ({ story }) => (
+                <div className="flex-shrink-0 w-20 cursor-pointer">
+                    <div className="relative">
+                        <div className={`w-20 h-28 rounded-lg overflow-hidden border-2 ${
+                            story.hasStory ? 'border-yellow-500' : story.isOwn ? 'border-gray-300' : 'border-transparent'
+                        } relative`}>
+                            <img 
+                                src={story.avatar} 
+                                alt={story.user}
+                                className="w-full h-full object-cover"
+                            />
+                            <div className="absolute bottom-0 left-0 right-0 bg-black bg-opacity-60 text-white text-xs p-1">
+                                <p className="text-center truncate font-medium">{story.user}</p>
+                            </div>
+                            {story.isOwn && (
+                                <div className="absolute top-1 right-1 w-5 h-5 bg-yellow-500 rounded-full flex items-center justify-center">
+                                    <Plus />
+                                </div>
+                            )}
+                        </div>
+                    </div>
+                </div>
+            );
+
+            // Post Component
+            const PostCard = ({ post }) => (
+                <div className="bg-white rounded-xl shadow-sm border mb-4">
+                    <div className="p-4 flex items-center justify-between">
+                        <div className="flex items-center space-x-3">
+                            <img 
+                                src={post.user.avatar} 
+                                alt={post.user.name}
+                                className="w-12 h-12 rounded-full object-cover"
+                            />
+                            <div>
+                                <div className="flex items-center space-x-2">
+                                    <h3 className="font-bold text-gray-900">{post.user.name}</h3>
+                                    {post.user.verified && (
+                                        <div className="w-5 h-5 bg-blue-500 rounded-full flex items-center justify-center">
+                                            <span className="text-white text-xs">✓</span>
+                                        </div>
+                                    )}
+                                </div>
+                                <div className="flex items-center space-x-2 text-sm text-gray-500">
+                                    <span>{post.time}</span>
+                                    <span>•</span>
+                                    <Globe />
+                                </div>
+                            </div>
+                        </div>
+                        <MoreHorizontal />
+                    </div>
+
+                    <div className="px-4 pb-3">
+                        <p className="text-gray-800 leading-relaxed">{post.content}</p>
+                    </div>
+
+                    {post.image && (
+                        <div className="mb-3">
+                            <img 
+                                src={post.image} 
+                                alt="Post content"
+                                className="w-full h-64 object-cover"
+                            />
+                        </div>
+                    )}
+
+                    <div className="px-4 py-2 border-b border-gray-100">
+                        <div className="flex items-center justify-between text-sm text-gray-600">
+                            <div className="flex items-center space-x-1">
+                                {post.reactions.map((reaction, index) => (
+                                    <span key={index} className="text-sm">{reaction.type}</span>
+                                ))}
+                                <span>{post.likes} people like this</span>
+                            </div>
+                            <div className="flex space-x-4">
+                                <span>{post.comments} comments</span>
+                                <span>{post.shares} shares</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div className="px-4 py-2">
+                        <div className="flex items-center justify-around">
+                            <button 
+                                onClick={() => handleLike(post.id)}
+                                className="flex items-center space-x-2 px-4 py-2 rounded-lg hover:bg-yellow-50 transition-colors flex-1 justify-center"
+                            >
+                                <ThumbsUp />
+                                <span className="text-gray-600 font-medium">Steady</span>
+                            </button>
+                            <button className="flex items-center space-x-2 px-4 py-2 rounded-lg hover:bg-yellow-50 transition-colors flex-1 justify-center">
+                                <MessageCircle />
+                                <span className="text-gray-600 font-medium">Comment</span>
+                            </button>
+                            <button className="flex items-center space-x-2 px-4 py-2 rounded-lg hover:bg-yellow-50 transition-colors flex-1 justify-center">
+                                <Share />
+                                <span className="text-gray-600 font-medium">Kongsi</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            );
+
+            const renderContent = () => {
+                if (showProfile) {
+                    return (
+                        <div className="max-w-4xl mx-auto">
+                            <div className="bg-white rounded-xl shadow-sm border mb-4 overflow-hidden">
+                                <div className="h-64 bg-gradient-to-r from-yellow-400 via-orange-500 to-pink-500 relative">
+                                    <div className="absolute inset-0 bg-black bg-opacity-20"></div>
+                                    <div className="absolute bottom-4 left-4 text-white">
+                                        <h1 className="text-2xl font-bold">我的 JomBro Profile</h1>
+                                        <p className="text-yellow-200">Living life to the fullest in Malaysia! 🇲🇾</p>
+                                    </div>
+                                </div>
+                                
+                                <div className="p-6 relative">
+                                    <div className="absolute -top-16 left-6">
+                                        <img 
+                                            src={user.avatar}
+                                            alt={user.name}
+                                            className="w-32 h-32 rounded-full border-4 border-white shadow-lg object-cover"
+                                        />
+                                    </div>
+                                    
+                                    <div className="ml-40 pt-4">
+                                        <div className="flex items-center justify-between">
+                                            <div>
+                                                <h2 className="text-3xl font-bold text-gray-900">{user.name}</h2>
+                                                <p className="text-gray-600 text-lg">@{user.name.toLowerCase().replace(' ', '_')}_jombro</p>
+                                            </div>
+                                            <div className="flex space-x-3">
+                                                <button className="bg-yellow-500 text-white px-6 py-2 rounded-lg font-medium hover:bg-yellow-600 transition-colors">
+                                                    Edit Profile
+                                                </button>
+                                                <button 
+                                                    onClick={() => setShowProfile(false)}
+                                                    className="bg-gray-200 text-gray-700 px-6 py-2 rounded-lg font-medium hover:bg-gray-300 transition-colors"
+                                                >
+                                                    Back to Feed
+                                                </button>
+                                            </div>
+                                        </div>
+                                        
+                                        <div className="mt-4">
+                                            <p className="text-gray-700 leading-relaxed">
+                                                🌟 Living the Malaysian dream! Love exploring local food, cycling around KL, and spending time with family. 
+                                                Tech geek by day, foodie by night! Always down for a good mamak session with the gang! 
+                                            </p>
+                                        </div>
+                                        
+                                        <div className="flex space-x-8 mt-6 pt-4 border-t border-gray-200">
+                                            <div className="text-center">
+                                                <div className="text-2xl font-bold text-gray-900">1,234</div>
+                                                <div className="text-gray-600">Posts</div>
+                                            </div>
+                                            <div className="text-center">
+                                                <div className="text-2xl font-bold text-gray-900">5,678</div>
+                                                <div className="text-gray-600">Kawan-kawan</div>
+                                            </div>
+                                            <div className="text-center">
+                                                <div className="text-2xl font-bold text-gray-900">890</div>
+                                                <div className="text-gray-600">Following</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    );
+                }
+
+                switch (activeTab) {
+                    case 'home':
+                        return (
+                            <div className="max-w-2xl mx-auto">
+                                {/* Stories */}
+                                <div className="bg-white rounded-xl shadow-sm border p-3 mb-4">
+                                    <div className="flex space-x-3 overflow-x-auto">
+                                        {stories.map(story => (
+                                            <StoryCard key={story.id} story={story} />
+                                        ))}
+                                    </div>
+                                </div>
+
+                                {/* Create Post */}
+                                <div className="bg-white rounded-xl shadow-sm border p-4 mb-4">
+                                    <div className="flex items-center space-x-3 mb-3">
+                                        <img 
+                                            src={user.avatar} 
+                                            alt={user.name}
+                                            className="w-10 h-10 rounded-full object-cover"
+                                        />
+                                        <button 
+                                            onClick={() => setShowPostModal(true)}
+                                            className="flex-1 bg-yellow-600 hover:bg-yellow-700 rounded-full px-6 py-3 text-white font-medium text-left"
+                                        >
+                                            Apa lu fikir, {user.name.split(' ')[0]}? Share lah bro!
+                                        </button>
+                                    </div>
+                                    
+                                    <div className="flex items-center justify-around pt-3 border-t border-gray-200">
+                                        <button className="flex items-center space-x-2 px-4 py-2 rounded-lg hover:bg-yellow-50">
+                                            <Video />
+                                            <span className="text-gray-600 font-medium text-sm">Live show</span>
+                                        </button>
+                                        <button className="flex items-center space-x-2 px-4 py-2 rounded-lg hover:bg-yellow-50">
+                                            <Camera />
+                                            <span className="text-gray-600 font-medium text-sm">Sure real</span>
+                                        </button>
+                                        <button className="flex items-center space-x-2 px-4 py-2 rounded-lg hover:bg-yellow-50">
+                                            <Smile />
+                                            <span className="text-gray-600 font-medium text-sm">Live pict</span>
+                                        </button>
+                                    </div>
+                                </div>
+
+                                {/* Posts Feed */}
+                                {posts.map(post => (
+                                    <PostCard key={post.id} post={post} />
+                                ))}
+                            </div>
+                        );
+
+                    case 'friends':
+                        return (
+                            <div className="max-w-2xl mx-auto">
+                                <div className="bg-white rounded-xl shadow-sm border p-8 text-center">
+                                    <Users />
+                                    <h2 className="text-2xl font-bold text-gray-900 mb-2 mt-4">Kawan-kawan</h2>
+                                    <p className="text-gray-600">Cari dan connect dengan member baru!</p>
+                                </div>
+                            </div>
+                        );
+
+                    case 'messenger':
+                        return (
+                            <div className="max-w-2xl mx-auto">
+                                <div className="bg-white rounded-xl shadow-sm border p-8 text-center">
+                                    <MessageSquare />
+                                    <h2 className="text-2xl font-bold text-gray-900 mb-2 mt-4">Chat Bro</h2>
+                                    <p className="text-gray-600">Borak dengan kawan dan family</p>
+                                </div>
+                            </div>
+                        );
+
+                    default:
+                        return <div>Select a tab</div>;
+                }
+            };
+
+            return (
+                <div className="min-h-screen bg-gray-100">
+                    {/* Header */}
+                    <div className="bg-white shadow-sm border-b border-gray-200 sticky top-0 z-50">
+                        <div className="max-w-6xl mx-auto px-4 py-2">
+                            <div className="flex items-center justify-between">
+                                <div className="flex items-center space-x-4">
+                                    <div className="flex items-center space-x-2">
+                                        <h1 className="text-2xl font-bold text-yellow-600">JomBro</h1>
+                                        <span className="hidden sm:inline text-sm text-gray-600 italic">"bro kang tau Lai liau!"</span>
+                                    </div>
+                                    <div className="relative hidden md:block">
+                                        <Search />
+                                        <input
+                                            type="text"
+                                            placeholder="Search JomBro"
+                                            className="bg-yellow-50 border border-yellow-200 rounded-full pl-10 pr-4 py-2 w-64 focus:outline-none focus:ring-2 focus:ring-yellow-500"
+                                        />
+                                    </div>
+                                </div>
+
+                                <div className="hidden md:flex items-center space-x-8">
+                                    <button
+                                        onClick={() => setActiveTab('home')}
+                                        className={`p-3 rounded-lg transition-colors ${
+                                            activeTab === 'home' 
+                                                ? 'text-yellow-600 bg-yellow-50' 
+                                                : 'text-gray-600 hover:bg-yellow-50'
+                                        }`}
+                                    >
+                                        <Home />
+                                    </button>
+                                    <button
+                                        onClick={() => setActiveTab('friends')}
+                                        className={`p-3 rounded-lg transition-colors ${
+                                            activeTab === 'friends' 
+                                                ? 'text-yellow-600 bg-yellow-50' 
+                                                : 'text-gray-600 hover:bg-yellow-50'
+                                        }`}
+                                    >
+                                        <Users />
+                                    </button>
+                                    <button
+                                        onClick={() => setActiveTab('messenger')}
+                                        className={`p-3 rounded-lg transition-colors ${
+                                            activeTab === 'messenger' 
+                                                ? 'text-yellow-600 bg-yellow-50' 
+                                                : 'text-gray-600 hover:bg-yellow-50'
+                                        }`}
+                                    >
+                                        <MessageSquare />
+                                    </button>
+                                </div>
+
+                                <div className="flex items-center space-x-2">
+                                    <button className="p-2 text-gray-600 hover:bg-yellow-50 rounded-full">
+                                        <Bell />
+                                    </button>
+                                    <button className="p-2 text-gray-600 hover:bg-yellow-50 rounded-full">
+                                        <Menu />
+                                    </button>
+                                    <img 
+                                        src={user.avatar} 
+                                        alt={user.name}
+                                        className="w-8 h-8 rounded-full object-cover cursor-pointer"
+                                        onClick={() => setShowProfile(!showProfile)}
+                                    />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Main Content */}
+                    <div className="max-w-6xl mx-auto px-4 py-6">
+                        {renderContent()}
+                    </div>
+
+                    {/* Mobile Navigation */}
+                    <div className="md:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200">
+                        <div className="flex items-center justify-around py-2">
+                            <button
+                                onClick={() => setActiveTab('home')}
+                                className={`p-3 ${activeTab === 'home' ? 'text-yellow-600' : 'text-gray-600'}`}
+                            >
+                                <Home />
+                            </button>
+                            <button
+                                onClick={() => setActiveTab('friends')}
+                                className={`p-3 ${activeTab === 'friends' ? 'text-yellow-600' : 'text-gray-600'}`}
+                            >
+                                <Users />
+                            </button>
+                            <button
+                                onClick={() => setActiveTab('messenger')}
+                                className={`p-3 ${activeTab === 'messenger' ? 'text-yellow-600' : 'text-gray-600'}`}
+                            >
+                                <MessageSquare />
+                            </button>
+                            <button className="p-3 text-gray-600">
+                                <Bell />
+                            </button>
+                            <button className="p-3 text-gray-600">
+                                <Menu />
+                            </button>
+                        </div>
+                    </div>
+
+                    {/* Create Post Modal */}
+                    {showPostModal && (
+                        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+                            <div className="bg-white rounded-xl w-full max-w-lg">
+                                <div className="p-4 border-b border-gray-200">
+                                    <div className="flex items-center justify-between">
+                                        <h2 className="text-lg font-semibold">Buat Post Baru</h2>
+                                        <button 
+                                            onClick={() => setShowPostModal(false)}
+                                            className="text-gray-500 hover:text-gray-700 text-2xl"
+                                        >
+                                            ×
+                                        </button>
+                                    </div>
+                                </div>
+                                <div className="p-4">
+                                    <div className="flex items-center space-x-3 mb-4">
+                                        <img 
+                                            src={user.avatar} 
+                                            alt={user.name}
+                                            className="w-10 h-10 rounded-full object-cover"
+                                        />
+                                        <div>
+                                            <h3 className="font-medium">{user.name}</h3>
+                                            <div className="flex items-center space-x-1 text-sm text-gray-600">
+                                                <Globe />
+                                                <span>Public</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <textarea
+                                        value={newPost}
+                                        onChange={(e) => setNewPost(e.target.value)}
+                                        placeholder={`Apa lu fikir sekarang, ${user.name.split(' ')[0]}? Share lah!`}
+                                        className="w-full p-3 border border-yellow-300 rounded-lg resize-none focus:outline-none focus:ring-2 focus:ring-yellow-500 mb-4"
+                                        rows="4"
+                                    />
+                                    
+                                    <div className="flex justify-end space-x-2">
+                                        <button 
+                                            onClick={() => setShowPostModal(false)}
+                                            className="px-4 py-2 text-gray-600 hover:bg-yellow-50 rounded-lg"
+                                        >
+                                            Cancel
+                                        </button>
+                                        <button 
+                                            onClick={handleCreatePost}
+                                            disabled={!newPost.trim()}
+                                            className="px-6 py-2 bg-yellow-500 text-white rounded-lg hover:bg-yellow-600 font-medium disabled:bg-gray-300 disabled:cursor-not-allowed"
+                                        >
+                                            Post Lah!
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    )}
+                </div>
+            );
+        };
+
+        // Render the app
+        ReactDOM.render(React.createElement(JomBroApp), document.getElementById('root'));
     </script>
 </body>
 </html>
