@@ -1,388 +1,398 @@
-json{
-  "name": "jombro-app",
-  "version": "1.0.0",
-  "description": "JomBro - Revolutionary Social Platform for Malaysia",
-  "private": true,
-  "homepage": ".",
-  "dependencies": {
-    "@testing-library/jest-dom": "^5.16.4",
-    "@testing-library/react": "^13.3.0",
-    "@testing-library/user-event": "^13.5.0",
-    "lucide-react": "^0.263.1",
-    "react": "^18.2.0",
-    "react-dom": "^18.2.0",
-    "react-scripts": "5.0.1",
-    "web-vitals": "^2.1.4"
-  },
-  "scripts": {
-    "start": "react-scripts start",
-    "build": "react-scripts build",
-    "test": "react-scripts test",
-    "eject": "react-scripts eject"
-  },
-  "eslintConfig": {
-    "extends": [
-      "react-app",
-      "react-app/jest"
-    ]
-  },
-  "browserslist": {
-    "production": [
-      ">0.2%",
-      "not dead",
-      "not op_mini all"
-    ],
-    "development": [
-      "last 1 chrome version",
-      "last 1 firefox version",
-      "last 1 safari version"
-    ]
-  },
-  "keywords": [
-    "social media",
-    "malaysia",
-    "challenges",
-    "community",
-    "points system"
-  ],
-  "author": "JomBro Team",
-  "license": "MIT"
-}
-2. public/index.html
-html<!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charset="utf-8" />
-    <link rel="icon" href="%PUBLIC_URL%/favicon.ico" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="theme-color" content="#EAB308" />
-    <meta name="description" content="JomBro - Revolutionary social platform for Malaysia. Earn points through real-world challenges and community engagement!" />
-    <meta name="keywords" content="social media, malaysia, challenges, community, points, jombro" />
-    
-    <!-- Open Graph / Facebook -->
-    <meta property="og:type" content="website">
-    <meta property="og:url" content="https://jombro.app/">
-    <meta property="og:title" content="JomBro - Revolutionary Social Platform">
-    <meta property="og:description" content="Join 1000+ Malaysians earning points through real-world challenges and community engagement!">
-    <meta property="og:image" content="%PUBLIC_URL%/og-image.jpg">
+import React, { useState, useEffect } from 'react';
 
-    <!-- Twitter -->
-    <meta property="twitter:card" content="summary_large_image">
-    <meta property="twitter:url" content="https://jombro.app/">
-    <meta property="twitter:title" content="JomBro - Revolutionary Social Platform">
-    <meta property="twitter:description" content="Join 1000+ Malaysians earning points through real-world challenges and community engagement!">
-    <meta property="twitter:image" content="%PUBLIC_URL%/og-image.jpg">
+// Sample user data with Malaysian names and realistic engagement
+const initialUsers = [
+  { id: 1, name: 'Ahmad Rahman', username: 'ahmad_r', points: 850, status: 'Makan nasi lemak sambil tengok Netflix!', location: 'KL', joinedDays: 45 },
+  { id: 2, name: 'Siti Nurhaliza', username: 'siti_singer', points: 920, status: 'Jom karaoke petang ni! Who\'s in?', location: 'Selangor', joinedDays: 32 },
+  { id: 3, name: 'Raj Kumar', username: 'raj_tech', points: 760, status: 'Coding sambil minum teh tarik. Perfect combination!', location: 'Cyberjaya', joinedDays: 28 },
+  { id: 4, name: 'Lim Wei Ming', username: 'wei_ming', points: 690, status: 'Baru lepas gym, siapa nak join futsal?', location: 'Penang', joinedDays: 55 },
+  { id: 5, name: 'Fatimah Zahra', username: 'fatimah_z', points: 830, status: 'Shopping spree di Mid Valley! Girls, jom!', location: 'KL', joinedDays: 38 },
+  { id: 6, name: 'David Tan', username: 'david_foodie', points: 715, status: 'Found the best cendol in Melaka! Must try!', location: 'Melaka', joinedDays: 42 },
+  { id: 7, name: 'Nurul Ain', username: 'nurul_photographer', points: 885, status: 'Sunrise photography session di KLCC. Cantik gila!', location: 'KL', joinedDays: 25 },
+  { id: 8, name: 'Jackson Lee', username: 'jackson_gamer', points: 945, status: 'New high score! Who can beat 2500 points?', location: 'JB', joinedDays: 67 },
+  { id: 9, name: 'Aisha Mohamed', username: 'aisha_travel', points: 775, status: 'Planning trip to Langkawi. Any recommendations?', location: 'Shah Alam', joinedDays: 33 },
+  { id: 10, name: 'Chen Wei', username: 'chen_chef', points: 820, status: 'Homemade dim sum for dinner. Recipe in comments!', location: 'Ipoh', joinedDays: 29 }
+];
 
-    <link rel="apple-touch-icon" href="%PUBLIC_URL%/logo192.png" />
-    <link rel="manifest" href="%PUBLIC_URL%/manifest.json" />
-    
-    <!-- Tailwind CSS CDN -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    
-    <title>JomBro - Revolutionary Social Platform for Malaysia</title>
-  </head>
-  <body>
-    <noscript>You need to enable JavaScript to run this app.</noscript>
-    <div id="root"></div>
-  </body>
-</html>
-3. public/manifest.json
-json{
-  "short_name": "JomBro",
-  "name": "JomBro - Revolutionary Social Platform",
-  "icons": [
-    {
-      "src": "favicon.ico",
-      "sizes": "64x64 32x32 24x24 16x16",
-      "type": "image/x-icon"
-    },
-    {
-      "src": "logo192.png",
-      "type": "image/png",
-      "sizes": "192x192"
-    },
-    {
-      "src": "logo512.png",
-      "type": "image/png",
-      "sizes": "512x512"
+// Challenge data
+const challenges = [
+  { id: 1, title: 'Share Your Breakfast', points: 50, participants: 234, timeLeft: '2h 15m' },
+  { id: 2, title: 'Weekend Adventure Photo', points: 100, participants: 156, timeLeft: '1d 8h' },
+  { id: 3, title: 'Recommend Local Food', points: 75, participants: 89, timeLeft: '5h 30m' },
+  { id: 4, title: 'Workout Video Challenge', points: 125, participants: 67, timeLeft: '3d 12h' },
+  { id: 5, title: 'Pet Photo Contest', points: 80, participants: 203, timeLeft: '18h 45m' }
+];
+
+function App() {
+  const [currentUser, setCurrentUser] = useState({ 
+    name: 'You', 
+    username: 'new_user', 
+    points: 100, 
+    joinedToday: true 
+  });
+  const [users, setUsers] = useState(initialUsers);
+  const [activeTab, setActiveTab] = useState('feed');
+  const [newPost, setNewPost] = useState('');
+  const [posts, setPosts] = useState([]);
+  const [showPointsShop, setShowPointsShop] = useState(false);
+
+  // Simulate real-time activity
+  useEffect(() => {
+    const interval = setInterval(() => {
+      // Random user activity simulation
+      const randomUser = users[Math.floor(Math.random() * users.length)];
+      const activities = [
+        'just joined a challenge!',
+        'shared a new photo',
+        'earned 25 points!',
+        'completed a challenge',
+        'liked your post'
+      ];
+      const randomActivity = activities[Math.floor(Math.random() * activities.length)];
+      
+      // Update points randomly for simulation
+      setUsers(prevUsers => 
+        prevUsers.map(user => 
+          user.id === randomUser.id 
+            ? { ...user, points: user.points + Math.floor(Math.random() * 20) }
+            : user
+        )
+      );
+    }, 8000);
+
+    return () => clearInterval(interval);
+  }, [users]);
+
+  // Generate sample posts
+  useEffect(() => {
+    const samplePosts = [
+      { id: 1, user: users[0], content: 'Morning vibes with the best nasi lemak in town! 🇲🇾', likes: 23, comments: 5, time: '2h ago' },
+      { id: 2, user: users[1], content: 'Karaoke session was epic! Thanks to everyone who joined 🎤', likes: 34, comments: 12, time: '4h ago' },
+      { id: 3, user: users[2], content: 'Just deployed my new app! Malaysia boleh! 💻🚀', likes: 41, comments: 8, time: '6h ago' },
+      { id: 4, user: users[3], content: 'Futsal game tomorrow 7PM. Still got slots! ⚽', likes: 18, comments: 15, time: '1d ago' },
+      { id: 5, user: users[4], content: 'Found the cutest accessories at Mid Valley! 💅✨', likes: 28, comments: 7, time: '1d ago' }
+    ];
+    setPosts(samplePosts);
+  }, [users]);
+
+  const pointsPackages = [
+    { points: 100, price: 'RM 5', popular: false },
+    { points: 250, price: 'RM 10', popular: false },
+    { points: 500, price: 'RM 18', popular: true, savings: 'Save RM2!' },
+    { points: 1000, price: 'RM 35', popular: false, savings: 'Save RM5!' },
+    { points: 2500, price: 'RM 80', popular: false, savings: 'Save RM15!' },
+    { points: 5000, price: 'RM 150', popular: false, savings: 'Save RM30!' }
+  ];
+
+  const handlePost = () => {
+    if (newPost.trim()) {
+      const post = {
+        id: Date.now(),
+        user: currentUser,
+        content: newPost,
+        likes: 0,
+        comments: 0,
+        time: 'now'
+      };
+      setPosts([post, ...posts]);
+      setNewPost('');
+      setCurrentUser(prev => ({ ...prev, points: prev.points + 25 }));
     }
-  ],
-  "start_url": ".",
-  "display": "standalone",
-  "theme_color": "#EAB308",
-  "background_color": "#ffffff",
-  "description": "Revolutionary social platform for Malaysia with real-world challenges and community engagement"
+  };
+
+  const joinChallenge = (challengeId) => {
+    setCurrentUser(prev => ({ ...prev, points: prev.points + 10 }));
+    alert('Challenge joined! You earned 10 bonus points! 🎉');
+  };
+
+  const buyPoints = (package_) => {
+    alert(`Redirecting to payment for ${package_.points} points at ${package_.price}...`);
+  };
+
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-purple-50 to-pink-50">
+      {/* Header */}
+      <header className="bg-white shadow-lg border-b-4 border-gradient-to-r from-purple-500 to-pink-500">
+        <div className="max-w-6xl mx-auto px-4 py-4">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-3">
+              <div className="w-10 h-10 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full flex items-center justify-center">
+                <span className="text-white font-bold text-xl">J</span>
+              </div>
+              <div>
+                <h1 className="text-2xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
+                  JomBro
+                </h1>
+                <p className="text-sm text-gray-500">Malaysia's Social Revolution</p>
+              </div>
+            </div>
+            
+            <div className="flex items-center space-x-4">
+              <div className="text-right">
+                <p className="font-semibold text-gray-800">{currentUser.name}</p>
+                <p className="text-sm text-purple-600 font-bold">{currentUser.points} points</p>
+              </div>
+              <button 
+                onClick={() => setShowPointsShop(!showPointsShop)}
+                className="bg-gradient-to-r from-purple-500 to-pink-500 text-white px-4 py-2 rounded-full hover:shadow-lg transition-all duration-300 font-semibold"
+              >
+                Buy Points
+              </button>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      {/* Points Shop Modal */}
+      {showPointsShop && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
+          <div className="bg-white rounded-2xl max-w-4xl w-full max-h-[90vh] overflow-y-auto">
+            <div className="p-6">
+              <div className="flex justify-between items-center mb-6">
+                <h2 className="text-3xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
+                  🛍️ Points Shop
+                </h2>
+                <button 
+                  onClick={() => setShowPointsShop(false)}
+                  className="text-gray-500 hover:text-gray-700 text-2xl"
+                >
+                  ×
+                </button>
+              </div>
+              
+              <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
+                {pointsPackages.map((pkg, index) => (
+                  <div key={index} className={`border-2 rounded-xl p-4 transition-all duration-300 hover:scale-105 ${
+                    pkg.popular ? 'border-purple-500 bg-purple-50' : 'border-gray-200 hover:border-purple-300'
+                  }`}>
+                    {pkg.popular && (
+                      <div className="bg-gradient-to-r from-purple-500 to-pink-500 text-white text-xs px-3 py-1 rounded-full inline-block mb-2">
+                        MOST POPULAR
+                      </div>
+                    )}
+                    <div className="text-center">
+                      <div className="text-3xl font-bold text-purple-600 mb-2">{pkg.points}</div>
+                      <div className="text-gray-500 mb-1">points</div>
+                      <div className="text-2xl font-bold text-gray-800 mb-2">{pkg.price}</div>
+                      {pkg.savings && (
+                        <div className="text-green-600 text-sm font-semibold mb-3">{pkg.savings}</div>
+                      )}
+                      <button 
+                        onClick={() => buyPoints(pkg)}
+                        className="w-full bg-gradient-to-r from-purple-500 to-pink-500 text-white py-2 rounded-lg hover:shadow-lg transition-all duration-300"
+                      >
+                        Purchase
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+              
+              <div className="bg-gradient-to-r from-purple-100 to-pink-100 rounded-xl p-4">
+                <h3 className="font-bold text-gray-800 mb-2">🎁 Special Offers:</h3>
+                <ul className="text-sm text-gray-600 space-y-1">
+                  <li>• New users get 100 bonus points!</li>
+                  <li>• Complete daily challenges for free points</li>
+                  <li>• Refer friends and earn 50 points each</li>
+                  <li>• Weekend double points on all purchases</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      <div className="max-w-6xl mx-auto px-4 py-6">
+        <div className="grid lg:grid-cols-4 gap-6">
+          {/* Sidebar */}
+          <div className="lg:col-span-1">
+            <div className="bg-white rounded-2xl shadow-lg p-6 mb-6">
+              <h3 className="font-bold text-gray-800 mb-4">🎯 Active Challenges</h3>
+              <div className="space-y-3">
+                {challenges.slice(0, 3).map(challenge => (
+                  <div key={challenge.id} className="border border-gray-200 rounded-lg p-3 hover:shadow-md transition-shadow">
+                    <div className="flex justify-between items-start mb-2">
+                      <h4 className="font-semibold text-sm text-gray-800">{challenge.title}</h4>
+                      <span className="text-purple-600 font-bold text-sm">{challenge.points}pts</span>
+                    </div>
+                    <div className="flex justify-between items-center">
+                      <span className="text-xs text-gray-500">{challenge.participants} joined</span>
+                      <span className="text-xs text-orange-500 font-semibold">{challenge.timeLeft}</span>
+                    </div>
+                    <button 
+                      onClick={() => joinChallenge(challenge.id)}
+                      className="w-full mt-2 bg-gradient-to-r from-purple-500 to-pink-500 text-white py-1 rounded-md text-sm hover:shadow-md transition-all"
+                    >
+                      Join Now
+                    </button>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Active Users */}
+            <div className="bg-white rounded-2xl shadow-lg p-6">
+              <h3 className="font-bold text-gray-800 mb-4">🔥 Top Users</h3>
+              <div className="space-y-3">
+                {users.slice(0, 5).sort((a, b) => b.points - a.points).map((user, index) => (
+                  <div key={user.id} className="flex items-center space-x-3">
+                    <div className={`w-8 h-8 rounded-full flex items-center justify-center text-white text-sm font-bold ${
+                      index === 0 ? 'bg-yellow-500' : index === 1 ? 'bg-gray-400' : index === 2 ? 'bg-orange-500' : 'bg-purple-500'
+                    }`}>
+                      {index + 1}
+                    </div>
+                    <div className="flex-1">
+                      <p className="font-semibold text-sm text-gray-800">{user.name}</p>
+                      <p className="text-xs text-purple-600 font-bold">{user.points} points</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          {/* Main Feed */}
+          <div className="lg:col-span-2">
+            {/* Create Post */}
+            <div className="bg-white rounded-2xl shadow-lg p-6 mb-6">
+              <h3 className="font-bold text-gray-800 mb-4">📝 What's happening, bro?</h3>
+              <div className="space-y-4">
+                <textarea
+                  value={newPost}
+                  onChange={(e) => setNewPost(e.target.value)}
+                  className="w-full p-4 border border-gray-200 rounded-xl resize-none focus:outline-none focus:ring-2 focus:ring-purple-500"
+                  rows="3"
+                  placeholder="Share something awesome with the community..."
+                />
+                <div className="flex justify-between items-center">
+                  <span className="text-sm text-gray-500">💎 Earn 25 points per post!</span>
+                  <button 
+                    onClick={handlePost}
+                    disabled={!newPost.trim()}
+                    className="bg-gradient-to-r from-purple-500 to-pink-500 text-white px-6 py-2 rounded-full hover:shadow-lg transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    Post & Earn
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            {/* Posts Feed */}
+            <div className="space-y-4">
+              {posts.map(post => (
+                <div key={post.id} className="bg-white rounded-2xl shadow-lg p-6 hover:shadow-xl transition-shadow">
+                  <div className="flex items-start space-x-3 mb-4">
+                    <div className="w-12 h-12 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full flex items-center justify-center">
+                      <span className="text-white font-bold">
+                        {post.user.name.charAt(0)}
+                      </span>
+                    </div>
+                    <div className="flex-1">
+                      <div className="flex items-center space-x-2">
+                        <h4 className="font-bold text-gray-800">{post.user.name}</h4>
+                        <span className="text-gray-500 text-sm">@{post.user.username}</span>
+                        <span className="text-gray-400 text-sm">•</span>
+                        <span className="text-gray-400 text-sm">{post.time}</span>
+                      </div>
+                      <p className="text-purple-600 text-sm font-semibold">{post.user.points} points</p>
+                    </div>
+                  </div>
+                  
+                  <p className="text-gray-800 mb-4 leading-relaxed">{post.content}</p>
+                  
+                  <div className="flex items-center space-x-6 text-gray-500">
+                    <button className="flex items-center space-x-2 hover:text-red-500 transition-colors">
+                      <span>❤️</span>
+                      <span className="text-sm">{post.likes}</span>
+                    </button>
+                    <button className="flex items-center space-x-2 hover:text-blue-500 transition-colors">
+                      <span>💬</span>
+                      <span className="text-sm">{post.comments}</span>
+                    </button>
+                    <button className="flex items-center space-x-2 hover:text-green-500 transition-colors">
+                      <span>🔄</span>
+                      <span className="text-sm">Share</span>
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Right Sidebar */}
+          <div className="lg:col-span-1">
+            {/* Stats */}
+            <div className="bg-white rounded-2xl shadow-lg p-6 mb-6">
+              <h3 className="font-bold text-gray-800 mb-4">📊 Community Stats</h3>
+              <div className="space-y-4">
+                <div className="text-center">
+                  <div className="text-3xl font-bold text-purple-600">1,247</div>
+                  <div className="text-sm text-gray-500">Active Users</div>
+                </div>
+                <div className="text-center">
+                  <div className="text-3xl font-bold text-pink-600">8,392</div>
+                  <div className="text-sm text-gray-500">Posts Today</div>
+                </div>
+                <div className="text-center">
+                  <div className="text-3xl font-bold text-orange-500">156</div>
+                  <div className="text-sm text-gray-500">Challenges Active</div>
+                </div>
+              </div>
+            </div>
+
+            {/* Recent Activity */}
+            <div className="bg-white rounded-2xl shadow-lg p-6">
+              <h3 className="font-bold text-gray-800 mb-4">⚡ Live Activity</h3>
+              <div className="space-y-3">
+                {users.slice(0, 6).map((user, index) => (
+                  <div key={`${user.id}-${index}`} className="flex items-center space-x-2 text-sm">
+                    <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+                    <span className="font-semibold text-gray-700">{user.name}</span>
+                    <span className="text-gray-500">earned points</span>
+                  </div>
+                ))}
+              </div>
+              <div className="mt-4 p-3 bg-gradient-to-r from-purple-100 to-pink-100 rounded-lg">
+                <p className="text-sm font-semibold text-gray-800">🎉 Join the action!</p>
+                <p className="text-xs text-gray-600">Be part of Malaysia's most active social community</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Footer */}
+      <footer className="bg-gray-800 text-white py-8 mt-12">
+        <div className="max-w-6xl mx-auto px-4">
+          <div className="grid md:grid-cols-3 gap-8">
+            <div>
+              <h3 className="font-bold text-xl mb-4">JomBro</h3>
+              <p className="text-gray-300">Malaysia's revolutionary social platform connecting communities through challenges and rewards.</p>
+            </div>
+            <div>
+              <h4 className="font-semibold mb-4">Features</h4>
+              <ul className="space-y-2 text-gray-300">
+                <li>• Daily Challenges</li>
+                <li>• Points Rewards</li>
+                <li>• Community Feed</li>
+                <li>• Local Connections</li>
+              </ul>
+            </div>
+            <div>
+              <h4 className="font-semibold mb-4">Get Started</h4>
+              <p className="text-gray-300 mb-4">Join thousands of Malaysians already using JomBro!</p>
+              <button className="bg-gradient-to-r from-purple-500 to-pink-500 text-white px-6 py-2 rounded-full hover:shadow-lg transition-all">
+                Download App
+              </button>
+            </div>
+          </div>
+          <div className="border-t border-gray-700 mt-8 pt-8 text-center text-gray-400">
+            <p>&copy; 2025 JomBro. Made with ❤️ in Malaysia</p>
+          </div>
+        </div>
+      </footer>
+    </div>
+  );
 }
-4. src/index.js
-javascriptimport React from 'react';
-import ReactDOM from 'react-dom/client';
-import './index.css';
-import App from './App';
 
-const root = ReactDOM.createRoot(document.getElementById('root'));
-root.render(
-  <React.StrictMode>
-    <App />
-  </React.StrictMode>
-);
-5. src/index.css
-css@tailwind base;
-@tailwind components;
-@tailwind utilities;
-
-body {
-  margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
-    sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  background-color: #f3f4f6;
-}
-
-code {
-  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
-    monospace;
-}
-
-/* Custom scrollbar */
-::-webkit-scrollbar {
-  width: 6px;
-}
-
-::-webkit-scrollbar-track {
-  background: #f1f1f1;
-}
-
-::-webkit-scrollbar-thumb {
-  background: #EAB308;
-  border-radius: 3px;
-}
-
-::-webkit-scrollbar-thumb:hover {
-  background: #D97706;
-}
-
-/* Smooth animations */
-* {
-  transition: all 0.2s ease-in-out;
-}
-
-/* Focus styles */
-button:focus {
-  outline: 2px solid #EAB308;
-  outline-offset: 2px;
-}
-
-input:focus {
-  outline: 2px solid #EAB308;
-  outline-offset: 2px;
-}
-
-/* Loading animation */
-@keyframes pulse {
-  0%, 100% {
-    opacity: 1;
-  }
-  50% {
-    opacity: .5;
-  }
-}
-
-.animate-pulse {
-  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
-}
-
-/* Responsive design helpers */
-@media (max-width: 768px) {
-  .mobile-hidden {
-    display: none;
-  }
-}
-
-/* Custom utility classes */
-.gradient-text {
-  background: linear-gradient(45deg, #EAB308, #F59E0B);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-}
-
-.shadow-glow {
-  box-shadow: 0 0 20px rgba(234, 179, 8, 0.3);
-}
-6. src/App.css
-css.App {
-  min-height: 100vh;
-  background-color: #f3f4f6;
-}
-
-/* JomBro specific styles */
-.jombro-header {
-  background: linear-gradient(135deg, #ffffff 0%, #fef3c7 100%);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-}
-
-.jombro-card {
-  background: white;
-  border: 2px solid #d1d5db;
-  border-radius: 12px;
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-  transition: all 0.3s ease;
-}
-
-.jombro-card:hover {
-  border-color: #EAB308;
-  transform: translateY(-2px);
-  box-shadow: 0 8px 15px -3px rgba(0, 0, 0, 0.1);
-}
-
-.jombro-button {
-  background: linear-gradient(135deg, #EAB308 0%, #F59E0B 100%);
-  border: none;
-  border-radius: 8px;
-  color: white;
-  font-weight: 600;
-  padding: 12px 24px;
-  transition: all 0.3s ease;
-  cursor: pointer;
-}
-
-.jombro-button:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(234, 179, 8, 0.4);
-}
-
-.jombro-button:active {
-  transform: translateY(0px);
-}
-
-/* Points animation */
-@keyframes pointsGlow {
-  0%, 100% {
-    text-shadow: 0 0 5px rgba(234, 179, 8, 0.5);
-  }
-  50% {
-    text-shadow: 0 0 20px rgba(234, 179, 8, 0.8);
-  }
-}
-
-.points-glow {
-  animation: pointsGlow 2s ease-in-out infinite;
-}
-
-/* Story card animations */
-.story-card {
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
-}
-
-.story-card:hover {
-  transform: scale(1.05);
-  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
-}
-
-/* Mobile optimizations */
-@media (max-width: 640px) {
-  .mobile-padding {
-    padding: 8px;
-  }
-  
-  .mobile-text-sm {
-    font-size: 14px;
-  }
-}
-
-/* Loading states */
-.skeleton {
-  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
-  background-size: 200% 100%;
-  animation: loading 1.5s infinite;
-}
-
-@keyframes loading {
-  0% {
-    background-position: 200% 0;
-  }
-  100% {
-    background-position: -200% 0;
-  }
-}
-
-/* Challenge completion animation */
-@keyframes celebration {
-  0% { transform: scale(1); }
-  50% { transform: scale(1.1); }
-  100% { transform: scale(1); }
-}
-
-.celebrate {
-  animation: celebration 0.6s ease-in-out;
-}
-7. README.md
-markdown# 🚀 JomBro - Revolutionary Social Platform
-
-**The future of social media for Malaysia! 🇲🇾**
-
-## 🌟 What is JomBro?
-
-JomBro is a revolutionary social platform that combines real-world challenges with social media engagement. Users earn points by completing action-based challenges, helping their community, and engaging with friends in meaningful ways.
-
-### ✨ Key Features
-
-- **1000+ Active Community Members** with diverse Malaysian profiles
-- **Action Challenge System** with AI verification
-- **Points Economy** - Earn and spend points for real value
-- **Business Communication Tools** for professional networking  
-- **Real-World Engagement** vs passive social media consumption
-- **Malaysian Cultural Context** with authentic local humor and references
-
-## 🎯 Unique Selling Points
-
-### vs Traditional Social Media:
-- **Active participation** instead of passive scrolling
-- **Real-world impact** through community service challenges
-- **Meaningful rewards** that translate to actual value
-- **Community building** focused on positive actions
-
-### Revolutionary Features:
-- **AI-Powered Verification** of challenge completions
-- **Points Purchase System** (RM5-100 packages)
-- **Tiered Signup Bonuses** (5,000-50,000 points)
-- **Challenge Categories**: Social, Entertainment, Community Service, Cultural
-- **Live Activity Feed** showing real-time community engagement
-
-## 🚀 Getting Started
-
-### Prerequisites
-- Node.js 16+ installed
-- Git installed
-- Modern web browser
-
-### Installation
-
-```bash
-# Clone the repository
-git clone https://github.com/yourusername/jombro-app.git
-cd jombro-app
-
-# Install dependencies
-npm install
-
-# Start development server
-npm start
-
-# Build for production
-npm run build
-🌍 Deployment
-Quick Deploy Options:
-Netlify (Recommended)
-bash# Build and deploy
-npm run build
-npx netlify-cli deploy --prod --dir=build
-Vercel
-bashnpx vercel --prod
-GitHub Pages
-bashnpm install --save-dev gh-pages
-npm run build
-npx gh-pages -d build
+export default App;
