@@ -1,446 +1,76 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
+<head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="theme-color" content="#EAB308" />
-    <meta name="description" content="JomBro - Malaysian Social Media Platform" />
     <title>JomBro - "bro kang tau Lai liau!"</title>
-    
-    <!-- Load external libraries -->
-    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
-    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
-    <script src="https://unpkg.com/lucide-react@0.263.1/dist/umd/lucide-react.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
-    
     <style>
-      body {
-        margin: 0;
-        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-          'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
-        -webkit-font-smoothing: antialiased;
-        -moz-osx-font-smoothing: grayscale;
-        background-color: #f3f4f6;
-      }
-      
-      .loading {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        height: 100vh;
-        font-size: 1.2rem;
-        color: #EAB308;
-      }
+        body { margin: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; }
     </style>
-  </head>
-  
-  <body>
-    <noscript>You need to enable JavaScript to run this app.</noscript>
-    <div id="root">
-      <div class="loading">
-        <div>Loading JomBro... 🚀</div>
-      </div>
-    </div>
-    
+</head>
+<body>
+    <div id="root"></div>
     <script type="text/babel">
-      const { useState, useEffect } = React;
-      const { 
-        Home, Users, MessageSquare, Bell, Menu, Search, Plus, Globe, Lock, 
-        Users2, MoreHorizontal, ThumbsUp, MessageCircle, Share, Video, 
-        Camera, Smile, Heart 
-      } = lucide;
+        const App = () => {
+            const [posts, setPosts] = React.useState([
+                {
+                    id: 1,
+                    user: { name: '不想早起的大罗', avatar: 'https://images.unsplash.com/photo-1494790108755-2616b612b469?w=100&h=100&fit=crop&crop=face' },
+                    time: '1 jam lepas',
+                    content: 'Wah today cycle around Putrajaya! 🚴‍♀️ Weather cantik gila! #CyclingLife',
+                    image: 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=600&h=400&fit=crop',
+                    likes: 68
+                }
+            ]);
 
-      const JomBroApp = () => {
-        const [activeTab, setActiveTab] = useState('home');
-        const [showPostModal, setShowPostModal] = useState(false);
-        const [newPost, setNewPost] = useState('');
-        const [posts, setPosts] = useState([
-          {
-            id: 1,
-            user: {
-              name: '不想早起的大罗',
-              avatar: 'https://images.unsplash.com/photo-1494790108755-2616b612b469?w=100&h=100&fit=crop&crop=face',
-              verified: true
-            },
-            time: '1 jam lepas',
-            content: 'Wah today cycle around Putrajaya! 🚴‍♀️ Weather cantik gila, perfect for outdoor activities. Siapa-siapa nak join next time? 💪 #CyclingLife #Putrajaya',
-            image: 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=600&h=400&fit=crop',
-            likes: 68,
-            comments: 12,
-            shares: 4,
-            privacy: 'public'
-          },
-          {
-            id: 2,
-            user: {
-              name: 'Ahmad Fitness Studio',
-              avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&h=100&fit=crop&crop=face',
-              verified: false
-            },
-            time: '3 jam lepas',
-            content: 'Baru renovate studio kami! 💇‍♀️ Modern minimalist design dengan equipment terbaru. STUDIO DAMDA - Your beauty destination! Book appointment sekarang! ✨',
-            image: 'https://images.unsplash.com/photo-1560066984-138dadb4c035?w=600&h=400&fit=crop',
-            likes: 234,
-            comments: 34,
-            shares: 18,
-            privacy: 'public'
-          },
-          {
-            id: 3,
-            user: {
-              name: 'Shopping Mall KL',
-              avatar: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=100&h=100&fit=crop&crop=face',
-              verified: true
-            },
-            time: '5 jam lepas',
-            content: 'Family day out at the mall! 🛒 Ada banyak kedai baru including R Pharmacy, Ai-Cha ice cream & OSUMO! Perfect spot untuk weekend family time 👨‍👩‍👧‍👦',
-            image: 'https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=600&h=400&fit=crop',
-            likes: 89,
-            comments: 21,
-            shares: 7,
-            privacy: 'public'
-          }
-        ]);
-
-        const [stories] = useState([
-          {
-            id: 1,
-            user: 'Your Story',
-            avatar: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=100&h=100&fit=crop&crop=face',
-            isOwn: true
-          },
-          {
-            id: 2,
-            user: 'Rajesh',
-            avatar: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=100&h=100&fit=crop&crop=face',
-            hasStory: true
-          },
-          {
-            id: 3,
-            user: 'Mei Ling',
-            avatar: 'https://images.unsplash.com/photo-1544725176-7c40e5a71c5e?w=100&h=100&fit=crop&crop=face',
-            hasStory: true
-          }
-        ]);
-
-        const [user] = useState({
-          name: 'John Doe',
-          avatar: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=100&h=100&fit=crop&crop=face'
-        });
-
-        const handleLike = (postId) => {
-          setPosts(posts.map(post => 
-            post.id === postId 
-              ? { ...post, likes: post.likes + 1 }
-              : post
-          ));
-        };
-
-        const handleCreatePost = () => {
-          if (newPost.trim()) {
-            const post = {
-              id: posts.length + 1,
-              user: {
-                name: user.name,
-                avatar: user.avatar,
-                verified: false
-              },
-              time: 'now',
-              content: newPost,
-              image: null,
-              likes: 0,
-              comments: 0,
-              shares: 0,
-              privacy: 'public'
-            };
-            setPosts([post, ...posts]);
-            setNewPost('');
-            setShowPostModal(false);
-          }
-        };
-
-        // Story Component
-        const StoryCard = ({ story }) => (
-          <div className="flex-shrink-0 w-20 cursor-pointer">
-            <div className="relative">
-              <div className={`w-20 h-28 rounded-lg overflow-hidden border-2 ${
-                story.hasStory ? 'border-yellow-500' : story.isOwn ? 'border-gray-300' : 'border-transparent'
-              } relative`}>
-                <img 
-                  src={story.avatar} 
-                  alt={story.user}
-                  className="w-full h-full object-cover"
-                />
-                <div className="absolute bottom-0 left-0 right-0 bg-black bg-opacity-60 text-white text-xs p-1">
-                  <p className="text-center truncate font-medium">{story.user}</p>
-                </div>
-                {story.isOwn && (
-                  <div className="absolute top-1 right-1 w-5 h-5 bg-yellow-500 rounded-full flex items-center justify-center">
-                    <Plus className="w-3 h-3 text-white" />
-                  </div>
-                )}
-              </div>
-            </div>
-          </div>
-        );
-
-        // Post Component
-        const PostCard = ({ post }) => (
-          <div className="bg-white rounded-xl shadow-sm border mb-4">
-            <div className="p-4 flex items-center justify-between">
-              <div className="flex items-center space-x-3">
-                <img 
-                  src={post.user.avatar} 
-                  alt={post.user.name}
-                  className="w-12 h-12 rounded-full object-cover"
-                />
-                <div>
-                  <div className="flex items-center space-x-2">
-                    <h3 className="font-bold text-gray-900">{post.user.name}</h3>
-                    {post.user.verified && (
-                      <div className="w-5 h-5 bg-blue-500 rounded-full flex items-center justify-center">
-                        <span className="text-white text-xs">✓</span>
-                      </div>
-                    )}
-                  </div>
-                  <div className="flex items-center space-x-2 text-sm text-gray-500">
-                    <span>{post.time}</span>
-                    <span>•</span>
-                    <Globe className="w-3 h-3" />
-                  </div>
-                </div>
-              </div>
-              <MoreHorizontal className="w-5 h-5 text-gray-500 cursor-pointer" />
-            </div>
-
-            <div className="px-4 pb-3">
-              <p className="text-gray-800 leading-relaxed">{post.content}</p>
-            </div>
-
-            {post.image && (
-              <div className="mb-3">
-                <img 
-                  src={post.image} 
-                  alt="Post content"
-                  className="w-full h-64 object-cover"
-                />
-              </div>
-            )}
-
-            <div className="px-4 py-2 border-b border-gray-100">
-              <div className="flex items-center justify-between text-sm text-gray-600">
-                <span>{post.likes} people like this</span>
-                <div className="flex space-x-4">
-                  <span>{post.comments} comments</span>
-                  <span>{post.shares} shares</span>
-                </div>
-              </div>
-            </div>
-
-            <div className="px-4 py-2">
-              <div className="flex items-center justify-around">
-                <button 
-                  onClick={() => handleLike(post.id)}
-                  className="flex items-center space-x-2 px-4 py-2 rounded-lg hover:bg-yellow-50 transition-colors flex-1 justify-center"
-                >
-                  <ThumbsUp className="w-5 h-5 text-gray-600" />
-                  <span className="text-gray-600 font-medium">Steady</span>
-                </button>
-                <button className="flex items-center space-x-2 px-4 py-2 rounded-lg hover:bg-yellow-50 transition-colors flex-1 justify-center">
-                  <MessageCircle className="w-5 h-5 text-gray-600" />
-                  <span className="text-gray-600 font-medium">Comment</span>
-                </button>
-                <button className="flex items-center space-x-2 px-4 py-2 rounded-lg hover:bg-yellow-50 transition-colors flex-1 justify-center">
-                  <Share className="w-5 h-5 text-gray-600" />
-                  <span className="text-gray-600 font-medium">Kongsi</span>
-                </button>
-              </div>
-            </div>
-          </div>
-        );
-
-        return (
-          <div className="min-h-screen bg-gray-100">
-            {/* Header */}
-            <div className="bg-white shadow-sm border-b border-gray-200 sticky top-0 z-50">
-              <div className="max-w-6xl mx-auto px-4 py-2">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center space-x-4">
-                    <div className="flex items-center space-x-2">
-                      <h1 className="text-2xl font-bold text-yellow-600">JomBro</h1>
-                      <span className="hidden sm:inline text-sm text-gray-600 italic">"bro kang tau Lai liau!"</span>
-                    </div>
-                    <div className="relative hidden md:block">
-                      <Search className="w-5 h-5 text-gray-400 absolute left-3 top-1/2 transform -translate-y-1/2" />
-                      <input
-                        type="text"
-                        placeholder="Search JomBro"
-                        className="bg-yellow-50 border border-yellow-200 rounded-full pl-10 pr-4 py-2 w-64 focus:outline-none focus:ring-2 focus:ring-yellow-500"
-                      />
-                    </div>
-                  </div>
-
-                  <div className="hidden md:flex items-center space-x-8">
-                    <button className="p-3 rounded-lg text-yellow-600 bg-yellow-50">
-                      <Home className="w-6 h-6" />
-                    </button>
-                    <button className="p-3 rounded-lg text-gray-600 hover:bg-yellow-50">
-                      <Users className="w-6 h-6" />
-                    </button>
-                    <button className="p-3 rounded-lg text-gray-600 hover:bg-yellow-50">
-                      <MessageSquare className="w-6 h-6" />
-                    </button>
-                  </div>
-
-                  <div className="flex items-center space-x-2">
-                    <button className="p-2 text-gray-600 hover:bg-yellow-50 rounded-full">
-                      <Bell className="w-6 h-6" />
-                    </button>
-                    <img 
-                      src={user.avatar} 
-                      alt={user.name}
-                      className="w-8 h-8 rounded-full object-cover cursor-pointer"
-                    />
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* Main Content */}
-            <div className="max-w-2xl mx-auto px-4 py-6">
-              {/* Stories */}
-              <div className="bg-white rounded-xl shadow-sm border p-3 mb-4">
-                <div className="flex space-x-3 overflow-x-auto">
-                  {stories.map(story => (
-                    <StoryCard key={story.id} story={story} />
-                  ))}
-                </div>
-              </div>
-
-              {/* Create Post */}
-              <div className="bg-white rounded-xl shadow-sm border p-4 mb-4">
-                <div className="flex items-center space-x-3 mb-3">
-                  <img 
-                    src={user.avatar} 
-                    alt={user.name}
-                    className="w-10 h-10 rounded-full object-cover"
-                  />
-                  <button 
-                    onClick={() => setShowPostModal(true)}
-                    className="flex-1 bg-yellow-600 hover:bg-yellow-700 rounded-full px-6 py-3 text-white font-medium text-left"
-                  >
-                    Apa lu fikir, {user.name.split(' ')[0]}? Share lah bro!
-                  </button>
-                </div>
-                
-                <div className="flex items-center justify-around pt-3 border-t border-gray-200">
-                  <button className="flex items-center space-x-2 px-4 py-2 rounded-lg hover:bg-yellow-50">
-                    <Video className="w-5 h-5 text-red-500" />
-                    <span className="text-gray-600 font-medium text-sm">Live</span>
-                  </button>
-                  <button className="flex items-center space-x-2 px-4 py-2 rounded-lg hover:bg-yellow-50">
-                    <Camera className="w-5 h-5 text-green-500" />
-                    <span className="text-gray-600 font-medium text-sm">Photo</span>
-                  </button>
-                  <button className="flex items-center space-x-2 px-4 py-2 rounded-lg hover:bg-yellow-50">
-                    <Smile className="w-5 h-5 text-yellow-500" />
-                    <span className="text-gray-600 font-medium text-sm">Feeling</span>
-                  </button>
-                </div>
-              </div>
-
-              {/* Posts Feed */}
-              {posts.map(post => (
-                <PostCard key={post.id} post={post} />
-              ))}
-            </div>
-
-            {/* Mobile Navigation */}
-            <div className="md:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 safe-area-pb">
-              <div className="flex items-center justify-around py-2">
-                <button className="p-3 text-yellow-600">
-                  <Home className="w-6 h-6" />
-                </button>
-                <button className="p-3 text-gray-600">
-                  <Users className="w-6 h-6" />
-                </button>
-                <button className="p-3 text-gray-600">
-                  <MessageSquare className="w-6 h-6" />
-                </button>
-                <button className="p-3 text-gray-600">
-                  <Bell className="w-6 h-6" />
-                </button>
-                <button className="p-3 text-gray-600">
-                  <Menu className="w-6 h-6" />
-                </button>
-              </div>
-            </div>
-
-            {/* Create Post Modal */}
-            {showPostModal && (
-              <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-                <div className="bg-white rounded-xl w-full max-w-lg">
-                  <div className="p-4 border-b border-gray-200">
-                    <div className="flex items-center justify-between">
-                      <h2 className="text-lg font-semibold">Buat Post Baru</h2>
-                      <button 
-                        onClick={() => setShowPostModal(false)}
-                        className="text-gray-500 hover:text-gray-700 text-2xl"
-                      >
-                        ×
-                      </button>
-                    </div>
-                  </div>
-                  <div className="p-4">
-                    <div className="flex items-center space-x-3 mb-4">
-                      <img 
-                        src={user.avatar} 
-                        alt={user.name}
-                        className="w-10 h-10 rounded-full object-cover"
-                      />
-                      <div>
-                        <h3 className="font-medium">{user.name}</h3>
-                        <div className="flex items-center space-x-1 text-sm text-gray-600">
-                          <Globe className="w-3 h-3" />
-                          <span>Public</span>
+            return (
+                <div className="min-h-screen bg-gray-100">
+                    <div className="bg-white shadow-sm border-b sticky top-0">
+                        <div className="max-w-6xl mx-auto px-4 py-3">
+                            <div className="flex items-center justify-between">
+                                <h1 className="text-2xl font-bold text-yellow-600">JomBro</h1>
+                                <span className="text-sm text-gray-600 italic">"bro kang tau Lai liau!"</span>
+                            </div>
                         </div>
-                      </div>
                     </div>
                     
-                    <textarea
-                      value={newPost}
-                      onChange={(e) => setNewPost(e.target.value)}
-                      placeholder={`Apa lu fikir sekarang, ${user.name.split(' ')[0]}? Share lah!`}
-                      className="w-full p-3 border border-yellow-300 rounded-lg resize-none focus:outline-none focus:ring-2 focus:ring-yellow-500 mb-4"
-                      rows="4"
-                    />
-                    
-                    <div className="flex justify-end space-x-2">
-                      <button 
-                        onClick={() => setShowPostModal(false)}
-                        className="px-4 py-2 text-gray-600 hover:bg-yellow-50 rounded-lg"
-                      >
-                        Cancel
-                      </button>
-                      <button 
-                        onClick={handleCreatePost}
-                        disabled={!newPost.trim()}
-                        className="px-6 py-2 bg-yellow-500 text-white rounded-lg hover:bg-yellow-600 font-medium disabled:bg-gray-300 disabled:cursor-not-allowed"
-                      >
-                        Post Lah!
-                      </button>
+                    <div className="max-w-2xl mx-auto px-4 py-6">
+                        <div className="bg-white rounded-xl shadow-sm border p-4 mb-4">
+                            <button className="w-full bg-yellow-600 text-white rounded-full px-6 py-3 font-medium">
+                                Apa lu fikir? Share lah bro!
+                            </button>
+                        </div>
+                        
+                        {posts.map(post => (
+                            <div key={post.id} className="bg-white rounded-xl shadow-sm border mb-4 p-4">
+                                <div className="flex items-center space-x-3 mb-3">
+                                    <img src={post.user.avatar} className="w-12 h-12 rounded-full object-cover" />
+                                    <div>
+                                        <h3 className="font-bold">{post.user.name}</h3>
+                                        <p className="text-sm text-gray-500">{post.time}</p>
+                                    </div>
+                                </div>
+                                <p className="mb-3">{post.content}</p>
+                                <img src={post.image} className="w-full h-48 object-cover rounded mb-3" />
+                                <div className="flex justify-around pt-2 border-t">
+                                    <button className="text-gray-600 hover:text-blue-600">
+                                        👍 {post.likes} Steady
+                                    </button>
+                                    <button className="text-gray-600 hover:text-blue-600">💬 Comment</button>
+                                    <button className="text-gray-600 hover:text-blue-600">📤 Kongsi</button>
+                                </div>
+                            </div>
+                        ))}
                     </div>
-                  </div>
                 </div>
-              </div>
-            )}
-          </div>
-        );
-      };
+            );
+        };
 
-      // Render the app
-      ReactDOM.render(<JomBroApp />, document.getElementById('root'));
+        ReactDOM.render(<App />, document.getElementById('root'));
     </script>
-  </body>
+</body>
 </html>
