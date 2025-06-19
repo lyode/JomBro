@@ -1,433 +1,681 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>JomBro - Malaysia's Social Revolution</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <style>
-        .animate-pulse { animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite; }
-        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: .5; } }
-        .gradient-bg { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
-        .card-hover:hover { transform: translateY(-2px); transition: all 0.3s ease; }
-    </style>
-</head>
-<body class="bg-gradient-to-br from-purple-50 to-pink-50 min-h-screen">
-    <!-- Header -->
-    <header class="bg-white shadow-lg border-b-4 border-gradient-to-r from-purple-500 to-pink-500">
-        <div class="max-w-6xl mx-auto px-4 py-4">
-            <div class="flex items-center justify-between">
-                <div class="flex items-center space-x-3">
-                    <div class="w-10 h-10 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full flex items-center justify-center">
-                        <span class="text-white font-bold text-xl">J</span>
+import React, { useState, useEffect } from 'react';
+import { Heart, MessageCircle, Share, ThumbsUp, Camera, Video, Smile, Search, Bell, MessageSquare, Users, Home, Menu, Plus, Globe, Lock, Users2, MoreHorizontal, Coins, Trophy, Gift, Zap, Star, DollarSign, Target, Award } from 'lucide-react';
+
+const JomBroEnhanced = () => {
+  const [activeTab, setActiveTab] = useState('home');
+  const [showProfile, setShowProfile] = useState(false);
+  const [newPost, setNewPost] = useState('');
+  const [showPostModal, setShowPostModal] = useState(false);
+  const [selectedImage, setSelectedImage] = useState(null);
+  const [imagePreview, setImagePreview] = useState(null);
+  const [showCompoundModal, setShowCompoundModal] = useState(false);
+  const [showPointsModal, setShowPointsModal] = useState(false);
+  const [showGameModal, setShowGameModal] = useState(false);
+  const [userPoints, setUserPoints] = useState(2450);
+  const [userLevel, setUserLevel] = useState(7);
+  const [compoundBalance, setCompoundBalance] = useState(75);
+  
+  const [cropSettings, setCropSettings] = useState({
+    aspectRatio: 'auto',
+    quality: 0.8
+  });
+
+  // Enhanced user state with points system
+  const [user] = useState({
+    name: 'John Doe',
+    avatar: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=100&h=100&fit=crop&crop=face',
+    points: userPoints,
+    level: userLevel,
+    badges: ['Early Adopter', 'Social Butterfly', 'Content Creator'],
+    compoundOwed: compoundBalance
+  });
+
+  // Compound challenges/games between users
+  const [activeGames, setActiveGames] = useState([
+    {
+      id: 1,
+      challenger: 'Ahmad',
+      challengerAvatar: 'https://images.unsplash.com/photo-1519244703995-f4e0f30006d5?w=50&h=50&fit=crop&crop=face',
+      type: 'parking_challenge',
+      description: 'Who can find parking faster at 1Utama?',
+      stakes: 25,
+      deadline: '2 hours',
+      status: 'pending'
+    },
+    {
+      id: 2,
+      challenger: 'Mei Ling',
+      challengerAvatar: 'https://images.unsplash.com/photo-1544725176-7c40e5a71c5e?w=50&h=50&fit=crop&crop=face',
+      type: 'food_review',
+      description: 'Best nasi lemak review gets points!',
+      stakes: 15,
+      deadline: '1 day',
+      status: 'active'
+    }
+  ]);
+
+  // Points earning activities
+  const [pointsActivities, setPointsActivities] = useState([
+    { type: 'post_like', points: 2, description: 'Like received on post' },
+    { type: 'comment', points: 5, description: 'Comment on friend\'s post' },
+    { type: 'share', points: 8, description: 'Share content' },
+    { type: 'check_in', points: 10, description: 'Check-in at local business' },
+    { type: 'review', points: 15, description: 'Write business review' },
+    { type: 'referral', points: 50, description: 'Invite new friend to JomBro' },
+    { type: 'compound_paid', points: 20, description: 'Pay compound on time' },
+    { type: 'challenge_win', points: 30, description: 'Win user challenge' }
+  ]);
+
+  // Revenue streams tracking
+  const [revenueStats] = useState({
+    dailyCompounds: 145,
+    pointsPurchased: 89,
+    premiumUpgrades: 23,
+    businessPromotions: 12,
+    totalDaily: 450.30
+  });
+
+  const [posts, setPosts] = useState([
+    {
+      id: 1,
+      user: {
+        name: '不想早起的大罗',
+        avatar: 'https://images.unsplash.com/photo-1494790108755-2616b612b469?w=100&h=100&fit=crop&crop=face',
+        verified: true,
+        level: 12,
+        points: 3420
+      },
+      time: '1 jam lepas',
+      content: 'Wah today cycle around Putrajaya! 🚴‍♀️ Weather cantik gila, perfect for outdoor activities. Siapa-siapa nak join next time? 💪 #CyclingLife #Putrajaya\n\n[Your cycling image with helmet would appear here]',
+      image: 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=600&h=400&fit=crop',
+      likes: 68,
+      comments: 12,
+      shares: 4,
+      privacy: 'public',
+      pointsEarned: 14,
+      reactions: [
+        { type: '👍', count: 45 },
+        { type: '❤️', count: 18 },
+        { type: '💪', count: 5 }
+      ]
+    },
+    {
+      id: 2,
+      user: {
+        name: 'Ahmad Fitness Studio',
+        avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&h=100&fit=crop&crop=face',
+        verified: false,
+        level: 8,
+        points: 1890
+      },
+      time: '3 jam lepas',
+      content: 'Baru renovate studio kami! 💇‍♀️ Modern minimalist design dengan equipment terbaru. STUDIO DAMDA - Your beauty destination! Book appointment sekarang! ✨\n\n[Your Studio DAMDA salon image would appear here]',
+      image: 'https://images.unsplash.com/photo-1560066984-138dadb4c035?w=600&h=400&fit=crop',
+      likes: 234,
+      comments: 34,
+      shares: 18,
+      privacy: 'public',
+      pointsEarned: 47,
+      isPromoted: true,
+      reactions: [
+        { type: '👍', count: 156 },
+        { type: '💕', count: 65 },
+        { type: '✨', count: 13 }
+      ]
+    }
+  ]);
+
+  const handleLike = (postId) => {
+    setPosts(posts.map(post => 
+      post.id === postId 
+        ? { ...post, likes: post.likes + 1 }
+        : post
+    ));
+    // Award points for liking
+    setUserPoints(prev => prev + 2);
+  };
+
+  const handleCompoundPayment = (amount) => {
+    setCompoundBalance(prev => Math.max(0, prev - amount));
+    setUserPoints(prev => prev + 20); // Reward for paying compound
+  };
+
+  const handlePointsPurchase = (pointsAmount, cost) => {
+    // In real app, this would integrate with payment gateway
+    setUserPoints(prev => prev + pointsAmount);
+  };
+
+  const acceptChallenge = (gameId) => {
+    setActiveGames(prev => prev.map(game => 
+      game.id === gameId 
+        ? { ...game, status: 'active' }
+        : game
+    ));
+  };
+
+  const CompoundModal = () => (
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+      <div className="bg-white rounded-xl w-full max-w-md">
+        <div className="p-6">
+          <div className="text-center mb-6">
+            <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
+              <DollarSign className="w-8 h-8 text-red-600" />
+            </div>
+            <h2 className="text-2xl font-bold text-gray-900 mb-2">Pay Compound</h2>
+            <p className="text-gray-600">Outstanding balance: RM{compoundBalance}</p>
+          </div>
+
+          <div className="space-y-4 mb-6">
+            <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+              <div className="flex justify-between items-center mb-2">
+                <span className="font-medium">Parking Violation</span>
+                <span className="text-red-600 font-bold">RM50</span>
+              </div>
+              <div className="text-sm text-red-600">Due: 2 days remaining</div>
+            </div>
+            
+            <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+              <div className="flex justify-between items-center mb-2">
+                <span className="font-medium">Late Payment Fee</span>
+                <span className="text-red-600 font-bold">RM25</span>
+              </div>
+              <div className="text-sm text-red-600">Due: 1 day remaining</div>
+            </div>
+          </div>
+
+          <div className="space-y-3">
+            <button 
+              onClick={() => {
+                handleCompoundPayment(75);
+                setShowCompoundModal(false);
+              }}
+              className="w-full bg-red-600 text-white py-3 rounded-lg font-semibold hover:bg-red-700 transition-colors"
+            >
+              Pay Full Amount (RM75) + Get 20 Points
+            </button>
+            <button 
+              onClick={() => {
+                handleCompoundPayment(50);
+                setShowCompoundModal(false);
+              }}
+              className="w-full bg-orange-500 text-white py-3 rounded-lg font-semibold hover:bg-orange-600 transition-colors"
+            >
+              Pay Parking Only (RM50) + Get 20 Points
+            </button>
+            <button 
+              onClick={() => setShowCompoundModal(false)}
+              className="w-full bg-gray-200 text-gray-700 py-3 rounded-lg font-semibold hover:bg-gray-300 transition-colors"
+            >
+              Pay Later
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+
+  const PointsModal = () => (
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+      <div className="bg-white rounded-xl w-full max-w-lg max-h-[90vh] overflow-y-auto">
+        <div className="p-6">
+          <div className="text-center mb-6">
+            <div className="w-16 h-16 bg-yellow-100 rounded-full flex items-center justify-center mx-auto mb-4">
+              <Coins className="w-8 h-8 text-yellow-600" />
+            </div>
+            <h2 className="text-2xl font-bold text-gray-900 mb-2">JomBro Points</h2>
+            <p className="text-gray-600">Current Balance: <span className="font-bold text-yellow-600">{userPoints} Points</span></p>
+            <p className="text-sm text-gray-500">Level {userLevel} Member</p>
+          </div>
+
+          <div className="mb-6">
+            <h3 className="font-bold text-lg mb-4">Earn Points</h3>
+            <div className="space-y-3">
+              {pointsActivities.map((activity, index) => (
+                <div key={index} className="flex justify-between items-center bg-gray-50 p-3 rounded-lg">
+                  <span className="text-gray-700">{activity.description}</span>
+                  <span className="font-bold text-yellow-600">+{activity.points}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <div className="mb-6">
+            <h3 className="font-bold text-lg mb-4">Purchase Points</h3>
+            <div className="grid grid-cols-2 gap-3">
+              <button 
+                onClick={() => handlePointsPurchase(100, 5)}
+                className="bg-yellow-500 text-white p-4 rounded-lg text-center hover:bg-yellow-600 transition-colors"
+              >
+                <div className="font-bold">100 Points</div>
+                <div className="text-sm">RM5.00</div>
+              </button>
+              <button 
+                onClick={() => handlePointsPurchase(250, 10)}
+                className="bg-yellow-500 text-white p-4 rounded-lg text-center hover:bg-yellow-600 transition-colors"
+              >
+                <div className="font-bold">250 Points</div>
+                <div className="text-sm">RM10.00</div>
+              </button>
+              <button 
+                onClick={() => handlePointsPurchase(500, 18)}
+                className="bg-yellow-500 text-white p-4 rounded-lg text-center hover:bg-yellow-600 transition-colors"
+              >
+                <div className="font-bold">500 Points</div>
+                <div className="text-sm">RM18.00</div>
+              </button>
+              <button 
+                onClick={() => handlePointsPurchase(1000, 30)}
+                className="bg-yellow-500 text-white p-4 rounded-lg text-center hover:bg-yellow-600 transition-colors"
+              >
+                <div className="font-bold">1000 Points</div>
+                <div className="text-sm">RM30.00</div>
+              </button>
+            </div>
+          </div>
+
+          <div className="mb-6">
+            <h3 className="font-bold text-lg mb-4">Redeem Points</h3>
+            <div className="space-y-3">
+              <div className="flex justify-between items-center bg-blue-50 p-3 rounded-lg">
+                <span className="text-gray-700">RM5 Grabfood Voucher</span>
+                <button className="bg-blue-500 text-white px-4 py-1 rounded text-sm hover:bg-blue-600 transition-colors">
+                  500 Points
+                </button>
+              </div>
+              <div className="flex justify-between items-center bg-green-50 p-3 rounded-lg">
+                <span className="text-gray-700">Free Parking (1 Day)</span>
+                <button className="bg-green-500 text-white px-4 py-1 rounded text-sm hover:bg-green-600 transition-colors">
+                  200 Points
+                </button>
+              </div>
+              <div className="flex justify-between items-center bg-purple-50 p-3 rounded-lg">
+                <span className="text-gray-700">Premium Badge (1 Month)</span>
+                <button className="bg-purple-500 text-white px-4 py-1 rounded text-sm hover:bg-purple-600 transition-colors">
+                  1000 Points
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <button 
+            onClick={() => setShowPointsModal(false)}
+            className="w-full bg-gray-200 text-gray-700 py-3 rounded-lg font-semibold hover:bg-gray-300 transition-colors"
+          >
+            Close
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+
+  const GameModal = () => (
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+      <div className="bg-white rounded-xl w-full max-w-lg">
+        <div className="p-6">
+          <div className="text-center mb-6">
+            <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+              <Trophy className="w-8 h-8 text-green-600" />
+            </div>
+            <h2 className="text-2xl font-bold text-gray-900 mb-2">User Challenges</h2>
+            <p className="text-gray-600">Compete with friends and earn points!</p>
+          </div>
+
+          <div className="space-y-4 mb-6">
+            {activeGames.map(game => (
+              <div key={game.id} className="border border-gray-200 rounded-lg p-4">
+                <div className="flex items-center space-x-3 mb-3">
+                  <img src={game.challengerAvatar} alt={game.challenger} className="w-10 h-10 rounded-full" />
+                  <div>
+                    <div className="font-medium">{game.challenger} challenges you!</div>
+                    <div className="text-sm text-gray-500">Stakes: {game.stakes} points</div>
+                  </div>
+                </div>
+                <p className="text-gray-700 mb-3">{game.description}</p>
+                <div className="flex justify-between items-center">
+                  <span className="text-sm text-gray-500">Deadline: {game.deadline}</span>
+                  {game.status === 'pending' && (
+                    <button 
+                      onClick={() => acceptChallenge(game.id)}
+                      className="bg-green-500 text-white px-4 py-1 rounded text-sm hover:bg-green-600 transition-colors"
+                    >
+                      Accept
+                    </button>
+                  )}
+                  {game.status === 'active' && (
+                    <span className="bg-yellow-100 text-yellow-700 px-2 py-1 rounded text-sm">
+                      Active
+                    </span>
+                  )}
+                </div>
+              </div>
+            ))}
+          </div>
+
+          <div className="mb-6">
+            <h3 className="font-bold text-lg mb-4">Create New Challenge</h3>
+            <div className="space-y-3">
+              <button className="w-full bg-blue-500 text-white py-3 rounded-lg font-medium hover:bg-blue-600 transition-colors">
+                📍 Location Challenge
+              </button>
+              <button className="w-full bg-purple-500 text-white py-3 rounded-lg font-medium hover:bg-purple-600 transition-colors">
+                🍽️ Food Review Challenge
+              </button>
+              <button className="w-full bg-orange-500 text-white py-3 rounded-lg font-medium hover:bg-orange-600 transition-colors">
+                🚗 Parking Bet
+              </button>
+            </div>
+          </div>
+
+          <button 
+            onClick={() => setShowGameModal(false)}
+            className="w-full bg-gray-200 text-gray-700 py-3 rounded-lg font-semibold hover:bg-gray-300 transition-colors"
+          >
+            Close
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+
+  const renderContent = () => {
+    switch (activeTab) {
+      case 'home':
+        return (
+          <div className="max-w-2xl mx-auto">
+            {/* Points & Status Bar */}
+            <div className="bg-gradient-to-r from-yellow-400 to-orange-500 rounded-xl shadow-sm p-4 mb-4 text-white">
+              <div className="flex justify-between items-center">
+                <div>
+                  <div className="flex items-center space-x-2">
+                    <Coins className="w-5 h-5" />
+                    <span className="font-bold">{userPoints} Points</span>
+                    <Star className="w-4 h-4" />
+                    <span>Level {userLevel}</span>
+                  </div>
+                  <p className="text-yellow-100 text-sm">Outstanding Compound: RM{compoundBalance}</p>
+                </div>
+                <div className="flex space-x-2">
+                  <button 
+                    onClick={() => setShowPointsModal(true)}
+                    className="bg-white bg-opacity-20 px-3 py-1 rounded-full text-sm hover:bg-opacity-30 transition-colors"
+                  >
+                    Get Points
+                  </button>
+                  <button 
+                    onClick={() => setShowGameModal(true)}
+                    className="bg-white bg-opacity-20 px-3 py-1 rounded-full text-sm hover:bg-opacity-30 transition-colors"
+                  >
+                    Challenges
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            {/* Compound Warning */}
+            {compoundBalance > 0 && (
+              <div className="bg-red-50 border-2 border-red-300 rounded-xl p-4 mb-4">
+                <div className="text-center mb-3">
+                  <h3 className="text-red-700 font-bold text-lg">⚠️ COMPOUND ALERT ⚠️</h3>
+                  <p className="text-red-600 font-semibold">You have outstanding compounds!</p>
+                </div>
+                
+                <div className="bg-white rounded-lg p-3 border border-red-200 mb-3">
+                  <div className="flex justify-between items-center">
+                    <span className="font-bold">Total Amount:</span>
+                    <span className="font-bold text-lg text-red-700">RM{compoundBalance}</span>
+                  </div>
+                  <p className="text-xs text-red-600 mt-1">⏰ Pay now and earn 20 bonus points!</p>
+                </div>
+                
+                <button 
+                  onClick={() => setShowCompoundModal(true)}
+                  className="w-full bg-red-600 text-white py-2 px-4 rounded-lg font-semibold hover:bg-red-700 transition-colors"
+                >
+                  Pay Compound & Earn Points
+                </button>
+              </div>
+            )}
+
+            {/* Revenue Dashboard for Admin */}
+            <div className="bg-white rounded-xl shadow-sm border-2 border-gray-400 p-4 mb-4">
+              <h3 className="font-bold text-lg mb-4 text-center">📊 Daily Revenue Dashboard</h3>
+              <div className="grid grid-cols-2 gap-4">
+                <div className="text-center">
+                  <div className="text-2xl font-bold text-green-600">{revenueStats.dailyCompounds}</div>
+                  <div className="text-sm text-gray-600">Compounds Paid</div>
+                </div>
+                <div className="text-center">
+                  <div className="text-2xl font-bold text-yellow-600">{revenueStats.pointsPurchased}</div>
+                  <div className="text-sm text-gray-600">Points Purchased</div>
+                </div>
+                <div className="text-center">
+                  <div className="text-2xl font-bold text-blue-600">{revenueStats.premiumUpgrades}</div>
+                  <div className="text-sm text-gray-600">Premium Upgrades</div>
+                </div>
+                <div className="text-center">
+                  <div className="text-2xl font-bold text-purple-600">RM{revenueStats.totalDaily}</div>
+                  <div className="text-sm text-gray-600">Total Revenue</div>
+                </div>
+              </div>
+            </div>
+
+            {/* Stories */}
+            <div className="bg-white rounded-xl shadow-sm border-2 border-gray-400 p-3 mb-4">
+              <div className="flex space-x-3 justify-between">
+                <div className="flex-shrink-0 w-20 cursor-pointer">
+                  <div className="w-20 h-28 rounded-lg overflow-hidden border-2 border-gray-300 relative">
+                    <img src={user.avatar} alt="Your Story" className="w-full h-full object-cover" />
+                    <div className="absolute bottom-0 left-0 right-0 bg-black bg-opacity-60 text-white text-xs p-1">
+                      <p className="text-center truncate font-medium">Your Story</p>
                     </div>
+                    <div className="absolute top-1 right-1 w-5 h-5 bg-yellow-500 rounded-full flex items-center justify-center">
+                      <Plus className="w-3 h-3 text-white" />
+                    </div>
+                  </div>
+                </div>
+                {/* More story cards... */}
+              </div>
+            </div>
+
+            {/* Create Post */}
+            <div className="bg-white rounded-xl shadow-sm border-2 border-gray-400 p-4 mb-4">
+              <div className="mb-3">
+                <div className="flex items-center space-x-3 mb-3">
+                  <img src={user.avatar} alt={user.name} className="w-10 h-10 rounded-full object-cover" />
+                  <div className="flex items-center space-x-2">
+                    <Coins className="w-4 h-4 text-yellow-500" />
+                    <span className="text-sm text-gray-600">{userPoints} points</span>
+                  </div>
+                </div>
+                <div className="flex justify-center">
+                  <button 
+                    onClick={() => setShowPostModal(true)}
+                    className="w-full max-w-lg bg-yellow-600 hover:bg-yellow-700 rounded-full px-6 py-3 text-center text-gray-200 transition-colors font-medium"
+                  >
+                    Apa lu fikir, {user.name.split(' ')[0]}? Share lah bro! (+5 points)
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            {/* Posts Feed with Points */}
+            {posts.map(post => (
+              <div key={post.id} className="bg-white rounded-xl shadow-sm border-2 border-gray-400 mb-4">
+                {/* Post Header */}
+                <div className="p-4 flex items-center justify-between">
+                  <div className="flex items-center space-x-4">
+                    <img src={post.user.avatar} alt={post.user.name} className="w-20 h-20 rounded-full object-cover border-3 border-yellow-500 shadow-lg" />
                     <div>
-                        <h1 class="text-2xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
-                            JomBro
-                        </h1>
-                        <p class="text-sm text-gray-500">Malaysia's Social Revolution</p>
+                      <div className="flex items-center space-x-2">
+                        <h3 className="font-bold text-xl text-gray-900">{post.user.name}</h3>
+                        {post.user.verified && (
+                          <div className="w-6 h-6 bg-blue-500 rounded-full flex items-center justify-center">
+                            <span className="text-white text-sm">✓</span>
+                          </div>
+                        )}
+                        <div className="flex items-center space-x-1 bg-yellow-100 px-2 py-1 rounded-full">
+                          <Star className="w-3 h-3 text-yellow-500" />
+                          <span className="text-xs font-medium">{post.user.level}</span>
+                        </div>
+                      </div>
+                      <div className="flex items-center space-x-2 text-sm text-gray-500 mt-1">
+                        <span>{post.time}</span>
+                        <span>•</span>
+                        <Globe className="w-4 h-4" />
+                        <span>•</span>
+                        <Coins className="w-4 h-4 text-yellow-500" />
+                        <span className="text-yellow-600 font-medium">+{post.pointsEarned} points earned</span>
+                      </div>
                     </div>
-                </div>
-                
-                <div class="flex items-center space-x-4">
-                    <div class="text-right">
-                        <p class="font-semibold text-gray-800" id="userName">You</p>
-                        <p class="text-sm text-purple-600 font-bold"><span id="userPoints">100</span> points</p>
+                  </div>
+                  {post.isPromoted && (
+                    <div className="bg-blue-100 text-blue-700 px-2 py-1 rounded text-xs font-medium">
+                      Promoted 💎
                     </div>
-                    <button onclick="togglePointsShop()" class="bg-gradient-to-r from-purple-500 to-pink-500 text-white px-4 py-2 rounded-full hover:shadow-lg transition-all duration-300 font-semibold">
-                        Buy Points
-                    </button>
+                  )}
                 </div>
-            </div>
-        </div>
-    </header>
 
-    <!-- Points Shop Modal -->
-    <div id="pointsShop" class="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4 hidden">
-        <div class="bg-white rounded-2xl max-w-4xl w-full max-h-[90vh] overflow-y-auto">
-            <div class="p-6">
-                <div class="flex justify-between items-center mb-6">
-                    <h2 class="text-3xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
-                        🛍️ Points Shop
-                    </h2>
-                    <button onclick="togglePointsShop()" class="text-gray-500 hover:text-gray-700 text-2xl">×</button>
+                {/* Post Content */}
+                <div className="px-4 pb-3">
+                  <p className="text-gray-800 leading-relaxed">{post.content}</p>
                 </div>
-                
-                <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
-                    <div class="border-2 border-gray-200 hover:border-purple-300 rounded-xl p-4 transition-all duration-300 hover:scale-105">
-                        <div class="text-center">
-                            <div class="text-3xl font-bold text-purple-600 mb-2">100</div>
-                            <div class="text-gray-500 mb-1">points</div>
-                            <div class="text-2xl font-bold text-gray-800 mb-2">RM 5</div>
-                            <button onclick="buyPoints(100, 'RM 5')" class="w-full bg-gradient-to-r from-purple-500 to-pink-500 text-white py-2 rounded-lg hover:shadow-lg transition-all duration-300">Purchase</button>
-                        </div>
+
+                {/* Post Image */}
+                {post.image && (
+                  <div className="mb-3">
+                    <img src={post.image} alt="Post content" className="w-full h-64 object-cover" />
+                  </div>
+                )}
+
+                {/* Reactions Summary */}
+                <div className="px-4 py-2 border-b border-gray-100">
+                  <div className="flex items-center justify-between text-sm text-gray-600">
+                    <div className="flex items-center space-x-1">
+                      {post.reactions.map((reaction, index) => (
+                        <span key={index} className="text-sm">{reaction.type}</span>
+                      ))}
+                      <span>{post.likes} people</span>
                     </div>
-                    <div class="border-2 border-purple-500 bg-purple-50 rounded-xl p-4 transition-all duration-300 hover:scale-105">
-                        <div class="bg-gradient-to-r from-purple-500 to-pink-500 text-white text-xs px-3 py-1 rounded-full inline-block mb-2">MOST POPULAR</div>
-                        <div class="text-center">
-                            <div class="text-3xl font-bold text-purple-600 mb-2">500</div>
-                            <div class="text-gray-500 mb-1">points</div>
-                            <div class="text-2xl font-bold text-gray-800 mb-2">RM 18</div>
-                            <div class="text-green-600 text-sm font-semibold mb-3">Save RM2!</div>
-                            <button onclick="buyPoints(500, 'RM 18')" class="w-full bg-gradient-to-r from-purple-500 to-pink-500 text-white py-2 rounded-lg hover:shadow-lg transition-all duration-300">Purchase</button>
-                        </div>
+                    <div className="flex space-x-4">
+                      <span>{post.comments} comments</span>
+                      <span>{post.shares} shares</span>
                     </div>
-                    <div class="border-2 border-gray-200 hover:border-purple-300 rounded-xl p-4 transition-all duration-300 hover:scale-105">
-                        <div class="text-center">
-                            <div class="text-3xl font-bold text-purple-600 mb-2">1000</div>
-                            <div class="text-gray-500 mb-1">points</div>
-                            <div class="text-2xl font-bold text-gray-800 mb-2">RM 35</div>
-                            <div class="text-green-600 text-sm font-semibold mb-3">Save RM5!</div>
-                            <button onclick="buyPoints(1000, 'RM 35')" class="w-full bg-gradient-to-r from-purple-500 to-pink-500 text-white py-2 rounded-lg hover:shadow-lg transition-all duration-300">Purchase</button>
-                        </div>
-                    </div>
+                  </div>
                 </div>
-                
-                <div class="bg-gradient-to-r from-purple-100 to-pink-100 rounded-xl p-4">
-                    <h3 class="font-bold text-gray-800 mb-2">🎁 Special Offers:</h3>
-                    <ul class="text-sm text-gray-600 space-y-1">
-                        <li>• New users get 100 bonus points!</li>
-                        <li>• Complete daily challenges for free points</li>
-                        <li>• Refer friends and earn 50 points each</li>
-                        <li>• Weekend double points on all purchases</li>
-                    </ul>
+
+                {/* Action Buttons */}
+                <div className="px-4 py-2">
+                  <div className="flex items-center justify-around">
+                    <button 
+                      onClick={() => handleLike(post.id)}
+                      className="flex items-center space-x-2 px-4 py-2 rounded-lg hover:bg-yellow-50 transition-colors flex-1 justify-center"
+                    >
+                      <ThumbsUp className="w-5 h-5 text-gray-600" />
+                      <span className="text-gray-600 font-medium">Steady (+2)</span>
+                    </button>
+                    <button className="flex items-center space-x-2 px-4 py-2 rounded-lg hover:bg-yellow-50 transition-colors flex-1 justify-center">
+                      <MessageCircle className="w-5 h-5 text-gray-600" />
+                      <span className="text-gray-600 font-medium">Comment (+5)</span>
+                    </button>
+                    <button className="flex items-center space-x-2 px-4 py-2 rounded-lg hover:bg-yellow-50 transition-colors flex-1 justify-center">
+                      <Share className="w-5 h-5 text-gray-600" />
+                      <span className="text-gray-600 font-medium">Kongsi (+8)</span>
+                    </button>
+                  </div>
                 </div>
+              </div>
+            ))}
+          </div>
+        );
+
+      default:
+        return <div>Other tabs content...</div>;
+    }
+  };
+
+  return (
+    <div className="min-h-screen bg-gray-100">
+      {/* Header */}
+      <div className="bg-white shadow-sm border-b border-gray-200 sticky top-0 z-50">
+        <div className="max-w-6xl mx-auto px-4 py-2">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-4">
+              <div className="flex items-center space-x-2">
+                <h1 className="text-2xl font-bold text-yellow-600">JomBro</h1>
+                <span className="text-sm text-gray-600 italic">"bro kang tau Lai liau!"</span>
+              </div>
+              <div className="relative hidden md:block">
+                <Search className="w-5 h-5 text-gray-400 absolute left-3 top-1/2 transform -translate-y-1/2" />
+                <input
+                  type="text"
+                  placeholder="Search JomBro"
+                  className="bg-yellow-50 border border-yellow-200 rounded-full pl-10 pr-4 py-2 w-64 focus:outline-none focus:ring-2 focus:ring-yellow-500"
+                />
+              </div>
             </div>
+
+            <div className="hidden md:flex items-center space-x-8">
+              <button
+                onClick={() => setActiveTab('home')}
+                className={`p-3 rounded-lg transition-colors ${
+                  activeTab === 'home' ? 'text-yellow-600 bg-yellow-50' : 'text-gray-600 hover:bg-yellow-50'
+                }`}
+              >
+                <Home className="w-6 h-6" />
+              </button>
+              <button className="p-3 rounded-lg transition-colors text-gray-600 hover:bg-yellow-50">
+                <Trophy className="w-6 h-6" />
+              </button>
+              <button className="p-3 rounded-lg transition-colors text-gray-600 hover:bg-yellow-50">
+                <Target className="w-6 h-6" />
+              </button>
+            </div>
+
+            <div className="flex items-center space-x-2">
+              <div className="flex items-center space-x-1 bg-yellow-100 px-3 py-1 rounded-full">
+                <Coins className="w-4 h-4 text-yellow-600" />
+                <span className="text-sm font-medium text-yellow-700">{userPoints}</span>
+              </div>
+              <button 
+                onClick={() => setShowCompoundModal(true)}
+                className="p-2 text-red-600 hover:bg-red-50 rounded-full transition-colors relative"
+              >
+                <DollarSign className="w-6 h-6" />
+                {compoundBalance > 0 && (
+                  <div className="absolute -top-1 -right-1 w-4 h-4 bg-red-500 rounded-full text-white text-xs flex items-center justify-center">
+                    !
+                  </div>
+                )}
+              </button>
+              <button 
+                onClick={() => setShowPointsModal(true)}
+                className="p-2 text-yellow-600 hover:bg-yellow-50 rounded-full transition-colors"
+              >
+                <Gift className="w-6 h-6" />
+              </button>
+              <button 
+                onClick={() => setShowGameModal(true)}
+                className="p-2 text-green-600 hover:bg-green-50 rounded-full transition-colors"
+              >
+                <Trophy className="w-6 h-6" />
+              </button>
+              <img src={user.avatar} alt={user.name} className="w-8 h-8 rounded-full object-cover cursor-pointer" />
+            </div>
+          </div>
         </div>
+      </div>
+
+      {/* Main Content */}
+      <div className="max-w-6xl mx-auto px-4 py-6">
+        {renderContent()}
+      </div>
+
+      {/* Modals */}
+      {showCompoundModal && <CompoundModal />}
+      {showPointsModal && <PointsModal />}
+      {showGameModal && <GameModal />}
     </div>
+  );
+};
 
-    <div class="max-w-6xl mx-auto px-4 py-6">
-        <div class="grid lg:grid-cols-4 gap-6">
-            <!-- Sidebar -->
-            <div class="lg:col-span-1">
-                <div class="bg-white rounded-2xl shadow-lg p-6 mb-6">
-                    <h3 class="font-bold text-gray-800 mb-4">🎯 Active Challenges</h3>
-                    <div class="space-y-3" id="challengesList">
-                        <!-- Challenges will be loaded here -->
-                    </div>
-                </div>
-
-                <!-- Active Users -->
-                <div class="bg-white rounded-2xl shadow-lg p-6">
-                    <h3 class="font-bold text-gray-800 mb-4">🔥 Top Users</h3>
-                    <div class="space-y-3" id="topUsersList">
-                        <!-- Top users will be loaded here -->
-                    </div>
-                </div>
-            </div>
-
-            <!-- Main Feed -->
-            <div class="lg:col-span-2">
-                <!-- Create Post -->
-                <div class="bg-white rounded-2xl shadow-lg p-6 mb-6">
-                    <h3 class="font-bold text-gray-800 mb-4">📝 What's happening, bro?</h3>
-                    <div class="space-y-4">
-                        <textarea
-                            id="newPostContent"
-                            class="w-full p-4 border border-gray-200 rounded-xl resize-none focus:outline-none focus:ring-2 focus:ring-purple-500"
-                            rows="3"
-                            placeholder="Share something awesome with the community..."
-                        ></textarea>
-                        <div class="flex justify-between items-center">
-                            <span class="text-sm text-gray-500">💎 Earn 25 points per post!</span>
-                            <button onclick="createPost()" class="bg-gradient-to-r from-purple-500 to-pink-500 text-white px-6 py-2 rounded-full hover:shadow-lg transition-all duration-300">
-                                Post & Earn
-                            </button>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Posts Feed -->
-                <div class="space-y-4" id="postsFeed">
-                    <!-- Posts will be loaded here -->
-                </div>
-            </div>
-
-            <!-- Right Sidebar -->
-            <div class="lg:col-span-1">
-                <!-- Stats -->
-                <div class="bg-white rounded-2xl shadow-lg p-6 mb-6">
-                    <h3 class="font-bold text-gray-800 mb-4">📊 Community Stats</h3>
-                    <div class="space-y-4">
-                        <div class="text-center">
-                            <div class="text-3xl font-bold text-purple-600" id="activeUsers">1,247</div>
-                            <div class="text-sm text-gray-500">Active Users</div>
-                        </div>
-                        <div class="text-center">
-                            <div class="text-3xl font-bold text-pink-600" id="postsToday">8,392</div>
-                            <div class="text-sm text-gray-500">Posts Today</div>
-                        </div>
-                        <div class="text-center">
-                            <div class="text-3xl font-bold text-orange-500">156</div>
-                            <div class="text-sm text-gray-500">Challenges Active</div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Recent Activity -->
-                <div class="bg-white rounded-2xl shadow-lg p-6">
-                    <h3 class="font-bold text-gray-800 mb-4">⚡ Live Activity</h3>
-                    <div class="space-y-3" id="liveActivity">
-                        <!-- Live activity will be loaded here -->
-                    </div>
-                    <div class="mt-4 p-3 bg-gradient-to-r from-purple-100 to-pink-100 rounded-lg">
-                        <p class="text-sm font-semibold text-gray-800">🎉 Join the action!</p>
-                        <p class="text-xs text-gray-600">Be part of Malaysia's most active social community</p>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Footer -->
-    <footer class="bg-gray-800 text-white py-8 mt-12">
-        <div class="max-w-6xl mx-auto px-4">
-            <div class="grid md:grid-cols-3 gap-8">
-                <div>
-                    <h3 class="font-bold text-xl mb-4">JomBro</h3>
-                    <p class="text-gray-300">Malaysia's revolutionary social platform connecting communities through challenges and rewards.</p>
-                </div>
-                <div>
-                    <h4 class="font-semibold mb-4">Features</h4>
-                    <ul class="space-y-2 text-gray-300">
-                        <li>• Daily Challenges</li>
-                        <li>• Points Rewards</li>
-                        <li>• Community Feed</li>
-                        <li>• Local Connections</li>
-                    </ul>
-                </div>
-                <div>
-                    <h4 class="font-semibold mb-4">Get Started</h4>
-                    <p class="text-gray-300 mb-4">Join thousands of Malaysians already using JomBro!</p>
-                    <button class="bg-gradient-to-r from-purple-500 to-pink-500 text-white px-6 py-2 rounded-full hover:shadow-lg transition-all">
-                        Download App
-                    </button>
-                </div>
-            </div>
-            <div class="border-t border-gray-700 mt-8 pt-8 text-center text-gray-400">
-                <p>&copy; 2025 JomBro. Made with ❤️ in Malaysia</p>
-            </div>
-        </div>
-    </footer>
-
-    <script>
-        // Sample Malaysian users data
-        const users = [
-            { id: 1, name: 'Ahmad Rahman', username: 'ahmad_r', points: 850, status: 'Makan nasi lemak sambil tengok Netflix!', location: 'KL', joinedDays: 45 },
-            { id: 2, name: 'Siti Nurhaliza', username: 'siti_singer', points: 920, status: 'Jom karaoke petang ni! Who\'s in?', location: 'Selangor', joinedDays: 32 },
-            { id: 3, name: 'Raj Kumar', username: 'raj_tech', points: 760, status: 'Coding sambil minum teh tarik. Perfect combination!', location: 'Cyberjaya', joinedDays: 28 },
-            { id: 4, name: 'Lim Wei Ming', username: 'wei_ming', points: 690, status: 'Baru lepas gym, siapa nak join futsal?', location: 'Penang', joinedDays: 55 },
-            { id: 5, name: 'Fatimah Zahra', username: 'fatimah_z', points: 830, status: 'Shopping spree di Mid Valley! Girls, jom!', location: 'KL', joinedDays: 38 },
-            { id: 6, name: 'David Tan', username: 'david_foodie', points: 715, status: 'Found the best cendol in Melaka! Must try!', location: 'Melaka', joinedDays: 42 },
-            { id: 7, name: 'Nurul Ain', username: 'nurul_photographer', points: 885, status: 'Sunrise photography session di KLCC. Cantik gila!', location: 'KL', joinedDays: 25 },
-            { id: 8, name: 'Jackson Lee', username: 'jackson_gamer', points: 945, status: 'New high score! Who can beat 2500 points?', location: 'JB', joinedDays: 67 },
-            { id: 9, name: 'Aisha Mohamed', username: 'aisha_travel', points: 775, status: 'Planning trip to Langkawi. Any recommendations?', location: 'Shah Alam', joinedDays: 33 },
-            { id: 10, name: 'Chen Wei', username: 'chen_chef', points: 820, status: 'Homemade dim sum for dinner. Recipe in comments!', location: 'Ipoh', joinedDays: 29 }
-        ];
-
-        // Challenges data
-        const challenges = [
-            { id: 1, title: 'Share Your Breakfast', points: 50, participants: 234, timeLeft: '2h 15m' },
-            { id: 2, title: 'Weekend Adventure Photo', points: 100, participants: 156, timeLeft: '1d 8h' },
-            { id: 3, title: 'Recommend Local Food', points: 75, participants: 89, timeLeft: '5h 30m' },
-            { id: 4, title: 'Workout Video Challenge', points: 125, participants: 67, timeLeft: '3d 12h' },
-            { id: 5, title: 'Pet Photo Contest', points: 80, participants: 203, timeLeft: '18h 45m' }
-        ];
-
-        // Sample posts
-        let posts = [
-            { id: 1, user: users[0], content: 'Morning vibes with the best nasi lemak in town! 🇲🇾', likes: 23, comments: 5, time: '2h ago' },
-            { id: 2, user: users[1], content: 'Karaoke session was epic! Thanks to everyone who joined 🎤', likes: 34, comments: 12, time: '4h ago' },
-            { id: 3, user: users[2], content: 'Just deployed my new app! Malaysia boleh! 💻🚀', likes: 41, comments: 8, time: '6h ago' },
-            { id: 4, user: users[3], content: 'Futsal game tomorrow 7PM. Still got slots! ⚽', likes: 18, comments: 15, time: '1d ago' },
-            { id: 5, user: users[4], content: 'Found the cutest accessories at Mid Valley! 💅✨', likes: 28, comments: 7, time: '1d ago' }
-        ];
-
-        let currentUserPoints = 100;
-
-        // Initialize the app
-        function initApp() {
-            loadChallenges();
-            loadTopUsers();
-            loadPosts();
-            loadLiveActivity();
-            startRealTimeUpdates();
-        }
-
-        // Load challenges
-        function loadChallenges() {
-            const challengesList = document.getElementById('challengesList');
-            challengesList.innerHTML = challenges.slice(0, 3).map(challenge => `
-                <div class="border border-gray-200 rounded-lg p-3 hover:shadow-md transition-shadow card-hover">
-                    <div class="flex justify-between items-start mb-2">
-                        <h4 class="font-semibold text-sm text-gray-800">${challenge.title}</h4>
-                        <span class="text-purple-600 font-bold text-sm">${challenge.points}pts</span>
-                    </div>
-                    <div class="flex justify-between items-center">
-                        <span class="text-xs text-gray-500">${challenge.participants} joined</span>
-                        <span class="text-xs text-orange-500 font-semibold">${challenge.timeLeft}</span>
-                    </div>
-                    <button onclick="joinChallenge(${challenge.id})" class="w-full mt-2 bg-gradient-to-r from-purple-500 to-pink-500 text-white py-1 rounded-md text-sm hover:shadow-md transition-all">
-                        Join Now
-                    </button>
-                </div>
-            `).join('');
-        }
-
-        // Load top users
-        function loadTopUsers() {
-            const topUsersList = document.getElementById('topUsersList');
-            const sortedUsers = [...users].sort((a, b) => b.points - a.points).slice(0, 5);
-            
-            topUsersList.innerHTML = sortedUsers.map((user, index) => `
-                <div class="flex items-center space-x-3">
-                    <div class="w-8 h-8 rounded-full flex items-center justify-center text-white text-sm font-bold ${
-                        index === 0 ? 'bg-yellow-500' : index === 1 ? 'bg-gray-400' : index === 2 ? 'bg-orange-500' : 'bg-purple-500'
-                    }">
-                        ${index + 1}
-                    </div>
-                    <div class="flex-1">
-                        <p class="font-semibold text-sm text-gray-800">${user.name}</p>
-                        <p class="text-xs text-purple-600 font-bold">${user.points} points</p>
-                    </div>
-                </div>
-            `).join('');
-        }
-
-        // Load posts
-        function loadPosts() {
-            const postsFeed = document.getElementById('postsFeed');
-            postsFeed.innerHTML = posts.map(post => `
-                <div class="bg-white rounded-2xl shadow-lg p-6 hover:shadow-xl transition-shadow card-hover">
-                    <div class="flex items-start space-x-3 mb-4">
-                        <div class="w-12 h-12 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full flex items-center justify-center">
-                            <span class="text-white font-bold">${post.user.name.charAt(0)}</span>
-                        </div>
-                        <div class="flex-1">
-                            <div class="flex items-center space-x-2">
-                                <h4 class="font-bold text-gray-800">${post.user.name}</h4>
-                                <span class="text-gray-500 text-sm">@${post.user.username}</span>
-                                <span class="text-gray-400 text-sm">•</span>
-                                <span class="text-gray-400 text-sm">${post.time}</span>
-                            </div>
-                            <p class="text-purple-600 text-sm font-semibold">${post.user.points} points</p>
-                        </div>
-                    </div>
-                    
-                    <p class="text-gray-800 mb-4 leading-relaxed">${post.content}</p>
-                    
-                    <div class="flex items-center space-x-6 text-gray-500">
-                        <button onclick="likePost(${post.id})" class="flex items-center space-x-2 hover:text-red-500 transition-colors">
-                            <span>❤️</span>
-                            <span class="text-sm">${post.likes}</span>
-                        </button>
-                        <button class="flex items-center space-x-2 hover:text-blue-500 transition-colors">
-                            <span>💬</span>
-                            <span class="text-sm">${post.comments}</span>
-                        </button>
-                        <button class="flex items-center space-x-2 hover:text-green-500 transition-colors">
-                            <span>🔄</span>
-                            <span class="text-sm">Share</span>
-                        </button>
-                    </div>
-                </div>
-            `).join('');
-        }
-
-        // Load live activity
-        function loadLiveActivity() {
-            const liveActivity = document.getElementById('liveActivity');
-            liveActivity.innerHTML = users.slice(0, 6).map((user, index) => `
-                <div class="flex items-center space-x-2 text-sm">
-                    <div class="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
-                    <span class="font-semibold text-gray-700">${user.name}</span>
-                    <span class="text-gray-500">earned points</span>
-                </div>
-            `).join('');
-        }
-
-        // Create new post
-        function createPost() {
-            const content = document.getElementById('newPostContent').value.trim();
-            if (!content) return;
-
-            const newPost = {
-                id: Date.now(),
-                user: { name: 'You', username: 'new_user', points: currentUserPoints },
-                content: content,
-                likes: 0,
-                comments: 0,
-                time: 'now'
-            };
-
-            posts.unshift(newPost);
-            currentUserPoints += 25;
-            document.getElementById('userPoints').textContent = currentUserPoints;
-            document.getElementById('newPostContent').value = '';
-            
-            loadPosts();
-            showNotification('Post created! You earned 25 points! 🎉');
-        }
-
-        // Join challenge
-        function joinChallenge(challengeId) {
-            currentUserPoints += 10;
-            document.getElementById('userPoints').textContent = currentUserPoints;
-            showNotification('Challenge joined! You earned 10 bonus points! 🎉');
-        }
-
-        // Like post
-        function likePost(postId) {
-            const post = posts.find(p => p.id === postId);
-            if (post) {
-                post.likes += 1;
-                loadPosts();
-            }
-        }
-
-        // Points shop functions
-        function togglePointsShop() {
-            const pointsShop = document.getElementById('pointsShop');
-            pointsShop.classList.toggle('hidden');
-        }
-
-        function buyPoints(points, price) {
-            showNotification(`Redirecting to payment for ${points} points at ${price}...`);
-            setTimeout(() => {
-                currentUserPoints += points;
-                document.getElementById('userPoints').textContent = currentUserPoints;
-                togglePointsShop();
-                showNotification(`${points} points added to your account! 💎`);
-            }, 2000);
-        }
-
-        // Show notification
-        function showNotification(message) {
-            alert(message);
-        }
-
-        // Start real-time updates
-        function startRealTimeUpdates() {
-            setInterval(() => {
-                // Update community stats
-                const activeUsers = document.getElementById('activeUsers');
-                const postsToday = document.getElementById('postsToday');
-                
-                activeUsers.textContent = Math.floor(1200 + Math.random() * 100);
-                postsToday.textContent = Math.floor(8300 + Math.random() * 200);
-                
-                // Update user points randomly
-                users.forEach(user => {
-                    user.points += Math.floor(Math.random() * 10);
-                });
-                
-                loadTopUsers();
-                loadLiveActivity();
-            }, 10000); // Update every 10 seconds
-        }
-
-        // Initialize when page loads
-        document.addEventListener('DOMContentLoaded', initApp);
-    </script>
-</body>
-</html>
+export default JomBroEnhanced;
