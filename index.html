@@ -7,11 +7,10 @@
     <meta name="description" content="JomBro - Malaysian Social Media Platform" />
     <title>JomBro - "bro kang tau Lai liau!"</title>
 
-    <!-- Load external libraries -->
+    <!-- Load external libraries from CDN -->
     <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
     <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
-    <script src="https://unpkg.com/lucide-react@0.263.1/dist/umd/lucide-react.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
 
     <style>
@@ -23,39 +22,60 @@
             -webkit-font-smoothing: antialiased;
             -moz-osx-font-smoothing: grayscale;
         }
+        .icon {
+            width: 24px;
+            height: 24px;
+            display: inline-block;
+        }
+        .loading {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            font-size: 18px;
+            color: #666;
+        }
     </style>
 </head>
 
 <body>
-    <div id="root"></div>
+    <div id="root">
+        <div class="loading">Loading JomBro...</div>
+    </div>
 
     <script type="text/babel">
-        const { useState, useEffect } = React;
-        const { Heart, MessageCircle, Share, ThumbsUp, Camera, Video, Smile, Search, Bell, MessageSquare, Users, Home, Menu, Plus, Globe, Lock, Users2, MoreHorizontal, Coins, Trophy, Gift, Zap, Star, DollarSign, Target, Award } = lucide;
+        const { useState } = React;
 
-        const JomBroComplete = () => {
+        // Simple icons as text/emoji instead of lucide-react
+        const Icons = {
+            Home: () => '🏠',
+            Users: () => '👥',
+            MessageSquare: () => '💬',
+            Search: () => '🔍',
+            Bell: () => '🔔',
+            Menu: () => '☰',
+            Coins: () => '🪙',
+            Star: () => '⭐',
+            DollarSign: () => '💰',
+            Gift: () => '🎁',
+            Trophy: () => '🏆',
+            ThumbsUp: () => '👍',
+            MessageCircle: () => '💬',
+            Share: () => '📤',
+            Globe: () => '🌍',
+            Plus: () => '➕'
+        };
+
+        const JomBro = () => {
             const [activeTab, setActiveTab] = useState('home');
-            const [showProfile, setShowProfile] = useState(false);
-            const [newPost, setNewPost] = useState('');
-            const [showPostModal, setShowPostModal] = useState(false);
-            const [selectedImage, setSelectedImage] = useState(null);
-            const [imagePreview, setImagePreview] = useState(null);
-            
-            // New revenue features state
-            const [showCompoundModal, setShowCompoundModal] = useState(false);
-            const [showPointsModal, setShowPointsModal] = useState(false);
-            const [showGameModal, setShowGameModal] = useState(false);
             const [userPoints, setUserPoints] = useState(2450);
             const [userLevel, setUserLevel] = useState(7);
             const [compoundBalance, setCompoundBalance] = useState(75);
-            
-            const [cropSettings, setCropSettings] = useState({
-                aspectRatio: 'auto',
-                quality: 0.8
-            });
+            const [showCompoundModal, setShowCompoundModal] = useState(false);
+            const [showPointsModal, setShowPointsModal] = useState(false);
+            const [showGameModal, setShowGameModal] = useState(false);
 
-            // Enhanced posts with original content + points system
-            const [posts, setPosts] = useState([
+            const posts = [
                 {
                     id: 1,
                     user: {
@@ -66,18 +86,11 @@
                         points: 3420
                     },
                     time: '1 jam lepas',
-                    content: 'Wah today cycle around Putrajaya! 🚴‍♀️ Weather cantik gila, perfect for outdoor activities. Siapa-siapa nak join next time? 💪 #CyclingLife #Putrajaya\n\n[Your cycling image with helmet would appear here]',
+                    content: 'Wah today cycle around Putrajaya! 🚴‍♀️ Weather cantik gila, perfect for outdoor activities. Siapa-siapa nak join next time? 💪 #CyclingLife #Putrajaya',
                     image: 'https://via.placeholder.com/600x400/10B981/FFFFFF?text=🚴‍♀️+Cycling+at+Putrajaya',
                     likes: 68,
-                    comments: 12,
-                    shares: 4,
-                    privacy: 'public',
                     pointsEarned: 14,
-                    reactions: [
-                        { type: '👍', count: 45 },
-                        { type: '❤️', count: 18 },
-                        { type: '💪', count: 5 }
-                    ]
+                    isPromoted: false
                 },
                 {
                     id: 2,
@@ -89,19 +102,11 @@
                         points: 1890
                     },
                     time: '3 jam lepas',
-                    content: 'Baru renovate studio kami! 💇‍♀️ Modern minimalist design dengan equipment terbaru. STUDIO DAMDA - Your beauty destination! Book appointment sekarang! ✨\n\n[Your Studio DAMDA salon image would appear here]',
+                    content: 'Baru renovate studio kami! 💇‍♀️ Modern minimalist design dengan equipment terbaru. STUDIO DAMDA - Your beauty destination! Book appointment sekarang! ✨',
                     image: 'https://via.placeholder.com/600x400/EC4899/FFFFFF?text=💇‍♀️+Studio+DAMDA',
                     likes: 234,
-                    comments: 34,
-                    shares: 18,
-                    privacy: 'public',
                     pointsEarned: 47,
-                    isPromoted: true,
-                    reactions: [
-                        { type: '👍', count: 156 },
-                        { type: '💕', count: 65 },
-                        { type: '✨', count: 13 }
-                    ]
+                    isPromoted: true
                 },
                 {
                     id: 3,
@@ -113,116 +118,19 @@
                         points: 5670
                     },
                     time: '5 jam lepas',
-                    content: 'Family day out at the mall! 🛒 Ada banyak kedai baru including R Pharmacy, Ai-Cha ice cream & OSUMO! Perfect spot untuk weekend family time 👨‍👩‍👧‍👦\n\n[Your shopping mall with R Pharmacy image would appear here]',
+                    content: 'Family day out at the mall! 🛒 Ada banyak kedai baru including R Pharmacy, Ai-Cha ice cream & OSUMO! Perfect spot untuk weekend family time 👨‍👩‍👧‍👦',
                     image: 'https://via.placeholder.com/600x400/8B5CF6/FFFFFF?text=🛒+Shopping+Mall+KL',
                     likes: 89,
-                    comments: 21,
-                    shares: 7,
-                    privacy: 'public',
                     pointsEarned: 18,
-                    reactions: [
-                        { type: '❤️', count: 52 },
-                        { type: '😊', count: 28 },
-                        { type: '👍', count: 9 }
-                    ]
-                },
-                {
-                    id: 4,
-                    user: {
-                        name: 'Home Renovation Pro',
-                        avatar: 'https://via.placeholder.com/100x100/EF4444/FFFFFF?text=HR',
-                        verified: false,
-                        level: 6,
-                        points: 1340
-                    },
-                    time: '1 hari lepas',
-                    content: 'Major renovation project ongoing! 🏗️ Tengah transform living space ni jadi modern concept. Progress power gila! Stay tuned for before & after shots! 💪\n\n[Your home renovation progress images would appear here]',
-                    image: 'https://via.placeholder.com/600x400/F97316/FFFFFF?text=🏗️+Home+Renovation',
-                    likes: 145,
-                    comments: 28,
-                    shares: 15,
-                    privacy: 'public',
-                    pointsEarned: 29,
-                    reactions: [
-                        { type: '👍', count: 98 },
-                        { type: '🔥', count: 35 },
-                        { type: '💪', count: 12 }
-                    ]
-                },
-                {
-                    id: 5,
-                    user: {
-                        name: 'Family Adventures',
-                        avatar: 'https://via.placeholder.com/100x100/06B6D4/FFFFFF?text=FA',
-                        verified: false,
-                        level: 9,
-                        points: 2180
-                    },
-                    time: '2 hari lepas',
-                    content: 'Sushi date with the family! 🍣 Anak-anak pun suka gila dengan sushi here. Even our doggy Bello ikut sekali dalam stroller! Family bonding time yang terbaik ❤️ #FamilyTime #SushiLover\n\n[Your sushi restaurant family photo with child and dog would appear here]',
-                    image: 'https://via.placeholder.com/600x400/84CC16/FFFFFF?text=🍣+Family+Sushi+Time',
-                    likes: 102,
-                    comments: 18,
-                    shares: 3,
-                    privacy: 'friends',
-                    pointsEarned: 21,
-                    reactions: [
-                        { type: '❤️', count: 67 },
-                        { type: '😍', count: 28 },
-                        { type: '🍣', count: 7 }
-                    ]
+                    isPromoted: false
                 }
-            ]);
+            ];
 
-            const [stories] = useState([
-                {
-                    id: 1,
-                    user: 'Your Story',
-                    avatar: 'https://via.placeholder.com/100x100/22C55E/FFFFFF?text=YOU',
-                    isOwn: true
-                },
-                {
-                    id: 2,
-                    user: 'Rajesh',
-                    avatar: 'https://via.placeholder.com/100x100/3B82F6/FFFFFF?text=R',
-                    hasStory: true
-                },
-                {
-                    id: 3,
-                    user: 'Mei Ling',
-                    avatar: 'https://via.placeholder.com/100x100/EC4899/FFFFFF?text=ML',
-                    hasStory: true
-                },
-                {
-                    id: 4,
-                    user: 'Ahmad',
-                    avatar: 'https://via.placeholder.com/100x100/F59E0B/FFFFFF?text=A',
-                    hasStory: true
-                },
-                {
-                    id: 5,
-                    user: 'Siti',
-                    avatar: 'https://via.placeholder.com/100x100/8B5CF6/FFFFFF?text=S',
-                    hasStory: true
-                }
-            ]);
-
-            const [user] = useState({
-                name: 'John Doe',
-                avatar: 'https://via.placeholder.com/100x100/6366F1/FFFFFF?text=JD',
-                points: userPoints,
-                level: userLevel,
-                badges: ['Early Adopter', 'Social Butterfly', 'Content Creator'],
-                compoundOwed: compoundBalance
-            });
-
-            // New revenue features
-            const [activeGames, setActiveGames] = useState([
+            const activeGames = [
                 {
                     id: 1,
                     challenger: 'Ahmad',
                     challengerAvatar: 'https://via.placeholder.com/50x50/F59E0B/FFFFFF?text=A',
-                    type: 'parking_challenge',
                     description: 'Who can find parking faster at 1Utama?',
                     stakes: 25,
                     deadline: '2 hours',
@@ -232,444 +140,523 @@
                     id: 2,
                     challenger: 'Mei Ling',
                     challengerAvatar: 'https://via.placeholder.com/50x50/EC4899/FFFFFF?text=ML',
-                    type: 'food_review',
                     description: 'Best nasi lemak review gets points!',
                     stakes: 15,
                     deadline: '1 day',
                     status: 'active'
                 }
-            ]);
+            ];
 
-            const [pointsActivities] = useState([
-                { type: 'post_like', points: 2, description: 'Like received on post' },
-                { type: 'comment', points: 5, description: 'Comment on friend\'s post' },
-                { type: 'share', points: 8, description: 'Share content' },
-                { type: 'check_in', points: 10, description: 'Check-in at local business' },
-                { type: 'review', points: 15, description: 'Write business review' },
-                { type: 'referral', points: 50, description: 'Invite new friend to JomBro' },
-                { type: 'compound_paid', points: 20, description: 'Pay compound on time' },
-                { type: 'challenge_win', points: 30, description: 'Win user challenge' }
-            ]);
-
-            const [revenueStats] = useState({
+            const revenueStats = {
                 dailyCompounds: 145,
                 pointsPurchased: 89,
                 premiumUpgrades: 23,
-                businessPromotions: 12,
                 totalDaily: 450.30
-            });
+            };
 
             const handleLike = (postId) => {
-                setPosts(posts.map(post => 
-                    post.id === postId 
-                        ? { ...post, likes: post.likes + 1 }
-                        : post
-                ));
                 setUserPoints(prev => prev + 2);
+                alert('👍 Post liked! +2 points earned!');
             };
 
             const handleCompoundPayment = (amount) => {
                 setCompoundBalance(prev => Math.max(0, prev - amount));
                 setUserPoints(prev => prev + 20);
+                setShowCompoundModal(false);
+                alert('💰 Compound paid! +20 bonus points earned!');
             };
 
             const handlePointsPurchase = (pointsAmount, cost) => {
                 setUserPoints(prev => prev + pointsAmount);
+                setShowPointsModal(false);
+                alert(`🪙 Purchased ${pointsAmount} points for RM${cost}!`);
             };
 
-            const acceptChallenge = (gameId) => {
-                setActiveGames(prev => prev.map(game => 
-                    game.id === gameId 
-                        ? { ...game, status: 'active' }
-                        : game
-                ));
-            };
-
-            // Revenue modals
+            // Modals
             const CompoundModal = () => (
-                React.createElement('div', { className: "fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50" },
-                    React.createElement('div', { className: "bg-white rounded-xl w-full max-w-md" },
-                        React.createElement('div', { className: "p-6" },
-                            React.createElement('div', { className: "text-center mb-6" },
-                                React.createElement('div', { className: "w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4" },
-                                    React.createElement(DollarSign, { className: "w-8 h-8 text-red-600" })
-                                ),
-                                React.createElement('h2', { className: "text-2xl font-bold text-gray-900 mb-2" }, "Pay Compound"),
-                                React.createElement('p', { className: "text-gray-600" }, `Outstanding balance: RM${compoundBalance}`)
-                            ),
-                            React.createElement('div', { className: "space-y-4 mb-6" },
-                                React.createElement('div', { className: "bg-red-50 border border-red-200 rounded-lg p-4" },
-                                    React.createElement('div', { className: "flex justify-between items-center mb-2" },
-                                        React.createElement('span', { className: "font-medium" }, "Parking Violation"),
-                                        React.createElement('span', { className: "text-red-600 font-bold" }, "RM50")
-                                    ),
-                                    React.createElement('div', { className: "text-sm text-red-600" }, "Due: 2 days remaining")
-                                ),
-                                React.createElement('div', { className: "bg-red-50 border border-red-200 rounded-lg p-4" },
-                                    React.createElement('div', { className: "flex justify-between items-center mb-2" },
-                                        React.createElement('span', { className: "font-medium" }, "Late Payment Fee"),
-                                        React.createElement('span', { className: "text-red-600 font-bold" }, "RM25")
-                                    ),
-                                    React.createElement('div', { className: "text-sm text-red-600" }, "Due: 1 day remaining")
-                                )
-                            ),
-                            React.createElement('div', { className: "space-y-3" },
-                                React.createElement('button', {
-                                    onClick: () => {
-                                        handleCompoundPayment(75);
-                                        setShowCompoundModal(false);
-                                    },
-                                    className: "w-full bg-red-600 text-white py-3 rounded-lg font-semibold hover:bg-red-700 transition-colors"
-                                }, "Pay Full Amount (RM75) + Get 20 Points"),
-                                React.createElement('button', {
-                                    onClick: () => setShowCompoundModal(false),
-                                    className: "w-full bg-gray-200 text-gray-700 py-3 rounded-lg font-semibold hover:bg-gray-300 transition-colors"
-                                }, "Pay Later")
-                            )
-                        )
-                    )
-                )
+                <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+                    <div className="bg-white rounded-xl w-full max-w-md">
+                        <div className="p-6">
+                            <div className="text-center mb-6">
+                                <div className="text-4xl mb-4">💰</div>
+                                <h2 className="text-2xl font-bold text-gray-900 mb-2">Pay Compound</h2>
+                                <p className="text-gray-600">Outstanding balance: RM{compoundBalance}</p>
+                            </div>
+
+                            <div className="space-y-4 mb-6">
+                                <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+                                    <div className="flex justify-between items-center mb-2">
+                                        <span className="font-medium">Parking Violation</span>
+                                        <span className="text-red-600 font-bold">RM50</span>
+                                    </div>
+                                    <div className="text-sm text-red-600">Due: 2 days remaining</div>
+                                </div>
+                                
+                                <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+                                    <div className="flex justify-between items-center mb-2">
+                                        <span className="font-medium">Late Payment Fee</span>
+                                        <span className="text-red-600 font-bold">RM25</span>
+                                    </div>
+                                    <div className="text-sm text-red-600">Due: 1 day remaining</div>
+                                </div>
+                            </div>
+
+                            <div className="space-y-3">
+                                <button 
+                                    onClick={() => handleCompoundPayment(75)}
+                                    className="w-full bg-red-600 text-white py-3 rounded-lg font-semibold hover:bg-red-700 transition-colors"
+                                >
+                                    Pay Full Amount (RM75) + Get 20 Points
+                                </button>
+                                <button 
+                                    onClick={() => setShowCompoundModal(false)}
+                                    className="w-full bg-gray-200 text-gray-700 py-3 rounded-lg font-semibold hover:bg-gray-300 transition-colors"
+                                >
+                                    Pay Later
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             );
 
             const PointsModal = () => (
-                React.createElement('div', { className: "fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50" },
-                    React.createElement('div', { className: "bg-white rounded-xl w-full max-w-lg max-h-[90vh] overflow-y-auto" },
-                        React.createElement('div', { className: "p-6" },
-                            React.createElement('div', { className: "text-center mb-6" },
-                                React.createElement('div', { className: "w-16 h-16 bg-yellow-100 rounded-full flex items-center justify-center mx-auto mb-4" },
-                                    React.createElement(Coins, { className: "w-8 h-8 text-yellow-600" })
-                                ),
-                                React.createElement('h2', { className: "text-2xl font-bold text-gray-900 mb-2" }, "JomBro Points"),
-                                React.createElement('p', { className: "text-gray-600" }, 
-                                    "Current Balance: ",
-                                    React.createElement('span', { className: "font-bold text-yellow-600" }, `${userPoints} Points`)
-                                )
-                            ),
-                            React.createElement('div', { className: "mb-6" },
-                                React.createElement('h3', { className: "font-bold text-lg mb-4" }, "Purchase Points"),
-                                React.createElement('div', { className: "grid grid-cols-2 gap-3" },
-                                    React.createElement('button', {
-                                        onClick: () => handlePointsPurchase(100, 5),
-                                        className: "bg-yellow-500 text-white p-4 rounded-lg text-center hover:bg-yellow-600 transition-colors"
-                                    },
-                                        React.createElement('div', { className: "font-bold" }, "100 Points"),
-                                        React.createElement('div', { className: "text-sm" }, "RM5.00")
-                                    ),
-                                    React.createElement('button', {
-                                        onClick: () => handlePointsPurchase(250, 10),
-                                        className: "bg-yellow-500 text-white p-4 rounded-lg text-center hover:bg-yellow-600 transition-colors"
-                                    },
-                                        React.createElement('div', { className: "font-bold" }, "250 Points"),
-                                        React.createElement('div', { className: "text-sm" }, "RM10.00")
-                                    )
-                                )
-                            ),
-                            React.createElement('button', {
-                                onClick: () => setShowPointsModal(false),
-                                className: "w-full bg-gray-200 text-gray-700 py-3 rounded-lg font-semibold hover:bg-gray-300 transition-colors"
-                            }, "Close")
-                        )
-                    )
-                )
+                <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+                    <div className="bg-white rounded-xl w-full max-w-lg">
+                        <div className="p-6">
+                            <div className="text-center mb-6">
+                                <div className="text-4xl mb-4">🪙</div>
+                                <h2 className="text-2xl font-bold text-gray-900 mb-2">JomBro Points</h2>
+                                <p className="text-gray-600">
+                                    Current Balance: <span className="font-bold text-yellow-600">{userPoints} Points</span>
+                                </p>
+                                <p className="text-sm text-gray-500">Level {userLevel} Member</p>
+                            </div>
+
+                            <div className="mb-6">
+                                <h3 className="font-bold text-lg mb-4">Purchase Points</h3>
+                                <div className="grid grid-cols-2 gap-3">
+                                    <button 
+                                        onClick={() => handlePointsPurchase(100, 5)}
+                                        className="bg-yellow-500 text-white p-4 rounded-lg text-center hover:bg-yellow-600 transition-colors"
+                                    >
+                                        <div className="font-bold">100 Points</div>
+                                        <div className="text-sm">RM5.00</div>
+                                    </button>
+                                    <button 
+                                        onClick={() => handlePointsPurchase(250, 10)}
+                                        className="bg-yellow-500 text-white p-4 rounded-lg text-center hover:bg-yellow-600 transition-colors"
+                                    >
+                                        <div className="font-bold">250 Points</div>
+                                        <div className="text-sm">RM10.00</div>
+                                    </button>
+                                    <button 
+                                        onClick={() => handlePointsPurchase(500, 18)}
+                                        className="bg-yellow-500 text-white p-4 rounded-lg text-center hover:bg-yellow-600 transition-colors"
+                                    >
+                                        <div className="font-bold">500 Points</div>
+                                        <div className="text-sm">RM18.00</div>
+                                    </button>
+                                    <button 
+                                        onClick={() => handlePointsPurchase(1000, 30)}
+                                        className="bg-yellow-500 text-white p-4 rounded-lg text-center hover:bg-yellow-600 transition-colors"
+                                    >
+                                        <div className="font-bold">1000 Points</div>
+                                        <div className="text-sm">RM30.00</div>
+                                    </button>
+                                </div>
+                            </div>
+
+                            <button 
+                                onClick={() => setShowPointsModal(false)}
+                                className="w-full bg-gray-200 text-gray-700 py-3 rounded-lg font-semibold hover:bg-gray-300 transition-colors"
+                            >
+                                Close
+                            </button>
+                        </div>
+                    </div>
+                </div>
             );
 
             const GameModal = () => (
-                React.createElement('div', { className: "fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50" },
-                    React.createElement('div', { className: "bg-white rounded-xl w-full max-w-lg" },
-                        React.createElement('div', { className: "p-6" },
-                            React.createElement('div', { className: "text-center mb-6" },
-                                React.createElement('div', { className: "w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4" },
-                                    React.createElement(Trophy, { className: "w-8 h-8 text-green-600" })
-                                ),
-                                React.createElement('h2', { className: "text-2xl font-bold text-gray-900 mb-2" }, "User Challenges"),
-                                React.createElement('p', { className: "text-gray-600" }, "Compete with friends and earn points!")
-                            ),
-                            React.createElement('div', { className: "space-y-4 mb-6" },
-                                activeGames.map(game => 
-                                    React.createElement('div', { key: game.id, className: "border border-gray-200 rounded-lg p-4" },
-                                        React.createElement('div', { className: "flex items-center space-x-3 mb-3" },
-                                            React.createElement('img', { src: game.challengerAvatar, alt: game.challenger, className: "w-10 h-10 rounded-full" }),
-                                            React.createElement('div', null,
-                                                React.createElement('div', { className: "font-medium" }, `${game.challenger} challenges you!`),
-                                                React.createElement('div', { className: "text-sm text-gray-500" }, `Stakes: ${game.stakes} points`)
-                                            )
-                                        ),
-                                        React.createElement('p', { className: "text-gray-700 mb-3" }, game.description),
-                                        React.createElement('div', { className: "flex justify-between items-center" },
-                                            React.createElement('span', { className: "text-sm text-gray-500" }, `Deadline: ${game.deadline}`),
-                                            game.status === 'pending' && React.createElement('button', {
-                                                onClick: () => acceptChallenge(game.id),
-                                                className: "bg-green-500 text-white px-4 py-1 rounded text-sm hover:bg-green-600 transition-colors"
-                                            }, "Accept")
-                                        )
-                                    )
-                                )
-                            ),
-                            React.createElement('button', {
-                                onClick: () => setShowGameModal(false),
-                                className: "w-full bg-gray-200 text-gray-700 py-3 rounded-lg font-semibold hover:bg-gray-300 transition-colors"
-                            }, "Close")
-                        )
-                    )
-                )
+                <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+                    <div className="bg-white rounded-xl w-full max-w-lg">
+                        <div className="p-6">
+                            <div className="text-center mb-6">
+                                <div className="text-4xl mb-4">🏆</div>
+                                <h2 className="text-2xl font-bold text-gray-900 mb-2">User Challenges</h2>
+                                <p className="text-gray-600">Compete with friends and earn points!</p>
+                            </div>
+
+                            <div className="space-y-4 mb-6">
+                                {activeGames.map(game => (
+                                    <div key={game.id} className="border border-gray-200 rounded-lg p-4">
+                                        <div className="flex items-center space-x-3 mb-3">
+                                            <img src={game.challengerAvatar} alt={game.challenger} className="w-10 h-10 rounded-full" />
+                                            <div>
+                                                <div className="font-medium">{game.challenger} challenges you!</div>
+                                                <div className="text-sm text-gray-500">Stakes: {game.stakes} points</div>
+                                            </div>
+                                        </div>
+                                        <p className="text-gray-700 mb-3">{game.description}</p>
+                                        <div className="flex justify-between items-center">
+                                            <span className="text-sm text-gray-500">Deadline: {game.deadline}</span>
+                                            {game.status === 'pending' && (
+                                                <button 
+                                                    onClick={() => alert('🎮 Challenge accepted!')}
+                                                    className="bg-green-500 text-white px-4 py-1 rounded text-sm hover:bg-green-600 transition-colors"
+                                                >
+                                                    Accept
+                                                </button>
+                                            )}
+                                            {game.status === 'active' && (
+                                                <span className="bg-yellow-100 text-yellow-700 px-2 py-1 rounded text-sm">
+                                                    Active
+                                                </span>
+                                            )}
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+
+                            <button 
+                                onClick={() => setShowGameModal(false)}
+                                className="w-full bg-gray-200 text-gray-700 py-3 rounded-lg font-semibold hover:bg-gray-300 transition-colors"
+                            >
+                                Close
+                            </button>
+                        </div>
+                    </div>
+                </div>
             );
 
             const renderContent = () => {
                 switch (activeTab) {
                     case 'home':
-                        return React.createElement('div', { className: "max-w-2xl mx-auto" },
-                            // Points & Status Bar
-                            React.createElement('div', { className: "bg-gradient-to-r from-yellow-400 to-orange-500 rounded-xl shadow-sm p-4 mb-4 text-white" },
-                                React.createElement('div', { className: "flex justify-between items-center" },
-                                    React.createElement('div', null,
-                                        React.createElement('div', { className: "flex items-center space-x-2" },
-                                            React.createElement(Coins, { className: "w-5 h-5" }),
-                                            React.createElement('span', { className: "font-bold" }, `${userPoints} Points`),
-                                            React.createElement(Star, { className: "w-4 h-4" }),
-                                            React.createElement('span', null, `Level ${userLevel}`)
-                                        ),
-                                        React.createElement('p', { className: "text-yellow-100 text-sm" }, `Outstanding Compound: RM${compoundBalance}`)
-                                    ),
-                                    React.createElement('div', { className: "flex space-x-2" },
-                                        React.createElement('button', {
-                                            onClick: () => setShowPointsModal(true),
-                                            className: "bg-white bg-opacity-20 px-3 py-1 rounded-full text-sm hover:bg-opacity-30 transition-colors"
-                                        }, "Get Points"),
-                                        React.createElement('button', {
-                                            onClick: () => setShowGameModal(true),
-                                            className: "bg-white bg-opacity-20 px-3 py-1 rounded-full text-sm hover:bg-opacity-30 transition-colors"
-                                        }, "Challenges")
-                                    )
-                                )
-                            ),
+                        return (
+                            <div className="max-w-2xl mx-auto">
+                                {/* Points & Status Bar */}
+                                <div className="bg-gradient-to-r from-yellow-400 to-orange-500 rounded-xl shadow-sm p-4 mb-4 text-white">
+                                    <div className="flex justify-between items-center">
+                                        <div>
+                                            <div className="flex items-center space-x-2">
+                                                <span className="text-2xl">🪙</span>
+                                                <span className="font-bold">{userPoints} Points</span>
+                                                <span className="text-2xl">⭐</span>
+                                                <span>Level {userLevel}</span>
+                                            </div>
+                                            <p className="text-yellow-100 text-sm">Outstanding Compound: RM{compoundBalance}</p>
+                                        </div>
+                                        <div className="flex space-x-2">
+                                            <button 
+                                                onClick={() => setShowPointsModal(true)}
+                                                className="bg-white bg-opacity-20 px-3 py-1 rounded-full text-sm hover:bg-opacity-30 transition-colors"
+                                            >
+                                                Get Points
+                                            </button>
+                                            <button 
+                                                onClick={() => setShowGameModal(true)}
+                                                className="bg-white bg-opacity-20 px-3 py-1 rounded-full text-sm hover:bg-opacity-30 transition-colors"
+                                            >
+                                                Challenges
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
 
-                            // Revenue Dashboard
-                            React.createElement('div', { className: "bg-white rounded-xl shadow-sm border-2 border-gray-400 p-4 mb-4" },
-                                React.createElement('h3', { className: "font-bold text-lg mb-4 text-center" }, "📊 Daily Revenue Dashboard"),
-                                React.createElement('div', { className: "grid grid-cols-2 gap-4" },
-                                    React.createElement('div', { className: "text-center" },
-                                        React.createElement('div', { className: "text-2xl font-bold text-green-600" }, revenueStats.dailyCompounds),
-                                        React.createElement('div', { className: "text-sm text-gray-600" }, "Compounds Paid")
-                                    ),
-                                    React.createElement('div', { className: "text-center" },
-                                        React.createElement('div', { className: "text-2xl font-bold text-yellow-600" }, revenueStats.pointsPurchased),
-                                        React.createElement('div', { className: "text-sm text-gray-600" }, "Points Purchased")
-                                    ),
-                                    React.createElement('div', { className: "text-center" },
-                                        React.createElement('div', { className: "text-2xl font-bold text-blue-600" }, revenueStats.premiumUpgrades),
-                                        React.createElement('div', { className: "text-sm text-gray-600" }, "Premium Upgrades")
-                                    ),
-                                    React.createElement('div', { className: "text-center" },
-                                        React.createElement('div', { className: "text-2xl font-bold text-purple-600" }, `RM${revenueStats.totalDaily}`),
-                                        React.createElement('div', { className: "text-sm text-gray-600" }, "Total Revenue")
-                                    )
-                                )
-                            ),
+                                {/* Revenue Dashboard */}
+                                <div className="bg-white rounded-xl shadow-sm border-2 border-gray-400 p-4 mb-4">
+                                    <h3 className="font-bold text-lg mb-4 text-center">📊 Daily Revenue Dashboard</h3>
+                                    <div className="grid grid-cols-2 gap-4">
+                                        <div className="text-center">
+                                            <div className="text-2xl font-bold text-green-600">{revenueStats.dailyCompounds}</div>
+                                            <div className="text-sm text-gray-600">Compounds Paid</div>
+                                        </div>
+                                        <div className="text-center">
+                                            <div className="text-2xl font-bold text-yellow-600">{revenueStats.pointsPurchased}</div>
+                                            <div className="text-sm text-gray-600">Points Purchased</div>
+                                        </div>
+                                        <div className="text-center">
+                                            <div className="text-2xl font-bold text-blue-600">{revenueStats.premiumUpgrades}</div>
+                                            <div className="text-sm text-gray-600">Premium Upgrades</div>
+                                        </div>
+                                        <div className="text-center">
+                                            <div className="text-2xl font-bold text-purple-600">RM{revenueStats.totalDaily}</div>
+                                            <div className="text-sm text-gray-600">Total Revenue</div>
+                                        </div>
+                                    </div>
+                                </div>
 
-                            // Compound Warning
-                            compoundBalance > 0 && React.createElement('div', { className: "bg-red-50 border-2 border-red-300 rounded-xl p-4 mb-4" },
-                                React.createElement('div', { className: "text-center mb-3" },
-                                    React.createElement('h3', { className: "text-red-700 font-bold text-lg" }, "⚠️ COMPOUND ALERT ⚠️"),
-                                    React.createElement('p', { className: "text-red-600 font-semibold" }, "You have outstanding compounds!")
-                                ),
-                                React.createElement('div', { className: "bg-white rounded-lg p-3 border border-red-200 mb-3" },
-                                    React.createElement('div', { className: "flex justify-between items-center" },
-                                        React.createElement('span', { className: "font-bold" }, "Total Amount:"),
-                                        React.createElement('span', { className: "font-bold text-lg text-red-700" }, `RM${compoundBalance}`)
-                                    ),
-                                    React.createElement('p', { className: "text-xs text-red-600 mt-1" }, "⏰ Pay now and earn 20 bonus points!")
-                                ),
-                                React.createElement('button', {
-                                    onClick: () => setShowCompoundModal(true),
-                                    className: "w-full bg-red-600 text-white py-2 px-4 rounded-lg font-semibold hover:bg-red-700 transition-colors"
-                                }, "Pay Compound & Earn Points")
-                            ),
+                                {/* Compound Warning */}
+                                {compoundBalance > 0 && (
+                                    <div className="bg-red-50 border-2 border-red-300 rounded-xl p-4 mb-4">
+                                        <div className="text-center mb-3">
+                                            <h3 className="text-red-700 font-bold text-lg">⚠️ COMPOUND ALERT ⚠️</h3>
+                                            <p className="text-red-600 font-semibold">You have outstanding compounds!</p>
+                                        </div>
+                                        
+                                        <div className="bg-white rounded-lg p-3 border border-red-200 mb-3">
+                                            <div className="flex justify-between items-center">
+                                                <span className="font-bold">Total Amount:</span>
+                                                <span className="font-bold text-lg text-red-700">RM{compoundBalance}</span>
+                                            </div>
+                                            <p className="text-xs text-red-600 mt-1">⏰ Pay now and earn 20 bonus points!</p>
+                                        </div>
+                                        
+                                        <button 
+                                            onClick={() => setShowCompoundModal(true)}
+                                            className="w-full bg-red-600 text-white py-2 px-4 rounded-lg font-semibold hover:bg-red-700 transition-colors"
+                                        >
+                                            Pay Compound & Earn Points
+                                        </button>
+                                    </div>
+                                )}
 
-                            // Posts Feed
-                            posts.map(post => 
-                                React.createElement('div', { key: post.id, className: "bg-white rounded-xl shadow-sm border-2 border-gray-400 mb-4" },
-                                    // Post Header
-                                    React.createElement('div', { className: "p-4 flex items-center justify-between" },
-                                        React.createElement('div', { className: "flex items-center space-x-4" },
-                                            React.createElement('img', { 
-                                                src: post.user.avatar, 
-                                                alt: post.user.name,
-                                                className: "w-16 h-16 rounded-full object-cover border-2 border-yellow-500"
-                                            }),
-                                            React.createElement('div', null,
-                                                React.createElement('div', { className: "flex items-center space-x-2" },
-                                                    React.createElement('h3', { className: "font-bold text-lg text-gray-900" }, post.user.name),
-                                                    post.user.verified && React.createElement('div', { className: "w-5 h-5 bg-blue-500 rounded-full flex items-center justify-center" },
-                                                        React.createElement('span', { className: "text-white text-xs" }, "✓")
-                                                    ),
-                                                    React.createElement('div', { className: "flex items-center space-x-1 bg-yellow-100 px-2 py-1 rounded-full" },
-                                                        React.createElement(Star, { className: "w-3 h-3 text-yellow-500" }),
-                                                        React.createElement('span', { className: "text-xs font-medium" }, post.user.level)
-                                                    )
-                                                ),
-                                                React.createElement('div', { className: "flex items-center space-x-2 text-sm text-gray-500 mt-1" },
-                                                    React.createElement('span', null, post.time),
-                                                    React.createElement('span', null, "•"),
-                                                    React.createElement(Globe, { className: "w-3 h-3" }),
-                                                    React.createElement('span', null, "•"),
-                                                    React.createElement(Coins, { className: "w-3 h-3 text-yellow-500" }),
-                                                    React.createElement('span', { className: "text-yellow-600 font-medium" }, `+${post.pointsEarned} points`)
-                                                )
-                                            )
-                                        ),
-                                        post.isPromoted && React.createElement('div', { className: "bg-blue-100 text-blue-700 px-2 py-1 rounded text-xs font-medium" }, "Promoted 💎")
-                                    ),
+                                {/* Posts Feed */}
+                                {posts.map(post => (
+                                    <div key={post.id} className="bg-white rounded-xl shadow-sm border-2 border-gray-400 mb-4">
+                                        {/* Post Header */}
+                                        <div className="p-4 flex items-center justify-between">
+                                            <div className="flex items-center space-x-4">
+                                                <img 
+                                                    src={post.user.avatar} 
+                                                    alt={post.user.name}
+                                                    className="w-16 h-16 rounded-full object-cover border-2 border-yellow-500"
+                                                />
+                                                <div>
+                                                    <div className="flex items-center space-x-2">
+                                                        <h3 className="font-bold text-lg text-gray-900">{post.user.name}</h3>
+                                                        {post.user.verified && (
+                                                            <div className="w-5 h-5 bg-blue-500 rounded-full flex items-center justify-center">
+                                                                <span className="text-white text-xs">✓</span>
+                                                            </div>
+                                                        )}
+                                                        <div className="flex items-center space-x-1 bg-yellow-100 px-2 py-1 rounded-full">
+                                                            <span className="text-xs">⭐</span>
+                                                            <span className="text-xs font-medium">{post.user.level}</span>
+                                                        </div>
+                                                    </div>
+                                                    <div className="flex items-center space-x-2 text-sm text-gray-500 mt-1">
+                                                        <span>{post.time}</span>
+                                                        <span>•</span>
+                                                        <span>🌍</span>
+                                                        <span>•</span>
+                                                        <span>🪙</span>
+                                                        <span className="text-yellow-600 font-medium">+{post.pointsEarned} points</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            {post.isPromoted && (
+                                                <div className="bg-blue-100 text-blue-700 px-2 py-1 rounded text-xs font-medium">
+                                                    Promoted 💎
+                                                </div>
+                                            )}
+                                        </div>
 
-                                    // Post Content
-                                    React.createElement('div', { className: "px-4 pb-3" },
-                                        React.createElement('p', { className: "text-gray-800 leading-relaxed" }, post.content)
-                                    ),
+                                        {/* Post Content */}
+                                        <div className="px-4 pb-3">
+                                            <p className="text-gray-800 leading-relaxed">{post.content}</p>
+                                        </div>
 
-                                    // Post Image
-                                    post.image && React.createElement('div', { className: "mb-3" },
-                                        React.createElement('img', { 
-                                            src: post.image, 
-                                            alt: "Post content",
-                                            className: "w-full h-64 object-cover"
-                                        })
-                                    ),
+                                        {/* Post Image */}
+                                        {post.image && (
+                                            <div className="mb-3">
+                                                <img 
+                                                    src={post.image} 
+                                                    alt="Post content"
+                                                    className="w-full h-64 object-cover"
+                                                />
+                                            </div>
+                                        )}
 
-                                    // Action Buttons
-                                    React.createElement('div', { className: "px-4 py-2 border-t border-gray-100" },
-                                        React.createElement('div', { className: "flex items-center justify-around" },
-                                            React.createElement('button', {
-                                                onClick: () => handleLike(post.id),
-                                                className: "flex items-center space-x-2 px-4 py-2 rounded-lg hover:bg-yellow-50 transition-colors flex-1 justify-center"
-                                            },
-                                                React.createElement(ThumbsUp, { className: "w-4 h-4 text-gray-600" }),
-                                                React.createElement('span', { className: "text-gray-600 font-medium" }, "Steady (+2)")
-                                            ),
-                                            React.createElement('button', { className: "flex items-center space-x-2 px-4 py-2 rounded-lg hover:bg-yellow-50 transition-colors flex-1 justify-center" },
-                                                React.createElement(MessageCircle, { className: "w-4 h-4 text-gray-600" }),
-                                                React.createElement('span', { className: "text-gray-600 font-medium" }, "Comment (+5)")
-                                            ),
-                                            React.createElement('button', { className: "flex items-center space-x-2 px-4 py-2 rounded-lg hover:bg-yellow-50 transition-colors flex-1 justify-center" },
-                                                React.createElement(Share, { className: "w-4 h-4 text-gray-600" }),
-                                                React.createElement('span', { className: "text-gray-600 font-medium" }, "Kongsi (+8)")
-                                            )
-                                        )
-                                    )
-                                )
-                            )
+                                        {/* Action Buttons */}
+                                        <div className="px-4 py-2 border-t border-gray-100">
+                                            <div className="flex items-center justify-around">
+                                                <button 
+                                                    onClick={() => handleLike(post.id)}
+                                                    className="flex items-center space-x-2 px-4 py-2 rounded-lg hover:bg-yellow-50 transition-colors flex-1 justify-center"
+                                                >
+                                                    <span>👍</span>
+                                                    <span className="text-gray-600 font-medium">Steady (+2)</span>
+                                                </button>
+                                                <button className="flex items-center space-x-2 px-4 py-2 rounded-lg hover:bg-yellow-50 transition-colors flex-1 justify-center">
+                                                    <span>💬</span>
+                                                    <span className="text-gray-600 font-medium">Comment (+5)</span>
+                                                </button>
+                                                <button className="flex items-center space-x-2 px-4 py-2 rounded-lg hover:bg-yellow-50 transition-colors flex-1 justify-center">
+                                                    <span>📤</span>
+                                                    <span className="text-gray-600 font-medium">Kongsi (+8)</span>
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
                         );
 
                     case 'friends':
-                        return React.createElement('div', { className: "max-w-2xl mx-auto" },
-                            React.createElement('div', { className: "bg-white rounded-xl shadow-sm border-2 border-gray-400 p-8 text-center" },
-                                React.createElement(Users, { className: "w-16 h-16 text-yellow-500 mx-auto mb-4" }),
-                                React.createElement('h2', { className: "text-2xl font-bold text-gray-900 mb-2" }, "Kawan-kawan"),
-                                React.createElement('p', { className: "text-gray-600" }, "Cari dan connect dengan member baru!")
-                            )
+                        return (
+                            <div className="max-w-2xl mx-auto">
+                                <div className="bg-white rounded-xl shadow-sm border-2 border-gray-400 p-8 text-center">
+                                    <div className="text-6xl mb-4">👥</div>
+                                    <h2 className="text-2xl font-bold text-gray-900 mb-2">Kawan-kawan</h2>
+                                    <p className="text-gray-600">Cari dan connect dengan member baru!</p>
+                                </div>
+                            </div>
                         );
 
                     case 'messenger':
-                        return React.createElement('div', { className: "max-w-2xl mx-auto" },
-                            React.createElement('div', { className: "bg-white rounded-xl shadow-sm border-2 border-gray-400 p-8 text-center" },
-                                React.createElement(MessageSquare, { className: "w-16 h-16 text-yellow-500 mx-auto mb-4" }),
-                                React.createElement('h2', { className: "text-2xl font-bold text-gray-900 mb-2" }, "Chat Bro"),
-                                React.createElement('p', { className: "text-gray-600" }, "Borak dengan kawan dan family")
-                            )
+                        return (
+                            <div className="max-w-2xl mx-auto">
+                                <div className="bg-white rounded-xl shadow-sm border-2 border-gray-400 p-8 text-center">
+                                    <div className="text-6xl mb-4">💬</div>
+                                    <h2 className="text-2xl font-bold text-gray-900 mb-2">Chat Bro</h2>
+                                    <p className="text-gray-600">Borak dengan kawan dan family</p>
+                                </div>
+                            </div>
                         );
 
                     default:
-                        return React.createElement('div', null, "Select a tab");
+                        return <div>Select a tab</div>;
                 }
             };
 
-            return React.createElement('div', { className: "min-h-screen bg-gray-100" },
-                // Header
-                React.createElement('div', { className: "bg-white shadow-sm border-b border-gray-200 sticky top-0 z-50" },
-                    React.createElement('div', { className: "max-w-6xl mx-auto px-4 py-2" },
-                        React.createElement('div', { className: "flex items-center justify-between" },
-                            // Left - Logo & Search
-                            React.createElement('div', { className: "flex items-center space-x-4" },
-                                React.createElement('div', { className: "flex items-center space-x-2" },
-                                    React.createElement('h1', { className: "text-2xl font-bold text-yellow-600" }, "JomBro"),
-                                    React.createElement('span', { className: "text-sm text-gray-600 italic" }, '"bro kang tau Lai liau!"')
-                                ),
-                                React.createElement('div', { className: "relative hidden md:block" },
-                                    React.createElement(Search, { className: "w-5 h-5 text-gray-400 absolute left-3 top-1/2 transform -translate-y-1/2" }),
-                                    React.createElement('input', {
-                                        type: "text",
-                                        placeholder: "Search JomBro",
-                                        className: "bg-yellow-50 border border-yellow-200 rounded-full pl-10 pr-4 py-2 w-64 focus:outline-none focus:ring-2 focus:ring-yellow-500"
-                                    })
-                                )
-                            ),
+            return (
+                <div className="min-h-screen bg-gray-100">
+                    {/* Header */}
+                    <div className="bg-white shadow-sm border-b border-gray-200 sticky top-0 z-50">
+                        <div className="max-w-6xl mx-auto px-4 py-2">
+                            <div className="flex items-center justify-between">
+                                {/* Left - Logo & Search */}
+                                <div className="flex items-center space-x-4">
+                                    <div className="flex items-center space-x-2">
+                                        <h1 className="text-2xl font-bold text-yellow-600">JomBro</h1>
+                                        <span className="text-sm text-gray-600 italic">"bro kang tau Lai liau!"</span>
+                                    </div>
+                                    <div className="relative hidden md:block">
+                                        <span className="absolute left-3 top-1/2 transform -translate-y-1/2">🔍</span>
+                                        <input
+                                            type="text"
+                                            placeholder="Search JomBro"
+                                            className="bg-yellow-50 border border-yellow-200 rounded-full pl-10 pr-4 py-2 w-64 focus:outline-none focus:ring-2 focus:ring-yellow-500"
+                                        />
+                                    </div>
+                                </div>
 
-                            // Center - Navigation
-                            React.createElement('div', { className: "hidden md:flex items-center space-x-8" },
-                                React.createElement('button', {
-                                    onClick: () => setActiveTab('home'),
-                                    className: `p-3 rounded-lg transition-colors ${activeTab === 'home' ? 'text-yellow-600 bg-yellow-50' : 'text-gray-600 hover:bg-yellow-50'}`
-                                }, React.createElement(Home, { className: "w-6 h-6" })),
-                                React.createElement('button', {
-                                    onClick: () => setActiveTab('friends'),
-                                    className: `p-3 rounded-lg transition-colors ${activeTab === 'friends' ? 'text-yellow-600 bg-yellow-50' : 'text-gray-600 hover:bg-yellow-50'}`
-                                }, React.createElement(Users, { className: "w-6 h-6" })),
-                                React.createElement('button', {
-                                    onClick: () => setActiveTab('messenger'),
-                                    className: `p-3 rounded-lg transition-colors ${activeTab === 'messenger' ? 'text-yellow-600 bg-yellow-50' : 'text-gray-600 hover:bg-yellow-50'}`
-                                }, React.createElement(MessageSquare, { className: "w-6 h-6" }))
-                            ),
+                                {/* Center - Navigation */}
+                                <div className="hidden md:flex items-center space-x-8">
+                                    <button
+                                        onClick={() => setActiveTab('home')}
+                                        className={`p-3 rounded-lg transition-colors ${activeTab === 'home' ? 'text-yellow-600 bg-yellow-50' : 'text-gray-600 hover:bg-yellow-50'}`}
+                                    >
+                                        <span className="text-xl">🏠</span>
+                                    </button>
+                                    <button
+                                        onClick={() => setActiveTab('friends')}
+                                        className={`p-3 rounded-lg transition-colors ${activeTab === 'friends' ? 'text-yellow-600 bg-yellow-50' : 'text-gray-600 hover:bg-yellow-50'}`}
+                                    >
+                                        <span className="text-xl">👥</span>
+                                    </button>
+                                    <button
+                                        onClick={() => setActiveTab('messenger')}
+                                        className={`p-3 rounded-lg transition-colors ${activeTab === 'messenger' ? 'text-yellow-600 bg-yellow-50' : 'text-gray-600 hover:bg-yellow-50'}`}
+                                    >
+                                        <span className="text-xl">💬</span>
+                                    </button>
+                                </div>
 
-                            // Right - User Actions
-                            React.createElement('div', { className: "flex items-center space-x-2" },
-                                // Points Display
-                                React.createElement('div', { className: "flex items-center space-x-1 bg-yellow-100 px-3 py-1 rounded-full" },
-                                    React.createElement(Coins, { className: "w-4 h-4 text-yellow-600" }),
-                                    React.createElement('span', { className: "text-sm font-medium text-yellow-700" }, userPoints)
-                                ),
-                                
-                                // Compound Alert
-                                React.createElement('button', {
-                                    onClick: () => setShowCompoundModal(true),
-                                    className: "p-2 text-red-600 hover:bg-red-50 rounded-full transition-colors relative"
-                                },
-                                    React.createElement(DollarSign, { className: "w-6 h-6" }),
-                                    compoundBalance > 0 && React.createElement('div', { className: "absolute -top-1 -right-1 w-4 h-4 bg-red-500 rounded-full text-white text-xs flex items-center justify-center" }, "!")
-                                ),
-                                
-                                // Points Store
-                                React.createElement('button', {
-                                    onClick: () => setShowPointsModal(true),
-                                    className: "p-2 text-yellow-600 hover:bg-yellow-50 rounded-full transition-colors"
-                                }, React.createElement(Gift, { className: "w-6 h-6" })),
-                                
-                                // Games
-                                React.createElement('button', {
-                                    onClick: () => setShowGameModal(true),
-                                    className: "p-2 text-green-600 hover:bg-green-50 rounded-full transition-colors"
-                                }, React.createElement(Trophy, { className: "w-6 h-6" })),
-                                
-                                React.createElement('img', { 
-                                    src: user.avatar, 
-                                    alt: user.name,
-                                    className: "w-8 h-8 rounded-full object-cover cursor-pointer"
-                                })
-                            )
-                        )
-                    )
-                ),
+                                {/* Right - User Actions */}
+                                <div className="flex items-center space-x-2">
+                                    {/* Points Display */}
+                                    <div className="flex items-center space-x-1 bg-yellow-100 px-3 py-1 rounded-full">
+                                        <span>🪙</span>
+                                        <span className="text-sm font-medium text-yellow-700">{userPoints}</span>
+                                    </div>
+                                    
+                                    {/* Compound Alert */}
+                                    <button 
+                                        onClick={() => setShowCompoundModal(true)}
+                                        className="p-2 text-red-600 hover:bg-red-50 rounded-full transition-colors relative"
+                                    >
+                                        <span className="text-xl">💰</span>
+                                        {compoundBalance > 0 && (
+                                            <div className="absolute -top-1 -right-1 w-4 h-4 bg-red-500 rounded-full text-white text-xs flex items-center justify-center">
+                                                !
+                                            </div>
+                                        )}
+                                    </button>
+                                    
+                                    {/* Points Store */}
+                                    <button 
+                                        onClick={() => setShowPointsModal(true)}
+                                        className="p-2 text-yellow-600 hover:bg-yellow-50 rounded-full transition-colors"
+                                    >
+                                        <span className="text-xl">🎁</span>
+                                    </button>
+                                    
+                                    {/* Games */}
+                                    <button 
+                                        onClick={() => setShowGameModal(true)}
+                                        className="p-2 text-green-600 hover:bg-green-50 rounded-full transition-colors"
+                                    >
+                                        <span className="text-xl">🏆</span>
+                                    </button>
+                                    
+                                    <img 
+                                        src="https://via.placeholder.com/32x32/6366F1/FFFFFF?text=JD" 
+                                        alt="User"
+                                        className="w-8 h-8 rounded-full object-cover cursor-pointer"
+                                    />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
 
-                // Main Content
-                React.createElement('div', { className: "max-w-6xl mx-auto px-4 py-6" },
-                    renderContent()
-                ),
+                    {/* Main Content */}
+                    <div className="max-w-6xl mx-auto px-4 py-6">
+                        {renderContent()}
+                    </div>
 
-                // Modals
-                showCompoundModal && React.createElement(CompoundModal),
-                showPointsModal && React.createElement(PointsModal),
-                showGameModal && React.createElement(GameModal)
+                    {/* Mobile Navigation */}
+                    <div className="md:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200">
+                        <div className="flex items-center justify-around py-2">
+                            <button
+                                onClick={() => setActiveTab('home')}
+                                className={`p-3 ${activeTab === 'home' ? 'text-yellow-600' : 'text-gray-600'}`}
+                            >
+                                <span className="text-xl">🏠</span>
+                            </button>
+                            <button
+                                onClick={() => setActiveTab('friends')}
+                                className={`p-3 ${activeTab === 'friends' ? 'text-yellow-600' : 'text-gray-600'}`}
+                            >
+                                <span className="text-xl">👥</span>
+                            </button>
+                            <button
+                                onClick={() => setActiveTab('messenger')}
+                                className={`p-3 ${activeTab === 'messenger' ? 'text-yellow-600' : 'text-gray-600'}`}
+                            >
+                                <span className="text-xl">💬</span>
+                            </button>
+                            <button className="p-3 text-gray-600">
+                                <span className="text-xl">🔔</span>
+                            </button>
+                            <button className="p-3 text-gray-600">
+                                <span className="text-xl">☰</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    {/* Modals */}
+                    {showCompoundModal && <CompoundModal />}
+                    {showPointsModal && <PointsModal />}
+                    {showGameModal && <GameModal />}
+                </div>
             );
         };
 
-        ReactDOM.render(React.createElement(JomBroComplete), document.getElementById('root'));
+        // Render the app
+        ReactDOM.render(React.createElement(JomBro), document.getElementById('root'));
     </script>
 </body>
 </html>
