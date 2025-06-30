@@ -761,33 +761,78 @@
             opacity: 0.7;
         }
 
-        /* Screensaver Controls */
-        .screensaver-controls {
-            position: absolute;
+        /* Screensaver Background Light Mode */
+        .screensaver-mode.background-light {
+            opacity: 0.3;
+            filter: blur(2px);
+            transform: scale(1.05);
+            transition: all 0.5s ease;
+        }
+
+        .screensaver-mode.background-light .screensaver-content {
+            opacity: 0.4;
+            transform: scale(0.95);
+        }
+
+        .screensaver-mode.background-light .screensaver-effects {
+            opacity: 0.6;
+        }
+
+        .screensaver-mode.background-light .screensaver-controls {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .screensaver-mode.background-light .screensaver-hint {
+            opacity: 0;
+        }
+
+        /* Enhanced Screensaver Controls - Always Visible in Background Mode */
+        .settings-overlay-controls {
+            position: fixed;
             top: 2rem;
-            right: 2rem;
-            z-index: 10;
-            display: flex;
+            left: 2rem;
+            z-index: 2100;
+            display: none;
             gap: 12px;
         }
 
-        .screensaver-control-btn {
-            background: rgba(255, 255, 255, 0.15);
-            backdrop-filter: blur(20px);
-            border: 1px solid rgba(255, 255, 255, 0.3);
+        .settings-overlay-controls.show {
+            display: flex;
+        }
+
+        .overlay-control-btn {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(30px);
+            -webkit-backdrop-filter: blur(30px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
             color: white;
-            padding: 8px 12px;
-            border-radius: 20px;
+            padding: 10px 14px;
+            border-radius: 25px;
             font-size: 12px;
             font-weight: 600;
             cursor: pointer;
             transition: all 0.3s ease;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+            text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
         }
 
-        .screensaver-control-btn:active {
+        .overlay-control-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 25px rgba(0, 0, 0, 0.4);
+        }
+
+        .overlay-control-btn:active {
             transform: scale(0.95);
-            background: rgba(255, 255, 255, 0.25);
+        }
+
+        .overlay-control-btn.exit {
+            background: linear-gradient(135deg, rgba(255, 59, 92, 0.8), rgba(255, 107, 53, 0.8));
+        }
+
+        .overlay-control-btn.theme {
+            background: linear-gradient(135deg, rgba(64, 93, 230, 0.8), rgba(193, 53, 132, 0.8));
         }
 
         /* Light Floating Controls */
@@ -832,7 +877,7 @@
             border: none;
         }
 
-        /* Modal - Instagram Style */
+        /* Enhanced Modal System - Translucent Dark Mode */
         .modal {
             position: fixed;
             top: 0;
@@ -853,6 +898,12 @@
             animation: fadeIn 0.3s ease;
         }
 
+        .modal.dark-translucent {
+            background: rgba(0, 0, 0, 0.75);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+        }
+
         .modal-content {
             background: white;
             border-radius: 12px;
@@ -861,6 +912,59 @@
             max-height: 80%;
             overflow-y: auto;
             box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+            transition: all 0.3s ease;
+        }
+
+        .modal-content.dark-glass {
+            background: rgba(20, 20, 20, 0.85);
+            backdrop-filter: blur(40px);
+            -webkit-backdrop-filter: blur(40px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: white;
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.5);
+        }
+
+        .modal-content.dark-glass .modal-title {
+            color: white;
+            text-shadow: 0 2px 10px rgba(255, 255, 255, 0.2);
+        }
+
+        .modal-content.dark-glass .form-label {
+            color: rgba(255, 255, 255, 0.9);
+        }
+
+        .modal-content.dark-glass .form-control {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: white;
+        }
+
+        .modal-content.dark-glass .form-control:focus {
+            border-color: rgba(255, 255, 255, 0.4);
+            background: rgba(255, 255, 255, 0.15);
+            box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.1);
+        }
+
+        .modal-content.dark-glass .form-control option {
+            background: rgba(20, 20, 20, 0.95);
+            color: white;
+        }
+
+        .modal-content.dark-glass .btn-primary {
+            background: linear-gradient(135deg, rgba(64, 93, 230, 0.8), rgba(193, 53, 132, 0.8));
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .modal-content.dark-glass .btn-secondary {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: white;
+            backdrop-filter: blur(10px);
+        }
+
+        .modal-content.dark-glass .btn-secondary:active {
+            background: rgba(255, 255, 255, 0.2);
         }
 
         .modal-title {
@@ -1457,10 +1561,10 @@
         <!-- Screensaver Effects Container -->
         <div class="screensaver-effects" id="screensaverEffects"></div>
         
-        <!-- Screensaver Controls -->
+        <!-- Standard Screensaver Controls (hidden in background mode) -->
         <div class="screensaver-controls">
             <div class="screensaver-control-btn" onclick="exitScreensaver()">✕ Exit</div>
-            <div class="screensaver-control-btn" onclick="showModal('screensaverEdit')">🎨 Edit</div>
+            <div class="screensaver-control-btn" onclick="showScreensaverSettings()">🎨 Edit</div>
         </div>
         
         <div class="screensaver-content">
@@ -1490,6 +1594,13 @@
         <div class="screensaver-hint">
             Touch anywhere to return to your challenge feed
         </div>
+    </div>
+
+    <!-- Settings Overlay Controls (shown when in background mode) -->
+    <div class="settings-overlay-controls" id="overlayControls">
+        <div class="overlay-control-btn exit" onclick="exitScreensaverSettings()">✕ Exit Settings</div>
+        <div class="overlay-control-btn theme" onclick="cycleScreensaverTheme()">🎨 Switch Theme</div>
+        <div class="overlay-control-btn" onclick="toggleScreensaverEffects()">✨ Toggle Effects</div>
     </div>
 
     <!-- Instagram Bottom Navigation -->
@@ -1580,9 +1691,9 @@
         </div>
     </div>
 
-    <!-- Settings Modal -->
+    <!-- Enhanced Settings Modal -->
     <div id="settingsModal" class="modal">
-        <div class="modal-content">
+        <div class="modal-content dark-glass">
             <div class="modal-title">⚙️ App Settings</div>
             
             <div class="form-group">
@@ -1622,6 +1733,14 @@
                 </select>
             </div>
             
+            <div class="form-group">
+                <label class="form-label">Settings Mode</label>
+                <select class="form-control" id="settingsMode">
+                    <option value="overlay" selected>Translucent Overlay</option>
+                    <option value="standard">Standard Modal</option>
+                </select>
+            </div>
+            
             <button class="btn-primary" onclick="saveSettings()">
                 💾 Save Settings
             </button>
@@ -1631,9 +1750,9 @@
         </div>
     </div>
 
-    <!-- Screensaver Edit Modal -->
+    <!-- Enhanced Screensaver Edit Modal -->
     <div id="screensaverEditModal" class="modal">
-        <div class="modal-content">
+        <div class="modal-content dark-glass">
             <div class="modal-title">🎨 Customize Screensaver</div>
             
             <div class="form-group">
@@ -1719,12 +1838,13 @@
             showStats: true
         };
         
-        // App settings
+        // App settings with enhanced features
         let appSettings = {
             theme: 'light',
             timeout: 30000,
             notifications: 'all',
-            haptics: 'enabled'
+            haptics: 'enabled',
+            settingsMode: 'overlay'
         };
         
         let stats = {
@@ -2141,6 +2261,9 @@
             }
         }
 
+        // Enhanced modal functions with translucent dark mode
+        let isSettingsOverlayMode = false;
+
         function showModal(type) {
             const modals = {
                 'create': 'createModal',
@@ -2148,8 +2271,17 @@
                 'settings': 'settingsModal',
                 'screensaverEdit': 'screensaverEditModal'
             };
+            
             if (modals[type]) {
-                document.getElementById(modals[type]).classList.add('show');
+                const modal = document.getElementById(modals[type]);
+                
+                // Check if opening settings while screensaver is active
+                if ((type === 'settings' || type === 'screensaverEdit') && screensaverActive) {
+                    activateSettingsOverlayMode(modal, type);
+                } else {
+                    // Standard modal behavior
+                    modal.classList.add('show');
+                }
             }
         }
 
@@ -2160,9 +2292,112 @@
                 'settings': 'settingsModal',
                 'screensaverEdit': 'screensaverEditModal'
             };
+            
             if (modals[type]) {
-                document.getElementById(modals[type]).classList.remove('show');
+                const modal = document.getElementById(modals[type]);
+                modal.classList.remove('show');
+                
+                // If exiting settings overlay mode
+                if (isSettingsOverlayMode && (type === 'settings' || type === 'screensaverEdit')) {
+                    exitSettingsOverlayMode();
+                }
             }
+        }
+
+        function activateSettingsOverlayMode(modal, type) {
+            isSettingsOverlayMode = true;
+            
+            // Convert screensaver to background light mode
+            const screensaver = document.getElementById('screensaverMode');
+            screensaver.classList.add('background-light');
+            
+            // Show modal with dark translucent styling
+            modal.classList.add('dark-translucent');
+            modal.classList.add('show');
+            
+            // Show overlay controls
+            document.getElementById('overlayControls').classList.add('show');
+            
+            // Prevent screensaver exit on touch
+            screensaver.removeEventListener('touchstart', exitScreensaver);
+            screensaver.removeEventListener('click', exitScreensaver);
+            
+            showToast('⚙️ Settings overlay mode activated');
+        }
+
+        function exitSettingsOverlayMode() {
+            isSettingsOverlayMode = false;
+            
+            // Restore screensaver to normal mode
+            const screensaver = document.getElementById('screensaverMode');
+            screensaver.classList.remove('background-light');
+            
+            // Hide overlay controls
+            document.getElementById('overlayControls').classList.remove('show');
+            
+            // Remove dark translucent styling from all modals
+            document.querySelectorAll('.modal').forEach(modal => {
+                modal.classList.remove('dark-translucent');
+            });
+            
+            // Restore screensaver exit events
+            screensaver.addEventListener('touchstart', exitScreensaver);
+            screensaver.addEventListener('click', exitScreensaver);
+        }
+
+        function exitScreensaverSettings() {
+            // Hide all modals and exit overlay mode
+            document.querySelectorAll('.modal').forEach(modal => {
+                modal.classList.remove('show');
+            });
+            exitSettingsOverlayMode();
+        }
+
+        function showScreensaverSettings() {
+            showModal('screensaverEdit');
+        }
+
+        // Quick overlay controls
+        function cycleScreensaverTheme() {
+            const themes = ['light-theme', 'dark-theme', 'space-theme', 'ocean-theme', 'sunset-theme', 'forest-theme'];
+            const currentTheme = screensaverSettings.theme;
+            const currentIndex = themes.indexOf(currentTheme);
+            const nextTheme = themes[(currentIndex + 1) % themes.length];
+            
+            screensaverSettings.theme = nextTheme;
+            applyScreensaverTheme();
+            
+            const themeNames = {
+                'light-theme': 'Light',
+                'dark-theme': 'Dark',
+                'space-theme': 'Space',
+                'ocean-theme': 'Ocean',
+                'sunset-theme': 'Sunset',
+                'forest-theme': 'Forest'
+            };
+            
+            showToast(`🎨 Theme: ${themeNames[nextTheme]}`);
+        }
+
+        function toggleScreensaverEffects() {
+            const effects = ['none', 'stars', 'drizzle', 'smoke', 'meteors', 'waves'];
+            const currentEffect = screensaverSettings.effects;
+            const currentIndex = effects.indexOf(currentEffect);
+            const nextEffect = effects[(currentIndex + 1) % effects.length];
+            
+            screensaverSettings.effects = nextEffect;
+            createScreensaverEffects();
+            
+            const effectNames = {
+                'none': 'None',
+                'stars': 'Stars',
+                'drizzle': 'Rain',
+                'smoke': 'Smoke',
+                'meteors': 'Meteors',
+                'waves': 'Waves'
+            };
+            
+            showToast(`✨ Effects: ${effectNames[nextEffect]}`);
         }
 
         function showToast(message) {
@@ -2261,6 +2496,7 @@
         document.getElementById('screensaverTimeout').value = appSettings.timeout;
         document.getElementById('notifications').value = appSettings.notifications;
         document.getElementById('haptics').value = appSettings.haptics;
+        document.getElementById('settingsMode').value = appSettings.settingsMode;
         document.getElementById('screensaverTheme').value = screensaverSettings.theme;
         document.getElementById('backgroundEffects').value = screensaverSettings.effects;
         document.getElementById('effectIntensity').value = screensaverSettings.intensity;
