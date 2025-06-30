@@ -6,7 +6,7 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="default">
     <meta name="theme-color" content="#007AFF">
-    <title>JomBro</title>
+    <title>JomBro Pro</title>
     <style>
         * {
             margin: 0;
@@ -27,7 +27,7 @@
             padding-bottom: env(safe-area-inset-bottom);
         }
 
-        /* Status Bar Area for Dynamic Island */
+        /* Status Bar with Dynamic Island */
         .status-bar {
             height: 47px;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
@@ -52,13 +52,13 @@
             font-weight: 600;
         }
 
-        /* iOS Navigation Bar */
+        /* Navigation Bar */
         .nav-bar {
             background: rgba(255, 255, 255, 0.95);
             backdrop-filter: blur(20px);
             -webkit-backdrop-filter: blur(20px);
             border-bottom: 0.5px solid rgba(0, 0, 0, 0.1);
-            padding: 8px 20px 8px 20px;
+            padding: 8px 20px;
             display: flex;
             align-items: center;
             justify-content: space-between;
@@ -76,7 +76,6 @@
             border: none;
             color: #007AFF;
             font-size: 17px;
-            font-weight: 400;
             padding: 0;
             cursor: pointer;
             min-width: 44px;
@@ -90,16 +89,23 @@
             width: 32px;
             height: 32px;
             border-radius: 16px;
-            background: linear-gradient(135deg, #007AFF, #5856D6);
+            background: linear-gradient(135deg, #FFD700, #FFA500);
             color: white;
-            font-size: 14px;
+            font-size: 12px;
             font-weight: 600;
             display: flex;
             align-items: center;
             justify-content: center;
-            border: none;
+            border: 2px solid #FFD700;
             cursor: pointer;
             position: relative;
+        }
+
+        .vip-crown {
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            font-size: 16px;
         }
 
         .notification-dot {
@@ -126,35 +132,48 @@
             padding-bottom: 20px;
         }
 
-        /* iOS Card Style */
-        .card {
-            background: #FFFFFF;
+        /* VIP Status Card */
+        .vip-status-card {
+            background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%);
             margin: 16px;
-            border-radius: 12px;
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            border-radius: 16px;
+            padding: 20px;
+            position: relative;
             overflow: hidden;
+            border: 2px solid #FFD700;
         }
 
-        .card-header {
-            padding: 16px 16px 8px 16px;
-            border-bottom: 0.5px solid #E5E5EA;
+        .vvip-status-card {
+            background: linear-gradient(135deg, #8A2BE2 0%, #4B0082 100%);
+            border: 2px solid #8A2BE2;
         }
 
-        .card-title {
-            font-size: 22px;
-            font-weight: 700;
-            color: #000000;
-            margin-bottom: 4px;
+        .status-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
         }
 
-        .card-subtitle {
-            font-size: 15px;
-            color: #8E8E93;
-            font-weight: 400;
+        .tier-badge {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 600;
+            backdrop-filter: blur(10px);
         }
 
-        .card-content {
-            padding: 16px;
+        .upgrade-btn {
+            background: rgba(255, 255, 255, 0.9);
+            color: #FFD700;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
         }
 
         /* Points Card */
@@ -165,22 +184,6 @@
             padding: 20px;
             position: relative;
             overflow: hidden;
-        }
-
-        .points-card::before {
-            content: '';
-            position: absolute;
-            top: -50%;
-            left: -50%;
-            width: 200%;
-            height: 200%;
-            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
-            animation: shimmer 3s ease-in-out infinite;
-        }
-
-        @keyframes shimmer {
-            0%, 100% { transform: rotate(0deg); }
-            50% { transform: rotate(180deg); }
         }
 
         .points-display {
@@ -197,98 +200,251 @@
             text-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
         }
 
-        .points-label {
-            font-size: 17px;
-            font-weight: 600;
-            opacity: 0.9;
-        }
-
-        .level-info {
-            margin-top: 12px;
+        .points-actions {
             display: flex;
             justify-content: space-between;
-            font-size: 15px;
+            margin-top: 16px;
+            gap: 12px;
+        }
+
+        .points-btn {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            flex: 1;
+            backdrop-filter: blur(10px);
+        }
+
+        /* Dashboard Cards */
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+            margin: 16px;
+        }
+
+        .dashboard-card {
+            background: #FFFFFF;
+            border-radius: 12px;
+            padding: 16px;
+            text-align: center;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+
+        .dashboard-number {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+
+        .dashboard-label {
+            font-size: 12px;
+            color: #8E8E93;
             font-weight: 500;
         }
 
-        /* iOS List Style */
-        .ios-list {
-            background: #FFFFFF;
+        .success { color: #34C759; }
+        .danger { color: #FF3B30; }
+        .warning { color: #FF9500; }
+        .info { color: #007AFF; }
+
+        /* Challenge Lists */
+        .challenge-section {
             margin: 16px;
+            background: #FFFFFF;
             border-radius: 12px;
             overflow: hidden;
         }
 
-        .list-item {
-            padding: 12px 16px;
+        .section-header {
+            padding: 16px;
+            background: #F8F9FA;
             border-bottom: 0.5px solid #E5E5EA;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            min-height: 44px;
-        }
-
-        .list-item:last-child {
-            border-bottom: none;
-        }
-
-        .list-item.danger {
-            background: rgba(255, 59, 48, 0.03);
-        }
-
-        .list-item.current-user {
-            background: rgba(255, 59, 48, 0.08);
-            animation: pulse-ios 2s ease-in-out infinite;
-        }
-
-        @keyframes pulse-ios {
-            0%, 100% { background: rgba(255, 59, 48, 0.08); }
-            50% { background: rgba(255, 59, 48, 0.15); }
-        }
-
-        .list-item-content {
-            display: flex;
-            align-items: center;
-            flex: 1;
-        }
-
-        .list-avatar {
-            width: 40px;
-            height: 40px;
-            border-radius: 20px;
-            background: linear-gradient(135deg, #FF6B6B, #4ECDC4);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-size: 16px;
-            font-weight: 600;
-            margin-right: 12px;
-            border: 2px solid white;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-        }
-
-        .list-info {
-            flex: 1;
-        }
-
-        .list-title {
             font-size: 17px;
             font-weight: 600;
             color: #000000;
-            margin-bottom: 2px;
         }
 
-        .list-subtitle {
+        .challenge-item {
+            padding: 16px;
+            border-bottom: 0.5px solid #E5E5EA;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .challenge-item:last-child {
+            border-bottom: none;
+        }
+
+        .challenge-info {
+            flex: 1;
+        }
+
+        .challenge-title {
+            font-size: 15px;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .challenge-desc {
             font-size: 13px;
             color: #8E8E93;
-            font-weight: 400;
+            margin-bottom: 4px;
         }
 
-        .list-value {
+        .challenge-price {
+            font-size: 12px;
+            color: #007AFF;
+            font-weight: 500;
+        }
+
+        .buy-challenge-btn {
+            background: #007AFF;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        /* VIP Group Card */
+        .vip-group-card {
+            background: linear-gradient(135deg, #34C759 0%, #30D158 100%);
+            margin: 16px;
+            border-radius: 16px;
+            padding: 20px;
+            color: white;
+        }
+
+        .group-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .group-info {
             font-size: 17px;
             font-weight: 600;
-            color: #FF3B30;
+        }
+
+        .exchange-rate {
+            background: rgba(255, 255, 255, 0.2);
+            padding: 4px 8px;
+            border-radius: 10px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        /* Profile Modal */
+        .profile-form {
+            padding: 20px;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+
+        .form-group {
+            margin-bottom: 16px;
+        }
+
+        .form-label {
+            font-size: 15px;
+            font-weight: 600;
+            color: #000000;
+            margin-bottom: 6px;
+            display: block;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 12px 16px;
+            font-size: 17px;
+            border: 1px solid #E5E5EA;
+            border-radius: 10px;
+            background: #F2F2F7;
+            color: #000000;
+            outline: none;
+        }
+
+        .form-control:focus {
+            border-color: #007AFF;
+            background: #FFFFFF;
+            box-shadow: 0 0 0 4px rgba(0, 122, 255, 0.1);
+        }
+
+        /* Modal Styles */
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.3);
+            display: none;
+            align-items: flex-end;
+            z-index: 1000;
+            padding-bottom: env(safe-area-inset-bottom);
+        }
+
+        .modal.show {
+            display: flex;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .modal-sheet {
+            background: #FFFFFF;
+            border-radius: 16px 16px 0 0;
+            width: 100%;
+            max-height: 80vh;
+            overflow-y: auto;
+            transform: translateY(100%);
+            animation: slideUp 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+        }
+
+        .modal-header {
+            padding: 16px 20px 8px;
+            text-align: center;
+            border-bottom: 0.5px solid #E5E5EA;
+            position: relative;
+        }
+
+        .modal-handle {
+            width: 36px;
+            height: 5px;
+            background: #C7C7CC;
+            border-radius: 3px;
+            margin: 0 auto 12px;
+        }
+
+        .modal-title {
+            font-size: 17px;
+            font-weight: 600;
+            color: #000000;
+        }
+
+        .modal-close {
+            position: absolute;
+            right: 16px;
+            top: 16px;
+            background: none;
+            border: none;
+            color: #007AFF;
+            font-size: 17px;
+            font-weight: 500;
+            cursor: pointer;
         }
 
         /* iOS Button Styles */
@@ -317,99 +473,17 @@
             background: #FF3B30;
         }
 
-        .ios-button.danger:active {
-            background: #D70015;
+        .ios-button.success {
+            background: #34C759;
+        }
+
+        .ios-button.warning {
+            background: #FF9500;
         }
 
         .ios-button.secondary {
             background: #F2F2F7;
             color: #007AFF;
-        }
-
-        .ios-button.secondary:active {
-            background: #E5E5EA;
-        }
-
-        /* Challenge Post Style */
-        .challenge-post {
-            background: #FFFFFF;
-            margin: 16px;
-            border-radius: 16px;
-            overflow: hidden;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-        }
-
-        .post-header {
-            padding: 16px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-        }
-
-        .post-user {
-            display: flex;
-            align-items: center;
-        }
-
-        .post-avatar {
-            width: 44px;
-            height: 44px;
-            border-radius: 22px;
-            background: linear-gradient(135deg, #FF6B6B, #4ECDC4);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-size: 18px;
-            font-weight: 600;
-            margin-right: 12px;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-        }
-
-        .post-user-info h3 {
-            font-size: 17px;
-            font-weight: 600;
-            color: #000000;
-            margin-bottom: 2px;
-        }
-
-        .post-user-info p {
-            font-size: 13px;
-            color: #8E8E93;
-        }
-
-        .post-points {
-            background: linear-gradient(135deg, #34C759, #30D158);
-            color: white;
-            padding: 6px 12px;
-            border-radius: 20px;
-            font-size: 15px;
-            font-weight: 600;
-            box-shadow: 0 2px 4px rgba(52, 199, 89, 0.3);
-        }
-
-        .post-content {
-            padding: 0 16px 16px;
-            font-size: 17px;
-            line-height: 1.4;
-            color: #000000;
-        }
-
-        .challenge-text {
-            background: #F2F2F7;
-            padding: 16px;
-            border-radius: 12px;
-            margin: 8px 0;
-            font-style: italic;
-            border-left: 4px solid #007AFF;
-            font-size: 16px;
-            line-height: 1.5;
-        }
-
-        .post-actions {
-            padding: 16px;
-            display: flex;
-            gap: 12px;
         }
 
         /* Tab Bar */
@@ -420,7 +494,6 @@
             right: 0;
             background: rgba(248, 248, 248, 0.95);
             backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
             border-top: 0.5px solid rgba(0, 0, 0, 0.1);
             display: flex;
             justify-content: space-around;
@@ -457,115 +530,7 @@
             justify-content: center;
         }
 
-        /* iOS Modal/Sheet */
-        .modal {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(0, 0, 0, 0.3);
-            display: none;
-            align-items: flex-end;
-            z-index: 1000;
-            padding-bottom: env(safe-area-inset-bottom);
-        }
-
-        .modal.show {
-            display: flex;
-            animation: fadeIn 0.3s ease;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
-        }
-
-        .modal-sheet {
-            background: #FFFFFF;
-            border-radius: 16px 16px 0 0;
-            width: 100%;
-            max-height: 80vh;
-            overflow-y: auto;
-            transform: translateY(100%);
-            animation: slideUp 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
-        }
-
-        @keyframes slideUp {
-            to { transform: translateY(0); }
-        }
-
-        .modal-header {
-            padding: 16px 20px 8px;
-            text-align: center;
-            border-bottom: 0.5px solid #E5E5EA;
-            position: relative;
-        }
-
-        .modal-handle {
-            width: 36px;
-            height: 5px;
-            background: #C7C7CC;
-            border-radius: 3px;
-            margin: 0 auto 12px;
-        }
-
-        .modal-title {
-            font-size: 17px;
-            font-weight: 600;
-            color: #000000;
-        }
-
-        .modal-close {
-            position: absolute;
-            right: 16px;
-            top: 16px;
-            background: none;
-            border: none;
-            color: #007AFF;
-            font-size: 17px;
-            font-weight: 500;
-            cursor: pointer;
-            padding: 4px;
-        }
-
-        .modal-content {
-            padding: 20px;
-        }
-
-        /* Form Styles */
-        .form-group {
-            margin-bottom: 20px;
-        }
-
-        .form-label {
-            font-size: 17px;
-            font-weight: 600;
-            color: #000000;
-            margin-bottom: 8px;
-            display: block;
-        }
-
-        .form-control {
-            width: 100%;
-            padding: 12px 16px;
-            font-size: 17px;
-            border: 1px solid #E5E5EA;
-            border-radius: 10px;
-            background: #F2F2F7;
-            color: #000000;
-            font-family: inherit;
-            outline: none;
-            transition: all 0.2s ease;
-        }
-
-        .form-control:focus {
-            border-color: #007AFF;
-            background: #FFFFFF;
-            box-shadow: 0 0 0 4px rgba(0, 122, 255, 0.1);
-        }
-
-        /* Toast Notification */
+        /* Toast */
         .toast {
             position: fixed;
             top: calc(91px + env(safe-area-inset-top) + 20px);
@@ -589,264 +554,165 @@
             opacity: 1;
         }
 
-        /* Haptic Feedback Visual */
-        .haptic-feedback {
-            animation: haptic 0.1s ease;
+        /* Animations */
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
         }
 
-        @keyframes haptic {
-            0%, 100% { transform: scale(1); }
-            50% { transform: scale(0.95); }
+        @keyframes slideUp {
+            to { transform: translateY(0); }
         }
 
-        /* Section Headers */
-        .section-header {
-            padding: 16px 32px 8px;
-            font-size: 13px;
-            font-weight: 500;
-            color: #8E8E93;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            background: #F2F2F7;
-        }
-
-        /* Story Circles */
-        .stories-section {
-            background: #FFFFFF;
-            padding: 16px;
-            margin: 16px;
-            border-radius: 12px;
-        }
-
-        .stories-container {
-            display: flex;
-            gap: 16px;
-            overflow-x: auto;
-            padding-bottom: 4px;
-        }
-
-        .story-item {
-            min-width: 70px;
-            text-align: center;
-        }
-
-        .story-circle {
-            width: 70px;
-            height: 70px;
-            border-radius: 35px;
-            background: linear-gradient(135deg, #FF6B6B, #4ECDC4, #45B7D1);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-size: 18px;
-            font-weight: 600;
-            margin-bottom: 6px;
-            border: 3px solid #FFFFFF;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-            cursor: pointer;
-            position: relative;
-        }
-
-        .story-circle.alert::after {
-            content: '';
-            position: absolute;
-            top: -2px;
-            right: -2px;
-            width: 20px;
-            height: 20px;
-            background: #FF3B30;
-            border-radius: 10px;
-            border: 3px solid white;
-        }
-
-        .story-name {
-            font-size: 12px;
-            color: #000000;
-            font-weight: 500;
+        @keyframes shimmer {
+            0%, 100% { transform: rotate(0deg); }
+            50% { transform: rotate(180deg); }
         }
     </style>
 </head>
 <body>
-    <!-- Status Bar with Dynamic Island -->
+    <!-- Status Bar -->
     <div class="status-bar">
-        <div class="dynamic-island">JomBro</div>
+        <div class="dynamic-island">JomBro Pro</div>
     </div>
 
-    <!-- Navigation Bar -->
+    <!-- Navigation -->
     <div class="nav-bar">
-        <button class="nav-button">⚙️</button>
+        <button class="nav-button" onclick="showModal('settings')">⚙️</button>
         <div class="nav-title">JomBro</div>
         <div style="display: flex; align-items: center; gap: 8px;">
-            <button class="profile-button notification-dot">
+            <button class="profile-button" onclick="showModal('profile')">
+                <span class="vip-crown">👑</span>
                 JD
-                <div class="notification-dot">3</div>
+                <div class="notification-dot">5</div>
             </button>
         </div>
     </div>
 
     <!-- Main Content -->
     <div class="main-content">
+        <!-- VIP Status Card -->
+        <div class="vip-status-card" id="vipCard">
+            <div class="status-header">
+                <div class="tier-badge">VIP MEMBER</div>
+                <button class="upgrade-btn" onclick="showModal('upgrade')">Upgrade to VVIP</button>
+            </div>
+            <div style="color: white; text-align: center;">
+                <div style="font-size: 20px; font-weight: 600;">Premium Benefits Active</div>
+                <div style="font-size: 14px; opacity: 0.9; margin-top: 4px;">Create custom challenges • VIP groups • Priority support</div>
+            </div>
+        </div>
+
         <!-- Points Card -->
         <div class="points-card">
             <div class="points-display">
-                <div class="points-number" id="userPoints">15,000</div>
-                <div class="points-label">JomBro Points</div>
-                <div class="level-info">
-                    <span>⭐ Level 7</span>
-                    <span>🔥 89% Active</span>
+                <div class="points-number" id="userPoints">25,430</div>
+                <div style="font-size: 17px; font-weight: 600;">JomBro Points</div>
+                <div style="font-size: 14px; opacity: 0.9; margin-top: 4px;">Level 12 • 94% Active</div>
+                <div class="points-actions">
+                    <button class="points-btn" onclick="showModal('buyPoints')">💳 Buy Points</button>
+                    <button class="points-btn" onclick="showModal('exchange')">💰 Exchange</button>
                 </div>
             </div>
         </div>
 
-        <!-- Friends Stories -->
-        <div class="stories-section">
-            <div style="font-size: 17px; font-weight: 600; margin-bottom: 12px; color: #000000;">Friend Status</div>
-            <div class="stories-container">
-                <div class="story-item">
-                    <div class="story-circle alert">YOU</div>
-                    <div class="story-name">You</div>
-                </div>
-                <div class="story-item">
-                    <div class="story-circle">AR</div>
-                    <div class="story-name">Ahmad</div>
-                </div>
-                <div class="story-item">
-                    <div class="story-circle">ML</div>
-                    <div class="story-name">Mei Ling</div>
-                </div>
-                <div class="story-item">
-                    <div class="story-circle">SL</div>
-                    <div class="story-name">Sarah</div>
-                </div>
-                <div class="story-item">
-                    <div class="story-circle">DT</div>
-                    <div class="story-name">David</div>
-                </div>
+        <!-- Dashboard Grid -->
+        <div class="dashboard-grid">
+            <div class="dashboard-card">
+                <div class="dashboard-number success">47</div>
+                <div class="dashboard-label">Completed</div>
+            </div>
+            <div class="dashboard-card">
+                <div class="dashboard-number danger">8</div>
+                <div class="dashboard-label">Failed</div>
+            </div>
+            <div class="dashboard-card">
+                <div class="dashboard-number warning">23</div>
+                <div class="dashboard-label">Help Requests</div>
+            </div>
+            <div class="dashboard-card">
+                <div class="dashboard-number info">156</div>
+                <div class="dashboard-label">Connections</div>
             </div>
         </div>
 
-        <!-- Wanted Board -->
-        <div class="section-header">⚠️ Community Wanted Board</div>
-        <div class="ios-list">
-            <div class="list-item current-user">
-                <div class="list-item-content">
-                    <div class="list-avatar">YOU</div>
-                    <div class="list-info">
-                        <div class="list-title">You</div>
-                        <div class="list-subtitle">3 compounds • 2 hours ago</div>
+        <!-- VIP Group Management -->
+        <div class="vip-group-card">
+            <div class="group-header">
+                <div class="group-info">My VIP Group</div>
+                <div class="exchange-rate">1 pt = RM10</div>
+            </div>
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+                <div style="font-size: 14px;">5 members • 30 days left</div>
+                <button style="background: rgba(255,255,255,0.2); border: none; color: white; padding: 6px 12px; border-radius: 15px; font-size: 12px; cursor: pointer;">
+                    Manage Group
+                </button>
+            </div>
+            <div style="font-size: 13px; opacity: 0.9;">
+                Total pool: 2,340 points • Winner takes 23,400 RM
+            </div>
+        </div>
+
+        <!-- System Challenges -->
+        <div class="challenge-section">
+            <div class="section-header">🎯 System Challenges</div>
+            <div class="challenge-item">
+                <div class="challenge-info">
+                    <div class="challenge-title">Social Butterfly Challenge</div>
+                    <div class="challenge-desc">Ask 5 strangers for their Instagram handle</div>
+                    <div class="challenge-price">Cost: 300 points</div>
+                </div>
+                <button class="buy-challenge-btn" onclick="buyChallenge('social1', 300)">Buy</button>
+            </div>
+            <div class="challenge-item">
+                <div class="challenge-info">
+                    <div class="challenge-title">Business Network</div>
+                    <div class="challenge-desc">Exchange business cards with 3 professionals</div>
+                    <div class="challenge-price">Cost: 500 points</div>
+                </div>
+                <button class="buy-challenge-btn" onclick="buyChallenge('business1', 500)">Buy</button>
+            </div>
+            <div class="challenge-item">
+                <div class="challenge-info">
+                    <div class="challenge-title">Fitness Goal</div>
+                    <div class="challenge-desc">Complete 100 push-ups in public</div>
+                    <div class="challenge-price">Cost: 200 points</div>
+                </div>
+                <button class="buy-challenge-btn" onclick="buyChallenge('fitness1', 200)">Buy</button>
+            </div>
+        </div>
+
+        <!-- VIP Custom Challenges -->
+        <div class="challenge-section">
+            <div class="section-header">⭐ VIP Custom Challenges</div>
+            <div style="padding: 20px; text-align: center;">
+                <div style="font-size: 17px; font-weight: 600; margin-bottom: 8px;">Create Your Own Challenges</div>
+                <div style="font-size: 14px; color: #8E8E93; margin-bottom: 16px;">VIP members can create unlimited custom challenges</div>
+                <button class="ios-button" onclick="showModal('createChallenge')" style="width: 100%;">
+                    ⚡ Create Custom Challenge
+                </button>
+            </div>
+        </div>
+
+        <!-- AI Treasure Hunt -->
+        <div class="challenge-section">
+            <div class="section-header">🏴‍☠️ Monthly AI Treasure Hunt</div>
+            <div style="padding: 20px;">
+                <div style="background: linear-gradient(135deg, #8A2BE2, #4B0082); color: white; padding: 16px; border-radius: 12px; margin-bottom: 16px;">
+                    <div style="font-size: 17px; font-weight: 600; margin-bottom: 8px;">🤖 AI Generated Quest</div>
+                    <div style="font-size: 14px; opacity: 0.9; margin-bottom: 12px;">
+                        "Find the golden QR code hidden where Malaysia's tech dreams take flight..."
                     </div>
-                </div>
-                <div style="display: flex; align-items: center; gap: 8px;">
-                    <div class="list-value">-1,900</div>
-                    <button class="ios-button" onclick="showModal('compounds')" style="padding: 6px 12px; font-size: 14px; min-height: 32px;">
-                        Fix
+                    <div style="font-size: 13px; margin-bottom: 16px;">
+                        Reward: 5,000 points • Location: Cyberjaya • 247 hunters active
+                    </div>
+                    <button style="background: rgba(255,255,255,0.2); border: none; color: white; padding: 12px 20px; border-radius: 10px; width: 100%; font-weight: 600;">
+                        🗺️ Join AI Hunt
                     </button>
                 </div>
-            </div>
-            <div class="list-item danger">
-                <div class="list-item-content">
-                    <div class="list-avatar">SL</div>
-                    <div class="list-info">
-                        <div class="list-title">Sarah Lim</div>
-                        <div class="list-subtitle">2 compounds • 5 hours ago</div>
-                    </div>
+                <div style="text-align: center; font-size: 13px; color: #8E8E93;">
+                    Only VVIP members can create treasure hunts
                 </div>
-                <div class="list-value">-1,100</div>
-            </div>
-            <div class="list-item danger">
-                <div class="list-item-content">
-                    <div class="list-avatar">DT</div>
-                    <div class="list-info">
-                        <div class="list-title">David Tan</div>
-                        <div class="list-subtitle">4 compounds • 3 days ago</div>
-                    </div>
-                </div>
-                <div class="list-value">-2,400</div>
-            </div>
-        </div>
-
-        <!-- Challenge Posts -->
-        <div class="section-header">💪 Active Challenges</div>
-
-        <div class="challenge-post">
-            <div class="post-header">
-                <div class="post-user">
-                    <div class="post-avatar">AR</div>
-                    <div class="post-user-info">
-                        <h3>Ahmad Rahman</h3>
-                        <p>2 hours ago • Social Challenge</p>
-                    </div>
-                </div>
-                <div class="post-points">+500</div>
-            </div>
-            <div class="post-content">
-                <strong>Ahmad challenged you:</strong>
-                <div class="challenge-text">
-                    "Ask 3 strangers for their phone number and record video proof"
-                </div>
-            </div>
-            <div class="post-actions">
-                <button class="ios-button" onclick="completeChallenge(1, 500)" style="flex: 1;">
-                    ✅ Complete
-                </button>
-                <button class="ios-button danger" onclick="forfeitChallenge(1, 500)" style="flex: 1;">
-                    ❌ Forfeit
-                </button>
-            </div>
-        </div>
-
-        <div class="challenge-post">
-            <div class="post-header">
-                <div class="post-user">
-                    <div class="post-avatar">ML</div>
-                    <div class="post-user-info">
-                        <h3>Mei Ling</h3>
-                        <p>1 day ago • Social Challenge</p>
-                    </div>
-                </div>
-                <div class="post-points">+800</div>
-            </div>
-            <div class="post-content">
-                <strong>Mei Ling challenged you:</strong>
-                <div class="challenge-text">
-                    "Get a girl's signature and take selfie at Pavilion KL"
-                </div>
-            </div>
-            <div class="post-actions">
-                <button class="ios-button" onclick="completeChallenge(2, 800)" style="flex: 1;">
-                    ✅ Complete
-                </button>
-                <button class="ios-button danger" onclick="forfeitChallenge(2, 800)" style="flex: 1;">
-                    ❌ Forfeit
-                </button>
-            </div>
-        </div>
-
-        <div class="challenge-post">
-            <div class="post-header">
-                <div class="post-user">
-                    <div class="post-avatar">SL</div>
-                    <div class="post-user-info">
-                        <h3>Sarah Lim</h3>
-                        <p>3 hours ago • Business Task</p>
-                    </div>
-                </div>
-                <div class="post-points">+600</div>
-            </div>
-            <div class="post-content">
-                <strong>Sarah challenged you:</strong>
-                <div class="challenge-text">
-                    "Give business card to 5 strangers and get their contact info"
-                </div>
-            </div>
-            <div class="post-actions">
-                <button class="ios-button" onclick="completeChallenge(3, 600)" style="flex: 1;">
-                    ✅ Complete
-                </button>
-                <button class="ios-button danger" onclick="forfeitChallenge(3, 600)" style="flex: 1;">
-                    ❌ Forfeit
-                </button>
             </div>
         </div>
     </div>
@@ -857,136 +723,250 @@
             <div class="tab-icon">🏠</div>
             <div>Home</div>
         </a>
-        <a href="#" class="tab-item">
+        <a href="#" class="tab-item" onclick="showModal('dashboard')">
+            <div class="tab-icon">📊</div>
+            <div>Dashboard</div>
+        </a>
+        <a href="#" class="tab-item" onclick="showModal('challenges')">
+            <div class="tab-icon">⚡</div>
+            <div>Challenges</div>
+        </a>
+        <a href="#" class="tab-item" onclick="showModal('friends')">
             <div class="tab-icon">👥</div>
-            <div>Friends</div>
+            <div>Network</div>
         </a>
-        <a href="#" class="tab-item" onclick="showModal('challenge')">
-            <div class="tab-icon">➕</div>
-            <div>Create</div>
-        </a>
-        <a href="#" class="tab-item" onclick="showModal('treasure')">
-            <div class="tab-icon">🏴‍☠️</div>
-            <div>Treasure</div>
-        </a>
-        <a href="#" class="tab-item">
-            <div class="tab-icon">🔔</div>
-            <div>Alerts</div>
+        <a href="#" class="tab-item" onclick="showModal('profile')">
+            <div class="tab-icon">👤</div>
+            <div>Profile</div>
         </a>
     </div>
 
-    <!-- Challenge Modal -->
-    <div id="challengeModal" class="modal">
+    <!-- Profile Modal -->
+    <div id="profileModal" class="modal">
         <div class="modal-sheet">
             <div class="modal-header">
                 <div class="modal-handle"></div>
-                <div class="modal-title">Create Challenge</div>
-                <button class="modal-close" onclick="hideModal('challenge')">Done</button>
+                <div class="modal-title">👤 Profile Settings</div>
+                <button class="modal-close" onclick="hideModal('profile')">Done</button>
             </div>
-            <div class="modal-content">
+            <div class="profile-form">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">First Name</label>
+                        <input type="text" class="form-control" value="John" />
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Last Name</label>
+                        <input type="text" class="form-control" value="Doe" />
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Email Address</label>
+                    <input type="email" class="form-control" value="john.doe@example.com" />
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">Phone Number</label>
+                        <input type="tel" class="form-control" value="+60 12-345 6789" />
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Age</label>
+                        <input type="number" class="form-control" value="28" />
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Occupation</label>
+                    <input type="text" class="form-control" value="Software Engineer" />
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Company</label>
+                    <input type="text" class="form-control" value="Tech Startup KL" />
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">City</label>
+                        <input type="text" class="form-control" value="Kuala Lumpur" />
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">State</label>
+                        <select class="form-control">
+                            <option>Selangor</option>
+                            <option>Kuala Lumpur</option>
+                            <option>Penang</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Bio</label>
+                    <textarea class="form-control" rows="3" placeholder="Tell us about yourself...">Passionate entrepreneur building the next big thing in Malaysia!</textarea>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Interests</label>
+                    <input type="text" class="form-control" value="Business, Tech, Networking, Fitness" />
+                </div>
+                <button class="ios-button" style="width: 100%; margin-bottom: 12px;">
+                    💾 Save Profile (+50 points)
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Buy Points Modal -->
+    <div id="buyPointsModal" class="modal">
+        <div class="modal-sheet">
+            <div class="modal-header">
+                <div class="modal-handle"></div>
+                <div class="modal-title">💳 Buy Points</div>
+                <button class="modal-close" onclick="hideModal('buyPoints')">Done</button>
+            </div>
+            <div style="padding: 20px;">
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 20px;">
+                    <button class="ios-button" onclick="buyPoints(1000, 10)">
+                        <div>
+                            <div>1,000 Points</div>
+                            <div style="font-size: 14px; opacity: 0.8;">RM10</div>
+                        </div>
+                    </button>
+                    <button class="ios-button" onclick="buyPoints(2500, 20)">
+                        <div>
+                            <div>2,500 Points</div>
+                            <div style="font-size: 14px; opacity: 0.8;">RM20</div>
+                        </div>
+                    </button>
+                    <button class="ios-button" onclick="buyPoints(5000, 35)">
+                        <div>
+                            <div>5,000 Points</div>
+                            <div style="font-size: 14px; opacity: 0.8;">RM35</div>
+                        </div>
+                    </button>
+                    <button class="ios-button" onclick="buyPoints(10000, 60)">
+                        <div>
+                            <div>10,000 Points</div>
+                            <div style="font-size: 14px; opacity: 0.8;">RM60</div>
+                        </div>
+                    </button>
+                </div>
+                <div style="background: #F8F9FA; padding: 16px; border-radius: 12px; text-align: center;">
+                    <div style="font-size: 14px; color: #8E8E93;">
+                        💡 VIP members get 20% bonus points on all purchases
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Upgrade Modal -->
+    <div id="upgradeModal" class="modal">
+        <div class="modal-sheet">
+            <div class="modal-header">
+                <div class="modal-handle"></div>
+                <div class="modal-title">👑 Membership Upgrade</div>
+                <button class="modal-close" onclick="hideModal('upgrade')">Done</button>
+            </div>
+            <div style="padding: 20px;">
+                <div style="background: linear-gradient(135deg, #FFD700, #FFA500); color: white; padding: 20px; border-radius: 16px; margin-bottom: 16px;">
+                    <div style="text-align: center; margin-bottom: 16px;">
+                        <div style="font-size: 24px; margin-bottom: 8px;">👑 VIP MEMBER</div>
+                        <div style="font-size: 18px; font-weight: 600;">RM188 / Year</div>
+                    </div>
+                    <div style="font-size: 14px; margin-bottom: 12px;">✅ Create custom challenges</div>
+                    <div style="font-size: 14px; margin-bottom: 12px;">✅ VIP groups with cash exchange</div>
+                    <div style="font-size: 14px; margin-bottom: 12px;">✅ 20% bonus on point purchases</div>
+                    <div style="font-size: 14px; margin-bottom: 16px;">✅ Priority customer support</div>
+                    <button style="background: rgba(255,255,255,0.9); color: #FFD700; border: none; padding: 12px; border-radius: 10px; width: 100%; font-weight: 600;">
+                        Already VIP Member ✓
+                    </button>
+                </div>
+                
+                <div style="background: linear-gradient(135deg, #8A2BE2, #4B0082); color: white; padding: 20px; border-radius: 16px;">
+                    <div style="text-align: center; margin-bottom: 16px;">
+                        <div style="font-size: 24px; margin-bottom: 8px;">💎 VVIP MEMBER</div>
+                        <div style="font-size: 18px; font-weight: 600;">RM1,880 / Year</div>
+                    </div>
+                    <div style="font-size: 14px; margin-bottom: 12px;">👑 All VIP benefits</div>
+                    <div style="font-size: 14px; margin-bottom: 12px;">🏴‍☠️ Create treasure hunts</div>
+                    <div style="font-size: 14px; margin-bottom: 12px;">🤖 AI challenge generation</div>
+                    <div style="font-size: 14px; margin-bottom: 12px;">💰 50% bonus on point purchases</div>
+                    <div style="font-size: 14px; margin-bottom: 16px;">🎯 Exclusive VVIP challenges</div>
+                    <button style="background: rgba(255,255,255,0.9); color: #8A2BE2; border: none; padding: 12px; border-radius: 10px; width: 100%; font-weight: 600;" onclick="upgradeToVVIP()">
+                        Upgrade to VVIP
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Create Challenge Modal -->
+    <div id="createChallengeModal" class="modal">
+        <div class="modal-sheet">
+            <div class="modal-header">
+                <div class="modal-handle"></div>
+                <div class="modal-title">⚡ Create Custom Challenge</div>
+                <button class="modal-close" onclick="hideModal('createChallenge')">Done</button>
+            </div>
+            <div style="padding: 20px;">
                 <div class="form-group">
                     <label class="form-label">Target Friend</label>
-                    <select class="form-control" id="targetFriend">
+                    <select class="form-control" id="challengeTarget">
                         <option value="">Choose friend...</option>
                         <option value="Ahmad Rahman">Ahmad Rahman</option>
                         <option value="Mei Ling">Mei Ling</option>
-                        <option value="David Tan">David Tan</option>
                         <option value="Sarah Lim">Sarah Lim</option>
+                        <option value="David Tan">David Tan</option>
                     </select>
                 </div>
                 <div class="form-group">
-                    <label class="form-label">Challenge Points</label>
-                    <select class="form-control" id="challengePoints">
-                        <option value="300">300 Points (Easy)</option>
-                        <option value="500">500 Points (Medium)</option>
-                        <option value="800">800 Points (Hard)</option>
-                    </select>
+                    <label class="form-label">Challenge Title</label>
+                    <input type="text" class="form-control" id="challengeTitle" placeholder="Give your challenge a catchy title" />
                 </div>
                 <div class="form-group">
                     <label class="form-label">Challenge Description</label>
-                    <textarea class="form-control" id="challengeText" rows="4" placeholder="Describe the challenge..."></textarea>
+                    <textarea class="form-control" id="challengeDesc" rows="3" placeholder="Describe what they need to do..."></textarea>
                 </div>
-                <button class="ios-button" onclick="createChallenge()" style="width: 100%; margin-bottom: 12px;">
-                    Create Challenge
+                <div class="form-group">
+                    <label class="form-label">Reward Points</label>
+                    <select class="form-control" id="challengePoints">
+                        <option value="200">200 Points (Easy)</option>
+                        <option value="500">500 Points (Medium)</option>
+                        <option value="800">800 Points (Hard)</option>
+                        <option value="1200">1200 Points (Extreme)</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Challenge Cost (Your Points)</label>
+                    <input type="number" class="form-control" id="challengeCost" value="300" min="100" />
+                </div>
+                <button class="ios-button" onclick="createCustomChallenge()" style="width: 100%; margin-bottom: 12px;">
+                    ⚡ Create Challenge
                 </button>
-                <button class="ios-button secondary" onclick="hideModal('challenge')" style="width: 100%;">
+                <button class="ios-button secondary" onclick="hideModal('createChallenge')" style="width: 100%;">
                     Cancel
                 </button>
             </div>
         </div>
     </div>
 
-    <!-- Treasure Modal -->
-    <div id="treasureModal" class="modal">
-        <div class="modal-sheet">
-            <div class="modal-header">
-                <div class="modal-handle"></div>
-                <div class="modal-title">🏴‍☠️ Treasure Hunts</div>
-                <button class="modal-close" onclick="hideModal('treasure')">Done</button>
-            </div>
-            <div class="modal-content">
-                <div class="card" style="margin: 0 0 16px 0;">
-                    <div class="card-content">
-                        <h3 style="font-size: 17px; font-weight: 600; margin-bottom: 8px;">🏆 Golden Trophy Hunt</h3>
-                        <p style="font-size: 15px; color: #8E8E93; margin-bottom: 8px;"><strong>Location:</strong> KLCC Area</p>
-                        <p style="font-size: 15px; color: #8E8E93; margin-bottom: 12px;"><strong>Reward:</strong> 2000 points</p>
-                        <p style="font-size: 15px; font-style: italic; margin-bottom: 16px;">"Near the twin towers, where coffee flows and businessmen meet..."</p>
-                        <button class="ios-button" onclick="startTreasureHunt('Golden Trophy')" style="width: 100%;">
-                            Start Hunt
-                        </button>
-                    </div>
-                </div>
-                <div class="card" style="margin: 0;">
-                    <div class="card-content">
-                        <h3 style="font-size: 17px; font-weight: 600; margin-bottom: 8px;">🧧 Lucky Red Packet</h3>
-                        <p style="font-size: 15px; color: #8E8E93; margin-bottom: 8px;"><strong>Location:</strong> Petaling Street</p>
-                        <p style="font-size: 15px; color: #8E8E93; margin-bottom: 12px;"><strong>Reward:</strong> 500 points</p>
-                        <p style="font-size: 15px; font-style: italic; margin-bottom: 16px;">"Where dragons dance and dumplings steam..."</p>
-                        <button class="ios-button" onclick="startTreasureHunt('Red Packet')" style="width: 100%;">
-                            Start Hunt
-                        </button>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Compounds Modal -->
-    <div id="compoundsModal" class="modal">
-        <div class="modal-sheet">
-            <div class="modal-header">
-                <div class="modal-handle"></div>
-                <div class="modal-title">🎯 Your Compounds</div>
-                <button class="modal-close" onclick="hideModal('compounds')">Done</button>
-            </div>
-            <div class="modal-content">
-                <div class="card" style="margin: 0 0 16px 0; border-left: 4px solid #FF3B30;">
-                    <div class="card-content">
-                        <h3 style="font-size: 17px; font-weight: 600; margin-bottom: 8px;">Ahmad Rahman challenges you</h3>
-                        <p style="font-size: 15px; margin-bottom: 12px; font-style: italic;">"Ask 3 strangers for their phone number and record video proof"</p>
-                        <p style="font-size: 15px; color: #8E8E93; margin-bottom: 16px;"><strong>Reward:</strong> +500 points | <strong>Deadline:</strong> 2 hours</p>
-                        <div style="display: flex; gap: 12px;">
-                            <button class="ios-button" onclick="completeFromModal(1, 500)" style="flex: 1;">
-                                ✅ Complete
-                            </button>
-                            <button class="ios-button danger" onclick="forfeitFromModal(1, 500)" style="flex: 1;">
-                                ❌ Forfeit
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Toast Notification -->
+    <!-- Toast -->
     <div id="toast" class="toast">
         <span id="toastText">Success!</span>
     </div>
 
     <script>
-        let userPoints = 15000;
+        let userPoints = 25430;
+        let userTier = 'VIP'; // 'Regular', 'VIP', 'VVIP'
         let completedChallenges = [];
+
+        // User actions tracking for points
+        const pointsConfig = {
+            profileUpdate: 50,
+            likePost: 2,
+            commentPost: 5,
+            sharePost: 8,
+            helpRequest: -10,
+            selfishAction: -5,
+            challengeComplete: 'variable',
+            challengeFail: 'negative_variable'
+        };
 
         function updatePointsDisplay() {
             document.getElementById('userPoints').textContent = userPoints.toLocaleString();
@@ -994,9 +974,15 @@
 
         function showModal(type) {
             const modals = {
-                'challenge': 'challengeModal',
-                'treasure': 'treasureModal',
-                'compounds': 'compoundsModal'
+                'profile': 'profileModal',
+                'buyPoints': 'buyPointsModal',
+                'upgrade': 'upgradeModal',
+                'createChallenge': 'createChallengeModal',
+                'settings': 'settingsModal',
+                'dashboard': 'dashboardModal',
+                'challenges': 'challengesModal',
+                'friends': 'friendsModal',
+                'exchange': 'exchangeModal'
             };
             if (modals[type]) {
                 document.getElementById(modals[type]).classList.add('show');
@@ -1005,13 +991,18 @@
 
         function hideModal(type) {
             const modals = {
-                'challenge': 'challengeModal',
-                'treasure': 'treasureModal',
-                'compounds': 'compoundsModal'
+                'profile': 'profileModal',
+                'buyPoints': 'buyPointsModal',
+                'upgrade': 'upgradeModal',
+                'createChallenge': 'createChallengeModal',
+                'settings': 'settingsModal',
+                'dashboard': 'dashboardModal',
+                'challenges': 'challengesModal',
+                'friends': 'friendsModal',
+                'exchange': 'exchangeModal'
             };
             if (modals[type]) {
-                const modal = document.getElementById(modals[type]);
-                modal.classList.remove('show');
+                document.getElementById(modals[type]).classList.remove('show');
             }
         }
 
@@ -1025,89 +1016,134 @@
             }, 3000);
         }
 
-        function addHapticFeedback(element) {
-            element.classList.add('haptic-feedback');
-            setTimeout(() => {
-                element.classList.remove('haptic-feedback');
-            }, 100);
-        }
-
-        function completeChallenge(id, points) {
-            if (completedChallenges.includes(id)) return;
-            
-            const button = event.target;
-            addHapticFeedback(button);
-            
-            userPoints += points;
-            completedChallenges.push(id);
+        // Points Management
+        function addPoints(amount, reason) {
+            userPoints += amount;
             updatePointsDisplay();
-            
-            // Hide the challenge post
-            const post = button.closest('.challenge-post');
-            post.style.opacity = '0.5';
-            post.style.pointerEvents = 'none';
-            
-            // iOS-style haptic feedback
-            if (navigator.vibrate) {
-                navigator.vibrate([100, 50, 100]);
-            }
-            
-            showToast(`🎉 Challenge completed! +${points} points`);
+            showToast(`+${amount} points earned! ${reason}`);
         }
 
-        function forfeitChallenge(id, points) {
-            if (completedChallenges.includes(id)) return;
-            
-            const button = event.target;
-            addHapticFeedback(button);
-            
-            userPoints -= points;
-            completedChallenges.push(id);
+        function deductPoints(amount, reason) {
+            userPoints -= amount;
             updatePointsDisplay();
-            
-            // Hide the challenge post
-            const post = button.closest('.challenge-post');
-            post.style.opacity = '0.5';
-            post.style.pointerEvents = 'none';
-            
-            showToast(`❌ Challenge forfeited! -${points} points`);
+            showToast(`-${amount} points deducted. ${reason}`);
         }
 
-        function completeFromModal(id, points) {
-            completeChallenge(id, points);
-            hideModal('compounds');
-        }
-
-        function forfeitFromModal(id, points) {
-            forfeitChallenge(id, points);
-            hideModal('compounds');
-        }
-
-        function createChallenge() {
-            const friend = document.getElementById('targetFriend').value;
-            const points = document.getElementById('challengePoints').value;
-            const text = document.getElementById('challengeText').value;
+        // Buy Points
+        function buyPoints(points, price) {
+            let bonus = userTier === 'VIP' ? 0.2 : userTier === 'VVIP' ? 0.5 : 0;
+            let totalPoints = points + Math.floor(points * bonus);
             
-            if (!friend || !text) {
-                showToast('❗ Please fill all fields');
+            userPoints += totalPoints;
+            updatePointsDisplay();
+            hideModal('buyPoints');
+            
+            showToast(`💳 Purchased ${totalPoints} points for RM${price}! ${bonus > 0 ? `(+${Math.floor(points * bonus)} bonus)` : ''}`);
+        }
+
+        // Buy System Challenge
+        function buyChallenge(challengeId, cost) {
+            if (userPoints < cost) {
+                showToast('❌ Insufficient points!');
                 return;
             }
             
-            userPoints -= parseInt(points);
+            userPoints -= cost;
             updatePointsDisplay();
-            hideModal('challenge');
             
-            // Clear form
-            document.getElementById('targetFriend').value = '';
-            document.getElementById('challengeText').value = '';
+            // Add to friends (simulation)
+            const challenges = ['Ahmad Rahman', 'Mei Ling', 'Sarah Lim'];
+            const randomFriend = challenges[Math.floor(Math.random() * challenges.length)];
             
-            showToast(`⚡ Challenge sent to ${friend}! -${points} points`);
+            showToast(`⚡ Challenge sent to ${randomFriend}! -${cost} points`);
         }
 
-        function startTreasureHunt(name) {
-            hideModal('treasure');
-            showToast(`🗺️ ${name} hunt started! Good luck!`);
+        // Create Custom Challenge (VIP feature)
+        function createCustomChallenge() {
+            if (userTier === 'Regular') {
+                showToast('🔒 VIP feature! Upgrade to VIP to create custom challenges.');
+                return;
+            }
+            
+            const target = document.getElementById('challengeTarget').value;
+            const title = document.getElementById('challengeTitle').value;
+            const desc = document.getElementById('challengeDesc').value;
+            const points = document.getElementById('challengePoints').value;
+            const cost = document.getElementById('challengeCost').value;
+            
+            if (!target || !title || !desc) {
+                showToast('❗ Please fill all fields!');
+                return;
+            }
+            
+            if (userPoints < parseInt(cost)) {
+                showToast('❌ Insufficient points!');
+                return;
+            }
+            
+            userPoints -= parseInt(cost);
+            updatePointsDisplay();
+            hideModal('createChallenge');
+            
+            // Clear form
+            document.getElementById('challengeTarget').value = '';
+            document.getElementById('challengeTitle').value = '';
+            document.getElementById('challengeDesc').value = '';
+            
+            showToast(`⚡ Custom challenge "${title}" sent to ${target}! -${cost} points`);
         }
+
+        // Upgrade to VVIP
+        function upgradeToVVIP() {
+            // Simulate payment process
+            showToast('💎 Processing VVIP upgrade... Please wait');
+            
+            setTimeout(() => {
+                userTier = 'VVIP';
+                document.getElementById('vipCard').className = 'vvip-status-card';
+                document.getElementById('vipCard').innerHTML = `
+                    <div class="status-header">
+                        <div class="tier-badge">💎 VVIP MEMBER</div>
+                        <div style="background: rgba(255,255,255,0.2); color: white; padding: 6px 12px; border-radius: 20px; font-size: 14px;">
+                            Elite Status
+                        </div>
+                    </div>
+                    <div style="color: white; text-align: center;">
+                        <div style="font-size: 20px; font-weight: 600;">Elite VVIP Benefits Active</div>
+                        <div style="font-size: 14px; opacity: 0.9; margin-top: 4px;">Create treasures • AI generation • 50% bonus • Exclusive features</div>
+                    </div>
+                `;
+                showToast('🎉 Welcome to VVIP! Elite features unlocked!');
+            }, 2000);
+        }
+
+        // Simulate user actions that affect points
+        function likePost() {
+            addPoints(pointsConfig.likePost, 'for liking a post');
+        }
+
+        function commentPost() {
+            addPoints(pointsConfig.commentPost, 'for commenting');
+        }
+
+        function sharePost() {
+            addPoints(pointsConfig.sharePost, 'for sharing');
+        }
+
+        function helpRequest() {
+            deductPoints(pointsConfig.helpRequest, 'Self-serving action detected');
+        }
+
+        function completeChallenge(points) {
+            addPoints(points, 'for completing challenge');
+        }
+
+        function failChallenge(points) {
+            deductPoints(points, 'Challenge failed');
+        }
+
+        // Initialize app
+        updatePointsDisplay();
 
         // Close modals when clicking outside
         window.onclick = function(event) {
@@ -1116,15 +1152,10 @@
             }
         }
 
-        // Initialize
-        updatePointsDisplay();
-
-        // iOS-style smooth scrolling
-        document.addEventListener('scroll', function() {
-            requestAnimationFrame(() => {
-                // Smooth scrolling handled by CSS
-            });
-        });
+        // Simulate some user activities for demo
+        setTimeout(() => {
+            showToast('👋 Welcome back! You have 3 new challenges waiting.');
+        }, 2000);
     </script>
 </body>
 </html>
