@@ -1,662 +1,1019 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="theme-color" content="#EAB308" />
-    <meta name="description" content="JomBro - Malaysian Social Media Platform" />
-    <title>JomBro - "bro kang tau Lai liau!"</title>
-
-    <!-- Load external libraries from CDN -->
-    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
-    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
-    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
-    <script src="https://cdn.tailwindcss.com"></script>
-
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JomBro</title>
     <style>
-        body {
+        * {
             margin: 0;
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-                'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
-                sans-serif;
-            -webkit-font-smoothing: antialiased;
-            -moz-osx-font-smoothing: grayscale;
+            padding: 0;
+            box-sizing: border-box;
         }
-        .icon {
-            width: 24px;
-            height: 24px;
-            display: inline-block;
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background-color: #f0f2f5;
+            color: #1c1e21;
         }
-        .loading {
+
+        /* Fixed Header - Facebook Style */
+        .header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: #ffffff;
+            border-bottom: 1px solid #dadde1;
+            padding: 8px 16px;
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            height: 56px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .logo {
+            font-size: 24px;
+            font-weight: bold;
+            color: #1877f2;
+        }
+
+        .header-center {
+            flex: 1;
             display: flex;
             justify-content: center;
             align-items: center;
-            height: 100vh;
+            max-width: 300px;
+            margin: 0 20px;
+        }
+
+        .search-box {
+            background: #f0f2f5;
+            border: none;
+            border-radius: 20px;
+            padding: 8px 16px;
+            width: 100%;
+            font-size: 15px;
+            outline: none;
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .user-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: linear-gradient(45deg, #1877f2, #42b883);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 12px;
+            cursor: pointer;
+            border: 2px solid #fff;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+        }
+
+        .notification-badge {
+            position: relative;
+        }
+
+        .notification-badge::after {
+            content: '3';
+            position: absolute;
+            top: -6px;
+            right: -6px;
+            background: #e41e3f;
+            color: white;
+            border-radius: 50%;
+            width: 18px;
+            height: 18px;
+            font-size: 11px;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 2px solid white;
+        }
+
+        /* Main Content */
+        .main-content {
+            margin-top: 56px;
+            margin-bottom: 56px;
+            padding: 16px;
+            max-width: 500px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        /* Stories Section - Facebook Style */
+        .stories-section {
+            background: white;
+            border-radius: 8px;
+            padding: 16px;
+            margin-bottom: 16px;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+        }
+
+        .stories-header {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 12px;
+            color: #65676b;
+        }
+
+        .stories-container {
+            display: flex;
+            gap: 12px;
+            overflow-x: auto;
+            padding-bottom: 4px;
+        }
+
+        .story-item {
+            min-width: 60px;
+            text-align: center;
+        }
+
+        .story-avatar {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: linear-gradient(45deg, #ff6b6b, #4ecdc4, #45b7d1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 14px;
+            margin-bottom: 4px;
+            border: 3px solid #1877f2;
+            cursor: pointer;
+            position: relative;
+        }
+
+        .story-avatar.compound-alert::after {
+            content: '!';
+            position: absolute;
+            top: -4px;
+            right: -4px;
+            background: #e41e3f;
+            color: white;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            font-size: 12px;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 2px solid white;
+        }
+
+        .story-name {
+            font-size: 12px;
+            color: #65676b;
+            font-weight: 500;
+        }
+
+        /* Points Card - Facebook Style */
+        .points-card {
+            background: white;
+            border-radius: 8px;
+            padding: 16px;
+            margin-bottom: 16px;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+        }
+
+        .points-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 12px;
+        }
+
+        .points-info {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .points-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(45deg, #1877f2, #42b883);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 14px;
+        }
+
+        .points-details h3 {
+            font-size: 15px;
+            font-weight: 600;
+            margin-bottom: 2px;
+        }
+
+        .points-details p {
+            font-size: 13px;
+            color: #65676b;
+        }
+
+        .points-value {
             font-size: 18px;
-            color: #666;
+            font-weight: bold;
+            color: #42b883;
+        }
+
+        .level-badge {
+            background: #e3f2fd;
+            color: #1565c0;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        /* Post Card - Facebook Style */
+        .post-card {
+            background: white;
+            border-radius: 8px;
+            margin-bottom: 16px;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .post-header {
+            padding: 12px 16px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .post-user {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .post-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(45deg, #ff6b6b, #4ecdc4);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 14px;
+        }
+
+        .post-user-info h4 {
+            font-size: 15px;
+            font-weight: 600;
+            margin-bottom: 2px;
+        }
+
+        .post-user-info p {
+            font-size: 13px;
+            color: #65676b;
+        }
+
+        .post-points {
+            background: #e8f5e8;
+            color: #2e7d32;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .post-content {
+            padding: 0 16px 12px;
+            font-size: 15px;
+            line-height: 1.4;
+        }
+
+        .challenge-content {
+            background: #f8f9fa;
+            border-left: 4px solid #1877f2;
+            padding: 12px;
+            margin: 8px 0;
+            border-radius: 4px;
+            font-style: italic;
+        }
+
+        .post-actions {
+            border-top: 1px solid #dadde1;
+            padding: 8px 4px;
+            display: flex;
+        }
+
+        .action-btn {
+            flex: 1;
+            background: none;
+            border: none;
+            padding: 8px;
+            font-size: 15px;
+            font-weight: 600;
+            color: #65676b;
+            cursor: pointer;
+            border-radius: 4px;
+            transition: background-color 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+        }
+
+        .action-btn:hover {
+            background-color: #f0f2f5;
+        }
+
+        .action-btn.complete {
+            color: #42b883;
+        }
+
+        .action-btn.forfeit {
+            color: #e74c3c;
+        }
+
+        /* Wanted Board - Facebook Style */
+        .wanted-board {
+            background: white;
+            border-radius: 8px;
+            margin-bottom: 16px;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+            border-left: 4px solid #e41e3f;
+        }
+
+        .wanted-header {
+            padding: 16px;
+            background: #fef2f2;
+            border-bottom: 1px solid #fecaca;
+        }
+
+        .wanted-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #dc2626;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 4px;
+        }
+
+        .wanted-subtitle {
+            font-size: 13px;
+            color: #991b1b;
+        }
+
+        .wanted-list {
+            padding: 12px 16px;
+        }
+
+        .wanted-person {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid #f3f4f6;
+        }
+
+        .wanted-person:last-child {
+            border-bottom: none;
+        }
+
+        .wanted-person.current-user {
+            background: #fef2f2;
+            margin: 0 -16px;
+            padding: 12px 16px;
+            border-radius: 8px;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.8; }
+        }
+
+        .wanted-user {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .wanted-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: linear-gradient(45deg, #e74c3c, #c0392b);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 12px;
+        }
+
+        .wanted-info h5 {
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 2px;
+        }
+
+        .wanted-info p {
+            font-size: 12px;
+            color: #65676b;
+        }
+
+        .wanted-penalty {
+            font-size: 14px;
+            font-weight: bold;
+            color: #dc2626;
+        }
+
+        .fix-btn {
+            background: #1877f2;
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-left: 8px;
+        }
+
+        /* Bottom Navigation - Facebook Style */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: white;
+            border-top: 1px solid #dadde1;
+            display: flex;
+            justify-content: space-around;
+            padding: 8px 0;
+            z-index: 1000;
+        }
+
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            color: #65676b;
+            text-decoration: none;
+            font-size: 12px;
+            padding: 4px;
+            min-width: 50px;
+        }
+
+        .nav-item.active {
+            color: #1877f2;
+        }
+
+        .nav-icon {
+            font-size: 20px;
+            margin-bottom: 2px;
+        }
+
+        /* Modal - Facebook Style */
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.8);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
+            padding: 20px;
+        }
+
+        .modal.show {
+            display: flex;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 8px;
+            width: 100%;
+            max-width: 400px;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+
+        .modal-header {
+            padding: 16px;
+            border-bottom: 1px solid #dadde1;
+            font-size: 18px;
+            font-weight: 600;
+            text-align: center;
+        }
+
+        .modal-body {
+            padding: 16px;
+        }
+
+        .form-group {
+            margin-bottom: 16px;
+        }
+
+        .form-label {
+            display: block;
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 6px;
+            color: #1c1e21;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #dadde1;
+            border-radius: 6px;
+            font-size: 15px;
+            outline: none;
+        }
+
+        .form-control:focus {
+            border-color: #1877f2;
+            box-shadow: 0 0 0 2px rgba(24,119,242,0.2);
+        }
+
+        .btn-primary {
+            background: #1877f2;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 6px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            width: 100%;
+            margin-bottom: 8px;
+        }
+
+        .btn-secondary {
+            background: #e4e6ea;
+            color: #1c1e21;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 6px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            width: 100%;
+        }
+
+        /* Success Toast */
+        .toast {
+            position: fixed;
+            top: 70px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #42b883;
+            color: white;
+            padding: 12px 20px;
+            border-radius: 6px;
+            font-weight: 600;
+            z-index: 3000;
+            display: none;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+        }
+
+        .toast.show {
+            display: block;
+            animation: slideDown 0.3s ease;
+        }
+
+        @keyframes slideDown {
+            from { transform: translateX(-50%) translateY(-20px); opacity: 0; }
+            to { transform: translateX(-50%) translateY(0); opacity: 1; }
         }
     </style>
 </head>
-
 <body>
-    <div id="root">
-        <div class="loading">Loading JomBro...</div>
+    <!-- Fixed Header -->
+    <div class="header">
+        <div class="logo">JomBro</div>
+        <div class="header-center">
+            <input type="text" class="search-box" placeholder="Search JomBro">
+        </div>
+        <div class="header-right">
+            <div class="user-avatar notification-badge">🎯</div>
+            <div class="user-avatar">AR</div>
+            <div class="user-avatar">ML</div>
+            <div class="user-avatar">JD</div>
+        </div>
     </div>
 
-    <script type="text/babel">
-        const { useState } = React;
+    <!-- Main Content -->
+    <div class="main-content">
+        <!-- Stories Section -->
+        <div class="stories-section">
+            <div class="stories-header">Friend Status</div>
+            <div class="stories-container">
+                <div class="story-item">
+                    <div class="story-avatar compound-alert">YOU</div>
+                    <div class="story-name">You</div>
+                </div>
+                <div class="story-item">
+                    <div class="story-avatar">AR</div>
+                    <div class="story-name">Ahmad</div>
+                </div>
+                <div class="story-item">
+                    <div class="story-avatar">ML</div>
+                    <div class="story-name">Mei Ling</div>
+                </div>
+                <div class="story-item">
+                    <div class="story-avatar">SL</div>
+                    <div class="story-name">Sarah</div>
+                </div>
+                <div class="story-item">
+                    <div class="story-avatar">DT</div>
+                    <div class="story-name">David</div>
+                </div>
+                <div class="story-item">
+                    <div class="story-avatar">RK</div>
+                    <div class="story-name">Raj</div>
+                </div>
+            </div>
+        </div>
 
-        // Simple icons as text/emoji instead of lucide-react
-        const Icons = {
-            Home: () => '🏠',
-            Users: () => '👥',
-            MessageSquare: () => '💬',
-            Search: () => '🔍',
-            Bell: () => '🔔',
-            Menu: () => '☰',
-            Coins: () => '🪙',
-            Star: () => '⭐',
-            DollarSign: () => '💰',
-            Gift: () => '🎁',
-            Trophy: () => '🏆',
-            ThumbsUp: () => '👍',
-            MessageCircle: () => '💬',
-            Share: () => '📤',
-            Globe: () => '🌍',
-            Plus: () => '➕'
-        };
-
-        const JomBro = () => {
-            const [activeTab, setActiveTab] = useState('home');
-            const [userPoints, setUserPoints] = useState(2450);
-            const [userLevel, setUserLevel] = useState(7);
-            const [compoundBalance, setCompoundBalance] = useState(75);
-            const [showCompoundModal, setShowCompoundModal] = useState(false);
-            const [showPointsModal, setShowPointsModal] = useState(false);
-            const [showGameModal, setShowGameModal] = useState(false);
-
-            const posts = [
-                {
-                    id: 1,
-                    user: {
-                        name: '不想早起的大罗',
-                        avatar: 'https://via.placeholder.com/100x100/4F46E5/FFFFFF?text=DL',
-                        verified: true,
-                        level: 12,
-                        points: 3420
-                    },
-                    time: '1 jam lepas',
-                    content: 'Wah today cycle around Putrajaya! 🚴‍♀️ Weather cantik gila, perfect for outdoor activities. Siapa-siapa nak join next time? 💪 #CyclingLife #Putrajaya',
-                    image: 'https://via.placeholder.com/600x400/10B981/FFFFFF?text=🚴‍♀️+Cycling+at+Putrajaya',
-                    likes: 68,
-                    pointsEarned: 14,
-                    isPromoted: false
-                },
-                {
-                    id: 2,
-                    user: {
-                        name: 'Ahmad Fitness Studio',
-                        avatar: 'https://via.placeholder.com/100x100/F59E0B/FFFFFF?text=AF',
-                        verified: false,
-                        level: 8,
-                        points: 1890
-                    },
-                    time: '3 jam lepas',
-                    content: 'Baru renovate studio kami! 💇‍♀️ Modern minimalist design dengan equipment terbaru. STUDIO DAMDA - Your beauty destination! Book appointment sekarang! ✨',
-                    image: 'https://via.placeholder.com/600x400/EC4899/FFFFFF?text=💇‍♀️+Studio+DAMDA',
-                    likes: 234,
-                    pointsEarned: 47,
-                    isPromoted: true
-                },
-                {
-                    id: 3,
-                    user: {
-                        name: 'Shopping Mall KL',
-                        avatar: 'https://via.placeholder.com/100x100/3B82F6/FFFFFF?text=SM',
-                        verified: true,
-                        level: 15,
-                        points: 5670
-                    },
-                    time: '5 jam lepas',
-                    content: 'Family day out at the mall! 🛒 Ada banyak kedai baru including R Pharmacy, Ai-Cha ice cream & OSUMO! Perfect spot untuk weekend family time 👨‍👩‍👧‍👦',
-                    image: 'https://via.placeholder.com/600x400/8B5CF6/FFFFFF?text=🛒+Shopping+Mall+KL',
-                    likes: 89,
-                    pointsEarned: 18,
-                    isPromoted: false
-                }
-            ];
-
-            const activeGames = [
-                {
-                    id: 1,
-                    challenger: 'Ahmad',
-                    challengerAvatar: 'https://via.placeholder.com/50x50/F59E0B/FFFFFF?text=A',
-                    description: 'Who can find parking faster at 1Utama?',
-                    stakes: 25,
-                    deadline: '2 hours',
-                    status: 'pending'
-                },
-                {
-                    id: 2,
-                    challenger: 'Mei Ling',
-                    challengerAvatar: 'https://via.placeholder.com/50x50/EC4899/FFFFFF?text=ML',
-                    description: 'Best nasi lemak review gets points!',
-                    stakes: 15,
-                    deadline: '1 day',
-                    status: 'active'
-                }
-            ];
-
-            const revenueStats = {
-                dailyCompounds: 145,
-                pointsPurchased: 89,
-                premiumUpgrades: 23,
-                totalDaily: 450.30
-            };
-
-            const handleLike = (postId) => {
-                setUserPoints(prev => prev + 2);
-                alert('👍 Post liked! +2 points earned!');
-            };
-
-            const handleCompoundPayment = (amount) => {
-                setCompoundBalance(prev => Math.max(0, prev - amount));
-                setUserPoints(prev => prev + 20);
-                setShowCompoundModal(false);
-                alert('💰 Compound paid! +20 bonus points earned!');
-            };
-
-            const handlePointsPurchase = (pointsAmount, cost) => {
-                setUserPoints(prev => prev + pointsAmount);
-                setShowPointsModal(false);
-                alert(`🪙 Purchased ${pointsAmount} points for RM${cost}!`);
-            };
-
-            // Modals
-            const CompoundModal = () => (
-                <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-                    <div className="bg-white rounded-xl w-full max-w-md">
-                        <div className="p-6">
-                            <div className="text-center mb-6">
-                                <div className="text-4xl mb-4">💰</div>
-                                <h2 className="text-2xl font-bold text-gray-900 mb-2">Pay Compound</h2>
-                                <p className="text-gray-600">Outstanding balance: RM{compoundBalance}</p>
-                            </div>
-
-                            <div className="space-y-4 mb-6">
-                                <div className="bg-red-50 border border-red-200 rounded-lg p-4">
-                                    <div className="flex justify-between items-center mb-2">
-                                        <span className="font-medium">Parking Violation</span>
-                                        <span className="text-red-600 font-bold">RM50</span>
-                                    </div>
-                                    <div className="text-sm text-red-600">Due: 2 days remaining</div>
-                                </div>
-                                
-                                <div className="bg-red-50 border border-red-200 rounded-lg p-4">
-                                    <div className="flex justify-between items-center mb-2">
-                                        <span className="font-medium">Late Payment Fee</span>
-                                        <span className="text-red-600 font-bold">RM25</span>
-                                    </div>
-                                    <div className="text-sm text-red-600">Due: 1 day remaining</div>
-                                </div>
-                            </div>
-
-                            <div className="space-y-3">
-                                <button 
-                                    onClick={() => handleCompoundPayment(75)}
-                                    className="w-full bg-red-600 text-white py-3 rounded-lg font-semibold hover:bg-red-700 transition-colors"
-                                >
-                                    Pay Full Amount (RM75) + Get 20 Points
-                                </button>
-                                <button 
-                                    onClick={() => setShowCompoundModal(false)}
-                                    className="w-full bg-gray-200 text-gray-700 py-3 rounded-lg font-semibold hover:bg-gray-300 transition-colors"
-                                >
-                                    Pay Later
-                                </button>
-                            </div>
-                        </div>
+        <!-- Points Card -->
+        <div class="points-card">
+            <div class="points-header">
+                <div class="points-info">
+                    <div class="points-avatar">JD</div>
+                    <div class="points-details">
+                        <h3>Your JomBro Status</h3>
+                        <p>Business Networking Level</p>
                     </div>
                 </div>
-            );
+                <div style="text-align: right;">
+                    <div class="points-value" id="userPoints">15,000 pts</div>
+                    <div class="level-badge">Level 7</div>
+                </div>
+            </div>
+        </div>
 
-            const PointsModal = () => (
-                <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-                    <div className="bg-white rounded-xl w-full max-w-lg">
-                        <div className="p-6">
-                            <div className="text-center mb-6">
-                                <div className="text-4xl mb-4">🪙</div>
-                                <h2 className="text-2xl font-bold text-gray-900 mb-2">JomBro Points</h2>
-                                <p className="text-gray-600">
-                                    Current Balance: <span className="font-bold text-yellow-600">{userPoints} Points</span>
-                                </p>
-                                <p className="text-sm text-gray-500">Level {userLevel} Member</p>
-                            </div>
-
-                            <div className="mb-6">
-                                <h3 className="font-bold text-lg mb-4">Purchase Points</h3>
-                                <div className="grid grid-cols-2 gap-3">
-                                    <button 
-                                        onClick={() => handlePointsPurchase(100, 5)}
-                                        className="bg-yellow-500 text-white p-4 rounded-lg text-center hover:bg-yellow-600 transition-colors"
-                                    >
-                                        <div className="font-bold">100 Points</div>
-                                        <div className="text-sm">RM5.00</div>
-                                    </button>
-                                    <button 
-                                        onClick={() => handlePointsPurchase(250, 10)}
-                                        className="bg-yellow-500 text-white p-4 rounded-lg text-center hover:bg-yellow-600 transition-colors"
-                                    >
-                                        <div className="font-bold">250 Points</div>
-                                        <div className="text-sm">RM10.00</div>
-                                    </button>
-                                    <button 
-                                        onClick={() => handlePointsPurchase(500, 18)}
-                                        className="bg-yellow-500 text-white p-4 rounded-lg text-center hover:bg-yellow-600 transition-colors"
-                                    >
-                                        <div className="font-bold">500 Points</div>
-                                        <div className="text-sm">RM18.00</div>
-                                    </button>
-                                    <button 
-                                        onClick={() => handlePointsPurchase(1000, 30)}
-                                        className="bg-yellow-500 text-white p-4 rounded-lg text-center hover:bg-yellow-600 transition-colors"
-                                    >
-                                        <div className="font-bold">1000 Points</div>
-                                        <div className="text-sm">RM30.00</div>
-                                    </button>
-                                </div>
-                            </div>
-
-                            <button 
-                                onClick={() => setShowPointsModal(false)}
-                                className="w-full bg-gray-200 text-gray-700 py-3 rounded-lg font-semibold hover:bg-gray-300 transition-colors"
-                            >
-                                Close
-                            </button>
+        <!-- Wanted Board -->
+        <div class="wanted-board">
+            <div class="wanted-header">
+                <div class="wanted-title">
+                    🚨 Community Wanted Board
+                </div>
+                <div class="wanted-subtitle">Outstanding compound violations</div>
+            </div>
+            <div class="wanted-list">
+                <div class="wanted-person current-user">
+                    <div class="wanted-user">
+                        <div class="wanted-avatar">YOU</div>
+                        <div class="wanted-info">
+                            <h5>You</h5>
+                            <p>3 compounds • 2 hours ago</p>
                         </div>
                     </div>
-                </div>
-            );
-
-            const GameModal = () => (
-                <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-                    <div className="bg-white rounded-xl w-full max-w-lg">
-                        <div className="p-6">
-                            <div className="text-center mb-6">
-                                <div className="text-4xl mb-4">🏆</div>
-                                <h2 className="text-2xl font-bold text-gray-900 mb-2">User Challenges</h2>
-                                <p className="text-gray-600">Compete with friends and earn points!</p>
-                            </div>
-
-                            <div className="space-y-4 mb-6">
-                                {activeGames.map(game => (
-                                    <div key={game.id} className="border border-gray-200 rounded-lg p-4">
-                                        <div className="flex items-center space-x-3 mb-3">
-                                            <img src={game.challengerAvatar} alt={game.challenger} className="w-10 h-10 rounded-full" />
-                                            <div>
-                                                <div className="font-medium">{game.challenger} challenges you!</div>
-                                                <div className="text-sm text-gray-500">Stakes: {game.stakes} points</div>
-                                            </div>
-                                        </div>
-                                        <p className="text-gray-700 mb-3">{game.description}</p>
-                                        <div className="flex justify-between items-center">
-                                            <span className="text-sm text-gray-500">Deadline: {game.deadline}</span>
-                                            {game.status === 'pending' && (
-                                                <button 
-                                                    onClick={() => alert('🎮 Challenge accepted!')}
-                                                    className="bg-green-500 text-white px-4 py-1 rounded text-sm hover:bg-green-600 transition-colors"
-                                                >
-                                                    Accept
-                                                </button>
-                                            )}
-                                            {game.status === 'active' && (
-                                                <span className="bg-yellow-100 text-yellow-700 px-2 py-1 rounded text-sm">
-                                                    Active
-                                                </span>
-                                            )}
-                                        </div>
-                                    </div>
-                                ))}
-                            </div>
-
-                            <button 
-                                onClick={() => setShowGameModal(false)}
-                                className="w-full bg-gray-200 text-gray-700 py-3 rounded-lg font-semibold hover:bg-gray-300 transition-colors"
-                            >
-                                Close
-                            </button>
-                        </div>
+                    <div style="display: flex; align-items: center;">
+                        <span class="wanted-penalty">-1,900</span>
+                        <button class="fix-btn" onclick="showModal('compounds')">Fix</button>
                     </div>
                 </div>
-            );
+                <div class="wanted-person">
+                    <div class="wanted-user">
+                        <div class="wanted-avatar">SL</div>
+                        <div class="wanted-info">
+                            <h5>Sarah Lim</h5>
+                            <p>2 compounds • 5 hours ago</p>
+                        </div>
+                    </div>
+                    <span class="wanted-penalty">-1,100</span>
+                </div>
+                <div class="wanted-person">
+                    <div class="wanted-user">
+                        <div class="wanted-avatar">DT</div>
+                        <div class="wanted-info">
+                            <h5>David Tan</h5>
+                            <p>4 compounds • 3 days ago</p>
+                        </div>
+                    </div>
+                    <span class="wanted-penalty">-2,400</span>
+                </div>
+            </div>
+        </div>
 
-            const renderContent = () => {
-                switch (activeTab) {
-                    case 'home':
-                        return (
-                            <div className="max-w-2xl mx-auto">
-                                {/* Points & Status Bar */}
-                                <div className="bg-gradient-to-r from-yellow-400 to-orange-500 rounded-xl shadow-sm p-4 mb-4 text-white">
-                                    <div className="flex justify-between items-center">
-                                        <div>
-                                            <div className="flex items-center space-x-2">
-                                                <span className="text-2xl">🪙</span>
-                                                <span className="font-bold">{userPoints} Points</span>
-                                                <span className="text-2xl">⭐</span>
-                                                <span>Level {userLevel}</span>
-                                            </div>
-                                            <p className="text-yellow-100 text-sm">Outstanding Compound: RM{compoundBalance}</p>
-                                        </div>
-                                        <div className="flex space-x-2">
-                                            <button 
-                                                onClick={() => setShowPointsModal(true)}
-                                                className="bg-white bg-opacity-20 px-3 py-1 rounded-full text-sm hover:bg-opacity-30 transition-colors"
-                                            >
-                                                Get Points
-                                            </button>
-                                            <button 
-                                                onClick={() => setShowGameModal(true)}
-                                                className="bg-white bg-opacity-20 px-3 py-1 rounded-full text-sm hover:bg-opacity-30 transition-colors"
-                                            >
-                                                Challenges
-                                            </button>
-                                        </div>
-                                    </div>
-                                </div>
+        <!-- Challenge Posts -->
+        <div class="post-card">
+            <div class="post-header">
+                <div class="post-user">
+                    <div class="post-avatar">AR</div>
+                    <div class="post-user-info">
+                        <h4>Ahmad Rahman</h4>
+                        <p>2 hours ago • Social Challenge</p>
+                    </div>
+                </div>
+                <div class="post-points">+500 pts</div>
+            </div>
+            <div class="post-content">
+                <strong>Ahmad challenged you:</strong>
+                <div class="challenge-content">
+                    "Ask 3 strangers for their phone number and record video proof"
+                </div>
+            </div>
+            <div class="post-actions">
+                <button class="action-btn complete" onclick="completeChallenge(1, 500)">
+                    ✅ Complete
+                </button>
+                <button class="action-btn forfeit" onclick="forfeitChallenge(1, 500)">
+                    ❌ Forfeit
+                </button>
+            </div>
+        </div>
 
-                                {/* Revenue Dashboard */}
-                                <div className="bg-white rounded-xl shadow-sm border-2 border-gray-400 p-4 mb-4">
-                                    <h3 className="font-bold text-lg mb-4 text-center">📊 Daily Revenue Dashboard</h3>
-                                    <div className="grid grid-cols-2 gap-4">
-                                        <div className="text-center">
-                                            <div className="text-2xl font-bold text-green-600">{revenueStats.dailyCompounds}</div>
-                                            <div className="text-sm text-gray-600">Compounds Paid</div>
-                                        </div>
-                                        <div className="text-center">
-                                            <div className="text-2xl font-bold text-yellow-600">{revenueStats.pointsPurchased}</div>
-                                            <div className="text-sm text-gray-600">Points Purchased</div>
-                                        </div>
-                                        <div className="text-center">
-                                            <div className="text-2xl font-bold text-blue-600">{revenueStats.premiumUpgrades}</div>
-                                            <div className="text-sm text-gray-600">Premium Upgrades</div>
-                                        </div>
-                                        <div className="text-center">
-                                            <div className="text-2xl font-bold text-purple-600">RM{revenueStats.totalDaily}</div>
-                                            <div className="text-sm text-gray-600">Total Revenue</div>
-                                        </div>
-                                    </div>
-                                </div>
+        <div class="post-card">
+            <div class="post-header">
+                <div class="post-user">
+                    <div class="post-avatar">ML</div>
+                    <div class="post-user-info">
+                        <h4>Mei Ling</h4>
+                        <p>1 day ago • Social Challenge</p>
+                    </div>
+                </div>
+                <div class="post-points">+800 pts</div>
+            </div>
+            <div class="post-content">
+                <strong>Mei Ling challenged you:</strong>
+                <div class="challenge-content">
+                    "Get a girl's signature and take selfie at Pavilion KL"
+                </div>
+            </div>
+            <div class="post-actions">
+                <button class="action-btn complete" onclick="completeChallenge(2, 800)">
+                    ✅ Complete
+                </button>
+                <button class="action-btn forfeit" onclick="forfeitChallenge(2, 800)">
+                    ❌ Forfeit
+                </button>
+            </div>
+        </div>
 
-                                {/* Compound Warning */}
-                                {compoundBalance > 0 && (
-                                    <div className="bg-red-50 border-2 border-red-300 rounded-xl p-4 mb-4">
-                                        <div className="text-center mb-3">
-                                            <h3 className="text-red-700 font-bold text-lg">⚠️ COMPOUND ALERT ⚠️</h3>
-                                            <p className="text-red-600 font-semibold">You have outstanding compounds!</p>
-                                        </div>
-                                        
-                                        <div className="bg-white rounded-lg p-3 border border-red-200 mb-3">
-                                            <div className="flex justify-between items-center">
-                                                <span className="font-bold">Total Amount:</span>
-                                                <span className="font-bold text-lg text-red-700">RM{compoundBalance}</span>
-                                            </div>
-                                            <p className="text-xs text-red-600 mt-1">⏰ Pay now and earn 20 bonus points!</p>
-                                        </div>
-                                        
-                                        <button 
-                                            onClick={() => setShowCompoundModal(true)}
-                                            className="w-full bg-red-600 text-white py-2 px-4 rounded-lg font-semibold hover:bg-red-700 transition-colors"
-                                        >
-                                            Pay Compound & Earn Points
-                                        </button>
-                                    </div>
-                                )}
+        <div class="post-card">
+            <div class="post-header">
+                <div class="post-user">
+                    <div class="post-avatar">SL</div>
+                    <div class="post-user-info">
+                        <h4>Sarah Lim</h4>
+                        <p>3 hours ago • Business Task</p>
+                    </div>
+                </div>
+                <div class="post-points">+600 pts</div>
+            </div>
+            <div class="post-content">
+                <strong>Sarah challenged you:</strong>
+                <div class="challenge-content">
+                    "Give business card to 5 strangers and get their contact info"
+                </div>
+            </div>
+            <div class="post-actions">
+                <button class="action-btn complete" onclick="completeChallenge(3, 600)">
+                    ✅ Complete
+                </button>
+                <button class="action-btn forfeit" onclick="forfeitChallenge(3, 600)">
+                    ❌ Forfeit
+                </button>
+            </div>
+        </div>
+    </div>
 
-                                {/* Posts Feed */}
-                                {posts.map(post => (
-                                    <div key={post.id} className="bg-white rounded-xl shadow-sm border-2 border-gray-400 mb-4">
-                                        {/* Post Header */}
-                                        <div className="p-4 flex items-center justify-between">
-                                            <div className="flex items-center space-x-4">
-                                                <img 
-                                                    src={post.user.avatar} 
-                                                    alt={post.user.name}
-                                                    className="w-16 h-16 rounded-full object-cover border-2 border-yellow-500"
-                                                />
-                                                <div>
-                                                    <div className="flex items-center space-x-2">
-                                                        <h3 className="font-bold text-lg text-gray-900">{post.user.name}</h3>
-                                                        {post.user.verified && (
-                                                            <div className="w-5 h-5 bg-blue-500 rounded-full flex items-center justify-center">
-                                                                <span className="text-white text-xs">✓</span>
-                                                            </div>
-                                                        )}
-                                                        <div className="flex items-center space-x-1 bg-yellow-100 px-2 py-1 rounded-full">
-                                                            <span className="text-xs">⭐</span>
-                                                            <span className="text-xs font-medium">{post.user.level}</span>
-                                                        </div>
-                                                    </div>
-                                                    <div className="flex items-center space-x-2 text-sm text-gray-500 mt-1">
-                                                        <span>{post.time}</span>
-                                                        <span>•</span>
-                                                        <span>🌍</span>
-                                                        <span>•</span>
-                                                        <span>🪙</span>
-                                                        <span className="text-yellow-600 font-medium">+{post.pointsEarned} points</span>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            {post.isPromoted && (
-                                                <div className="bg-blue-100 text-blue-700 px-2 py-1 rounded text-xs font-medium">
-                                                    Promoted 💎
-                                                </div>
-                                            )}
-                                        </div>
+    <!-- Bottom Navigation -->
+    <div class="bottom-nav">
+        <a href="#" class="nav-item active">
+            <div class="nav-icon">🏠</div>
+            <div>Home</div>
+        </a>
+        <a href="#" class="nav-item">
+            <div class="nav-icon">👥</div>
+            <div>Friends</div>
+        </a>
+        <a href="#" class="nav-item" onclick="showModal('challenge')">
+            <div class="nav-icon">➕</div>
+            <div>Create</div>
+        </a>
+        <a href="#" class="nav-item" onclick="showModal('treasure')">
+            <div class="nav-icon">🏴‍☠️</div>
+            <div>Treasure</div>
+        </a>
+        <a href="#" class="nav-item">
+            <div class="nav-icon">🔔</div>
+            <div>Alerts</div>
+        </a>
+    </div>
 
-                                        {/* Post Content */}
-                                        <div className="px-4 pb-3">
-                                            <p className="text-gray-800 leading-relaxed">{post.content}</p>
-                                        </div>
+    <!-- Challenge Modal -->
+    <div id="challengeModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">Create New Challenge</div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label class="form-label">Target Friend</label>
+                    <select class="form-control" id="targetFriend">
+                        <option value="">Choose friend...</option>
+                        <option value="Ahmad Rahman">Ahmad Rahman</option>
+                        <option value="Mei Ling">Mei Ling</option>
+                        <option value="David Tan">David Tan</option>
+                        <option value="Sarah Lim">Sarah Lim</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Challenge Points</label>
+                    <select class="form-control" id="challengePoints">
+                        <option value="300">300 Points (Easy)</option>
+                        <option value="500">500 Points (Medium)</option>
+                        <option value="800">800 Points (Hard)</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Challenge Description</label>
+                    <textarea class="form-control" id="challengeText" rows="3" placeholder="Describe the challenge..."></textarea>
+                </div>
+                <button class="btn-primary" onclick="createChallenge()">Create Challenge</button>
+                <button class="btn-secondary" onclick="hideModal('challenge')">Cancel</button>
+            </div>
+        </div>
+    </div>
 
-                                        {/* Post Image */}
-                                        {post.image && (
-                                            <div className="mb-3">
-                                                <img 
-                                                    src={post.image} 
-                                                    alt="Post content"
-                                                    className="w-full h-64 object-cover"
-                                                />
-                                            </div>
-                                        )}
+    <!-- Treasure Modal -->
+    <div id="treasureModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">🏴‍☠️ Treasure Hunts</div>
+            <div class="modal-body">
+                <div style="padding: 16px; background: #f8f9fa; border-radius: 8px; margin-bottom: 16px;">
+                    <h4>🏆 Golden Trophy Hunt</h4>
+                    <p><strong>Location:</strong> KLCC Area</p>
+                    <p><strong>Reward:</strong> 2000 points</p>
+                    <p><em>"Near the twin towers, where coffee flows and businessmen meet..."</em></p>
+                    <button class="btn-primary" onclick="startTreasureHunt('Golden Trophy')">Start Hunt</button>
+                </div>
+                <div style="padding: 16px; background: #f8f9fa; border-radius: 8px; margin-bottom: 16px;">
+                    <h4>🧧 Lucky Red Packet</h4>
+                    <p><strong>Location:</strong> Petaling Street</p>
+                    <p><strong>Reward:</strong> 500 points</p>
+                    <p><em>"Where dragons dance and dumplings steam..."</em></p>
+                    <button class="btn-primary" onclick="startTreasureHunt('Red Packet')">Start Hunt</button>
+                </div>
+                <button class="btn-secondary" onclick="hideModal('treasure')">Close</button>
+            </div>
+        </div>
+    </div>
 
-                                        {/* Action Buttons */}
-                                        <div className="px-4 py-2 border-t border-gray-100">
-                                            <div className="flex items-center justify-around">
-                                                <button 
-                                                    onClick={() => handleLike(post.id)}
-                                                    className="flex items-center space-x-2 px-4 py-2 rounded-lg hover:bg-yellow-50 transition-colors flex-1 justify-center"
-                                                >
-                                                    <span>👍</span>
-                                                    <span className="text-gray-600 font-medium">Steady (+2)</span>
-                                                </button>
-                                                <button className="flex items-center space-x-2 px-4 py-2 rounded-lg hover:bg-yellow-50 transition-colors flex-1 justify-center">
-                                                    <span>💬</span>
-                                                    <span className="text-gray-600 font-medium">Comment (+5)</span>
-                                                </button>
-                                                <button className="flex items-center space-x-2 px-4 py-2 rounded-lg hover:bg-yellow-50 transition-colors flex-1 justify-center">
-                                                    <span>📤</span>
-                                                    <span className="text-gray-600 font-medium">Kongsi (+8)</span>
-                                                </button>
-                                            </div>
-                                        </div>
-                                    </div>
-                                ))}
-                            </div>
-                        );
+    <!-- Compounds Modal -->
+    <div id="compoundsModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">🎯 Your Active Compounds</div>
+            <div class="modal-body">
+                <div style="padding: 16px; background: #fff3cd; border-radius: 8px; margin-bottom: 16px; border-left: 4px solid #ffc107;">
+                    <h4>Ahmad Rahman challenges you</h4>
+                    <p>"Ask 3 strangers for their phone number and record video proof"</p>
+                    <p><strong>Reward:</strong> +500 points | <strong>Deadline:</strong> 2 hours</p>
+                    <button class="btn-primary" onclick="completeFromModal(1, 500)">✅ Complete Challenge</button>
+                </div>
+                <button class="btn-secondary" onclick="hideModal('compounds')">Close</button>
+            </div>
+        </div>
+    </div>
 
-                    case 'friends':
-                        return (
-                            <div className="max-w-2xl mx-auto">
-                                <div className="bg-white rounded-xl shadow-sm border-2 border-gray-400 p-8 text-center">
-                                    <div className="text-6xl mb-4">👥</div>
-                                    <h2 className="text-2xl font-bold text-gray-900 mb-2">Kawan-kawan</h2>
-                                    <p className="text-gray-600">Cari dan connect dengan member baru!</p>
-                                </div>
-                            </div>
-                        );
+    <!-- Toast Notification -->
+    <div id="toast" class="toast">
+        <span id="toastText">Success!</span>
+    </div>
 
-                    case 'messenger':
-                        return (
-                            <div className="max-w-2xl mx-auto">
-                                <div className="bg-white rounded-xl shadow-sm border-2 border-gray-400 p-8 text-center">
-                                    <div className="text-6xl mb-4">💬</div>
-                                    <h2 className="text-2xl font-bold text-gray-900 mb-2">Chat Bro</h2>
-                                    <p className="text-gray-600">Borak dengan kawan dan family</p>
-                                </div>
-                            </div>
-                        );
+    <script>
+        let userPoints = 15000;
+        let completedChallenges = [];
 
-                    default:
-                        return <div>Select a tab</div>;
-                }
+        function updatePointsDisplay() {
+            document.getElementById('userPoints').textContent = userPoints.toLocaleString() + ' pts';
+        }
+
+        function showModal(type) {
+            const modals = {
+                'challenge': 'challengeModal',
+                'treasure': 'treasureModal', 
+                'compounds': 'compoundsModal'
             };
+            if (modals[type]) {
+                document.getElementById(modals[type]).classList.add('show');
+            }
+        }
 
-            return (
-                <div className="min-h-screen bg-gray-100">
-                    {/* Header */}
-                    <div className="bg-white shadow-sm border-b border-gray-200 sticky top-0 z-50">
-                        <div className="max-w-6xl mx-auto px-4 py-2">
-                            <div className="flex items-center justify-between">
-                                {/* Left - Logo & Search */}
-                                <div className="flex items-center space-x-4">
-                                    <div className="flex items-center space-x-2">
-                                        <h1 className="text-2xl font-bold text-yellow-600">JomBro</h1>
-                                        <span className="text-sm text-gray-600 italic">"bro kang tau Lai liau!"</span>
-                                    </div>
-                                    <div className="relative hidden md:block">
-                                        <span className="absolute left-3 top-1/2 transform -translate-y-1/2">🔍</span>
-                                        <input
-                                            type="text"
-                                            placeholder="Search JomBro"
-                                            className="bg-yellow-50 border border-yellow-200 rounded-full pl-10 pr-4 py-2 w-64 focus:outline-none focus:ring-2 focus:ring-yellow-500"
-                                        />
-                                    </div>
-                                </div>
+        function hideModal(type) {
+            const modals = {
+                'challenge': 'challengeModal',
+                'treasure': 'treasureModal',
+                'compounds': 'compoundsModal' 
+            };
+            if (modals[type]) {
+                document.getElementById(modals[type]).classList.remove('show');
+            }
+        }
 
-                                {/* Center - Navigation */}
-                                <div className="hidden md:flex items-center space-x-8">
-                                    <button
-                                        onClick={() => setActiveTab('home')}
-                                        className={`p-3 rounded-lg transition-colors ${activeTab === 'home' ? 'text-yellow-600 bg-yellow-50' : 'text-gray-600 hover:bg-yellow-50'}`}
-                                    >
-                                        <span className="text-xl">🏠</span>
-                                    </button>
-                                    <button
-                                        onClick={() => setActiveTab('friends')}
-                                        className={`p-3 rounded-lg transition-colors ${activeTab === 'friends' ? 'text-yellow-600 bg-yellow-50' : 'text-gray-600 hover:bg-yellow-50'}`}
-                                    >
-                                        <span className="text-xl">👥</span>
-                                    </button>
-                                    <button
-                                        onClick={() => setActiveTab('messenger')}
-                                        className={`p-3 rounded-lg transition-colors ${activeTab === 'messenger' ? 'text-yellow-600 bg-yellow-50' : 'text-gray-600 hover:bg-yellow-50'}`}
-                                    >
-                                        <span className="text-xl">💬</span>
-                                    </button>
-                                </div>
+        function showToast(message) {
+            const toast = document.getElementById('toast');
+            const toastText = document.getElementById('toastText');
+            toastText.textContent = message;
+            toast.classList.add('show');
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 3000);
+        }
 
-                                {/* Right - User Actions */}
-                                <div className="flex items-center space-x-2">
-                                    {/* Points Display */}
-                                    <div className="flex items-center space-x-1 bg-yellow-100 px-3 py-1 rounded-full">
-                                        <span>🪙</span>
-                                        <span className="text-sm font-medium text-yellow-700">{userPoints}</span>
-                                    </div>
-                                    
-                                    {/* Compound Alert */}
-                                    <button 
-                                        onClick={() => setShowCompoundModal(true)}
-                                        className="p-2 text-red-600 hover:bg-red-50 rounded-full transition-colors relative"
-                                    >
-                                        <span className="text-xl">💰</span>
-                                        {compoundBalance > 0 && (
-                                            <div className="absolute -top-1 -right-1 w-4 h-4 bg-red-500 rounded-full text-white text-xs flex items-center justify-center">
-                                                !
-                                            </div>
-                                        )}
-                                    </button>
-                                    
-                                    {/* Points Store */}
-                                    <button 
-                                        onClick={() => setShowPointsModal(true)}
-                                        className="p-2 text-yellow-600 hover:bg-yellow-50 rounded-full transition-colors"
-                                    >
-                                        <span className="text-xl">🎁</span>
-                                    </button>
-                                    
-                                    {/* Games */}
-                                    <button 
-                                        onClick={() => setShowGameModal(true)}
-                                        className="p-2 text-green-600 hover:bg-green-50 rounded-full transition-colors"
-                                    >
-                                        <span className="text-xl">🏆</span>
-                                    </button>
-                                    
-                                    <img 
-                                        src="https://via.placeholder.com/32x32/6366F1/FFFFFF?text=JD" 
-                                        alt="User"
-                                        className="w-8 h-8 rounded-full object-cover cursor-pointer"
-                                    />
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+        function completeChallenge(id, points) {
+            if (completedChallenges.includes(id)) return;
+            
+            userPoints += points;
+            completedChallenges.push(id);
+            updatePointsDisplay();
+            
+            // Hide the post
+            event.target.closest('.post-card').style.opacity = '0.5';
+            event.target.closest('.post-card').style.pointerEvents = 'none';
+            
+            if (navigator.vibrate) {
+                navigator.vibrate([100, 50, 100]);
+            }
+            
+            showToast(`🎉 Challenge completed! +${points} points!`);
+        }
 
-                    {/* Main Content */}
-                    <div className="max-w-6xl mx-auto px-4 py-6">
-                        {renderContent()}
-                    </div>
+        function forfeitChallenge(id, points) {
+            if (completedChallenges.includes(id)) return;
+            
+            userPoints -= points;
+            completedChallenges.push(id);
+            updatePointsDisplay();
+            
+            // Hide the post
+            event.target.closest('.post-card').style.opacity = '0.5';
+            event.target.closest('.post-card').style.pointerEvents = 'none';
+            
+            showToast(`❌ Challenge forfeited! -${points} points`);
+        }
 
-                    {/* Mobile Navigation */}
-                    <div className="md:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200">
-                        <div className="flex items-center justify-around py-2">
-                            <button
-                                onClick={() => setActiveTab('home')}
-                                className={`p-3 ${activeTab === 'home' ? 'text-yellow-600' : 'text-gray-600'}`}
-                            >
-                                <span className="text-xl">🏠</span>
-                            </button>
-                            <button
-                                onClick={() => setActiveTab('friends')}
-                                className={`p-3 ${activeTab === 'friends' ? 'text-yellow-600' : 'text-gray-600'}`}
-                            >
-                                <span className="text-xl">👥</span>
-                            </button>
-                            <button
-                                onClick={() => setActiveTab('messenger')}
-                                className={`p-3 ${activeTab === 'messenger' ? 'text-yellow-600' : 'text-gray-600'}`}
-                            >
-                                <span className="text-xl">💬</span>
-                            </button>
-                            <button className="p-3 text-gray-600">
-                                <span className="text-xl">🔔</span>
-                            </button>
-                            <button className="p-3 text-gray-600">
-                                <span className="text-xl">☰</span>
-                            </button>
-                        </div>
-                    </div>
+        function completeFromModal(id, points) {
+            completeChallenge(id, points);
+            hideModal('compounds');
+        }
 
-                    {/* Modals */}
-                    {showCompoundModal && <CompoundModal />}
-                    {showPointsModal && <PointsModal />}
-                    {showGameModal && <GameModal />}
-                </div>
-            );
-        };
+        function createChallenge() {
+            const friend = document.getElementById('targetFriend').value;
+            const points = document.getElementById('challengePoints').value;
+            const text = document.getElementById('challengeText').value;
+            
+            if (!friend || !text) {
+                showToast('❗ Please fill all fields!');
+                return;
+            }
+            
+            userPoints -= parseInt(points);
+            updatePointsDisplay();
+            hideModal('challenge');
+            
+            // Clear form
+            document.getElementById('targetFriend').value = '';
+            document.getElementById('challengeText').value = '';
+            
+            showToast(`⚡ Challenge sent to ${friend}! -${points} points`);
+        }
 
-        // Render the app
-        ReactDOM.render(React.createElement(JomBro), document.getElementById('root'));
+        function startTreasureHunt(name) {
+            hideModal('treasure');
+            showToast(`🗺️ ${name} hunt started! Good luck!`);
+        }
+
+        // Close modals when clicking outside
+        window.onclick = function(event) {
+            if (event.target.classList.contains('modal')) {
+                event.target.classList.remove('show');
+            }
+        }
+
+        // Initialize
+        updatePointsDisplay();
     </script>
 </body>
 </html>
