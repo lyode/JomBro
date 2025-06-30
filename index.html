@@ -515,24 +515,21 @@
             color: #405DE6;
         }
 
-        /* Light Screensaver Mode */
+        /* Enhanced Screensaver Mode */
         .screensaver-mode {
             position: fixed;
             top: 0;
             left: 0;
             right: 0;
             bottom: 0;
-            background: linear-gradient(135deg, #FFECD2 0%, #FCB69F 25%, #FFECD2 50%, #FCB69F 75%, #FFECD2 100%);
-            background-size: 400% 400%;
-            animation: lightGradientFlow 20s ease infinite;
             z-index: 9999;
             display: none;
             flex-direction: column;
             justify-content: center;
             align-items: center;
-            color: #262626;
             overflow: hidden;
             padding: env(safe-area-inset-top, 0) env(safe-area-inset-right, 0) env(safe-area-inset-bottom, 0) env(safe-area-inset-left, 0);
+            transition: all 0.5s ease;
         }
 
         .screensaver-mode.active {
@@ -540,11 +537,148 @@
             animation: fadeIn 2s ease;
         }
 
+        /* Screensaver Themes */
+        .screensaver-mode.light-theme {
+            background: linear-gradient(135deg, #FFECD2 0%, #FCB69F 25%, #FFECD2 50%, #FCB69F 75%, #FFECD2 100%);
+            background-size: 400% 400%;
+            animation: lightGradientFlow 20s ease infinite;
+            color: #262626;
+        }
+
+        .screensaver-mode.dark-theme {
+            background: linear-gradient(135deg, #0D1421 0%, #1A1A2E 25%, #16213E 50%, #2E236C 75%, #17153B 100%);
+            background-size: 400% 400%;
+            animation: darkGradientFlow 20s ease infinite;
+            color: white;
+        }
+
+        .screensaver-mode.space-theme {
+            background: radial-gradient(circle at 20% 80%, #120458 0%, #000000 50%), 
+                        radial-gradient(circle at 80% 20%, #1a0033 0%, #000000 50%),
+                        #000000;
+            color: white;
+        }
+
+        .screensaver-mode.ocean-theme {
+            background: linear-gradient(180deg, #001122 0%, #003366 30%, #004488 60%, #0066AA 100%);
+            color: white;
+        }
+
+        .screensaver-mode.sunset-theme {
+            background: linear-gradient(180deg, #FF6B35 0%, #F7931E 25%, #FFE66D 50%, #FF9F1C 75%, #FF6B35 100%);
+            background-size: 400% 400%;
+            animation: sunsetFlow 15s ease infinite;
+            color: #2C1810;
+        }
+
+        .screensaver-mode.forest-theme {
+            background: linear-gradient(180deg, #1B4332 0%, #2D5A41 25%, #40916C 50%, #52B788 75%, #74C69D 100%);
+            color: white;
+        }
+
+        /* Screensaver Background Effects */
+        .screensaver-effects {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            overflow: hidden;
+        }
+
+        /* Stars Effect */
+        .star {
+            position: absolute;
+            background: white;
+            border-radius: 50%;
+            animation: twinkle 3s ease-in-out infinite alternate;
+        }
+
+        .star.small {
+            width: 2px;
+            height: 2px;
+        }
+
+        .star.medium {
+            width: 3px;
+            height: 3px;
+        }
+
+        .star.large {
+            width: 4px;
+            height: 4px;
+            box-shadow: 0 0 10px rgba(255, 255, 255, 0.8);
+        }
+
+        /* Drizzle Effect */
+        .drizzle {
+            position: absolute;
+            width: 1px;
+            height: 15px;
+            background: linear-gradient(to bottom, transparent, rgba(173, 216, 230, 0.8), transparent);
+            animation: fall 2s linear infinite;
+        }
+
+        /* Smoke Effect */
+        .smoke {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            background: radial-gradient(circle, rgba(255, 255, 255, 0.3) 0%, transparent 70%);
+            border-radius: 50%;
+            animation: drift 8s ease-in-out infinite;
+        }
+
+        /* Wave Effects */
+        .wave {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 200%;
+            height: 100px;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+            border-radius: 50%;
+            animation: wave 6s ease-in-out infinite;
+        }
+
+        .wave.sun-wave {
+            background: linear-gradient(90deg, transparent, rgba(255, 215, 0, 0.3), transparent);
+            animation: sunWave 4s ease-in-out infinite;
+        }
+
+        .wave.sea-wave {
+            background: linear-gradient(90deg, transparent, rgba(0, 191, 255, 0.2), transparent);
+            animation: seaWave 5s ease-in-out infinite;
+        }
+
+        /* Meteor Effect */
+        .meteor {
+            position: absolute;
+            width: 2px;
+            height: 2px;
+            background: white;
+            box-shadow: 0 0 8px white, -80px 0 8px rgba(255, 255, 255, 0.3);
+            animation: meteor 3s linear infinite;
+        }
+
         .screensaver-content {
             text-align: center;
             max-width: 90%;
             position: relative;
             z-index: 2;
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            border-radius: 24px;
+            padding: 2rem;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+
+        .screensaver-mode.light-theme .screensaver-content {
+            background: rgba(255, 255, 255, 0.8);
+            border: 2px solid rgba(255, 255, 255, 0.9);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
         }
 
         .screensaver-logo {
@@ -555,6 +689,7 @@
             -webkit-text-fill-color: transparent;
             margin-bottom: 2rem;
             animation: instagramGradient 4s ease infinite;
+            text-shadow: 0 0 20px rgba(255, 255, 255, 0.3);
         }
 
         .screensaver-time {
@@ -562,7 +697,17 @@
             font-weight: 300;
             margin-bottom: 2rem;
             font-family: 'SF Mono', monospace;
+            text-shadow: 0 0 10px currentColor;
+        }
+
+        .screensaver-mode.light-theme .screensaver-time {
             color: #405DE6;
+        }
+
+        .screensaver-mode.dark-theme .screensaver-time,
+        .screensaver-mode.space-theme .screensaver-time,
+        .screensaver-mode.ocean-theme .screensaver-time {
+            color: #ffffff;
         }
 
         .screensaver-stats {
@@ -574,14 +719,19 @@
         }
 
         .stat-card {
-            background: rgba(255, 255, 255, 0.8);
+            background: rgba(255, 255, 255, 0.1);
             backdrop-filter: blur(20px);
-            border: 1px solid rgba(255, 255, 255, 0.5);
+            border: 1px solid rgba(255, 255, 255, 0.3);
             border-radius: 16px;
             padding: 1.5rem 1rem;
             text-align: center;
             box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
             animation: lightPulse 4s ease-in-out infinite;
+        }
+
+        .screensaver-mode.light-theme .stat-card {
+            background: rgba(255, 255, 255, 0.8);
+            border: 1px solid rgba(255, 255, 255, 0.9);
         }
 
         .stat-number {
@@ -595,8 +745,8 @@
 
         .stat-label {
             font-size: 0.8rem;
-            color: #8E8E8E;
             font-weight: 600;
+            opacity: 0.8;
         }
 
         .screensaver-hint {
@@ -605,10 +755,39 @@
             left: 50%;
             transform: translateX(-50%);
             font-size: 0.9rem;
-            color: #8E8E8E;
             animation: lightBreathe 3s ease-in-out infinite;
             text-align: center;
             padding: 0 20px;
+            opacity: 0.7;
+        }
+
+        /* Screensaver Controls */
+        .screensaver-controls {
+            position: absolute;
+            top: 2rem;
+            right: 2rem;
+            z-index: 10;
+            display: flex;
+            gap: 12px;
+        }
+
+        .screensaver-control-btn {
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            color: white;
+            padding: 8px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        .screensaver-control-btn:active {
+            transform: scale(0.95);
+            background: rgba(255, 255, 255, 0.25);
         }
 
         /* Light Floating Controls */
@@ -639,6 +818,18 @@
         .light-control-btn:active {
             transform: scale(0.95);
             background: white;
+        }
+
+        .light-control-btn.settings {
+            background: linear-gradient(135deg, #405DE6, #C13584);
+            color: white;
+            border: none;
+        }
+
+        .light-control-btn.edit {
+            background: linear-gradient(135deg, #FF6B35, #F7931E);
+            color: white;
+            border: none;
         }
 
         /* Modal - Instagram Style */
@@ -781,6 +972,16 @@
             50% { background-position: 100% 50%; }
         }
 
+        @keyframes darkGradientFlow {
+            0%, 100% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+        }
+
+        @keyframes sunsetFlow {
+            0%, 100% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+        }
+
         @keyframes lightFloat {
             0% {
                 transform: translateY(100vh) rotate(0deg);
@@ -821,6 +1022,103 @@
         @keyframes fadeIn {
             from { opacity: 0; }
             to { opacity: 1; }
+        }
+
+        /* Effect Animations */
+        @keyframes twinkle {
+            0% {
+                opacity: 0.3;
+                transform: scale(1);
+            }
+            50% {
+                opacity: 1;
+                transform: scale(1.2);
+            }
+            100% {
+                opacity: 0.3;
+                transform: scale(1);
+            }
+        }
+
+        @keyframes fall {
+            0% {
+                transform: translateY(-100vh);
+                opacity: 0;
+            }
+            10% {
+                opacity: 1;
+            }
+            90% {
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(100vh);
+                opacity: 0;
+            }
+        }
+
+        @keyframes drift {
+            0% {
+                transform: translateY(100vh) translateX(0);
+                opacity: 0;
+            }
+            10% {
+                opacity: 0.7;
+            }
+            90% {
+                opacity: 0.7;
+            }
+            100% {
+                transform: translateY(-100px) translateX(50px);
+                opacity: 0;
+            }
+        }
+
+        @keyframes wave {
+            0%, 100% {
+                transform: translateX(-50%) translateY(0) scaleY(1);
+                opacity: 0.3;
+            }
+            50% {
+                transform: translateX(-50%) translateY(-20px) scaleY(1.5);
+                opacity: 0.7;
+            }
+        }
+
+        @keyframes sunWave {
+            0%, 100% {
+                transform: translateX(-50%) translateY(0) scaleY(1);
+                opacity: 0.5;
+            }
+            50% {
+                transform: translateX(-50%) translateY(-30px) scaleY(2);
+                opacity: 0.8;
+            }
+        }
+
+        @keyframes seaWave {
+            0%, 100% {
+                transform: translateX(-50%) translateY(0) scaleY(1);
+                opacity: 0.4;
+            }
+            50% {
+                transform: translateX(-50%) translateY(-25px) scaleY(1.8);
+                opacity: 0.6;
+            }
+        }
+
+        @keyframes meteor {
+            0% {
+                transform: translateX(100vw) translateY(-100px) rotate(-45deg);
+                opacity: 1;
+            }
+            70% {
+                opacity: 1;
+            }
+            100% {
+                transform: translateX(-100px) translateY(100vh) rotate(-45deg);
+                opacity: 0;
+            }
         }
 
         /* Responsive */
@@ -878,6 +1176,8 @@
     <div class="light-controls">
         <div class="light-control-btn" onclick="toggleScreensaver()" id="screensaverBtn">🌙 Sleep</div>
         <div class="light-control-btn" onclick="toggleFullscreen()" id="fullscreenBtn">⛶ Full</div>
+        <div class="light-control-btn settings" onclick="showModal('settings')">⚙️ Set</div>
+        <div class="light-control-btn edit" onclick="showModal('screensaverEdit')">🎨 Edit</div>
     </div>
 
     <!-- Instagram Stories -->
@@ -1152,8 +1452,17 @@
         </div>
     </div>
 
-    <!-- Light Screensaver Mode -->
-    <div class="screensaver-mode" id="screensaverMode">
+    <!-- Enhanced Screensaver Mode -->
+    <div class="screensaver-mode light-theme" id="screensaverMode">
+        <!-- Screensaver Effects Container -->
+        <div class="screensaver-effects" id="screensaverEffects"></div>
+        
+        <!-- Screensaver Controls -->
+        <div class="screensaver-controls">
+            <div class="screensaver-control-btn" onclick="exitScreensaver()">✕ Exit</div>
+            <div class="screensaver-control-btn" onclick="showModal('screensaverEdit')">🎨 Edit</div>
+        </div>
+        
         <div class="screensaver-content">
             <div class="screensaver-logo">JomBro</div>
             <div class="screensaver-time" id="screensaverClock">12:00:00</div>
@@ -1271,6 +1580,122 @@
         </div>
     </div>
 
+    <!-- Settings Modal -->
+    <div id="settingsModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-title">⚙️ App Settings</div>
+            
+            <div class="form-group">
+                <label class="form-label">App Theme</label>
+                <select class="form-control" id="appTheme" onchange="changeAppTheme()">
+                    <option value="light">Light Mode</option>
+                    <option value="dark">Dark Mode</option>
+                    <option value="auto">Auto (System)</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">Screensaver Timeout</label>
+                <select class="form-control" id="screensaverTimeout" onchange="changeTimeout()">
+                    <option value="15000">15 seconds</option>
+                    <option value="30000" selected>30 seconds</option>
+                    <option value="60000">1 minute</option>
+                    <option value="300000">5 minutes</option>
+                    <option value="never">Never</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">Notifications</label>
+                <select class="form-control" id="notifications">
+                    <option value="all">All Notifications</option>
+                    <option value="challenges">Challenges Only</option>
+                    <option value="none">None</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">Haptic Feedback</label>
+                <select class="form-control" id="haptics">
+                    <option value="enabled" selected>Enabled</option>
+                    <option value="disabled">Disabled</option>
+                </select>
+            </div>
+            
+            <button class="btn-primary" onclick="saveSettings()">
+                💾 Save Settings
+            </button>
+            <button class="btn-secondary" onclick="hideModal('settings')">
+                Cancel
+            </button>
+        </div>
+    </div>
+
+    <!-- Screensaver Edit Modal -->
+    <div id="screensaverEditModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-title">🎨 Customize Screensaver</div>
+            
+            <div class="form-group">
+                <label class="form-label">Screensaver Theme</label>
+                <select class="form-control" id="screensaverTheme" onchange="previewTheme()">
+                    <option value="light-theme" selected>Light Gradient</option>
+                    <option value="dark-theme">Dark Space</option>
+                    <option value="space-theme">Outer Space</option>
+                    <option value="ocean-theme">Ocean Waves</option>
+                    <option value="sunset-theme">Sunset Vibes</option>
+                    <option value="forest-theme">Forest Dreams</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">Background Effects</label>
+                <select class="form-control" id="backgroundEffects" onchange="previewEffects()">
+                    <option value="none">No Effects</option>
+                    <option value="stars">Twinkling Stars</option>
+                    <option value="drizzle">Drizzling Rain</option>
+                    <option value="smoke">Smoke Drift</option>
+                    <option value="meteors">Shooting Meteors</option>
+                    <option value="waves">Gentle Waves</option>
+                    <option value="sun-waves">Sun Waves</option>
+                    <option value="sea-waves">Sea Waves</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">Effect Intensity</label>
+                <select class="form-control" id="effectIntensity">
+                    <option value="light">Light</option>
+                    <option value="medium" selected>Medium</option>
+                    <option value="heavy">Heavy</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">Show Clock</label>
+                <select class="form-control" id="showClock">
+                    <option value="true" selected>Yes</option>
+                    <option value="false">No</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">Show Stats</label>
+                <select class="form-control" id="showStats">
+                    <option value="true" selected>Yes</option>
+                    <option value="false">No</option>
+                </select>
+            </div>
+            
+            <button class="btn-primary" onclick="applyScreensaverSettings()">
+                🎨 Apply Changes
+            </button>
+            <button class="btn-secondary" onclick="hideModal('screensaverEdit')">
+                Cancel
+            </button>
+        </div>
+    </div>
+
     <!-- Toast -->
     <div id="toast" class="toast">
         <span id="toastText">Success!</span>
@@ -1285,6 +1710,23 @@
         let maxIdleTime = 30000;
         let isIOSDevice = /iPad|iPhone|iPod/.test(navigator.userAgent);
         
+        // Screensaver settings
+        let screensaverSettings = {
+            theme: 'light-theme',
+            effects: 'none',
+            intensity: 'medium',
+            showClock: true,
+            showStats: true
+        };
+        
+        // App settings
+        let appSettings = {
+            theme: 'light',
+            timeout: 30000,
+            notifications: 'all',
+            haptics: 'enabled'
+        };
+        
         let stats = {
             points: 25430,
             challenges: 47,
@@ -1292,7 +1734,231 @@
             streak: 7
         };
 
-        function updatePointsDisplay() {
+        // Screensaver Effects Functions
+        function createScreensaverEffects() {
+            const container = document.getElementById('screensaverEffects');
+            container.innerHTML = ''; // Clear existing effects
+            
+            const effect = screensaverSettings.effects;
+            const intensity = screensaverSettings.intensity;
+            
+            if (effect === 'none') return;
+            
+            const counts = {
+                light: { stars: 50, drizzle: 20, smoke: 10, meteors: 3, waves: 2 },
+                medium: { stars: 100, drizzle: 40, smoke: 20, meteors: 5, waves: 3 },
+                heavy: { stars: 200, drizzle: 80, smoke: 40, meteors: 8, waves: 5 }
+            };
+            
+            const count = counts[intensity];
+            
+            switch(effect) {
+                case 'stars':
+                    createStars(container, count.stars);
+                    break;
+                case 'drizzle':
+                    createDrizzle(container, count.drizzle);
+                    break;
+                case 'smoke':
+                    createSmoke(container, count.smoke);
+                    break;
+                case 'meteors':
+                    createMeteors(container, count.meteors);
+                    break;
+                case 'waves':
+                case 'sun-waves':
+                case 'sea-waves':
+                    createWaves(container, effect, count.waves);
+                    break;
+            }
+        }
+
+        function createStars(container, count) {
+            for (let i = 0; i < count; i++) {
+                const star = document.createElement('div');
+                star.className = `star ${['small', 'medium', 'large'][Math.floor(Math.random() * 3)]}`;
+                star.style.left = Math.random() * 100 + '%';
+                star.style.top = Math.random() * 100 + '%';
+                star.style.animationDelay = Math.random() * 3 + 's';
+                star.style.animationDuration = (2 + Math.random() * 2) + 's';
+                container.appendChild(star);
+            }
+        }
+
+        function createDrizzle(container, count) {
+            for (let i = 0; i < count; i++) {
+                const drop = document.createElement('div');
+                drop.className = 'drizzle';
+                drop.style.left = Math.random() * 100 + '%';
+                drop.style.animationDelay = Math.random() * 2 + 's';
+                drop.style.animationDuration = (1.5 + Math.random()) + 's';
+                container.appendChild(drop);
+                
+                // Continuously create new drops
+                setInterval(() => {
+                    if (screensaverActive && screensaverSettings.effects === 'drizzle') {
+                        const newDrop = drop.cloneNode();
+                        newDrop.style.left = Math.random() * 100 + '%';
+                        newDrop.style.animationDelay = '0s';
+                        container.appendChild(newDrop);
+                        setTimeout(() => container.removeChild(newDrop), 2000);
+                    }
+                }, 500);
+            }
+        }
+
+        function createSmoke(container, count) {
+            for (let i = 0; i < count; i++) {
+                const smoke = document.createElement('div');
+                smoke.className = 'smoke';
+                smoke.style.left = Math.random() * 100 + '%';
+                smoke.style.animationDelay = Math.random() * 8 + 's';
+                smoke.style.animationDuration = (6 + Math.random() * 4) + 's';
+                container.appendChild(smoke);
+            }
+        }
+
+        function createMeteors(container, count) {
+            for (let i = 0; i < count; i++) {
+                setTimeout(() => {
+                    if (screensaverActive) {
+                        const meteor = document.createElement('div');
+                        meteor.className = 'meteor';
+                        meteor.style.top = Math.random() * 50 + '%';
+                        container.appendChild(meteor);
+                        setTimeout(() => {
+                            if (container.contains(meteor)) {
+                                container.removeChild(meteor);
+                            }
+                        }, 3000);
+                    }
+                }, i * 2000);
+            }
+        }
+
+        function createWaves(container, type, count) {
+            for (let i = 0; i < count; i++) {
+                const wave = document.createElement('div');
+                wave.className = `wave ${type}`;
+                wave.style.animationDelay = i * 2 + 's';
+                wave.style.bottom = (i * 20) + 'px';
+                container.appendChild(wave);
+            }
+        }
+
+        // Settings Functions
+        function changeAppTheme() {
+            const theme = document.getElementById('appTheme').value;
+            appSettings.theme = theme;
+            
+            if (theme === 'dark') {
+                document.body.style.background = '#000';
+                document.body.style.color = '#fff';
+                // Apply dark theme styles
+                showToast('🌙 Dark mode activated');
+            } else if (theme === 'light') {
+                document.body.style.background = '#FAFAFA';
+                document.body.style.color = '#262626';
+                // Apply light theme styles
+                showToast('☀️ Light mode activated');
+            } else {
+                // Auto theme based on system preference
+                const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+                changeAppTheme(prefersDark ? 'dark' : 'light');
+                showToast('🔄 Auto theme enabled');
+            }
+        }
+
+        function changeTimeout() {
+            const timeout = document.getElementById('screensaverTimeout').value;
+            if (timeout === 'never') {
+                maxIdleTime = Infinity;
+                clearTimeout(idleTimer);
+                showToast('⏰ Screensaver timeout disabled');
+            } else {
+                maxIdleTime = parseInt(timeout);
+                resetIdleTimer();
+                showToast(`⏰ Screensaver timeout set to ${timeout/1000}s`);
+            }
+            appSettings.timeout = timeout;
+        }
+
+        function saveSettings() {
+            // Save settings to localStorage
+            localStorage.setItem('jombroAppSettings', JSON.stringify(appSettings));
+            hideModal('settings');
+            showToast('💾 Settings saved successfully!');
+        }
+
+        function previewTheme() {
+            const theme = document.getElementById('screensaverTheme').value;
+            screensaverSettings.theme = theme;
+            
+            if (screensaverActive) {
+                applyScreensaverTheme();
+            }
+        }
+
+        function previewEffects() {
+            const effects = document.getElementById('backgroundEffects').value;
+            screensaverSettings.effects = effects;
+            
+            if (screensaverActive) {
+                createScreensaverEffects();
+            }
+        }
+
+        function applyScreensaverTheme() {
+            const screensaver = document.getElementById('screensaverMode');
+            screensaver.className = `screensaver-mode ${screensaverSettings.theme}`;
+            if (screensaverActive) {
+                screensaver.classList.add('active');
+            }
+        }
+
+        function applyScreensaverSettings() {
+            const theme = document.getElementById('screensaverTheme').value;
+            const effects = document.getElementById('backgroundEffects').value;
+            const intensity = document.getElementById('effectIntensity').value;
+            const showClock = document.getElementById('showClock').value === 'true';
+            const showStats = document.getElementById('showStats').value === 'true';
+            
+            screensaverSettings = {
+                theme, effects, intensity, showClock, showStats
+            };
+            
+            // Apply settings
+            applyScreensaverTheme();
+            
+            if (screensaverActive) {
+                createScreensaverEffects();
+                
+                // Show/hide clock and stats
+                document.getElementById('screensaverClock').style.display = showClock ? 'block' : 'none';
+                document.querySelector('.screensaver-stats').style.display = showStats ? 'grid' : 'none';
+            }
+            
+            // Save settings
+            localStorage.setItem('jombroScreensaverSettings', JSON.stringify(screensaverSettings));
+            
+            hideModal('screensaverEdit');
+            showToast('🎨 Screensaver customized successfully!');
+        }
+
+        // Load saved settings
+        function loadSettings() {
+            const savedAppSettings = localStorage.getItem('jombroAppSettings');
+            const savedScreensaverSettings = localStorage.getItem('jombroScreensaverSettings');
+            
+            if (savedAppSettings) {
+                appSettings = { ...appSettings, ...JSON.parse(savedAppSettings) };
+                maxIdleTime = appSettings.timeout === 'never' ? Infinity : parseInt(appSettings.timeout);
+            }
+            
+            if (savedScreensaverSettings) {
+                screensaverSettings = { ...screensaverSettings, ...JSON.parse(savedScreensaverSettings) };
+            }
+        }
             const pointsText = userPoints >= 1000 ? (userPoints/1000).toFixed(1) + 'K' : userPoints.toString();
             document.getElementById('userPoints').textContent = pointsText;
             stats.points = userPoints;
@@ -1370,7 +2036,7 @@
             resetIdleTimer();
         }
 
-        // Screensaver Functions
+        // Enhanced Screensaver Functions
         async function toggleScreensaver() {
             if (screensaverActive) {
                 exitScreensaver();
@@ -1382,7 +2048,12 @@
         async function activateScreensaver() {
             try {
                 screensaverActive = true;
-                document.getElementById('screensaverMode').classList.add('active');
+                const screensaver = document.getElementById('screensaverMode');
+                
+                // Apply theme and effects
+                applyScreensaverTheme();
+                screensaver.classList.add('active');
+                
                 document.getElementById('screensaverBtn').textContent = '☀️ Wake';
                 
                 if ('wakeLock' in navigator) {
@@ -1391,8 +2062,13 @@
                 
                 startScreensaverClock();
                 updateScreensaverStats();
+                createScreensaverEffects();
                 
-                showToast('🌙 Light screensaver activated');
+                // Apply visibility settings
+                document.getElementById('screensaverClock').style.display = screensaverSettings.showClock ? 'block' : 'none';
+                document.querySelector('.screensaver-stats').style.display = screensaverSettings.showStats ? 'grid' : 'none';
+                
+                showToast('🌙 Enhanced screensaver activated');
                 
             } catch (err) {
                 console.error('Screensaver failed:', err);
@@ -1404,6 +2080,9 @@
             screensaverActive = false;
             document.getElementById('screensaverMode').classList.remove('active');
             document.getElementById('screensaverBtn').textContent = '🌙 Sleep';
+            
+            // Clear effects
+            document.getElementById('screensaverEffects').innerHTML = '';
             
             if (wakeLock) {
                 wakeLock.release();
@@ -1465,7 +2144,9 @@
         function showModal(type) {
             const modals = {
                 'create': 'createModal',
-                'compounds': 'compoundsModal'
+                'compounds': 'compoundsModal',
+                'settings': 'settingsModal',
+                'screensaverEdit': 'screensaverEditModal'
             };
             if (modals[type]) {
                 document.getElementById(modals[type]).classList.add('show');
@@ -1475,7 +2156,9 @@
         function hideModal(type) {
             const modals = {
                 'create': 'createModal',
-                'compounds': 'compoundsModal'
+                'compounds': 'compoundsModal',
+                'settings': 'settingsModal',
+                'screensaverEdit': 'screensaverEditModal'
             };
             if (modals[type]) {
                 document.getElementById(modals[type]).classList.remove('show');
@@ -1556,14 +2239,37 @@
             });
         });
 
+        function updatePointsDisplay() {
+            const pointsText = userPoints >= 1000 ? (userPoints/1000).toFixed(1) + 'K' : userPoints.toString();
+            document.getElementById('userPoints').textContent = pointsText;
+            stats.points = userPoints;
+        }
+
         // Initialize
+        loadSettings(); // Load saved settings first
         updatePointsDisplay();
         createLightEffects();
         resetIdleTimer();
         
+        // Apply loaded theme
+        if (appSettings.theme !== 'light') {
+            document.getElementById('appTheme').value = appSettings.theme;
+            changeAppTheme();
+        }
+        
+        // Set up form values from saved settings
+        document.getElementById('screensaverTimeout').value = appSettings.timeout;
+        document.getElementById('notifications').value = appSettings.notifications;
+        document.getElementById('haptics').value = appSettings.haptics;
+        document.getElementById('screensaverTheme').value = screensaverSettings.theme;
+        document.getElementById('backgroundEffects').value = screensaverSettings.effects;
+        document.getElementById('effectIntensity').value = screensaverSettings.intensity;
+        document.getElementById('showClock').value = screensaverSettings.showClock.toString();
+        document.getElementById('showStats').value = screensaverSettings.showStats.toString();
+        
         setTimeout(() => {
-            const deviceInfo = isIOSDevice ? ' Instagram-style interface with light TikTok overlays!' : '';
-            showToast(`📸 Welcome to JomBro!${deviceInfo}`);
+            const deviceInfo = isIOSDevice ? ' Enhanced screensaver with customizable themes!' : '';
+            showToast(`🎨 Welcome to JomBro!${deviceInfo}`);
         }, 2000);
 
         setInterval(updateScreensaverStats, 10000);
