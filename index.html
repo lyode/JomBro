@@ -6,13 +6,13 @@
     
     <!-- iOS Specific Meta Tags -->
     <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-status-bar-style" content="light-content">
     <meta name="apple-mobile-web-app-title" content="JomBro">
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="format-detection" content="telephone=no">
-    <meta name="theme-color" content="#000000">
+    <meta name="theme-color" content="#FFFFFF">
     
-    <title>JomBro - TikTok Style Challenge App</title>
+    <title>JomBro - Instagram Style Challenge App</title>
 
     <style>
         * {
@@ -27,342 +27,510 @@
         }
 
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', sans-serif;
-            background: #000;
+            font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Helvetica Neue', sans-serif;
+            background: #FAFAFA;
             min-height: 100vh;
             min-height: 100dvh;
-            overflow: hidden;
-            position: relative;
-            color: white;
+            color: #262626;
+            overflow-x: hidden;
+            padding-top: env(safe-area-inset-top);
+            padding-bottom: env(safe-area-inset-bottom);
         }
 
-        /* TikTok-style Background Video Effect */
-        .background-container {
+        /* Instagram-style Header */
+        .header {
             position: fixed;
-            top: 0;
+            top: env(safe-area-inset-top, 0);
             left: 0;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(45deg, 
-                #FF0050 0%, 
-                #00D4FF 25%, 
-                #FF6B00 50%, 
-                #9D4EDD 75%, 
-                #FF0050 100%);
-            background-size: 400% 400%;
-            animation: gradientFlow 20s ease infinite;
-            z-index: 1;
-        }
-
-        .background-overlay {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.4);
-            backdrop-filter: blur(1px);
-        }
-
-        /* TikTok-style Floating Cards */
-        .challenge-cards-container {
-            position: relative;
-            height: 100vh;
-            height: 100dvh;
-            overflow-y: auto;
-            scroll-snap-type: y mandatory;
-            -webkit-overflow-scrolling: touch;
-            scrollbar-width: none;
-            z-index: 10;
-        }
-
-        .challenge-cards-container::-webkit-scrollbar {
-            display: none;
-        }
-
-        .challenge-card {
-            height: 100vh;
-            height: 100dvh;
-            display: flex;
-            flex-direction: column;
-            justify-content: flex-end;
-            padding: env(safe-area-inset-top, 20px) 20px calc(120px + env(safe-area-inset-bottom, 0)) 20px;
-            scroll-snap-align: start;
-            position: relative;
-        }
-
-        /* TikTok-style Right Side Actions */
-        .right-actions {
-            position: fixed;
-            right: 12px;
-            bottom: calc(140px + env(safe-area-inset-bottom, 0));
-            z-index: 100;
-            display: flex;
-            flex-direction: column;
-            gap: 16px;
-        }
-
-        .action-bubble {
-            width: 56px;
-            height: 56px;
-            border-radius: 28px;
-            background: rgba(255, 255, 255, 0.15);
+            right: 0;
+            background: rgba(255, 255, 255, 0.95);
             backdrop-filter: blur(20px);
-            border: 1px solid rgba(255, 255, 255, 0.2);
+            -webkit-backdrop-filter: blur(20px);
+            border-bottom: 1px solid #DBDBDB;
+            padding: 12px 16px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            z-index: 1000;
+            height: 60px;
+        }
+
+        .logo {
+            font-size: 24px;
+            font-weight: 700;
+            background: linear-gradient(45deg, #405DE6, #5851DB, #833AB4, #C13584, #E1306C, #FD1D1D, #F56040, #F77737, #FCAF45, #FFDC80);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-size: 200% 200%;
+            animation: instagramGradient 3s ease infinite;
+        }
+
+        .header-icons {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .header-icon {
+            font-size: 24px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            color: #262626;
+            position: relative;
+        }
+
+        .header-icon:active {
+            transform: scale(0.9);
+        }
+
+        .notification-badge {
+            position: absolute;
+            top: -6px;
+            right: -6px;
+            width: 16px;
+            height: 16px;
+            background: #FF3040;
+            border-radius: 8px;
+            font-size: 10px;
+            color: white;
             display: flex;
             align-items: center;
             justify-content: center;
-            color: white;
-            font-size: 24px;
+            font-weight: 700;
+            border: 2px solid white;
+        }
+
+        /* Instagram-style Stories Section */
+        .stories-container {
+            position: fixed;
+            top: calc(60px + env(safe-area-inset-top, 0));
+            left: 0;
+            right: 0;
+            background: white;
+            border-bottom: 1px solid #EFEFEF;
+            padding: 16px 0 12px;
+            z-index: 900;
+            height: 110px;
+        }
+
+        .stories-scroll {
+            display: flex;
+            gap: 16px;
+            padding: 0 16px;
+            overflow-x: auto;
+            scrollbar-width: none;
+            -ms-overflow-style: none;
+        }
+
+        .stories-scroll::-webkit-scrollbar {
+            display: none;
+        }
+
+        .story-item {
+            min-width: 70px;
+            text-align: center;
+        }
+
+        .story-circle {
+            width: 70px;
+            height: 70px;
+            border-radius: 35px;
+            background: linear-gradient(45deg, #405DE6, #5851DB, #833AB4, #C13584, #E1306C, #FD1D1D);
+            padding: 3px;
+            margin-bottom: 6px;
             cursor: pointer;
-            transition: all 0.3s ease;
+            position: relative;
+            transition: transform 0.2s ease;
+        }
+
+        .story-circle:active {
+            transform: scale(0.95);
+        }
+
+        .story-inner {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            background: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            border: 3px solid white;
+        }
+
+        .story-image {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 50%;
+        }
+
+        .story-name {
+            font-size: 12px;
+            color: #262626;
+            font-weight: 400;
+            max-width: 70px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .add-story {
+            background: #FAFAFA;
+            color: #262626;
+            border: 2px dashed #DBDBDB;
+        }
+
+        /* Main Feed Container */
+        .feed-container {
+            margin-top: calc(170px + env(safe-area-inset-top, 0));
+            margin-bottom: calc(60px + env(safe-area-inset-bottom, 0));
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        /* Instagram-style Post Cards */
+        .post-card {
+            background: white;
+            margin-bottom: 12px;
+            border-radius: 0;
+            border-top: 1px solid #EFEFEF;
+            border-bottom: 1px solid #EFEFEF;
             position: relative;
         }
 
-        .action-bubble:active {
-            transform: scale(0.9);
-            background: rgba(255, 255, 255, 0.25);
+        .post-header {
+            padding: 14px 16px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
         }
 
-        .action-bubble .label {
-            position: absolute;
-            bottom: -20px;
-            left: 50%;
-            transform: translateX(-50%);
-            font-size: 10px;
+        .post-user {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .post-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 16px;
+            background: linear-gradient(45deg, #405DE6, #C13584, #E1306C, #FD1D1D);
+            padding: 2px;
+        }
+
+        .post-avatar-inner {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            background: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+
+        .post-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 50%;
+        }
+
+        .post-user-info h4 {
+            font-size: 14px;
             font-weight: 600;
-            text-align: center;
-            text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
+            color: #262626;
+            margin-bottom: 2px;
         }
 
-        .action-bubble.points {
-            background: linear-gradient(135deg, #FF6B00, #FF0050);
+        .post-user-info p {
+            font-size: 12px;
+            color: #8E8E8E;
+        }
+
+        .post-menu {
+            font-size: 20px;
+            color: #262626;
+            cursor: pointer;
+            transform: rotate(90deg);
+        }
+
+        /* Challenge Content Area */
+        .post-image {
+            width: 100%;
+            height: 400px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .challenge-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(transparent 0%, transparent 30%, rgba(0,0,0,0.1) 70%, rgba(0,0,0,0.3) 100%);
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+            padding: 20px;
+            color: white;
+        }
+
+        .challenge-text {
+            font-size: 18px;
+            font-weight: 700;
+            text-shadow: 0 2px 8px rgba(0,0,0,0.3);
+            margin-bottom: 8px;
+            line-height: 1.3;
+        }
+
+        .challenge-reward {
+            background: rgba(255, 255, 255, 0.9);
+            color: #262626;
+            padding: 6px 12px;
+            border-radius: 16px;
+            font-size: 12px;
+            font-weight: 700;
+            align-self: flex-start;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.5);
+        }
+
+        /* Light TikTok-style Floating Elements */
+        .floating-actions {
+            position: absolute;
+            right: 12px;
+            bottom: 100px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            z-index: 50;
+        }
+
+        .floating-btn {
+            width: 44px;
+            height: 44px;
+            border-radius: 22px;
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(0, 0, 0, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        .floating-btn:active {
+            transform: scale(0.9);
+            background: rgba(255, 255, 255, 1);
+        }
+
+        .floating-btn.points {
+            background: linear-gradient(135deg, #405DE6, #C13584);
+            color: white;
             border: none;
             flex-direction: column;
-            padding: 8px;
+            padding: 6px;
+            height: 50px;
         }
 
-        .points-number {
-            font-size: 14px;
+        .points-display {
+            font-size: 11px;
             font-weight: 800;
             line-height: 1;
         }
 
         .points-label {
-            font-size: 8px;
+            font-size: 7px;
             font-weight: 500;
             opacity: 0.9;
         }
 
-        /* TikTok-style Bottom Overlay */
-        .bottom-overlay {
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            padding: 20px 20px calc(20px + env(safe-area-inset-bottom, 0));
-            background: linear-gradient(transparent, rgba(0, 0, 0, 0.8));
-            z-index: 50;
-            pointer-events: none;
-        }
-
-        .challenge-info {
-            pointer-events: auto;
-        }
-
-        .user-info {
+        /* Instagram-style Post Actions */
+        .post-actions {
+            padding: 8px 16px 4px;
             display: flex;
             align-items: center;
-            gap: 12px;
-            margin-bottom: 12px;
+            justify-content: space-between;
         }
 
-        .user-avatar {
-            width: 48px;
-            height: 48px;
-            border-radius: 24px;
-            border: 3px solid white;
-            overflow: hidden;
-            background: linear-gradient(135deg, #FF6B00, #FF0050);
+        .action-group {
+            display: flex;
+            align-items: center;
+            gap: 16px;
         }
 
-        .user-avatar img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
+        .action-icon {
+            font-size: 24px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            color: #262626;
         }
 
-        .user-details h3 {
-            font-size: 16px;
-            font-weight: 700;
-            margin-bottom: 2px;
-            text-shadow: 0 1px 3px rgba(0, 0, 0, 0.7);
+        .action-icon:active {
+            transform: scale(0.9);
         }
 
-        .user-details p {
-            font-size: 12px;
-            opacity: 0.8;
-            text-shadow: 0 1px 3px rgba(0, 0, 0, 0.7);
+        .action-icon.liked {
+            color: #ED4956;
         }
 
-        .follow-btn {
-            background: rgba(255, 255, 255, 0.2);
-            border: 1px solid white;
-            color: white;
-            padding: 6px 16px;
-            border-radius: 20px;
-            font-size: 12px;
-            font-weight: 600;
-            margin-left: auto;
+        .post-content {
+            padding: 0 16px 16px;
         }
 
-        .challenge-text {
-            margin-bottom: 16px;
-        }
-
-        .challenge-title {
+        .post-description {
             font-size: 14px;
-            font-weight: 600;
+            line-height: 1.4;
+            color: #262626;
             margin-bottom: 8px;
-            text-shadow: 0 1px 3px rgba(0, 0, 0, 0.7);
-        }
-
-        .challenge-description {
-            font-size: 18px;
-            font-weight: 700;
-            line-height: 1.3;
-            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.8);
-            margin-bottom: 12px;
         }
 
         .challenge-hashtags {
             display: flex;
             flex-wrap: wrap;
             gap: 8px;
-            margin-bottom: 16px;
+            margin-bottom: 12px;
         }
 
         .hashtag {
-            background: rgba(255, 255, 255, 0.2);
-            backdrop-filter: blur(10px);
-            padding: 4px 12px;
-            border-radius: 16px;
-            font-size: 12px;
-            font-weight: 600;
-            border: 1px solid rgba(255, 255, 255, 0.3);
-        }
-
-        .challenge-actions {
-            display: flex;
-            gap: 12px;
-        }
-
-        .action-btn {
-            flex: 1;
-            padding: 14px 20px;
-            border-radius: 25px;
-            border: none;
-            font-size: 16px;
-            font-weight: 700;
+            color: #385898;
+            font-size: 14px;
+            font-weight: 500;
             cursor: pointer;
-            transition: all 0.3s ease;
-            backdrop-filter: blur(20px);
+        }
+
+        .challenge-buttons {
+            display: flex;
+            gap: 8px;
+            margin-top: 12px;
+        }
+
+        .challenge-btn {
+            flex: 1;
+            padding: 12px 16px;
+            border-radius: 8px;
+            border: none;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
         }
 
         .btn-accept {
-            background: rgba(0, 255, 127, 0.8);
+            background: #4267B2;
             color: white;
-            border: 2px solid rgba(0, 255, 127, 0.5);
+        }
+
+        .btn-accept:active {
+            background: #365899;
+            transform: scale(0.98);
         }
 
         .btn-decline {
-            background: rgba(255, 59, 92, 0.8);
-            color: white;
-            border: 2px solid rgba(255, 59, 92, 0.5);
+            background: #F5F5F5;
+            color: #262626;
+            border: 1px solid #DBDBDB;
         }
 
-        .action-btn:active {
-            transform: scale(0.95);
+        .btn-decline:active {
+            background: #EFEFEF;
+            transform: scale(0.98);
         }
 
-        /* TikTok-style Top Overlay */
-        .top-overlay {
-            position: fixed;
-            top: env(safe-area-inset-top, 20px);
-            left: 0;
-            right: 0;
-            padding: 20px;
-            z-index: 100;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .logo {
-            font-size: 20px;
-            font-weight: 800;
-            color: white;
-            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.8);
-        }
-
-        .top-actions {
-            display: flex;
-            gap: 12px;
-        }
-
-        .top-btn {
-            width: 40px;
-            height: 40px;
-            border-radius: 20px;
-            background: rgba(255, 255, 255, 0.15);
-            backdrop-filter: blur(20px);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            color: white;
-            font-size: 18px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-        .top-btn:active {
-            transform: scale(0.9);
-            background: rgba(255, 255, 255, 0.25);
-        }
-
-        /* TikTok-style Floating Effects */
-        .floating-effects {
+        /* Light Floating Effects */
+        .light-effects {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
             pointer-events: none;
-            z-index: 5;
+            z-index: 10;
         }
 
-        .floating-emoji {
+        .floating-sparkle {
             position: absolute;
-            font-size: 24px;
-            animation: floatUp 8s linear infinite;
-            opacity: 0.6;
+            font-size: 16px;
+            animation: lightFloat 6s linear infinite;
+            opacity: 0.4;
+            color: #405DE6;
         }
 
-        /* Screensaver Mode - TikTok Dark Style */
+        /* Instagram-style Bottom Navigation */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-top: 1px solid #DBDBDB;
+            display: flex;
+            justify-content: space-around;
+            padding: 12px env(safe-area-inset-left, 0) calc(12px + env(safe-area-inset-bottom, 0)) env(safe-area-inset-right, 0);
+            z-index: 1000;
+        }
+
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            color: #262626;
+            text-decoration: none;
+            font-size: 10px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .nav-item:active {
+            transform: scale(0.9);
+        }
+
+        .nav-icon {
+            font-size: 24px;
+            margin-bottom: 2px;
+            transition: all 0.2s ease;
+        }
+
+        .nav-item.active .nav-icon {
+            color: #405DE6;
+            transform: scale(1.1);
+        }
+
+        .nav-item.active {
+            color: #405DE6;
+        }
+
+        /* Light Screensaver Mode */
         .screensaver-mode {
             position: fixed;
             top: 0;
             left: 0;
             right: 0;
             bottom: 0;
-            background: linear-gradient(135deg, #0D1421 0%, #1A1A2E 25%, #16213E 50%, #2E236C 75%, #17153B 100%);
+            background: linear-gradient(135deg, #FFECD2 0%, #FCB69F 25%, #FFECD2 50%, #FCB69F 75%, #FFECD2 100%);
+            background-size: 400% 400%;
+            animation: lightGradientFlow 20s ease infinite;
             z-index: 9999;
             display: none;
             flex-direction: column;
             justify-content: center;
             align-items: center;
-            color: white;
+            color: #262626;
             overflow: hidden;
             padding: env(safe-area-inset-top, 0) env(safe-area-inset-right, 0) env(safe-area-inset-bottom, 0) env(safe-area-inset-left, 0);
         }
@@ -381,22 +549,20 @@
 
         .screensaver-logo {
             font-size: clamp(3rem, 10vw, 5rem);
-            font-weight: 900;
-            background: linear-gradient(45deg, #FF0050, #00D4FF, #FF6B00, #9D4EDD);
-            background-size: 300% 300%;
+            font-weight: 800;
+            background: linear-gradient(45deg, #405DE6, #5851DB, #833AB4, #C13584, #E1306C, #FD1D1D);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
-            animation: gradientFlow 8s ease infinite;
             margin-bottom: 2rem;
-            text-shadow: 0 0 30px rgba(255, 0, 80, 0.3);
+            animation: instagramGradient 4s ease infinite;
         }
 
         .screensaver-time {
-            font-size: clamp(2.5rem, 8vw, 4rem);
-            font-weight: 200;
+            font-size: clamp(2rem, 8vw, 3.5rem);
+            font-weight: 300;
             margin-bottom: 2rem;
             font-family: 'SF Mono', monospace;
-            text-shadow: 0 0 20px rgba(255, 255, 255, 0.2);
+            color: #405DE6;
         }
 
         .screensaver-stats {
@@ -407,20 +573,21 @@
             margin: 0 auto;
         }
 
-        .stat-bubble {
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(30px);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            border-radius: 20px;
+        .stat-card {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.5);
+            border-radius: 16px;
             padding: 1.5rem 1rem;
             text-align: center;
-            animation: pulse 3s ease-in-out infinite;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            animation: lightPulse 4s ease-in-out infinite;
         }
 
         .stat-number {
             font-size: 1.8rem;
             font-weight: 800;
-            background: linear-gradient(45deg, #00D4FF, #FF6B00);
+            background: linear-gradient(45deg, #405DE6, #C13584);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             margin-bottom: 0.5rem;
@@ -428,8 +595,8 @@
 
         .stat-label {
             font-size: 0.8rem;
-            opacity: 0.8;
-            font-weight: 500;
+            color: #8E8E8E;
+            font-weight: 600;
         }
 
         .screensaver-hint {
@@ -438,126 +605,55 @@
             left: 50%;
             transform: translateX(-50%);
             font-size: 0.9rem;
-            opacity: 0.6;
-            animation: breathe 3s ease-in-out infinite;
+            color: #8E8E8E;
+            animation: lightBreathe 3s ease-in-out infinite;
             text-align: center;
             padding: 0 20px;
         }
 
-        /* Navigation Dots - TikTok Style */
-        .nav-dots {
+        /* Light Floating Controls */
+        .light-controls {
             position: fixed;
-            right: 8px;
-            top: 50%;
-            transform: translateY(-50%);
-            z-index: 80;
+            top: calc(70px + env(safe-area-inset-top, 0));
+            right: 16px;
+            z-index: 900;
             display: flex;
             flex-direction: column;
             gap: 8px;
         }
 
-        .nav-dot {
-            width: 4px;
-            height: 20px;
-            background: rgba(255, 255, 255, 0.3);
-            border-radius: 2px;
-            transition: all 0.3s ease;
-        }
-
-        .nav-dot.active {
-            background: white;
-            height: 30px;
-        }
-
-        /* Floating Screensaver Controls */
-        .screensaver-controls {
-            position: fixed;
-            top: calc(60px + env(safe-area-inset-top, 0));
-            left: 20px;
-            z-index: 120;
-            display: flex;
-            gap: 12px;
-        }
-
-        .control-btn {
-            background: rgba(0, 0, 0, 0.6);
+        .light-control-btn {
+            background: rgba(255, 255, 255, 0.9);
             backdrop-filter: blur(20px);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            color: white;
+            border: 1px solid rgba(0, 0, 0, 0.1);
+            color: #262626;
             padding: 8px 12px;
             border-radius: 20px;
-            font-size: 12px;
+            font-size: 11px;
             font-weight: 600;
             cursor: pointer;
             transition: all 0.3s ease;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
         }
 
-        .control-btn:active {
+        .light-control-btn:active {
             transform: scale(0.95);
-            background: rgba(0, 0, 0, 0.8);
+            background: white;
         }
 
-        /* Animations */
-        @keyframes gradientFlow {
-            0%, 100% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
-        }
-
-        @keyframes floatUp {
-            0% {
-                transform: translateY(100vh) rotate(0deg);
-                opacity: 0;
-            }
-            10% {
-                opacity: 0.6;
-            }
-            90% {
-                opacity: 0.6;
-            }
-            100% {
-                transform: translateY(-100px) rotate(360deg);
-                opacity: 0;
-            }
-        }
-
-        @keyframes pulse {
-            0%, 100% {
-                transform: scale(1);
-                opacity: 1;
-            }
-            50% {
-                transform: scale(1.05);
-                opacity: 0.8;
-            }
-        }
-
-        @keyframes breathe {
-            0%, 100% {
-                opacity: 0.4;
-            }
-            50% {
-                opacity: 0.8;
-            }
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
-        }
-
-        /* Modal - TikTok Style */
+        /* Modal - Instagram Style */
         .modal {
             position: fixed;
             top: 0;
             left: 0;
             right: 0;
             bottom: 0;
-            background: rgba(0, 0, 0, 0.8);
-            backdrop-filter: blur(10px);
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(5px);
             display: none;
             align-items: center;
             justify-content: center;
-            z-index: 1000;
+            z-index: 2000;
             padding: 20px;
         }
 
@@ -567,112 +663,103 @@
         }
 
         .modal-content {
-            background: rgba(20, 20, 20, 0.9);
-            backdrop-filter: blur(30px);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            border-radius: 20px;
-            padding: 30px;
+            background: white;
+            border-radius: 12px;
+            padding: 24px;
             max-width: 90%;
             max-height: 80%;
             overflow-y: auto;
-            color: white;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
         }
 
         .modal-title {
-            font-size: 24px;
-            font-weight: 800;
+            font-size: 20px;
+            font-weight: 700;
             margin-bottom: 20px;
             text-align: center;
-            background: linear-gradient(45deg, #FF0050, #00D4FF);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
+            color: #262626;
         }
 
         .form-group {
-            margin-bottom: 20px;
+            margin-bottom: 16px;
         }
 
         .form-label {
             display: block;
-            margin-bottom: 8px;
+            margin-bottom: 6px;
             font-weight: 600;
             font-size: 14px;
+            color: #262626;
         }
 
         .form-control {
             width: 100%;
             padding: 12px 16px;
-            background: rgba(255, 255, 255, 0.1);
-            border: 1px solid rgba(255, 255, 255, 0.3);
-            border-radius: 12px;
-            color: white;
-            font-size: 16px;
+            background: #FAFAFA;
+            border: 1px solid #DBDBDB;
+            border-radius: 8px;
+            color: #262626;
+            font-size: 14px;
             outline: none;
-            transition: all 0.3s ease;
+            transition: all 0.2s ease;
         }
 
         .form-control:focus {
-            border-color: #00D4FF;
-            background: rgba(255, 255, 255, 0.15);
-            box-shadow: 0 0 0 3px rgba(0, 212, 255, 0.2);
-        }
-
-        .form-control::placeholder {
-            color: rgba(255, 255, 255, 0.5);
+            border-color: #405DE6;
+            background: white;
         }
 
         .btn-primary {
             width: 100%;
-            padding: 14px;
-            background: linear-gradient(45deg, #FF0050, #FF6B00);
+            padding: 12px;
+            background: #405DE6;
             border: none;
-            border-radius: 25px;
+            border-radius: 8px;
             color: white;
-            font-size: 16px;
-            font-weight: 700;
+            font-size: 14px;
+            font-weight: 600;
             cursor: pointer;
-            transition: all 0.3s ease;
-            margin-bottom: 12px;
+            transition: all 0.2s ease;
+            margin-bottom: 8px;
         }
 
         .btn-primary:active {
+            background: #365899;
             transform: scale(0.98);
         }
 
         .btn-secondary {
             width: 100%;
-            padding: 14px;
-            background: rgba(255, 255, 255, 0.1);
-            border: 1px solid rgba(255, 255, 255, 0.3);
-            border-radius: 25px;
-            color: white;
-            font-size: 16px;
+            padding: 12px;
+            background: white;
+            border: 1px solid #DBDBDB;
+            border-radius: 8px;
+            color: #262626;
+            font-size: 14px;
             font-weight: 600;
             cursor: pointer;
-            transition: all 0.3s ease;
+            transition: all 0.2s ease;
         }
 
         .btn-secondary:active {
+            background: #FAFAFA;
             transform: scale(0.98);
-            background: rgba(255, 255, 255, 0.2);
         }
 
-        /* Toast - TikTok Style */
+        /* Toast - Instagram Style */
         .toast {
             position: fixed;
-            top: calc(100px + env(safe-area-inset-top, 0));
+            top: calc(120px + env(safe-area-inset-top, 0));
             left: 20px;
             right: 20px;
-            background: rgba(0, 0, 0, 0.8);
-            backdrop-filter: blur(20px);
-            border: 1px solid rgba(255, 255, 255, 0.2);
+            background: rgba(38, 38, 38, 0.9);
             color: white;
-            padding: 16px 20px;
-            border-radius: 25px;
+            padding: 12px 16px;
+            border-radius: 8px;
             font-size: 14px;
-            font-weight: 600;
+            font-weight: 500;
             text-align: center;
-            z-index: 2000;
+            z-index: 3000;
             transform: translateY(-100px);
             opacity: 0;
             transition: all 0.4s ease;
@@ -683,19 +770,72 @@
             opacity: 1;
         }
 
+        /* Animations */
+        @keyframes instagramGradient {
+            0%, 100% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+        }
+
+        @keyframes lightGradientFlow {
+            0%, 100% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+        }
+
+        @keyframes lightFloat {
+            0% {
+                transform: translateY(100vh) rotate(0deg);
+                opacity: 0;
+            }
+            10% {
+                opacity: 0.4;
+            }
+            90% {
+                opacity: 0.4;
+            }
+            100% {
+                transform: translateY(-100px) rotate(180deg);
+                opacity: 0;
+            }
+        }
+
+        @keyframes lightPulse {
+            0%, 100% {
+                transform: scale(1);
+                opacity: 0.8;
+            }
+            50% {
+                transform: scale(1.02);
+                opacity: 1;
+            }
+        }
+
+        @keyframes lightBreathe {
+            0%, 100% {
+                opacity: 0.6;
+            }
+            50% {
+                opacity: 1;
+            }
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
         /* Responsive */
         @media (max-width: 375px) {
-            .challenge-description {
-                font-size: 16px;
+            .post-image {
+                height: 350px;
             }
             
-            .right-actions {
+            .floating-actions {
                 right: 8px;
             }
             
-            .action-bubble {
-                width: 48px;
-                height: 48px;
+            .floating-btn {
+                width: 40px;
+                height: 40px;
             }
         }
 
@@ -718,239 +858,320 @@
     </style>
 </head>
 <body>
-    <!-- Background -->
-    <div class="background-container">
-        <div class="background-overlay"></div>
-    </div>
+    <!-- Light Floating Effects -->
+    <div class="light-effects" id="lightEffects"></div>
 
-    <!-- Floating Effects -->
-    <div class="floating-effects" id="floatingEffects"></div>
-
-    <!-- Top Overlay -->
-    <div class="top-overlay">
+    <!-- Instagram Header -->
+    <div class="header">
         <div class="logo">JomBro</div>
-        <div class="top-actions">
-            <div class="top-btn" onclick="showModal('search')">🔍</div>
-            <div class="top-btn" onclick="showModal('profile')">👤</div>
-            <div class="top-btn" onclick="showModal('messages')">💬</div>
-        </div>
-    </div>
-
-    <!-- Screensaver Controls -->
-    <div class="screensaver-controls">
-        <div class="control-btn" onclick="toggleScreensaver()" id="screensaverBtn">🌙 Sleep</div>
-        <div class="control-btn" onclick="toggleFullscreen()" id="fullscreenBtn">⛶ Full</div>
-    </div>
-
-    <!-- Navigation Dots -->
-    <div class="nav-dots">
-        <div class="nav-dot active"></div>
-        <div class="nav-dot"></div>
-        <div class="nav-dot"></div>
-        <div class="nav-dot"></div>
-    </div>
-
-    <!-- Right Side Actions -->
-    <div class="right-actions">
-        <div class="action-bubble points">
-            <div class="points-number" id="userPoints">25.4K</div>
-            <div class="points-label">POINTS</div>
-        </div>
-        
-        <div class="action-bubble" onclick="likeChallenge()">
-            ❤️
-            <div class="label">Like</div>
-        </div>
-        
-        <div class="action-bubble" onclick="showModal('create')">
-            ➕
-            <div class="label">Create</div>
-        </div>
-        
-        <div class="action-bubble" onclick="shareChallenge()">
-            📤
-            <div class="label">Share</div>
-        </div>
-        
-        <div class="action-bubble" onclick="showModal('compounds')">
-            🚨
-            <div class="label">Fix</div>
-        </div>
-    </div>
-
-    <!-- Challenge Cards Container -->
-    <div class="challenge-cards-container" id="cardsContainer">
-        
-        <!-- Challenge Card 1 -->
-        <div class="challenge-card">
-            <div class="bottom-overlay">
-                <div class="challenge-info">
-                    <div class="user-info">
-                        <div class="user-avatar">
-                            <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=48&h=48&fit=crop&crop=face" alt="Ahmad">
-                        </div>
-                        <div class="user-details">
-                            <h3>@ahmad_rahman <span style="color: #FFD700;">👑</span></h3>
-                            <p>2 hours ago • Social Challenge</p>
-                        </div>
-                        <button class="follow-btn">Follow</button>
-                    </div>
-                    
-                    <div class="challenge-text">
-                        <div class="challenge-title">Ahmad challenges you:</div>
-                        <div class="challenge-description">
-                            "Go to Starbucks and ask the barista to write a poem on your cup, then post it on your story! ☕️📝"
-                        </div>
-                        
-                        <div class="challenge-hashtags">
-                            <div class="hashtag">#StarbucksPoetry</div>
-                            <div class="hashtag">#SocialChallenge</div>
-                            <div class="hashtag">#500Points</div>
-                        </div>
-                    </div>
-                    
-                    <div class="challenge-actions">
-                        <button class="action-btn btn-accept" onclick="acceptChallenge(1, 500)">
-                            ✅ Accept (+500)
-                        </button>
-                        <button class="action-btn btn-decline" onclick="declineChallenge(1)">
-                            ❌ Pass
-                        </button>
-                    </div>
-                </div>
+        <div class="header-icons">
+            <div class="header-icon" onclick="showModal('create')">➕</div>
+            <div class="header-icon" onclick="showModal('notifications')">
+                🔔
+                <div class="notification-badge">3</div>
             </div>
+            <div class="header-icon" onclick="showModal('messages')">💬</div>
         </div>
+    </div>
 
-        <!-- Challenge Card 2 -->
-        <div class="challenge-card">
-            <div class="bottom-overlay">
-                <div class="challenge-info">
-                    <div class="user-info">
-                        <div class="user-avatar">
-                            <img src="https://images.unsplash.com/photo-1494790108755-2616b612b786?w=48&h=48&fit=crop&crop=face" alt="Mei Ling">
-                        </div>
-                        <div class="user-details">
-                            <h3>@meilingwong</h3>
-                            <p>1 day ago • Adventure Challenge</p>
-                        </div>
-                        <button class="follow-btn">Follow</button>
-                    </div>
-                    
-                    <div class="challenge-text">
-                        <div class="challenge-title">Mei Ling challenges you:</div>
-                        <div class="challenge-description">
-                            "Find someone wearing the same color shirt as you and take a selfie together at KLCC! 🤳✨"
-                        </div>
-                        
-                        <div class="challenge-hashtags">
-                            <div class="hashtag">#KLCC</div>
-                            <div class="hashtag">#TwinningChallenge</div>
-                            <div class="hashtag">#800Points</div>
-                        </div>
-                    </div>
-                    
-                    <div class="challenge-actions">
-                        <button class="action-btn btn-accept" onclick="acceptChallenge(2, 800)">
-                            ✅ Accept (+800)
-                        </button>
-                        <button class="action-btn btn-decline" onclick="declineChallenge(2)">
-                            ❌ Pass
-                        </button>
+    <!-- Light Floating Controls -->
+    <div class="light-controls">
+        <div class="light-control-btn" onclick="toggleScreensaver()" id="screensaverBtn">🌙 Sleep</div>
+        <div class="light-control-btn" onclick="toggleFullscreen()" id="fullscreenBtn">⛶ Full</div>
+    </div>
+
+    <!-- Instagram Stories -->
+    <div class="stories-container">
+        <div class="stories-scroll">
+            <div class="story-item">
+                <div class="story-circle add-story">
+                    <div class="story-inner">
+                        ➕
                     </div>
                 </div>
+                <div class="story-name">Your Story</div>
             </div>
-        </div>
-
-        <!-- Challenge Card 3 -->
-        <div class="challenge-card">
-            <div class="bottom-overlay">
-                <div class="challenge-info">
-                    <div class="user-info">
-                        <div class="user-avatar">
-                            <img src="https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=48&h=48&fit=crop&crop=face" alt="Sarah">
-                        </div>
-                        <div class="user-details">
-                            <h3>@sarahchen</h3>
-                            <p>3 hours ago • Business Challenge</p>
-                        </div>
-                        <button class="follow-btn">Follow</button>
-                    </div>
-                    
-                    <div class="challenge-text">
-                        <div class="challenge-title">Sarah challenges you:</div>
-                        <div class="challenge-description">
-                            "Start a conversation with someone at a coffee shop and exchange LinkedIn profiles 💼"
-                        </div>
-                        
-                        <div class="challenge-hashtags">
-                            <div class="hashtag">#Networking</div>
-                            <div class="hashtag">#LinkedIn</div>
-                            <div class="hashtag">#600Points</div>
-                        </div>
-                    </div>
-                    
-                    <div class="challenge-actions">
-                        <button class="action-btn btn-accept" onclick="acceptChallenge(3, 600)">
-                            ✅ Accept (+600)
-                        </button>
-                        <button class="action-btn btn-decline" onclick="declineChallenge(3)">
-                            ❌ Pass
-                        </button>
+            <div class="story-item">
+                <div class="story-circle">
+                    <div class="story-inner">
+                        <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=70&h=70&fit=crop&crop=face" alt="Ahmad" class="story-image">
                     </div>
                 </div>
+                <div class="story-name">ahmad_rahman</div>
             </div>
-        </div>
-
-        <!-- Wanted Board Card -->
-        <div class="challenge-card">
-            <div class="bottom-overlay">
-                <div class="challenge-info">
-                    <div class="challenge-text">
-                        <div class="challenge-title">🚨 WANTED BOARD 🚨</div>
-                        <div class="challenge-description">
-                            You have 3 outstanding compounds worth -1,900 points. Complete them now to avoid further penalties!
-                        </div>
-                        
-                        <div class="challenge-hashtags">
-                            <div class="hashtag">#FixCompounds</div>
-                            <div class="hashtag">#UrgentAction</div>
-                            <div class="hashtag">#Penalty</div>
-                        </div>
-                    </div>
-                    
-                    <div class="challenge-actions">
-                        <button class="action-btn btn-accept" onclick="showModal('compounds')">
-                            🔧 Fix Now
-                        </button>
-                        <button class="action-btn btn-decline">
-                            ⏰ Later
-                        </button>
+            <div class="story-item">
+                <div class="story-circle">
+                    <div class="story-inner">
+                        <img src="https://images.unsplash.com/photo-1494790108755-2616b612b786?w=70&h=70&fit=crop&crop=face" alt="Mei Ling" class="story-image">
                     </div>
                 </div>
+                <div class="story-name">meilingwong</div>
+            </div>
+            <div class="story-item">
+                <div class="story-circle">
+                    <div class="story-inner">
+                        <img src="https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=70&h=70&fit=crop&crop=face" alt="Sarah" class="story-image">
+                    </div>
+                </div>
+                <div class="story-name">sarahchen</div>
+            </div>
+            <div class="story-item">
+                <div class="story-circle">
+                    <div class="story-inner">
+                        <img src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=70&h=70&fit=crop&crop=face" alt="David" class="story-image">
+                    </div>
+                </div>
+                <div class="story-name">davidkumar</div>
             </div>
         </div>
     </div>
 
-    <!-- Screensaver Mode -->
+    <!-- Main Feed -->
+    <div class="feed-container">
+        
+        <!-- Challenge Post 1 -->
+        <div class="post-card">
+            <div class="post-header">
+                <div class="post-user">
+                    <div class="post-avatar">
+                        <div class="post-avatar-inner">
+                            <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=32&h=32&fit=crop&crop=face" alt="Ahmad">
+                        </div>
+                    </div>
+                    <div class="post-user-info">
+                        <h4>ahmad_rahman <span style="color: #FFD700;">✓</span></h4>
+                        <p>2 hours ago</p>
+                    </div>
+                </div>
+                <div class="post-menu">⋯</div>
+            </div>
+            
+            <div class="post-image">
+                <div class="challenge-overlay">
+                    <div class="challenge-text">
+                        "Go to Starbucks and ask the barista to write a poem on your cup! ☕️📝"
+                    </div>
+                    <div class="challenge-reward">+500 Points</div>
+                </div>
+                
+                <!-- Light TikTok-style Floating Actions -->
+                <div class="floating-actions">
+                    <div class="floating-btn points">
+                        <div class="points-display" id="userPoints">25.4K</div>
+                        <div class="points-label">PTS</div>
+                    </div>
+                    <div class="floating-btn" onclick="likePost(this)">❤️</div>
+                    <div class="floating-btn" onclick="sharePost()">📤</div>
+                </div>
+            </div>
+            
+            <div class="post-actions">
+                <div class="action-group">
+                    <div class="action-icon" onclick="likePost(this)">❤️</div>
+                    <div class="action-icon" onclick="showModal('comments')">💬</div>
+                    <div class="action-icon" onclick="sharePost()">📤</div>
+                </div>
+                <div class="action-icon" onclick="savePost()">🔖</div>
+            </div>
+            
+            <div class="post-content">
+                <div class="post-description">
+                    <strong>ahmad_rahman</strong> challenges you to this epic social quest! Are you brave enough? 
+                </div>
+                <div class="challenge-hashtags">
+                    <span class="hashtag">#StarbucksPoetry</span>
+                    <span class="hashtag">#SocialChallenge</span>
+                    <span class="hashtag">#JomBro</span>
+                </div>
+                <div class="challenge-buttons">
+                    <button class="challenge-btn btn-accept" onclick="acceptChallenge(1, 500)">
+                        ✅ Accept Challenge
+                    </button>
+                    <button class="challenge-btn btn-decline" onclick="declineChallenge(1)">
+                        Pass
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Challenge Post 2 -->
+        <div class="post-card">
+            <div class="post-header">
+                <div class="post-user">
+                    <div class="post-avatar">
+                        <div class="post-avatar-inner">
+                            <img src="https://images.unsplash.com/photo-1494790108755-2616b612b786?w=32&h=32&fit=crop&crop=face" alt="Mei Ling">
+                        </div>
+                    </div>
+                    <div class="post-user-info">
+                        <h4>meilingwong</h4>
+                        <p>1 day ago</p>
+                    </div>
+                </div>
+                <div class="post-menu">⋯</div>
+            </div>
+            
+            <div class="post-image">
+                <div class="challenge-overlay">
+                    <div class="challenge-text">
+                        "Find someone wearing the same color shirt as you and take a selfie together at KLCC! 🤳✨"
+                    </div>
+                    <div class="challenge-reward">+800 Points</div>
+                </div>
+                
+                <div class="floating-actions">
+                    <div class="floating-btn" onclick="likePost(this)">❤️</div>
+                    <div class="floating-btn" onclick="sharePost()">📤</div>
+                </div>
+            </div>
+            
+            <div class="post-actions">
+                <div class="action-group">
+                    <div class="action-icon" onclick="likePost(this)">❤️</div>
+                    <div class="action-icon" onclick="showModal('comments')">💬</div>
+                    <div class="action-icon" onclick="sharePost()">📤</div>
+                </div>
+                <div class="action-icon" onclick="savePost()">🔖</div>
+            </div>
+            
+            <div class="post-content">
+                <div class="post-description">
+                    <strong>meilingwong</strong> wants you to find your fashion twin at KLCC! This is going to be fun 😄
+                </div>
+                <div class="challenge-hashtags">
+                    <span class="hashtag">#KLCC</span>
+                    <span class="hashtag">#TwinningChallenge</span>
+                    <span class="hashtag">#Malaysia</span>
+                </div>
+                <div class="challenge-buttons">
+                    <button class="challenge-btn btn-accept" onclick="acceptChallenge(2, 800)">
+                        ✅ Accept Challenge
+                    </button>
+                    <button class="challenge-btn btn-decline" onclick="declineChallenge(2)">
+                        Pass
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Challenge Post 3 -->
+        <div class="post-card">
+            <div class="post-header">
+                <div class="post-user">
+                    <div class="post-avatar">
+                        <div class="post-avatar-inner">
+                            <img src="https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=32&h=32&fit=crop&crop=face" alt="Sarah">
+                        </div>
+                    </div>
+                    <div class="post-user-info">
+                        <h4>sarahchen</h4>
+                        <p>3 hours ago</p>
+                    </div>
+                </div>
+                <div class="post-menu">⋯</div>
+            </div>
+            
+            <div class="post-image">
+                <div class="challenge-overlay">
+                    <div class="challenge-text">
+                        "Start a conversation with someone at a coffee shop and exchange LinkedIn profiles 💼"
+                    </div>
+                    <div class="challenge-reward">+600 Points</div>
+                </div>
+                
+                <div class="floating-actions">
+                    <div class="floating-btn" onclick="likePost(this)">❤️</div>
+                    <div class="floating-btn" onclick="sharePost()">📤</div>
+                </div>
+            </div>
+            
+            <div class="post-actions">
+                <div class="action-group">
+                    <div class="action-icon" onclick="likePost(this)">❤️</div>
+                    <div class="action-icon" onclick="showModal('comments')">💬</div>
+                    <div class="action-icon" onclick="sharePost()">📤</div>
+                </div>
+                <div class="action-icon" onclick="savePost()">🔖</div>
+            </div>
+            
+            <div class="post-content">
+                <div class="post-description">
+                    <strong>sarahchen</strong> is challenging your networking skills! Perfect for building professional connections 💪
+                </div>
+                <div class="challenge-hashtags">
+                    <span class="hashtag">#Networking</span>
+                    <span class="hashtag">#LinkedIn</span>
+                    <span class="hashtag">#Professional</span>
+                </div>
+                <div class="challenge-buttons">
+                    <button class="challenge-btn btn-accept" onclick="acceptChallenge(3, 600)">
+                        ✅ Accept Challenge
+                    </button>
+                    <button class="challenge-btn btn-decline" onclick="declineChallenge(3)">
+                        Pass
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Wanted Board Post -->
+        <div class="post-card" style="border: 2px solid #FF3040; background: linear-gradient(135deg, #FFF5F5, #FFE5E5);">
+            <div class="post-header">
+                <div class="post-user">
+                    <div class="post-avatar" style="background: linear-gradient(45deg, #FF3040, #FF6B6B);">
+                        <div class="post-avatar-inner">
+                            🚨
+                        </div>
+                    </div>
+                    <div class="post-user-info">
+                        <h4>JomBro Alert System</h4>
+                        <p>Urgent • Outstanding Compounds</p>
+                    </div>
+                </div>
+                <div class="post-menu">⋯</div>
+            </div>
+            
+            <div class="post-content">
+                <div class="post-description">
+                    <strong>🚨 WANTED BOARD ALERT</strong><br>
+                    You have 3 outstanding compounds worth -1,900 points! Complete them now to avoid further penalties.
+                </div>
+                <div class="challenge-hashtags">
+                    <span class="hashtag" style="color: #FF3040;">#FixCompounds</span>
+                    <span class="hashtag" style="color: #FF3040;">#UrgentAction</span>
+                </div>
+                <div class="challenge-buttons">
+                    <button class="challenge-btn" style="background: #FF3040; color: white;" onclick="showModal('compounds')">
+                        🔧 Fix Compounds Now
+                    </button>
+                    <button class="challenge-btn btn-decline">
+                        ⏰ Remind Me Later
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Light Screensaver Mode -->
     <div class="screensaver-mode" id="screensaverMode">
         <div class="screensaver-content">
             <div class="screensaver-logo">JomBro</div>
             <div class="screensaver-time" id="screensaverClock">12:00:00</div>
             
             <div class="screensaver-stats">
-                <div class="stat-bubble">
+                <div class="stat-card">
                     <div class="stat-number" id="screensaverPoints">25.4K</div>
                     <div class="stat-label">Points</div>
                 </div>
-                <div class="stat-bubble">
+                <div class="stat-card">
                     <div class="stat-number" id="screensaverChallenges">47</div>
                     <div class="stat-label">Completed</div>
                 </div>
-                <div class="stat-bubble">
+                <div class="stat-card">
                     <div class="stat-number" id="screensaverFriends">12</div>
                     <div class="stat-label">Friends</div>
                 </div>
-                <div class="stat-bubble">
+                <div class="stat-card">
                     <div class="stat-number" id="screensaverStreak">7</div>
                     <div class="stat-label">Day Streak</div>
                 </div>
@@ -958,23 +1179,47 @@
         </div>
         
         <div class="screensaver-hint">
-            Touch anywhere to wake up JomBro
+            Touch anywhere to return to your challenge feed
+        </div>
+    </div>
+
+    <!-- Instagram Bottom Navigation -->
+    <div class="bottom-nav">
+        <div class="nav-item active">
+            <div class="nav-icon">🏠</div>
+            <div>Home</div>
+        </div>
+        <div class="nav-item" onclick="showModal('search')">
+            <div class="nav-icon">🔍</div>
+            <div>Search</div>
+        </div>
+        <div class="nav-item" onclick="showModal('create')">
+            <div class="nav-icon">➕</div>
+            <div>Create</div>
+        </div>
+        <div class="nav-item" onclick="showModal('activity')">
+            <div class="nav-icon">❤️</div>
+            <div>Activity</div>
+        </div>
+        <div class="nav-item" onclick="showModal('profile')">
+            <div class="nav-icon">👤</div>
+            <div>Profile</div>
         </div>
     </div>
 
     <!-- Create Challenge Modal -->
     <div id="createModal" class="modal">
         <div class="modal-content">
-            <div class="modal-title">⚡ Create Challenge</div>
+            <div class="modal-title">➕ Create New Challenge</div>
             
             <div class="form-group">
                 <label class="form-label">Target Friend</label>
                 <select class="form-control" id="challengeTarget">
                     <option value="">Choose friend...</option>
-                    <option value="Ahmad Rahman">Ahmad Rahman</option>
-                    <option value="Mei Ling Wong">Mei Ling Wong</option>
-                    <option value="Sarah Chen">Sarah Chen</option>
-                    <option value="David Kumar">David Kumar</option>
+                    <option value="Ahmad Rahman">ahmad_rahman</option>
+                    <option value="Mei Ling Wong">meilingwong</option>
+                    <option value="Sarah Chen">sarahchen</option>
+                    <option value="David Kumar">davidkumar</option>
                 </select>
             </div>
             
@@ -994,7 +1239,7 @@
             </div>
             
             <button class="btn-primary" onclick="createChallenge()">
-                🚀 Launch Challenge
+                Share Challenge
             </button>
             <button class="btn-secondary" onclick="hideModal('create')">
                 Cancel
@@ -1005,16 +1250,16 @@
     <!-- Compounds Modal -->
     <div id="compoundsModal" class="modal">
         <div class="modal-content">
-            <div class="modal-title">🎯 Fix Your Compounds</div>
+            <div class="modal-title">🎯 Outstanding Compounds</div>
             
-            <div style="margin-bottom: 20px; padding: 16px; background: rgba(255, 0, 80, 0.1); border: 1px solid rgba(255, 0, 80, 0.3); border-radius: 12px;">
-                <h4 style="margin-bottom: 8px;">Ahmad's Starbucks Poetry Challenge</h4>
-                <p style="opacity: 0.8; margin-bottom: 12px;">"Ask the barista to write a poem on your cup..."</p>
-                <div style="display: flex; gap: 12px;">
-                    <button class="btn-primary" onclick="completeFromModal(1, 500)" style="flex: 1;">
+            <div style="margin-bottom: 20px; padding: 16px; background: #FFF5F5; border: 1px solid #FFB3B3; border-radius: 8px;">
+                <h4 style="margin-bottom: 8px; color: #FF3040;">Ahmad's Starbucks Poetry Challenge</h4>
+                <p style="color: #666; margin-bottom: 12px; font-size: 14px;">"Ask the barista to write a poem on your cup..."</p>
+                <div style="display: flex; gap: 8px;">
+                    <button class="btn-primary" onclick="completeFromModal(1, 500)" style="flex: 1; font-size: 12px;">
                         ✅ Complete (+500)
                     </button>
-                    <button class="btn-secondary" onclick="forfeitFromModal(1, 500)" style="flex: 1;">
+                    <button class="btn-secondary" onclick="forfeitFromModal(1, 500)" style="flex: 1; font-size: 12px;">
                         ❌ Forfeit (-500)
                     </button>
                 </div>
@@ -1037,10 +1282,9 @@
         let screensaverActive = false;
         let wakeLock = null;
         let idleTimer = null;
-        let maxIdleTime = 30000; // 30 seconds
+        let maxIdleTime = 30000;
         let isIOSDevice = /iPad|iPhone|iPod/.test(navigator.userAgent);
         
-        // Stats for screensaver
         let stats = {
             points: 25430,
             challenges: 47,
@@ -1054,29 +1298,55 @@
             stats.points = userPoints;
         }
 
-        function createFloatingEffects() {
-            const container = document.getElementById('floatingEffects');
-            const emojis = ['⚡', '🔥', '💎', '🌟', '💫', '✨', '🎯', '🚀'];
+        function createLightEffects() {
+            const container = document.getElementById('lightEffects');
+            const sparkles = ['✨', '⭐', '💫', '🌟', '💎', '🔆'];
             
-            function addFloatingEmoji() {
-                const emoji = document.createElement('div');
-                emoji.className = 'floating-emoji';
-                emoji.textContent = emojis[Math.floor(Math.random() * emojis.length)];
-                emoji.style.left = Math.random() * 80 + 10 + '%';
-                emoji.style.animationDuration = (6 + Math.random() * 4) + 's';
-                emoji.style.animationDelay = Math.random() * 2 + 's';
+            function addSparkle() {
+                const sparkle = document.createElement('div');
+                sparkle.className = 'floating-sparkle';
+                sparkle.textContent = sparkles[Math.floor(Math.random() * sparkles.length)];
+                sparkle.style.left = Math.random() * 90 + 5 + '%';
+                sparkle.style.animationDuration = (4 + Math.random() * 3) + 's';
+                sparkle.style.animationDelay = Math.random() * 2 + 's';
                 
-                container.appendChild(emoji);
+                container.appendChild(sparkle);
                 
                 setTimeout(() => {
-                    if (emoji.parentNode) {
-                        emoji.parentNode.removeChild(emoji);
+                    if (sparkle.parentNode) {
+                        sparkle.parentNode.removeChild(sparkle);
                     }
-                }, 8000);
+                }, 6000);
             }
             
-            // Add emoji every 3-5 seconds
-            setInterval(addFloatingEmoji, 3000 + Math.random() * 2000);
+            setInterval(addSparkle, 4000);
+        }
+
+        function likePost(element) {
+            element.classList.toggle('liked');
+            element.style.color = element.classList.contains('liked') ? '#ED4956' : '#262626';
+            
+            if (isIOSDevice && navigator.vibrate) {
+                navigator.vibrate([50]);
+            }
+            
+            showToast(element.classList.contains('liked') ? '❤️ Liked!' : '🤍 Unliked');
+        }
+
+        function sharePost() {
+            if (navigator.share) {
+                navigator.share({
+                    title: 'JomBro Challenge',
+                    text: 'Check out this challenge on JomBro!',
+                    url: window.location.href
+                });
+            } else {
+                showToast('📤 Shared to your story!');
+            }
+        }
+
+        function savePost() {
+            showToast('🔖 Saved to your collection!');
         }
 
         function acceptChallenge(id, points) {
@@ -1088,7 +1358,7 @@
             updatePointsDisplay();
             
             if (isIOSDevice && navigator.vibrate) {
-                navigator.vibrate([100, 50, 100, 50, 200]);
+                navigator.vibrate([100, 50, 100]);
             }
             
             showToast(`🎉 Challenge accepted! +${points} points!`);
@@ -1096,27 +1366,8 @@
         }
 
         function declineChallenge(id) {
-            showToast(`❌ Challenge declined. No penalty this time!`);
+            showToast('👋 Challenge declined');
             resetIdleTimer();
-        }
-
-        function likeChallenge() {
-            showToast(`❤️ Challenge liked!`);
-            if (isIOSDevice && navigator.vibrate) {
-                navigator.vibrate([50]);
-            }
-        }
-
-        function shareChallenge() {
-            if (navigator.share) {
-                navigator.share({
-                    title: 'JomBro Challenge',
-                    text: 'Check out this epic challenge on JomBro!',
-                    url: window.location.href
-                });
-            } else {
-                showToast(`📤 Challenge shared to your story!`);
-            }
         }
 
         // Screensaver Functions
@@ -1134,7 +1385,6 @@
                 document.getElementById('screensaverMode').classList.add('active');
                 document.getElementById('screensaverBtn').textContent = '☀️ Wake';
                 
-                // Request wake lock
                 if ('wakeLock' in navigator) {
                     wakeLock = await navigator.wakeLock.request('screen');
                 }
@@ -1142,7 +1392,7 @@
                 startScreensaverClock();
                 updateScreensaverStats();
                 
-                showToast('🌙 Screensaver activated');
+                showToast('🌙 Light screensaver activated');
                 
             } catch (err) {
                 console.error('Screensaver failed:', err);
@@ -1161,7 +1411,7 @@
             }
             
             resetIdleTimer();
-            showToast('☀️ Welcome back!');
+            showToast('☀️ Welcome back to JomBro!');
         }
 
         function startScreensaverClock() {
@@ -1194,18 +1444,17 @@
                 if (!document.fullscreenElement) {
                     await document.documentElement.requestFullscreen();
                     document.getElementById('fullscreenBtn').textContent = '⛶ Exit';
-                    showToast('📺 Fullscreen mode');
+                    showToast('📺 Fullscreen mode activated');
                 } else {
                     await document.exitFullscreen();
                     document.getElementById('fullscreenBtn').textContent = '⛶ Full';
-                    showToast('📱 Normal mode');
+                    showToast('📱 Normal view restored');
                 }
             } catch (err) {
                 showToast('❌ Fullscreen not supported');
             }
         }
 
-        // Idle Detection
         function resetIdleTimer() {
             clearTimeout(idleTimer);
             if (!screensaverActive) {
@@ -1213,7 +1462,6 @@
             }
         }
 
-        // Modal Functions
         function showModal(type) {
             const modals = {
                 'create': 'createModal',
@@ -1250,13 +1498,13 @@
             const points = document.getElementById('challengePoints').value;
             
             if (!target || !desc) {
-                showToast('❗ Please fill all fields!');
+                showToast('❗ Please fill all fields');
                 return;
             }
             
             const cost = Math.floor(parseInt(points) * 0.6);
             if (userPoints < cost) {
-                showToast('❌ Insufficient points!');
+                showToast('❌ Insufficient points');
                 return;
             }
             
@@ -1267,7 +1515,7 @@
             document.getElementById('challengeTarget').value = '';
             document.getElementById('challengeDesc').value = '';
             
-            showToast(`🚀 Challenge sent to ${target}! -${cost} points`);
+            showToast(`🚀 Challenge shared with ${target}! -${cost} points`);
         }
 
         function completeFromModal(id, points) {
@@ -1289,7 +1537,7 @@
             }
         });
 
-        // Activity detection for idle timer
+        // Activity detection
         const activityEvents = ['touchstart', 'touchmove', 'scroll', 'mousedown', 'mousemove', 'keypress'];
         activityEvents.forEach(event => {
             document.addEventListener(event, resetIdleTimer, { passive: true });
@@ -1299,32 +1547,25 @@
         document.getElementById('screensaverMode').addEventListener('touchstart', exitScreensaver);
         document.getElementById('screensaverMode').addEventListener('click', exitScreensaver);
 
-        // Navigation dots update on scroll
-        const cardsContainer = document.getElementById('cardsContainer');
-        const navDots = document.querySelectorAll('.nav-dot');
-        
-        cardsContainer.addEventListener('scroll', () => {
-            const scrollTop = cardsContainer.scrollTop;
-            const cardHeight = window.innerHeight;
-            const currentCard = Math.round(scrollTop / cardHeight);
-            
-            navDots.forEach((dot, index) => {
-                dot.classList.toggle('active', index === currentCard);
+        // Navigation switching
+        document.querySelectorAll('.nav-item').forEach(item => {
+            item.addEventListener('click', function() {
+                document.querySelectorAll('.nav-item').forEach(nav => nav.classList.remove('active'));
+                this.classList.add('active');
+                resetIdleTimer();
             });
         });
 
         // Initialize
         updatePointsDisplay();
-        createFloatingEffects();
+        createLightEffects();
         resetIdleTimer();
         
-        // Welcome message
         setTimeout(() => {
-            const deviceInfo = isIOSDevice ? ' TikTok-style interface optimized for iPhone!' : '';
-            showToast(`🎉 Welcome to JomBro!${deviceInfo}`);
+            const deviceInfo = isIOSDevice ? ' Instagram-style interface with light TikTok overlays!' : '';
+            showToast(`📸 Welcome to JomBro!${deviceInfo}`);
         }, 2000);
 
-        // Update screensaver stats periodically
         setInterval(updateScreensaverStats, 10000);
     </script>
 </body>
