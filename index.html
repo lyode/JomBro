@@ -2,258 +2,345 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="theme-color" content="#007AFF">
     <title>JomBro</title>
     <style>
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+            -webkit-touch-callout: none;
+            -webkit-user-select: none;
+            user-select: none;
         }
 
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background-color: #f0f2f5;
-            color: #1c1e21;
+            font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', sans-serif;
+            background: #000000;
+            color: #000000;
+            overflow-x: hidden;
+            padding-top: env(safe-area-inset-top);
+            padding-bottom: env(safe-area-inset-bottom);
         }
 
-        /* Fixed Header - Facebook Style */
-        .header {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            background: #ffffff;
-            border-bottom: 1px solid #dadde1;
-            padding: 8px 16px;
-            z-index: 1000;
+        /* Status Bar Area for Dynamic Island */
+        .status-bar {
+            height: 47px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .dynamic-island {
+            width: 126px;
+            height: 37px;
+            background: #000000;
+            border-radius: 19px;
+            position: absolute;
+            top: 5px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        /* iOS Navigation Bar */
+        .nav-bar {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-bottom: 0.5px solid rgba(0, 0, 0, 0.1);
+            padding: 8px 20px 8px 20px;
             display: flex;
             align-items: center;
             justify-content: space-between;
-            height: 56px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            height: 44px;
         }
 
-        .logo {
-            font-size: 24px;
-            font-weight: bold;
-            color: #1877f2;
+        .nav-title {
+            font-size: 17px;
+            font-weight: 600;
+            color: #000000;
         }
 
-        .header-center {
-            flex: 1;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            max-width: 300px;
-            margin: 0 20px;
-        }
-
-        .search-box {
-            background: #f0f2f5;
+        .nav-button {
+            background: none;
             border: none;
-            border-radius: 20px;
-            padding: 8px 16px;
-            width: 100%;
-            font-size: 15px;
-            outline: none;
-        }
-
-        .header-right {
+            color: #007AFF;
+            font-size: 17px;
+            font-weight: 400;
+            padding: 0;
+            cursor: pointer;
+            min-width: 44px;
+            min-height: 44px;
             display: flex;
             align-items: center;
-            gap: 12px;
+            justify-content: center;
         }
 
-        .user-avatar {
+        .profile-button {
             width: 32px;
             height: 32px;
-            border-radius: 50%;
-            background: linear-gradient(45deg, #1877f2, #42b883);
+            border-radius: 16px;
+            background: linear-gradient(135deg, #007AFF, #5856D6);
+            color: white;
+            font-size: 14px;
+            font-weight: 600;
             display: flex;
             align-items: center;
             justify-content: center;
-            color: white;
-            font-weight: bold;
-            font-size: 12px;
+            border: none;
             cursor: pointer;
-            border: 2px solid #fff;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.2);
-        }
-
-        .notification-badge {
             position: relative;
         }
 
-        .notification-badge::after {
-            content: '3';
+        .notification-dot {
             position: absolute;
-            top: -6px;
-            right: -6px;
-            background: #e41e3f;
+            top: -2px;
+            right: -2px;
+            width: 12px;
+            height: 12px;
+            background: #FF3B30;
+            border-radius: 6px;
+            border: 2px solid white;
+            font-size: 8px;
             color: white;
-            border-radius: 50%;
-            width: 18px;
-            height: 18px;
-            font-size: 11px;
-            font-weight: bold;
             display: flex;
             align-items: center;
             justify-content: center;
-            border: 2px solid white;
+            font-weight: 700;
         }
 
         /* Main Content */
         .main-content {
-            margin-top: 56px;
-            margin-bottom: 56px;
-            padding: 16px;
-            max-width: 500px;
-            margin-left: auto;
-            margin-right: auto;
+            background: #F2F2F7;
+            min-height: calc(100vh - 91px - env(safe-area-inset-top) - env(safe-area-inset-bottom) - 83px);
+            padding-bottom: 20px;
         }
 
-        /* Stories Section - Facebook Style */
-        .stories-section {
-            background: white;
-            border-radius: 8px;
-            padding: 16px;
-            margin-bottom: 16px;
-            box-shadow: 0 1px 2px rgba(0,0,0,0.1);
-        }
-
-        .stories-header {
-            font-size: 16px;
-            font-weight: 600;
-            margin-bottom: 12px;
-            color: #65676b;
-        }
-
-        .stories-container {
-            display: flex;
-            gap: 12px;
-            overflow-x: auto;
-            padding-bottom: 4px;
-        }
-
-        .story-item {
-            min-width: 60px;
-            text-align: center;
-        }
-
-        .story-avatar {
-            width: 60px;
-            height: 60px;
-            border-radius: 50%;
-            background: linear-gradient(45deg, #ff6b6b, #4ecdc4, #45b7d1);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-weight: bold;
-            font-size: 14px;
-            margin-bottom: 4px;
-            border: 3px solid #1877f2;
-            cursor: pointer;
-            position: relative;
-        }
-
-        .story-avatar.compound-alert::after {
-            content: '!';
-            position: absolute;
-            top: -4px;
-            right: -4px;
-            background: #e41e3f;
-            color: white;
-            border-radius: 50%;
-            width: 20px;
-            height: 20px;
-            font-size: 12px;
-            font-weight: bold;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border: 2px solid white;
-        }
-
-        .story-name {
-            font-size: 12px;
-            color: #65676b;
-            font-weight: 500;
-        }
-
-        /* Points Card - Facebook Style */
-        .points-card {
-            background: white;
-            border-radius: 8px;
-            padding: 16px;
-            margin-bottom: 16px;
-            box-shadow: 0 1px 2px rgba(0,0,0,0.1);
-        }
-
-        .points-header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            margin-bottom: 12px;
-        }
-
-        .points-info {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .points-avatar {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            background: linear-gradient(45deg, #1877f2, #42b883);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-weight: bold;
-            font-size: 14px;
-        }
-
-        .points-details h3 {
-            font-size: 15px;
-            font-weight: 600;
-            margin-bottom: 2px;
-        }
-
-        .points-details p {
-            font-size: 13px;
-            color: #65676b;
-        }
-
-        .points-value {
-            font-size: 18px;
-            font-weight: bold;
-            color: #42b883;
-        }
-
-        .level-badge {
-            background: #e3f2fd;
-            color: #1565c0;
-            padding: 4px 8px;
+        /* iOS Card Style */
+        .card {
+            background: #FFFFFF;
+            margin: 16px;
             border-radius: 12px;
-            font-size: 12px;
-            font-weight: 600;
-        }
-
-        /* Post Card - Facebook Style */
-        .post-card {
-            background: white;
-            border-radius: 8px;
-            margin-bottom: 16px;
-            box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
             overflow: hidden;
         }
 
-        .post-header {
+        .card-header {
+            padding: 16px 16px 8px 16px;
+            border-bottom: 0.5px solid #E5E5EA;
+        }
+
+        .card-title {
+            font-size: 22px;
+            font-weight: 700;
+            color: #000000;
+            margin-bottom: 4px;
+        }
+
+        .card-subtitle {
+            font-size: 15px;
+            color: #8E8E93;
+            font-weight: 400;
+        }
+
+        .card-content {
+            padding: 16px;
+        }
+
+        /* Points Card */
+        .points-card {
+            background: linear-gradient(135deg, #007AFF 0%, #5856D6 100%);
+            margin: 16px;
+            border-radius: 16px;
+            padding: 20px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .points-card::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+            animation: shimmer 3s ease-in-out infinite;
+        }
+
+        @keyframes shimmer {
+            0%, 100% { transform: rotate(0deg); }
+            50% { transform: rotate(180deg); }
+        }
+
+        .points-display {
+            color: white;
+            text-align: center;
+            position: relative;
+            z-index: 1;
+        }
+
+        .points-number {
+            font-size: 36px;
+            font-weight: 800;
+            margin-bottom: 4px;
+            text-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+        }
+
+        .points-label {
+            font-size: 17px;
+            font-weight: 600;
+            opacity: 0.9;
+        }
+
+        .level-info {
+            margin-top: 12px;
+            display: flex;
+            justify-content: space-between;
+            font-size: 15px;
+            font-weight: 500;
+        }
+
+        /* iOS List Style */
+        .ios-list {
+            background: #FFFFFF;
+            margin: 16px;
+            border-radius: 12px;
+            overflow: hidden;
+        }
+
+        .list-item {
             padding: 12px 16px;
+            border-bottom: 0.5px solid #E5E5EA;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            min-height: 44px;
+        }
+
+        .list-item:last-child {
+            border-bottom: none;
+        }
+
+        .list-item.danger {
+            background: rgba(255, 59, 48, 0.03);
+        }
+
+        .list-item.current-user {
+            background: rgba(255, 59, 48, 0.08);
+            animation: pulse-ios 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse-ios {
+            0%, 100% { background: rgba(255, 59, 48, 0.08); }
+            50% { background: rgba(255, 59, 48, 0.15); }
+        }
+
+        .list-item-content {
+            display: flex;
+            align-items: center;
+            flex: 1;
+        }
+
+        .list-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 20px;
+            background: linear-gradient(135deg, #FF6B6B, #4ECDC4);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 16px;
+            font-weight: 600;
+            margin-right: 12px;
+            border: 2px solid white;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .list-info {
+            flex: 1;
+        }
+
+        .list-title {
+            font-size: 17px;
+            font-weight: 600;
+            color: #000000;
+            margin-bottom: 2px;
+        }
+
+        .list-subtitle {
+            font-size: 13px;
+            color: #8E8E93;
+            font-weight: 400;
+        }
+
+        .list-value {
+            font-size: 17px;
+            font-weight: 600;
+            color: #FF3B30;
+        }
+
+        /* iOS Button Styles */
+        .ios-button {
+            background: #007AFF;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 17px;
+            font-weight: 600;
+            padding: 12px 16px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            min-height: 44px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .ios-button:active {
+            transform: scale(0.97);
+            background: #0056CC;
+        }
+
+        .ios-button.danger {
+            background: #FF3B30;
+        }
+
+        .ios-button.danger:active {
+            background: #D70015;
+        }
+
+        .ios-button.secondary {
+            background: #F2F2F7;
+            color: #007AFF;
+        }
+
+        .ios-button.secondary:active {
+            background: #E5E5EA;
+        }
+
+        /* Challenge Post Style */
+        .challenge-post {
+            background: #FFFFFF;
+            margin: 16px;
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        }
+
+        .post-header {
+            padding: 16px;
             display: flex;
             align-items: center;
             justify-content: space-between;
@@ -262,573 +349,541 @@
         .post-user {
             display: flex;
             align-items: center;
-            gap: 12px;
         }
 
         .post-avatar {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            background: linear-gradient(45deg, #ff6b6b, #4ecdc4);
+            width: 44px;
+            height: 44px;
+            border-radius: 22px;
+            background: linear-gradient(135deg, #FF6B6B, #4ECDC4);
             display: flex;
             align-items: center;
             justify-content: center;
             color: white;
-            font-weight: bold;
-            font-size: 14px;
+            font-size: 18px;
+            font-weight: 600;
+            margin-right: 12px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
         }
 
-        .post-user-info h4 {
-            font-size: 15px;
+        .post-user-info h3 {
+            font-size: 17px;
             font-weight: 600;
+            color: #000000;
             margin-bottom: 2px;
         }
 
         .post-user-info p {
             font-size: 13px;
-            color: #65676b;
+            color: #8E8E93;
         }
 
         .post-points {
-            background: #e8f5e8;
-            color: #2e7d32;
-            padding: 4px 8px;
-            border-radius: 12px;
-            font-size: 12px;
+            background: linear-gradient(135deg, #34C759, #30D158);
+            color: white;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 15px;
             font-weight: 600;
+            box-shadow: 0 2px 4px rgba(52, 199, 89, 0.3);
         }
 
         .post-content {
-            padding: 0 16px 12px;
-            font-size: 15px;
+            padding: 0 16px 16px;
+            font-size: 17px;
             line-height: 1.4;
+            color: #000000;
         }
 
-        .challenge-content {
-            background: #f8f9fa;
-            border-left: 4px solid #1877f2;
-            padding: 12px;
+        .challenge-text {
+            background: #F2F2F7;
+            padding: 16px;
+            border-radius: 12px;
             margin: 8px 0;
-            border-radius: 4px;
             font-style: italic;
+            border-left: 4px solid #007AFF;
+            font-size: 16px;
+            line-height: 1.5;
         }
 
         .post-actions {
-            border-top: 1px solid #dadde1;
-            padding: 8px 4px;
-            display: flex;
-        }
-
-        .action-btn {
-            flex: 1;
-            background: none;
-            border: none;
-            padding: 8px;
-            font-size: 15px;
-            font-weight: 600;
-            color: #65676b;
-            cursor: pointer;
-            border-radius: 4px;
-            transition: background-color 0.2s;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 6px;
-        }
-
-        .action-btn:hover {
-            background-color: #f0f2f5;
-        }
-
-        .action-btn.complete {
-            color: #42b883;
-        }
-
-        .action-btn.forfeit {
-            color: #e74c3c;
-        }
-
-        /* Wanted Board - Facebook Style */
-        .wanted-board {
-            background: white;
-            border-radius: 8px;
-            margin-bottom: 16px;
-            box-shadow: 0 1px 2px rgba(0,0,0,0.1);
-            border-left: 4px solid #e41e3f;
-        }
-
-        .wanted-header {
             padding: 16px;
-            background: #fef2f2;
-            border-bottom: 1px solid #fecaca;
-        }
-
-        .wanted-title {
-            font-size: 16px;
-            font-weight: 600;
-            color: #dc2626;
             display: flex;
-            align-items: center;
-            gap: 8px;
-            margin-bottom: 4px;
+            gap: 12px;
         }
 
-        .wanted-subtitle {
-            font-size: 13px;
-            color: #991b1b;
-        }
-
-        .wanted-list {
-            padding: 12px 16px;
-        }
-
-        .wanted-person {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 8px 0;
-            border-bottom: 1px solid #f3f4f6;
-        }
-
-        .wanted-person:last-child {
-            border-bottom: none;
-        }
-
-        .wanted-person.current-user {
-            background: #fef2f2;
-            margin: 0 -16px;
-            padding: 12px 16px;
-            border-radius: 8px;
-            animation: pulse 2s infinite;
-        }
-
-        @keyframes pulse {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.8; }
-        }
-
-        .wanted-user {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .wanted-avatar {
-            width: 36px;
-            height: 36px;
-            border-radius: 50%;
-            background: linear-gradient(45deg, #e74c3c, #c0392b);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-weight: bold;
-            font-size: 12px;
-        }
-
-        .wanted-info h5 {
-            font-size: 14px;
-            font-weight: 600;
-            margin-bottom: 2px;
-        }
-
-        .wanted-info p {
-            font-size: 12px;
-            color: #65676b;
-        }
-
-        .wanted-penalty {
-            font-size: 14px;
-            font-weight: bold;
-            color: #dc2626;
-        }
-
-        .fix-btn {
-            background: #1877f2;
-            color: white;
-            border: none;
-            padding: 6px 12px;
-            border-radius: 6px;
-            font-size: 12px;
-            font-weight: 600;
-            cursor: pointer;
-            margin-left: 8px;
-        }
-
-        /* Bottom Navigation - Facebook Style */
-        .bottom-nav {
+        /* Tab Bar */
+        .tab-bar {
             position: fixed;
             bottom: 0;
             left: 0;
             right: 0;
-            background: white;
-            border-top: 1px solid #dadde1;
+            background: rgba(248, 248, 248, 0.95);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-top: 0.5px solid rgba(0, 0, 0, 0.1);
             display: flex;
             justify-content: space-around;
             padding: 8px 0;
-            z-index: 1000;
+            padding-bottom: calc(8px + env(safe-area-inset-bottom));
+            height: calc(83px + env(safe-area-inset-bottom));
         }
 
-        .nav-item {
+        .tab-item {
             display: flex;
             flex-direction: column;
             align-items: center;
-            color: #65676b;
+            color: #8E8E93;
             text-decoration: none;
-            font-size: 12px;
-            padding: 4px;
-            min-width: 50px;
+            font-size: 10px;
+            font-weight: 500;
+            padding: 4px 8px;
+            min-width: 44px;
+            cursor: pointer;
+            transition: color 0.2s ease;
         }
 
-        .nav-item.active {
-            color: #1877f2;
+        .tab-item.active {
+            color: #007AFF;
         }
 
-        .nav-icon {
-            font-size: 20px;
+        .tab-icon {
+            font-size: 24px;
             margin-bottom: 2px;
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
-        /* Modal - Facebook Style */
+        /* iOS Modal/Sheet */
         .modal {
             position: fixed;
             top: 0;
             left: 0;
             right: 0;
             bottom: 0;
-            background: rgba(0,0,0,0.8);
+            background: rgba(0, 0, 0, 0.3);
             display: none;
-            align-items: center;
-            justify-content: center;
-            z-index: 2000;
-            padding: 20px;
+            align-items: flex-end;
+            z-index: 1000;
+            padding-bottom: env(safe-area-inset-bottom);
         }
 
         .modal.show {
             display: flex;
+            animation: fadeIn 0.3s ease;
         }
 
-        .modal-content {
-            background: white;
-            border-radius: 8px;
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .modal-sheet {
+            background: #FFFFFF;
+            border-radius: 16px 16px 0 0;
             width: 100%;
-            max-width: 400px;
             max-height: 80vh;
             overflow-y: auto;
+            transform: translateY(100%);
+            animation: slideUp 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+        }
+
+        @keyframes slideUp {
+            to { transform: translateY(0); }
         }
 
         .modal-header {
-            padding: 16px;
-            border-bottom: 1px solid #dadde1;
-            font-size: 18px;
-            font-weight: 600;
+            padding: 16px 20px 8px;
             text-align: center;
+            border-bottom: 0.5px solid #E5E5EA;
+            position: relative;
         }
 
-        .modal-body {
-            padding: 16px;
+        .modal-handle {
+            width: 36px;
+            height: 5px;
+            background: #C7C7CC;
+            border-radius: 3px;
+            margin: 0 auto 12px;
         }
 
+        .modal-title {
+            font-size: 17px;
+            font-weight: 600;
+            color: #000000;
+        }
+
+        .modal-close {
+            position: absolute;
+            right: 16px;
+            top: 16px;
+            background: none;
+            border: none;
+            color: #007AFF;
+            font-size: 17px;
+            font-weight: 500;
+            cursor: pointer;
+            padding: 4px;
+        }
+
+        .modal-content {
+            padding: 20px;
+        }
+
+        /* Form Styles */
         .form-group {
-            margin-bottom: 16px;
+            margin-bottom: 20px;
         }
 
         .form-label {
-            display: block;
-            font-size: 14px;
+            font-size: 17px;
             font-weight: 600;
-            margin-bottom: 6px;
-            color: #1c1e21;
+            color: #000000;
+            margin-bottom: 8px;
+            display: block;
         }
 
         .form-control {
             width: 100%;
-            padding: 12px;
-            border: 1px solid #dadde1;
-            border-radius: 6px;
-            font-size: 15px;
+            padding: 12px 16px;
+            font-size: 17px;
+            border: 1px solid #E5E5EA;
+            border-radius: 10px;
+            background: #F2F2F7;
+            color: #000000;
+            font-family: inherit;
             outline: none;
+            transition: all 0.2s ease;
         }
 
         .form-control:focus {
-            border-color: #1877f2;
-            box-shadow: 0 0 0 2px rgba(24,119,242,0.2);
+            border-color: #007AFF;
+            background: #FFFFFF;
+            box-shadow: 0 0 0 4px rgba(0, 122, 255, 0.1);
         }
 
-        .btn-primary {
-            background: #1877f2;
-            color: white;
-            border: none;
-            padding: 12px 24px;
-            border-radius: 6px;
-            font-size: 15px;
-            font-weight: 600;
-            cursor: pointer;
-            width: 100%;
-            margin-bottom: 8px;
-        }
-
-        .btn-secondary {
-            background: #e4e6ea;
-            color: #1c1e21;
-            border: none;
-            padding: 12px 24px;
-            border-radius: 6px;
-            font-size: 15px;
-            font-weight: 600;
-            cursor: pointer;
-            width: 100%;
-        }
-
-        /* Success Toast */
+        /* Toast Notification */
         .toast {
             position: fixed;
-            top: 70px;
-            left: 50%;
-            transform: translateX(-50%);
-            background: #42b883;
+            top: calc(91px + env(safe-area-inset-top) + 20px);
+            left: 20px;
+            right: 20px;
+            background: rgba(0, 0, 0, 0.9);
             color: white;
-            padding: 12px 20px;
-            border-radius: 6px;
-            font-weight: 600;
-            z-index: 3000;
-            display: none;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+            padding: 16px 20px;
+            border-radius: 12px;
+            font-size: 17px;
+            font-weight: 500;
+            text-align: center;
+            z-index: 2000;
+            transform: translateY(-100px);
+            opacity: 0;
+            transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
         }
 
         .toast.show {
-            display: block;
-            animation: slideDown 0.3s ease;
+            transform: translateY(0);
+            opacity: 1;
         }
 
-        @keyframes slideDown {
-            from { transform: translateX(-50%) translateY(-20px); opacity: 0; }
-            to { transform: translateX(-50%) translateY(0); opacity: 1; }
+        /* Haptic Feedback Visual */
+        .haptic-feedback {
+            animation: haptic 0.1s ease;
+        }
+
+        @keyframes haptic {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(0.95); }
+        }
+
+        /* Section Headers */
+        .section-header {
+            padding: 16px 32px 8px;
+            font-size: 13px;
+            font-weight: 500;
+            color: #8E8E93;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            background: #F2F2F7;
+        }
+
+        /* Story Circles */
+        .stories-section {
+            background: #FFFFFF;
+            padding: 16px;
+            margin: 16px;
+            border-radius: 12px;
+        }
+
+        .stories-container {
+            display: flex;
+            gap: 16px;
+            overflow-x: auto;
+            padding-bottom: 4px;
+        }
+
+        .story-item {
+            min-width: 70px;
+            text-align: center;
+        }
+
+        .story-circle {
+            width: 70px;
+            height: 70px;
+            border-radius: 35px;
+            background: linear-gradient(135deg, #FF6B6B, #4ECDC4, #45B7D1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 6px;
+            border: 3px solid #FFFFFF;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            cursor: pointer;
+            position: relative;
+        }
+
+        .story-circle.alert::after {
+            content: '';
+            position: absolute;
+            top: -2px;
+            right: -2px;
+            width: 20px;
+            height: 20px;
+            background: #FF3B30;
+            border-radius: 10px;
+            border: 3px solid white;
+        }
+
+        .story-name {
+            font-size: 12px;
+            color: #000000;
+            font-weight: 500;
         }
     </style>
 </head>
 <body>
-    <!-- Fixed Header -->
-    <div class="header">
-        <div class="logo">JomBro</div>
-        <div class="header-center">
-            <input type="text" class="search-box" placeholder="Search JomBro">
-        </div>
-        <div class="header-right">
-            <div class="user-avatar notification-badge">🎯</div>
-            <div class="user-avatar">AR</div>
-            <div class="user-avatar">ML</div>
-            <div class="user-avatar">JD</div>
+    <!-- Status Bar with Dynamic Island -->
+    <div class="status-bar">
+        <div class="dynamic-island">JomBro</div>
+    </div>
+
+    <!-- Navigation Bar -->
+    <div class="nav-bar">
+        <button class="nav-button">⚙️</button>
+        <div class="nav-title">JomBro</div>
+        <div style="display: flex; align-items: center; gap: 8px;">
+            <button class="profile-button notification-dot">
+                JD
+                <div class="notification-dot">3</div>
+            </button>
         </div>
     </div>
 
     <!-- Main Content -->
     <div class="main-content">
-        <!-- Stories Section -->
-        <div class="stories-section">
-            <div class="stories-header">Friend Status</div>
-            <div class="stories-container">
-                <div class="story-item">
-                    <div class="story-avatar compound-alert">YOU</div>
-                    <div class="story-name">You</div>
-                </div>
-                <div class="story-item">
-                    <div class="story-avatar">AR</div>
-                    <div class="story-name">Ahmad</div>
-                </div>
-                <div class="story-item">
-                    <div class="story-avatar">ML</div>
-                    <div class="story-name">Mei Ling</div>
-                </div>
-                <div class="story-item">
-                    <div class="story-avatar">SL</div>
-                    <div class="story-name">Sarah</div>
-                </div>
-                <div class="story-item">
-                    <div class="story-avatar">DT</div>
-                    <div class="story-name">David</div>
-                </div>
-                <div class="story-item">
-                    <div class="story-avatar">RK</div>
-                    <div class="story-name">Raj</div>
+        <!-- Points Card -->
+        <div class="points-card">
+            <div class="points-display">
+                <div class="points-number" id="userPoints">15,000</div>
+                <div class="points-label">JomBro Points</div>
+                <div class="level-info">
+                    <span>⭐ Level 7</span>
+                    <span>🔥 89% Active</span>
                 </div>
             </div>
         </div>
 
-        <!-- Points Card -->
-        <div class="points-card">
-            <div class="points-header">
-                <div class="points-info">
-                    <div class="points-avatar">JD</div>
-                    <div class="points-details">
-                        <h3>Your JomBro Status</h3>
-                        <p>Business Networking Level</p>
-                    </div>
+        <!-- Friends Stories -->
+        <div class="stories-section">
+            <div style="font-size: 17px; font-weight: 600; margin-bottom: 12px; color: #000000;">Friend Status</div>
+            <div class="stories-container">
+                <div class="story-item">
+                    <div class="story-circle alert">YOU</div>
+                    <div class="story-name">You</div>
                 </div>
-                <div style="text-align: right;">
-                    <div class="points-value" id="userPoints">15,000 pts</div>
-                    <div class="level-badge">Level 7</div>
+                <div class="story-item">
+                    <div class="story-circle">AR</div>
+                    <div class="story-name">Ahmad</div>
+                </div>
+                <div class="story-item">
+                    <div class="story-circle">ML</div>
+                    <div class="story-name">Mei Ling</div>
+                </div>
+                <div class="story-item">
+                    <div class="story-circle">SL</div>
+                    <div class="story-name">Sarah</div>
+                </div>
+                <div class="story-item">
+                    <div class="story-circle">DT</div>
+                    <div class="story-name">David</div>
                 </div>
             </div>
         </div>
 
         <!-- Wanted Board -->
-        <div class="wanted-board">
-            <div class="wanted-header">
-                <div class="wanted-title">
-                    🚨 Community Wanted Board
+        <div class="section-header">⚠️ Community Wanted Board</div>
+        <div class="ios-list">
+            <div class="list-item current-user">
+                <div class="list-item-content">
+                    <div class="list-avatar">YOU</div>
+                    <div class="list-info">
+                        <div class="list-title">You</div>
+                        <div class="list-subtitle">3 compounds • 2 hours ago</div>
+                    </div>
                 </div>
-                <div class="wanted-subtitle">Outstanding compound violations</div>
+                <div style="display: flex; align-items: center; gap: 8px;">
+                    <div class="list-value">-1,900</div>
+                    <button class="ios-button" onclick="showModal('compounds')" style="padding: 6px 12px; font-size: 14px; min-height: 32px;">
+                        Fix
+                    </button>
+                </div>
             </div>
-            <div class="wanted-list">
-                <div class="wanted-person current-user">
-                    <div class="wanted-user">
-                        <div class="wanted-avatar">YOU</div>
-                        <div class="wanted-info">
-                            <h5>You</h5>
-                            <p>3 compounds • 2 hours ago</p>
-                        </div>
-                    </div>
-                    <div style="display: flex; align-items: center;">
-                        <span class="wanted-penalty">-1,900</span>
-                        <button class="fix-btn" onclick="showModal('compounds')">Fix</button>
+            <div class="list-item danger">
+                <div class="list-item-content">
+                    <div class="list-avatar">SL</div>
+                    <div class="list-info">
+                        <div class="list-title">Sarah Lim</div>
+                        <div class="list-subtitle">2 compounds • 5 hours ago</div>
                     </div>
                 </div>
-                <div class="wanted-person">
-                    <div class="wanted-user">
-                        <div class="wanted-avatar">SL</div>
-                        <div class="wanted-info">
-                            <h5>Sarah Lim</h5>
-                            <p>2 compounds • 5 hours ago</p>
-                        </div>
+                <div class="list-value">-1,100</div>
+            </div>
+            <div class="list-item danger">
+                <div class="list-item-content">
+                    <div class="list-avatar">DT</div>
+                    <div class="list-info">
+                        <div class="list-title">David Tan</div>
+                        <div class="list-subtitle">4 compounds • 3 days ago</div>
                     </div>
-                    <span class="wanted-penalty">-1,100</span>
                 </div>
-                <div class="wanted-person">
-                    <div class="wanted-user">
-                        <div class="wanted-avatar">DT</div>
-                        <div class="wanted-info">
-                            <h5>David Tan</h5>
-                            <p>4 compounds • 3 days ago</p>
-                        </div>
-                    </div>
-                    <span class="wanted-penalty">-2,400</span>
-                </div>
+                <div class="list-value">-2,400</div>
             </div>
         </div>
 
         <!-- Challenge Posts -->
-        <div class="post-card">
+        <div class="section-header">💪 Active Challenges</div>
+
+        <div class="challenge-post">
             <div class="post-header">
                 <div class="post-user">
                     <div class="post-avatar">AR</div>
                     <div class="post-user-info">
-                        <h4>Ahmad Rahman</h4>
+                        <h3>Ahmad Rahman</h3>
                         <p>2 hours ago • Social Challenge</p>
                     </div>
                 </div>
-                <div class="post-points">+500 pts</div>
+                <div class="post-points">+500</div>
             </div>
             <div class="post-content">
                 <strong>Ahmad challenged you:</strong>
-                <div class="challenge-content">
+                <div class="challenge-text">
                     "Ask 3 strangers for their phone number and record video proof"
                 </div>
             </div>
             <div class="post-actions">
-                <button class="action-btn complete" onclick="completeChallenge(1, 500)">
+                <button class="ios-button" onclick="completeChallenge(1, 500)" style="flex: 1;">
                     ✅ Complete
                 </button>
-                <button class="action-btn forfeit" onclick="forfeitChallenge(1, 500)">
+                <button class="ios-button danger" onclick="forfeitChallenge(1, 500)" style="flex: 1;">
                     ❌ Forfeit
                 </button>
             </div>
         </div>
 
-        <div class="post-card">
+        <div class="challenge-post">
             <div class="post-header">
                 <div class="post-user">
                     <div class="post-avatar">ML</div>
                     <div class="post-user-info">
-                        <h4>Mei Ling</h4>
+                        <h3>Mei Ling</h3>
                         <p>1 day ago • Social Challenge</p>
                     </div>
                 </div>
-                <div class="post-points">+800 pts</div>
+                <div class="post-points">+800</div>
             </div>
             <div class="post-content">
                 <strong>Mei Ling challenged you:</strong>
-                <div class="challenge-content">
+                <div class="challenge-text">
                     "Get a girl's signature and take selfie at Pavilion KL"
                 </div>
             </div>
             <div class="post-actions">
-                <button class="action-btn complete" onclick="completeChallenge(2, 800)">
+                <button class="ios-button" onclick="completeChallenge(2, 800)" style="flex: 1;">
                     ✅ Complete
                 </button>
-                <button class="action-btn forfeit" onclick="forfeitChallenge(2, 800)">
+                <button class="ios-button danger" onclick="forfeitChallenge(2, 800)" style="flex: 1;">
                     ❌ Forfeit
                 </button>
             </div>
         </div>
 
-        <div class="post-card">
+        <div class="challenge-post">
             <div class="post-header">
                 <div class="post-user">
                     <div class="post-avatar">SL</div>
                     <div class="post-user-info">
-                        <h4>Sarah Lim</h4>
+                        <h3>Sarah Lim</h3>
                         <p>3 hours ago • Business Task</p>
                     </div>
                 </div>
-                <div class="post-points">+600 pts</div>
+                <div class="post-points">+600</div>
             </div>
             <div class="post-content">
                 <strong>Sarah challenged you:</strong>
-                <div class="challenge-content">
+                <div class="challenge-text">
                     "Give business card to 5 strangers and get their contact info"
                 </div>
             </div>
             <div class="post-actions">
-                <button class="action-btn complete" onclick="completeChallenge(3, 600)">
+                <button class="ios-button" onclick="completeChallenge(3, 600)" style="flex: 1;">
                     ✅ Complete
                 </button>
-                <button class="action-btn forfeit" onclick="forfeitChallenge(3, 600)">
+                <button class="ios-button danger" onclick="forfeitChallenge(3, 600)" style="flex: 1;">
                     ❌ Forfeit
                 </button>
             </div>
         </div>
     </div>
 
-    <!-- Bottom Navigation -->
-    <div class="bottom-nav">
-        <a href="#" class="nav-item active">
-            <div class="nav-icon">🏠</div>
+    <!-- Tab Bar -->
+    <div class="tab-bar">
+        <a href="#" class="tab-item active">
+            <div class="tab-icon">🏠</div>
             <div>Home</div>
         </a>
-        <a href="#" class="nav-item">
-            <div class="nav-icon">👥</div>
+        <a href="#" class="tab-item">
+            <div class="tab-icon">👥</div>
             <div>Friends</div>
         </a>
-        <a href="#" class="nav-item" onclick="showModal('challenge')">
-            <div class="nav-icon">➕</div>
+        <a href="#" class="tab-item" onclick="showModal('challenge')">
+            <div class="tab-icon">➕</div>
             <div>Create</div>
         </a>
-        <a href="#" class="nav-item" onclick="showModal('treasure')">
-            <div class="nav-icon">🏴‍☠️</div>
+        <a href="#" class="tab-item" onclick="showModal('treasure')">
+            <div class="tab-icon">🏴‍☠️</div>
             <div>Treasure</div>
         </a>
-        <a href="#" class="nav-item">
-            <div class="nav-icon">🔔</div>
+        <a href="#" class="tab-item">
+            <div class="tab-icon">🔔</div>
             <div>Alerts</div>
         </a>
     </div>
 
     <!-- Challenge Modal -->
     <div id="challengeModal" class="modal">
-        <div class="modal-content">
-            <div class="modal-header">Create New Challenge</div>
-            <div class="modal-body">
+        <div class="modal-sheet">
+            <div class="modal-header">
+                <div class="modal-handle"></div>
+                <div class="modal-title">Create Challenge</div>
+                <button class="modal-close" onclick="hideModal('challenge')">Done</button>
+            </div>
+            <div class="modal-content">
                 <div class="form-group">
                     <label class="form-label">Target Friend</label>
                     <select class="form-control" id="targetFriend">
@@ -849,50 +904,77 @@
                 </div>
                 <div class="form-group">
                     <label class="form-label">Challenge Description</label>
-                    <textarea class="form-control" id="challengeText" rows="3" placeholder="Describe the challenge..."></textarea>
+                    <textarea class="form-control" id="challengeText" rows="4" placeholder="Describe the challenge..."></textarea>
                 </div>
-                <button class="btn-primary" onclick="createChallenge()">Create Challenge</button>
-                <button class="btn-secondary" onclick="hideModal('challenge')">Cancel</button>
+                <button class="ios-button" onclick="createChallenge()" style="width: 100%; margin-bottom: 12px;">
+                    Create Challenge
+                </button>
+                <button class="ios-button secondary" onclick="hideModal('challenge')" style="width: 100%;">
+                    Cancel
+                </button>
             </div>
         </div>
     </div>
 
     <!-- Treasure Modal -->
     <div id="treasureModal" class="modal">
-        <div class="modal-content">
-            <div class="modal-header">🏴‍☠️ Treasure Hunts</div>
-            <div class="modal-body">
-                <div style="padding: 16px; background: #f8f9fa; border-radius: 8px; margin-bottom: 16px;">
-                    <h4>🏆 Golden Trophy Hunt</h4>
-                    <p><strong>Location:</strong> KLCC Area</p>
-                    <p><strong>Reward:</strong> 2000 points</p>
-                    <p><em>"Near the twin towers, where coffee flows and businessmen meet..."</em></p>
-                    <button class="btn-primary" onclick="startTreasureHunt('Golden Trophy')">Start Hunt</button>
+        <div class="modal-sheet">
+            <div class="modal-header">
+                <div class="modal-handle"></div>
+                <div class="modal-title">🏴‍☠️ Treasure Hunts</div>
+                <button class="modal-close" onclick="hideModal('treasure')">Done</button>
+            </div>
+            <div class="modal-content">
+                <div class="card" style="margin: 0 0 16px 0;">
+                    <div class="card-content">
+                        <h3 style="font-size: 17px; font-weight: 600; margin-bottom: 8px;">🏆 Golden Trophy Hunt</h3>
+                        <p style="font-size: 15px; color: #8E8E93; margin-bottom: 8px;"><strong>Location:</strong> KLCC Area</p>
+                        <p style="font-size: 15px; color: #8E8E93; margin-bottom: 12px;"><strong>Reward:</strong> 2000 points</p>
+                        <p style="font-size: 15px; font-style: italic; margin-bottom: 16px;">"Near the twin towers, where coffee flows and businessmen meet..."</p>
+                        <button class="ios-button" onclick="startTreasureHunt('Golden Trophy')" style="width: 100%;">
+                            Start Hunt
+                        </button>
+                    </div>
                 </div>
-                <div style="padding: 16px; background: #f8f9fa; border-radius: 8px; margin-bottom: 16px;">
-                    <h4>🧧 Lucky Red Packet</h4>
-                    <p><strong>Location:</strong> Petaling Street</p>
-                    <p><strong>Reward:</strong> 500 points</p>
-                    <p><em>"Where dragons dance and dumplings steam..."</em></p>
-                    <button class="btn-primary" onclick="startTreasureHunt('Red Packet')">Start Hunt</button>
+                <div class="card" style="margin: 0;">
+                    <div class="card-content">
+                        <h3 style="font-size: 17px; font-weight: 600; margin-bottom: 8px;">🧧 Lucky Red Packet</h3>
+                        <p style="font-size: 15px; color: #8E8E93; margin-bottom: 8px;"><strong>Location:</strong> Petaling Street</p>
+                        <p style="font-size: 15px; color: #8E8E93; margin-bottom: 12px;"><strong>Reward:</strong> 500 points</p>
+                        <p style="font-size: 15px; font-style: italic; margin-bottom: 16px;">"Where dragons dance and dumplings steam..."</p>
+                        <button class="ios-button" onclick="startTreasureHunt('Red Packet')" style="width: 100%;">
+                            Start Hunt
+                        </button>
+                    </div>
                 </div>
-                <button class="btn-secondary" onclick="hideModal('treasure')">Close</button>
             </div>
         </div>
     </div>
 
     <!-- Compounds Modal -->
     <div id="compoundsModal" class="modal">
-        <div class="modal-content">
-            <div class="modal-header">🎯 Your Active Compounds</div>
-            <div class="modal-body">
-                <div style="padding: 16px; background: #fff3cd; border-radius: 8px; margin-bottom: 16px; border-left: 4px solid #ffc107;">
-                    <h4>Ahmad Rahman challenges you</h4>
-                    <p>"Ask 3 strangers for their phone number and record video proof"</p>
-                    <p><strong>Reward:</strong> +500 points | <strong>Deadline:</strong> 2 hours</p>
-                    <button class="btn-primary" onclick="completeFromModal(1, 500)">✅ Complete Challenge</button>
+        <div class="modal-sheet">
+            <div class="modal-header">
+                <div class="modal-handle"></div>
+                <div class="modal-title">🎯 Your Compounds</div>
+                <button class="modal-close" onclick="hideModal('compounds')">Done</button>
+            </div>
+            <div class="modal-content">
+                <div class="card" style="margin: 0 0 16px 0; border-left: 4px solid #FF3B30;">
+                    <div class="card-content">
+                        <h3 style="font-size: 17px; font-weight: 600; margin-bottom: 8px;">Ahmad Rahman challenges you</h3>
+                        <p style="font-size: 15px; margin-bottom: 12px; font-style: italic;">"Ask 3 strangers for their phone number and record video proof"</p>
+                        <p style="font-size: 15px; color: #8E8E93; margin-bottom: 16px;"><strong>Reward:</strong> +500 points | <strong>Deadline:</strong> 2 hours</p>
+                        <div style="display: flex; gap: 12px;">
+                            <button class="ios-button" onclick="completeFromModal(1, 500)" style="flex: 1;">
+                                ✅ Complete
+                            </button>
+                            <button class="ios-button danger" onclick="forfeitFromModal(1, 500)" style="flex: 1;">
+                                ❌ Forfeit
+                            </button>
+                        </div>
+                    </div>
                 </div>
-                <button class="btn-secondary" onclick="hideModal('compounds')">Close</button>
             </div>
         </div>
     </div>
@@ -907,13 +989,13 @@
         let completedChallenges = [];
 
         function updatePointsDisplay() {
-            document.getElementById('userPoints').textContent = userPoints.toLocaleString() + ' pts';
+            document.getElementById('userPoints').textContent = userPoints.toLocaleString();
         }
 
         function showModal(type) {
             const modals = {
                 'challenge': 'challengeModal',
-                'treasure': 'treasureModal', 
+                'treasure': 'treasureModal',
                 'compounds': 'compoundsModal'
             };
             if (modals[type]) {
@@ -925,10 +1007,11 @@
             const modals = {
                 'challenge': 'challengeModal',
                 'treasure': 'treasureModal',
-                'compounds': 'compoundsModal' 
+                'compounds': 'compoundsModal'
             };
             if (modals[type]) {
-                document.getElementById(modals[type]).classList.remove('show');
+                const modal = document.getElementById(modals[type]);
+                modal.classList.remove('show');
             }
         }
 
@@ -942,34 +1025,50 @@
             }, 3000);
         }
 
+        function addHapticFeedback(element) {
+            element.classList.add('haptic-feedback');
+            setTimeout(() => {
+                element.classList.remove('haptic-feedback');
+            }, 100);
+        }
+
         function completeChallenge(id, points) {
             if (completedChallenges.includes(id)) return;
+            
+            const button = event.target;
+            addHapticFeedback(button);
             
             userPoints += points;
             completedChallenges.push(id);
             updatePointsDisplay();
             
-            // Hide the post
-            event.target.closest('.post-card').style.opacity = '0.5';
-            event.target.closest('.post-card').style.pointerEvents = 'none';
+            // Hide the challenge post
+            const post = button.closest('.challenge-post');
+            post.style.opacity = '0.5';
+            post.style.pointerEvents = 'none';
             
+            // iOS-style haptic feedback
             if (navigator.vibrate) {
                 navigator.vibrate([100, 50, 100]);
             }
             
-            showToast(`🎉 Challenge completed! +${points} points!`);
+            showToast(`🎉 Challenge completed! +${points} points`);
         }
 
         function forfeitChallenge(id, points) {
             if (completedChallenges.includes(id)) return;
             
+            const button = event.target;
+            addHapticFeedback(button);
+            
             userPoints -= points;
             completedChallenges.push(id);
             updatePointsDisplay();
             
-            // Hide the post
-            event.target.closest('.post-card').style.opacity = '0.5';
-            event.target.closest('.post-card').style.pointerEvents = 'none';
+            // Hide the challenge post
+            const post = button.closest('.challenge-post');
+            post.style.opacity = '0.5';
+            post.style.pointerEvents = 'none';
             
             showToast(`❌ Challenge forfeited! -${points} points`);
         }
@@ -979,13 +1078,18 @@
             hideModal('compounds');
         }
 
+        function forfeitFromModal(id, points) {
+            forfeitChallenge(id, points);
+            hideModal('compounds');
+        }
+
         function createChallenge() {
             const friend = document.getElementById('targetFriend').value;
             const points = document.getElementById('challengePoints').value;
             const text = document.getElementById('challengeText').value;
             
             if (!friend || !text) {
-                showToast('❗ Please fill all fields!');
+                showToast('❗ Please fill all fields');
                 return;
             }
             
@@ -1014,6 +1118,13 @@
 
         // Initialize
         updatePointsDisplay();
+
+        // iOS-style smooth scrolling
+        document.addEventListener('scroll', function() {
+            requestAnimationFrame(() => {
+                // Smooth scrolling handled by CSS
+            });
+        });
     </script>
 </body>
 </html>
