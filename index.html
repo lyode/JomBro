@@ -233,14 +233,14 @@
             gap: 16px;
         }
 
-        /* Ultra Round Floating Buttons */
+        /* Enhanced Round Floating Buttons with Blue Borders and White Shadows */
         .round-btn {
             width: 40px;
             height: 40px;
             background: rgba(0, 0, 0, 0.7);
             backdrop-filter: blur(15px);
             -webkit-backdrop-filter: blur(15px);
-            border: 1px solid rgba(255, 255, 255, 0.15);
+            border: 2px solid rgba(64, 93, 230, 0.8);
             border-radius: 20px;
             display: flex;
             align-items: center;
@@ -254,10 +254,23 @@
                 2px 2px 4px rgba(0, 0, 0, 0.9);
             box-shadow: 
                 0 8px 16px rgba(0, 0, 0, 0.4),
-                inset 0 1px 0 rgba(255, 255, 255, 0.08);
+                inset 0 1px 0 rgba(255, 255, 255, 0.3),
+                0 0 15px rgba(255, 255, 255, 0.2),
+                0 4px 8px rgba(255, 255, 255, 0.1);
             position: relative;
             transform-style: preserve-3d;
-            animation: buttonFloat 10s ease-in-out infinite;
+            animation: buttonFloatUp 10s ease-in-out infinite, buttonBlink 3s ease-in-out infinite;
+        }
+
+        .round-btn:hover {
+            transform: translateY(-12px) translateZ(25px) scale(1.1);
+            background: rgba(0, 0, 0, 0.8);
+            border-color: rgba(64, 93, 230, 1);
+            box-shadow: 
+                0 20px 32px rgba(0, 0, 0, 0.5),
+                0 0 30px rgba(64, 93, 230, 0.4),
+                inset 0 1px 0 rgba(255, 255, 255, 0.4),
+                0 0 25px rgba(255, 255, 255, 0.3);
         }
 
         .round-btn::before {
@@ -441,26 +454,34 @@
                 1px 1px 2px rgba(0, 0, 0, 0.8);
         }
 
-        /* Main Feed */
+        /* Main Feed - Page Flip Effect */
         .dark-feed {
             position: fixed;
             top: calc(206px + env(safe-area-inset-top, 0));
             left: 0;
             right: 0;
             bottom: calc(80px + env(safe-area-inset-bottom, 0));
-            overflow-y: auto;
-            scroll-snap-type: y mandatory;
-            -webkit-overflow-scrolling: touch;
+            overflow: hidden;
             z-index: 100;
             padding: 0 16px;
+            perspective: 1000px;
         }
 
-        /* Floating Challenge Cards */
-        .challenge-card {
-            width: 100%;
-            min-height: calc(100vh - 286px - env(safe-area-inset-top, 0) - env(safe-area-inset-bottom, 0));
-            scroll-snap-align: start;
+        .feed-pages {
             position: relative;
+            width: 100%;
+            height: 100%;
+            transform-style: preserve-3d;
+        }
+
+        /* Static Challenge Cards - No Twisting */
+        .challenge-card {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            width: calc(100% - 32px);
+            height: 100%;
             display: flex;
             flex-direction: column;
             justify-content: flex-end;
@@ -469,14 +490,30 @@
             -webkit-backdrop-filter: blur(10px);
             border: 1px solid rgba(255, 255, 255, 0.1);
             border-radius: 24px;
-            margin-bottom: 20px;
             overflow: hidden;
             box-shadow: 
                 0 20px 40px rgba(0, 0, 0, 0.6),
                 inset 0 1px 0 rgba(255, 255, 255, 0.1),
                 0 0 60px rgba(0, 255, 150, 0.08);
-            animation: cardFloat 18s ease-in-out infinite;
+            animation: cardFloatUp 18s ease-in-out infinite;
             transform-style: preserve-3d;
+            transform-origin: bottom center;
+            transition: transform 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        }
+
+        .challenge-card.current {
+            transform: translateZ(0px) rotateX(0deg);
+            z-index: 10;
+        }
+
+        .challenge-card.next {
+            transform: translateZ(-100px) rotateX(-90deg);
+            z-index: 5;
+        }
+
+        .challenge-card.prev {
+            transform: translateZ(-100px) rotateX(90deg);
+            z-index: 5;
         }
 
         .challenge-card::before {
@@ -527,13 +564,14 @@
             z-index: 200;
         }
 
+        /* Enhanced Floating Side Actions with Blue Borders and White Shadows */
         .action-btn {
             width: 52px;
             height: 52px;
             background: rgba(0, 0, 0, 0.7);
             backdrop-filter: blur(20px);
             -webkit-backdrop-filter: blur(20px);
-            border: 1px solid rgba(255, 255, 255, 0.2);
+            border: 2px solid rgba(0, 191, 255, 0.8);
             border-radius: 26px;
             display: flex;
             align-items: center;
@@ -547,10 +585,23 @@
                 1px 1px 2px rgba(0, 0, 0, 0.8);
             box-shadow: 
                 0 10px 20px rgba(0, 0, 0, 0.4),
-                inset 0 1px 0 rgba(255, 255, 255, 0.1);
-            animation: actionFloat 12s ease-in-out infinite;
+                inset 0 1px 0 rgba(255, 255, 255, 0.3),
+                0 0 20px rgba(255, 255, 255, 0.2),
+                0 6px 12px rgba(255, 255, 255, 0.1);
+            animation: actionFloatUp 12s ease-in-out infinite, actionBlink 4s ease-in-out infinite;
             transform-style: preserve-3d;
             position: relative;
+        }
+
+        .action-btn:hover {
+            transform: translateY(-15px) translateZ(30px) scale(1.1);
+            background: rgba(0, 0, 0, 0.8);
+            border-color: rgba(0, 191, 255, 1);
+            box-shadow: 
+                0 25px 40px rgba(0, 0, 0, 0.5),
+                0 0 40px rgba(0, 191, 255, 0.4),
+                inset 0 1px 0 rgba(255, 255, 255, 0.4),
+                0 0 30px rgba(255, 255, 255, 0.3);
         }
 
         .action-btn::before {
@@ -1154,6 +1205,7 @@
             }
         }
 
+        /* Enhanced Floating Animations */
         @keyframes headerFloat {
             0%, 100% { transform: translateY(0px) translateZ(0px); }
             50% { transform: translateY(-5px) translateZ(8px); }
@@ -1174,26 +1226,6 @@
             50% { transform: scale(1.03) translateY(-2px); }
         }
 
-        @keyframes buttonFloat {
-            0%, 100% { transform: translateY(0px) translateZ(0px); }
-            50% { transform: translateY(-4px) translateZ(4px); }
-        }
-
-        @keyframes actionFloat {
-            0%, 100% { transform: translateY(0px) translateZ(0px); }
-            50% { transform: translateY(-6px) translateZ(6px); }
-        }
-
-        @keyframes navItemFloat {
-            0%, 100% { transform: translateY(0px) translateZ(0px); }
-            50% { transform: translateY(-3px) translateZ(3px); }
-        }
-
-        @keyframes cardFloat {
-            0%, 100% { transform: translateY(0px) translateZ(0px); }
-            50% { transform: translateY(-8px) translateZ(8px); }
-        }
-
         @keyframes storyFloat {
             0%, 100% { transform: translateY(0px) translateZ(0px); }
             50% { transform: translateY(-4px) translateZ(4px); }
@@ -1207,6 +1239,107 @@
         @keyframes rewardFloat {
             0%, 100% { transform: translateY(0px) scale(1); }
             50% { transform: translateY(-4px) scale(1.03); }
+        }
+
+        @keyframes navItemFloat {
+            0%, 100% { transform: translateY(0px) translateZ(0px); }
+            50% { transform: translateY(-3px) translateZ(3px); }
+        }
+
+        @keyframes buttonFloatUp {
+            0%, 100% { transform: translateY(0px) translateZ(0px); }
+            50% { transform: translateY(-6px) translateZ(6px); }
+        }
+
+        @keyframes actionFloatUp {
+            0%, 100% { transform: translateY(0px) translateZ(0px); }
+            50% { transform: translateY(-8px) translateZ(8px); }
+        }
+
+        @keyframes challengeBtnFloatUp {
+            0%, 100% { transform: translateY(0px) translateZ(0px); }
+            50% { transform: translateY(-5px) translateZ(5px); }
+        }
+
+        @keyframes cardFloatUp {
+            0%, 100% { transform: translateY(0px) translateZ(0px); }
+            50% { transform: translateY(-10px) translateZ(10px); }
+        }
+
+        /* Blinking Button Animations */
+        @keyframes buttonBlink {
+            0%, 50%, 100% { 
+                border-color: rgba(64, 93, 230, 0.8);
+                box-shadow: 
+                    0 8px 16px rgba(0, 0, 0, 0.4),
+                    inset 0 1px 0 rgba(255, 255, 255, 0.3),
+                    0 0 15px rgba(255, 255, 255, 0.2);
+            }
+            25%, 75% { 
+                border-color: rgba(64, 93, 230, 1);
+                box-shadow: 
+                    0 8px 16px rgba(0, 0, 0, 0.4),
+                    inset 0 1px 0 rgba(255, 255, 255, 0.4),
+                    0 0 25px rgba(255, 255, 255, 0.4),
+                    0 0 15px rgba(64, 93, 230, 0.6);
+            }
+        }
+
+        @keyframes actionBlink {
+            0%, 50%, 100% { 
+                border-color: rgba(0, 191, 255, 0.8);
+                box-shadow: 
+                    0 10px 20px rgba(0, 0, 0, 0.4),
+                    inset 0 1px 0 rgba(255, 255, 255, 0.3),
+                    0 0 20px rgba(255, 255, 255, 0.2);
+            }
+            25%, 75% { 
+                border-color: rgba(0, 191, 255, 1);
+                box-shadow: 
+                    0 10px 20px rgba(0, 0, 0, 0.4),
+                    inset 0 1px 0 rgba(255, 255, 255, 0.4),
+                    0 0 30px rgba(255, 255, 255, 0.4),
+                    0 0 20px rgba(0, 191, 255, 0.6);
+            }
+        }
+
+        @keyframes acceptBlink {
+            0%, 50%, 100% { 
+                border-color: rgba(0, 255, 150, 0.8);
+                box-shadow: 
+                    0 8px 16px rgba(0, 0, 0, 0.3),
+                    0 0 20px rgba(0, 255, 150, 0.15),
+                    inset 0 1px 0 rgba(255, 255, 255, 0.3),
+                    0 0 15px rgba(255, 255, 255, 0.2);
+            }
+            25%, 75% { 
+                border-color: rgba(0, 255, 150, 1);
+                box-shadow: 
+                    0 8px 16px rgba(0, 0, 0, 0.3),
+                    0 0 30px rgba(0, 255, 150, 0.3),
+                    inset 0 1px 0 rgba(255, 255, 255, 0.4),
+                    0 0 25px rgba(255, 255, 255, 0.3),
+                    0 0 15px rgba(0, 255, 150, 0.8);
+            }
+        }
+
+        /* Black Hole Effect Animations */
+        @keyframes blackHoleRotate {
+            0% { transform: translate(-50%, -50%) rotate(0deg); }
+            100% { transform: translate(-50%, -50%) rotate(360deg); }
+        }
+
+        @keyframes blackHolePulse {
+            0%, 100% { 
+                width: 300px; 
+                height: 300px; 
+                opacity: 0.8;
+            }
+            50% { 
+                width: 400px; 
+                height: 400px; 
+                opacity: 0.6;
+            }
         }
 
         @keyframes businessFloat {
@@ -1379,6 +1512,9 @@
     </style>
 </head>
 <body>
+    <!-- Black Hole Background Effect -->
+    <div class="black-hole-effect"></div>
+
     <!-- Dark Overlay -->
     <div class="dark-overlay"></div>
 
@@ -1453,137 +1589,139 @@
             </div>
         </div>
 
-        <!-- Dark Feed -->
+        <!-- Dark Feed with Page Flip -->
         <div class="dark-feed">
-            
-            <!-- Challenge Card 1 -->
-            <div class="challenge-card">
-                <!-- Side Actions -->
-                <div class="side-actions">
-                    <div class="action-btn points-btn">
-                        <div class="points-number" id="userPoints">25.4K</div>
-                        <div class="points-label">PTS</div>
-                    </div>
-                    <div class="action-btn" onclick="likeAction(this)">❤️</div>
-                    <div class="action-btn" onclick="commentAction(this)">💬</div>
-                    <div class="action-btn" onclick="shareAction(this)">📤</div>
-                    <div class="action-btn" onclick="saveAction(this)">🔖</div>
-                </div>
-
-                <!-- Challenge Content -->
-                <div class="challenge-content">
-                    <div class="challenge-user">
-                        <div class="challenge-avatar">
-                            <div class="challenge-avatar-inner">
-                                <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=44&h=44&fit=crop&crop=face" alt="Ahmad">
-                            </div>
+            <div class="feed-pages" id="feedPages">
+                
+                <!-- Challenge Page 1 -->
+                <div class="challenge-card current" data-page="0">
+                    <!-- Side Actions -->
+                    <div class="side-actions">
+                        <div class="action-btn points-btn">
+                            <div class="points-number" id="userPoints">25.4K</div>
+                            <div class="points-label">PTS</div>
                         </div>
-                        <div class="challenge-username">ahmad_rahman ✓</div>
+                        <div class="action-btn" onclick="likeAction(this)">❤️</div>
+                        <div class="action-btn" onclick="commentAction(this)">💬</div>
+                        <div class="action-btn" onclick="shareAction(this)">📤</div>
+                        <div class="action-btn" onclick="saveAction(this)">🔖</div>
                     </div>
-                    
-                    <div class="challenge-text">
-                        "Go to Starbucks and ask the barista to write a poem on your cup! ☕️📝"
-                    </div>
-                    
-                    <div class="challenge-hashtags">
-                        <span class="challenge-hashtag" onclick="hashtagAction(this)">#StarbucksPoetry</span>
-                        <span class="challenge-hashtag" onclick="hashtagAction(this)">#SocialChallenge</span>
-                        <span class="challenge-hashtag" onclick="hashtagAction(this)">#JomBro</span>
-                    </div>
-                    
-                    <div class="challenge-reward">+500 Points</div>
-                    
-                    <div class="challenge-actions">
-                        <button class="challenge-btn btn-accept" onclick="acceptChallenge(1, 500, this)">
-                            ✅ Accept Challenge
-                        </button>
-                        <button class="challenge-btn btn-decline" onclick="declineChallenge(1, this)">
-                            Pass
-                        </button>
-                    </div>
-                </div>
-            </div>
 
-            <!-- Challenge Card 2 - Business -->
-            <div class="challenge-card business-card">
-                <div class="side-actions">
-                    <div class="action-btn" onclick="likeAction(this)">❤️</div>
-                    <div class="action-btn" onclick="commentAction(this)">💬</div>
-                    <div class="action-btn" onclick="shareAction(this)">📤</div>
-                    <div class="action-btn" onclick="saveAction(this)">🔖</div>
-                </div>
-
-                <div class="challenge-content">
-                    <div class="challenge-user">
-                        <div class="challenge-avatar" style="background: linear-gradient(45deg, rgba(255, 193, 7, 0.8), rgba(255, 107, 53, 0.8));">
-                            <div class="challenge-avatar-inner">
-                                🏢
+                    <!-- Challenge Content -->
+                    <div class="challenge-content">
+                        <div class="challenge-user">
+                            <div class="challenge-avatar">
+                                <div class="challenge-avatar-inner">
+                                    <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=44&h=44&fit=crop&crop=face" alt="Ahmad">
+                                </div>
                             </div>
+                            <div class="challenge-username">ahmad_rahman ✓</div>
                         </div>
-                        <div class="challenge-username">Starbucks Malaysia ✓</div>
-                    </div>
-                    
-                    <div class="challenge-text">
-                        "💰 BUSINESS PARTNERSHIP: Complete 5 coffee challenges this week and earn REAL rewards!"
-                    </div>
-                    
-                    <div class="challenge-hashtags">
-                        <span class="challenge-hashtag" onclick="hashtagAction(this)">#StarbucksPartner</span>
-                        <span class="challenge-hashtag" onclick="hashtagAction(this)">#RealRewards</span>
-                        <span class="challenge-hashtag" onclick="hashtagAction(this)">#MoneyChallenge</span>
-                    </div>
-                    
-                    <div class="challenge-reward">+2000 Points + RM50 Voucher</div>
-                    
-                    <div class="challenge-actions">
-                        <button class="challenge-btn btn-accept" onclick="acceptBusinessChallenge(2, 2000, this)">
-                            💰 Join Partnership
-                        </button>
-                        <button class="challenge-btn btn-decline" onclick="declineChallenge(2, this)">
-                            Pass
-                        </button>
+                        
+                        <div class="challenge-text">
+                            "Go to Starbucks and ask the barista to write a poem on your cup! ☕️📝"
+                        </div>
+                        
+                        <div class="challenge-hashtags">
+                            <span class="challenge-hashtag" onclick="hashtagAction(this)">#StarbucksPoetry</span>
+                            <span class="challenge-hashtag" onclick="hashtagAction(this)">#SocialChallenge</span>
+                            <span class="challenge-hashtag" onclick="hashtagAction(this)">#JomBro</span>
+                        </div>
+                        
+                        <div class="challenge-reward">+500 Points</div>
+                        
+                        <div class="challenge-actions">
+                            <button class="challenge-btn btn-accept" onclick="acceptChallenge(1, 500, this)">
+                                ✅ Accept Challenge
+                            </button>
+                            <button class="challenge-btn btn-decline" onclick="declineChallenge(1, this)">
+                                Pass
+                            </button>
+                        </div>
                     </div>
                 </div>
-            </div>
 
-            <!-- Challenge Card 3 -->
-            <div class="challenge-card">
-                <div class="side-actions">
-                    <div class="action-btn" onclick="likeAction(this)">❤️</div>
-                    <div class="action-btn" onclick="commentAction(this)">💬</div>
-                    <div class="action-btn" onclick="shareAction(this)">📤</div>
-                    <div class="action-btn" onclick="saveAction(this)">🔖</div>
-                </div>
+                <!-- Challenge Page 2 - Business -->
+                <div class="challenge-card next" data-page="1">
+                    <div class="side-actions">
+                        <div class="action-btn" onclick="likeAction(this)">❤️</div>
+                        <div class="action-btn" onclick="commentAction(this)">💬</div>
+                        <div class="action-btn" onclick="shareAction(this)">📤</div>
+                        <div class="action-btn" onclick="saveAction(this)">🔖</div>
+                    </div>
 
-                <div class="challenge-content">
-                    <div class="challenge-user">
-                        <div class="challenge-avatar">
-                            <div class="challenge-avatar-inner">
-                                <img src="https://images.unsplash.com/photo-1494790108755-2616b612b786?w=44&h=44&fit=crop&crop=face" alt="Mei Ling">
+                    <div class="challenge-content">
+                        <div class="challenge-user">
+                            <div class="challenge-avatar" style="background: linear-gradient(45deg, rgba(255, 193, 7, 0.8), rgba(255, 107, 53, 0.8));">
+                                <div class="challenge-avatar-inner">
+                                    🏢
+                                </div>
                             </div>
+                            <div class="challenge-username">Starbucks Malaysia ✓</div>
                         </div>
-                        <div class="challenge-username">meilingwong</div>
+                        
+                        <div class="challenge-text">
+                            "💰 BUSINESS PARTNERSHIP: Complete 5 coffee challenges this week and earn REAL rewards!"
+                        </div>
+                        
+                        <div class="challenge-hashtags">
+                            <span class="challenge-hashtag" onclick="hashtagAction(this)">#StarbucksPartner</span>
+                            <span class="challenge-hashtag" onclick="hashtagAction(this)">#RealRewards</span>
+                            <span class="challenge-hashtag" onclick="hashtagAction(this)">#MoneyChallenge</span>
+                        </div>
+                        
+                        <div class="challenge-reward">+2000 Points + RM50 Voucher</div>
+                        
+                        <div class="challenge-actions">
+                            <button class="challenge-btn btn-accept" onclick="acceptBusinessChallenge(2, 2000, this)">
+                                💰 Join Partnership
+                            </button>
+                            <button class="challenge-btn btn-decline" onclick="declineChallenge(2, this)">
+                                Pass
+                            </button>
+                        </div>
                     </div>
-                    
-                    <div class="challenge-text">
-                        "Find someone wearing the same color shirt as you and take a selfie together at KLCC! 🤳✨"
+                </div>
+
+                <!-- Challenge Page 3 -->
+                <div class="challenge-card next" data-page="2">
+                    <div class="side-actions">
+                        <div class="action-btn" onclick="likeAction(this)">❤️</div>
+                        <div class="action-btn" onclick="commentAction(this)">💬</div>
+                        <div class="action-btn" onclick="shareAction(this)">📤</div>
+                        <div class="action-btn" onclick="saveAction(this)">🔖</div>
                     </div>
-                    
-                    <div class="challenge-hashtags">
-                        <span class="challenge-hashtag" onclick="hashtagAction(this)">#KLCC</span>
-                        <span class="challenge-hashtag" onclick="hashtagAction(this)">#TwinningChallenge</span>
-                        <span class="challenge-hashtag" onclick="hashtagAction(this)">#Malaysia</span>
-                    </div>
-                    
-                    <div class="challenge-reward">+800 Points</div>
-                    
-                    <div class="challenge-actions">
-                        <button class="challenge-btn btn-accept" onclick="acceptChallenge(3, 800, this)">
-                            ✅ Accept Challenge
-                        </button>
-                        <button class="challenge-btn btn-decline" onclick="declineChallenge(3, this)">
-                            Pass
-                        </button>
+
+                    <div class="challenge-content">
+                        <div class="challenge-user">
+                            <div class="challenge-avatar">
+                                <div class="challenge-avatar-inner">
+                                    <img src="https://images.unsplash.com/photo-1494790108755-2616b612b786?w=44&h=44&fit=crop&crop=face" alt="Mei Ling">
+                                </div>
+                            </div>
+                            <div class="challenge-username">meilingwong</div>
+                        </div>
+                        
+                        <div class="challenge-text">
+                            "Find someone wearing the same color shirt as you and take a selfie together at KLCC! 🤳✨"
+                        </div>
+                        
+                        <div class="challenge-hashtags">
+                            <span class="challenge-hashtag" onclick="hashtagAction(this)">#KLCC</span>
+                            <span class="challenge-hashtag" onclick="hashtagAction(this)">#TwinningChallenge</span>
+                            <span class="challenge-hashtag" onclick="hashtagAction(this)">#Malaysia</span>
+                        </div>
+                        
+                        <div class="challenge-reward">+800 Points</div>
+                        
+                        <div class="challenge-actions">
+                            <button class="challenge-btn btn-accept" onclick="acceptChallenge(3, 800, this)">
+                                ✅ Accept Challenge
+                            </button>
+                            <button class="challenge-btn btn-decline" onclick="declineChallenge(3, this)">
+                                Pass
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -1674,6 +1812,93 @@
         let userPoints = 25430;
         let completedChallenges = [];
         let businessPartnerships = [];
+        let currentPage = 0;
+        let totalPages = 3;
+        let isFlipping = false;
+
+        // Page Flip System
+        function flipToPage(targetPage) {
+            if (isFlipping || targetPage < 0 || targetPage >= totalPages) return;
+            
+            isFlipping = true;
+            const cards = document.querySelectorAll('.challenge-card');
+            
+            // Update page classes
+            cards.forEach((card, index) => {
+                card.classList.remove('current', 'next', 'prev');
+                
+                if (index === targetPage) {
+                    card.classList.add('current');
+                } else if (index > targetPage) {
+                    card.classList.add('next');
+                } else {
+                    card.classList.add('prev');
+                }
+            });
+            
+            currentPage = targetPage;
+            
+            // Reset flipping flag after animation
+            setTimeout(() => {
+                isFlipping = false;
+            }, 800);
+        }
+
+        function nextPage() {
+            if (currentPage < totalPages - 1) {
+                flipToPage(currentPage + 1);
+                showToast(`📄 Flipped to page ${currentPage + 1}!`);
+            }
+        }
+
+        function prevPage() {
+            if (currentPage > 0) {
+                flipToPage(currentPage - 1);
+                showToast(`📄 Flipped back to page ${currentPage + 1}!`);
+            }
+        }
+
+        // Touch/Swipe Detection for Page Flipping
+        let startY = 0;
+        let endY = 0;
+        let minSwipeDistance = 50;
+
+        function setupPageFlipGestures() {
+            const feedContainer = document.getElementById('feedPages');
+            
+            feedContainer.addEventListener('touchstart', function(e) {
+                startY = e.touches[0].clientY;
+            }, { passive: true });
+            
+            feedContainer.addEventListener('touchend', function(e) {
+                endY = e.changedTouches[0].clientY;
+                handleSwipe();
+            }, { passive: true });
+            
+            // Mouse events for desktop
+            feedContainer.addEventListener('mousedown', function(e) {
+                startY = e.clientY;
+            });
+            
+            feedContainer.addEventListener('mouseup', function(e) {
+                endY = e.clientY;
+                handleSwipe();
+            });
+        }
+
+        function handleSwipe() {
+            const deltaY = startY - endY;
+            
+            if (Math.abs(deltaY) > minSwipeDistance) {
+                if (deltaY > 0) {
+                    // Swiped up - next page
+                    nextPage();
+                } else {
+                    // Swiped down - previous page
+                    prevPage();
+                }
+            }
+        }
 
         // Create Light Lines
         function createLightLines() {
@@ -2030,14 +2255,15 @@
         updatePointsDisplay();
         createLightLines();
         createFloatingParticles();
+        setupPageFlipGestures();
         
         setTimeout(() => {
-            showToast('🌟 Welcome to JomBro Dark Floating Interface! Experience the elegant darkness with light effects!');
+            showToast('🌟 Welcome to JomBro! Swipe up/down to flip pages with black hole effects and blinking buttons!');
         }, 2000);
 
         setInterval(() => {
             if (Math.random() > 0.85) {
-                showToast('✨ Dark floating effects refreshed with light backglow!');
+                showToast('✨ Black hole effects and floating buttons refreshed!');
             }
         }, 18000);
     </script>
