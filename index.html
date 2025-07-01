@@ -877,7 +877,342 @@
             border: none;
         }
 
-        /* Enhanced Modal System - Translucent Dark Mode */
+        /* Glow-in-the-Dark Teen Skin Overlay */
+        .teen-skin-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.4);
+            backdrop-filter: blur(5px);
+            -webkit-backdrop-filter: blur(5px);
+            z-index: 1500;
+            display: none;
+            pointer-events: none;
+        }
+
+        .teen-skin-overlay.active {
+            display: block;
+            animation: skinActivate 1s ease;
+            pointer-events: auto;
+        }
+
+        /* Glowing UI Elements */
+        .glow-element {
+            transition: all 0.3s ease;
+            filter: drop-shadow(0 0 8px currentColor);
+        }
+
+        .glow-element:hover {
+            transform: scale(1.05);
+            filter: drop-shadow(0 0 15px currentColor) brightness(1.2);
+        }
+
+        .glow-element:active {
+            transform: scale(1.15);
+            filter: drop-shadow(0 0 25px currentColor) brightness(1.5);
+            animation: glowPulse 0.3s ease;
+        }
+
+        /* Glow Buttons */
+        .glow-btn {
+            background: rgba(0, 255, 150, 0.1);
+            border: 2px solid rgba(0, 255, 150, 0.3);
+            color: #00FF96;
+            text-shadow: 0 0 10px #00FF96;
+            box-shadow: 
+                0 0 20px rgba(0, 255, 150, 0.2),
+                inset 0 0 20px rgba(0, 255, 150, 0.1);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-radius: 15px;
+            padding: 12px 20px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .glow-btn::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(45deg, transparent, rgba(0, 255, 150, 0.1), transparent);
+            transform: rotate(45deg);
+            transition: all 0.5s ease;
+            opacity: 0;
+        }
+
+        .glow-btn:hover {
+            transform: scale(1.05);
+            border-color: rgba(0, 255, 150, 0.6);
+            box-shadow: 
+                0 0 30px rgba(0, 255, 150, 0.4),
+                inset 0 0 30px rgba(0, 255, 150, 0.2);
+        }
+
+        .glow-btn:hover::before {
+            opacity: 1;
+            transform: rotate(45deg) translate(50%, 50%);
+        }
+
+        .glow-btn:active {
+            transform: scale(1.1);
+            border-color: rgba(0, 255, 150, 0.8);
+            box-shadow: 
+                0 0 40px rgba(0, 255, 150, 0.6),
+                inset 0 0 40px rgba(0, 255, 150, 0.3);
+            animation: glowPulse 0.3s ease;
+        }
+
+        /* Different Glow Colors for Different Themes */
+        .glow-btn.space-glow {
+            border-color: rgba(138, 43, 226, 0.5);
+            color: #8A2BE2;
+            text-shadow: 0 0 10px #8A2BE2;
+            box-shadow: 
+                0 0 20px rgba(138, 43, 226, 0.3),
+                inset 0 0 20px rgba(138, 43, 226, 0.1);
+        }
+
+        .glow-btn.space-glow::before {
+            background: linear-gradient(45deg, transparent, rgba(138, 43, 226, 0.2), transparent);
+        }
+
+        .glow-btn.ocean-glow {
+            border-color: rgba(0, 191, 255, 0.5);
+            color: #00BFFF;
+            text-shadow: 0 0 10px #00BFFF;
+            box-shadow: 
+                0 0 20px rgba(0, 191, 255, 0.3),
+                inset 0 0 20px rgba(0, 191, 255, 0.1);
+        }
+
+        .glow-btn.ocean-glow::before {
+            background: linear-gradient(45deg, transparent, rgba(0, 191, 255, 0.2), transparent);
+        }
+
+        .glow-btn.sunset-glow {
+            border-color: rgba(255, 140, 0, 0.5);
+            color: #FF8C00;
+            text-shadow: 0 0 10px #FF8C00;
+            box-shadow: 
+                0 0 20px rgba(255, 140, 0, 0.3),
+                inset 0 0 20px rgba(255, 140, 0, 0.1);
+        }
+
+        .glow-btn.sunset-glow::before {
+            background: linear-gradient(45deg, transparent, rgba(255, 140, 0, 0.2), transparent);
+        }
+
+        .glow-btn.forest-glow {
+            border-color: rgba(50, 205, 50, 0.5);
+            color: #32CD32;
+            text-shadow: 0 0 10px #32CD32;
+            box-shadow: 
+                0 0 20px rgba(50, 205, 50, 0.3),
+                inset 0 0 20px rgba(50, 205, 50, 0.1);
+        }
+
+        .glow-btn.forest-glow::before {
+            background: linear-gradient(45deg, transparent, rgba(50, 205, 50, 0.2), transparent);
+        }
+
+        /* Glowing Teen Skin Controls */
+        .teen-controls {
+            position: fixed;
+            top: calc(70px + env(safe-area-inset-top, 0));
+            right: 16px;
+            z-index: 1600;
+            display: none;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .teen-controls.active {
+            display: flex;
+        }
+
+        .teen-control-btn {
+            background: rgba(0, 0, 0, 0.3);
+            border: 2px solid rgba(0, 255, 150, 0.4);
+            color: #00FF96;
+            text-shadow: 0 0 8px #00FF96;
+            box-shadow: 
+                0 0 15px rgba(0, 255, 150, 0.3),
+                inset 0 0 15px rgba(0, 255, 150, 0.1);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-radius: 20px;
+            padding: 8px 12px;
+            font-size: 11px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .teen-control-btn::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            background: radial-gradient(circle, rgba(0, 255, 150, 0.5) 0%, transparent 70%);
+            border-radius: 50%;
+            transition: all 0.4s ease;
+            transform: translate(-50%, -50%);
+            z-index: -1;
+        }
+
+        .teen-control-btn:hover {
+            transform: scale(1.08);
+            border-color: rgba(0, 255, 150, 0.6);
+            box-shadow: 
+                0 0 25px rgba(0, 255, 150, 0.5),
+                inset 0 0 25px rgba(0, 255, 150, 0.2);
+        }
+
+        .teen-control-btn:hover::after {
+            width: 100px;
+            height: 100px;
+        }
+
+        .teen-control-btn:active {
+            transform: scale(1.15);
+            border-color: rgba(0, 255, 150, 0.8);
+            box-shadow: 
+                0 0 40px rgba(0, 255, 150, 0.7),
+                inset 0 0 40px rgba(0, 255, 150, 0.3);
+            animation: teenGlowPulse 0.5s ease;
+        }
+
+        /* Teen Skin Modal Style */
+        .teen-modal {
+            background: rgba(0, 0, 0, 0.9);
+            backdrop-filter: blur(30px);
+            -webkit-backdrop-filter: blur(30px);
+            border: 2px solid rgba(0, 255, 150, 0.3);
+            box-shadow: 
+                0 0 50px rgba(0, 255, 150, 0.4),
+                inset 0 0 50px rgba(0, 255, 150, 0.1);
+        }
+
+        .teen-modal .modal-title {
+            color: #00FF96;
+            text-shadow: 0 0 15px #00FF96;
+            text-align: center;
+            margin-bottom: 25px;
+            font-size: 24px;
+            font-weight: 800;
+        }
+
+        .teen-modal .form-label {
+            color: rgba(0, 255, 150, 0.9);
+            text-shadow: 0 0 5px rgba(0, 255, 150, 0.5);
+            font-weight: 600;
+        }
+
+        .teen-modal .form-control {
+            background: rgba(0, 0, 0, 0.5);
+            border: 2px solid rgba(0, 255, 150, 0.3);
+            color: #00FF96;
+            text-shadow: 0 0 5px rgba(0, 255, 150, 0.3);
+            box-shadow: 
+                0 0 10px rgba(0, 255, 150, 0.2),
+                inset 0 0 10px rgba(0, 255, 150, 0.1);
+        }
+
+        .teen-modal .form-control:focus {
+            border-color: rgba(0, 255, 150, 0.6);
+            box-shadow: 
+                0 0 20px rgba(0, 255, 150, 0.4),
+                inset 0 0 20px rgba(0, 255, 150, 0.2);
+        }
+
+        .teen-modal .form-control option {
+            background: rgba(0, 0, 0, 0.9);
+            color: #00FF96;
+        }
+
+        /* Teen Skin Floating Elements */
+        .teen-floating-effects {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1400;
+            display: none;
+        }
+
+        .teen-floating-effects.active {
+            display: block;
+        }
+
+        .teen-particle {
+            position: absolute;
+            width: 3px;
+            height: 3px;
+            background: #00FF96;
+            border-radius: 50%;
+            box-shadow: 0 0 6px #00FF96;
+            animation: teenFloat 8s linear infinite;
+        }
+
+        .teen-particle.purple {
+            background: #8A2BE2;
+            box-shadow: 0 0 6px #8A2BE2;
+        }
+
+        .teen-particle.blue {
+            background: #00BFFF;
+            box-shadow: 0 0 6px #00BFFF;
+        }
+
+        .teen-particle.orange {
+            background: #FF8C00;
+            box-shadow: 0 0 6px #FF8C00;
+        }
+
+        /* Teen Skin Toggle Button */
+        .teen-skin-toggle {
+            position: fixed;
+            bottom: calc(80px + env(safe-area-inset-bottom, 0));
+            left: 20px;
+            background: rgba(0, 0, 0, 0.7);
+            border: 2px solid rgba(0, 255, 150, 0.5);
+            color: #00FF96;
+            text-shadow: 0 0 10px #00FF96;
+            box-shadow: 
+                0 0 20px rgba(0, 255, 150, 0.4),
+                inset 0 0 20px rgba(0, 255, 150, 0.1);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-radius: 25px;
+            padding: 10px 15px;
+            font-size: 12px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            z-index: 1700;
+        }
+
+        .teen-skin-toggle:active {
+            transform: scale(1.1);
+            box-shadow: 
+                0 0 30px rgba(0, 255, 150, 0.6),
+                inset 0 0 30px rgba(0, 255, 150, 0.2);
+            animation: teenGlowPulse 0.3s ease;
+        }
         .modal {
             position: fixed;
             top: 0;
@@ -1065,7 +1400,70 @@
             opacity: 1;
         }
 
-        /* Animations */
+        /* Teen Skin Animations */
+        @keyframes skinActivate {
+            from {
+                opacity: 0;
+                transform: scale(0.95);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        @keyframes glowPulse {
+            0% {
+                box-shadow: 
+                    0 0 20px currentColor,
+                    inset 0 0 20px rgba(255, 255, 255, 0.1);
+            }
+            50% {
+                box-shadow: 
+                    0 0 40px currentColor,
+                    inset 0 0 40px rgba(255, 255, 255, 0.2);
+            }
+            100% {
+                box-shadow: 
+                    0 0 20px currentColor,
+                    inset 0 0 20px rgba(255, 255, 255, 0.1);
+            }
+        }
+
+        @keyframes teenGlowPulse {
+            0% {
+                box-shadow: 
+                    0 0 15px rgba(0, 255, 150, 0.3),
+                    inset 0 0 15px rgba(0, 255, 150, 0.1);
+            }
+            50% {
+                box-shadow: 
+                    0 0 50px rgba(0, 255, 150, 0.8),
+                    inset 0 0 50px rgba(0, 255, 150, 0.4);
+            }
+            100% {
+                box-shadow: 
+                    0 0 15px rgba(0, 255, 150, 0.3),
+                    inset 0 0 15px rgba(0, 255, 150, 0.1);
+            }
+        }
+
+        @keyframes teenFloat {
+            0% {
+                transform: translateY(100vh) translateX(0) rotate(0deg);
+                opacity: 0;
+            }
+            10% {
+                opacity: 1;
+            }
+            90% {
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(-100px) translateX(50px) rotate(360deg);
+                opacity: 0;
+            }
+        }
         @keyframes instagramGradient {
             0%, 100% { background-position: 0% 50%; }
             50% { background-position: 100% 50%; }
@@ -1261,43 +1659,45 @@
 </head>
 <body>
     <!-- Teen Skin Overlay System -->
-    <div class="app-skin-overlay" id="appSkinOverlay"></div>
+    <div class="teen-skin-overlay" id="teenSkinOverlay"></div>
     
-    <!-- Teen Skin Toggle -->
-    <div class="teen-skin-toggle glow-button" onclick="toggleTeenSkinMode()" id="teenSkinToggle">
-        🌌 Skin: Off
-    </div>
+    <!-- Teen Skin Floating Effects -->
+    <div class="teen-floating-effects" id="teenFloatingEffects"></div>
 
-    <!-- Skin Control Panel -->
-    <div class="skin-control-panel" id="skinControlPanel">
-        <div class="skin-btn off active glow-button" onclick="setSkin('off')" data-skin="off"></div>
-        <div class="skin-btn space glow-button" onclick="setSkin('space')" data-skin="space"></div>
-        <div class="skin-btn underwater glow-button" onclick="setSkin('underwater')" data-skin="underwater"></div>
-        <div class="skin-btn sea glow-button" onclick="setSkin('sea')" data-skin="sea"></div>
-    </div>
+    <!-- Teen Skin Toggle Button -->
+    <button class="teen-skin-toggle" onclick="toggleTeenSkin()" id="teenSkinToggle">
+        🌟 GLOW MODE
+    </button>
 
-    <!-- Light Floating Effects -->
+    <!-- Teen Skin Controls -->
+    <div class="teen-controls" id="teenControls">
+        <div class="teen-control-btn" onclick="toggleScreensaver()" id="teenScreensaverBtn">🌙 Dream</div>
+        <div class="teen-control-btn" onclick="toggleFullscreen()" id="teenFullscreenBtn">⛶ Expand</div>
+        <div class="teen-control-btn" onclick="showTeenModal('settings')">⚙️ Vibe</div>
+        <div class="teen-control-btn" onclick="showTeenModal('screensaverEdit')">🎨 Style</div>
+        <div class="teen-control-btn" onclick="cycleTeenTheme()">🌈 Switch</div>
+    </div>
     <div class="light-effects" id="lightEffects"></div>
 
     <!-- Instagram Header -->
     <div class="header">
-        <div class="logo glow-text">JomBro</div>
+        <div class="logo">JomBro</div>
         <div class="header-icons">
-            <div class="header-icon glow-button" onclick="showModal('create')">➕</div>
-            <div class="header-icon glow-button" onclick="showModal('notifications')">
+            <div class="header-icon" onclick="showModal('create')">➕</div>
+            <div class="header-icon" onclick="showModal('notifications')">
                 🔔
                 <div class="notification-badge">3</div>
             </div>
-            <div class="header-icon glow-button" onclick="showModal('messages')">💬</div>
+            <div class="header-icon" onclick="showModal('messages')">💬</div>
         </div>
     </div>
 
     <!-- Light Floating Controls -->
     <div class="light-controls">
-        <div class="light-control-btn glow-button" onclick="toggleScreensaver()" id="screensaverBtn">🌙 Sleep</div>
-        <div class="light-control-btn glow-button" onclick="toggleFullscreen()" id="fullscreenBtn">⛶ Full</div>
-        <div class="light-control-btn settings glow-button" onclick="showModal('settings')">⚙️ Set</div>
-        <div class="light-control-btn edit glow-button" onclick="showModal('screensaverEdit')">🎨 Edit</div>
+        <div class="light-control-btn" onclick="toggleScreensaver()" id="screensaverBtn">🌙 Sleep</div>
+        <div class="light-control-btn" onclick="toggleFullscreen()" id="fullscreenBtn">⛶ Full</div>
+        <div class="light-control-btn settings" onclick="showModal('settings')">⚙️ Set</div>
+        <div class="light-control-btn edit" onclick="showModal('screensaverEdit')">🎨 Edit</div>
     </div>
 
     <!-- Instagram Stories -->
@@ -1376,22 +1776,22 @@
                 
                 <!-- Light TikTok-style Floating Actions -->
                 <div class="floating-actions">
-                    <div class="floating-btn points glow-button">
+                    <div class="floating-btn points">
                         <div class="points-display" id="userPoints">25.4K</div>
                         <div class="points-label">PTS</div>
                     </div>
-                    <div class="floating-btn glow-button" onclick="likePost(this)">❤️</div>
-                    <div class="floating-btn glow-button" onclick="sharePost()">📤</div>
+                    <div class="floating-btn" onclick="likePost(this)">❤️</div>
+                    <div class="floating-btn" onclick="sharePost()">📤</div>
                 </div>
             </div>
             
             <div class="post-actions">
                 <div class="action-group">
-                    <div class="action-icon glow-button" onclick="likePost(this)">❤️</div>
-                    <div class="action-icon glow-button" onclick="showModal('comments')">💬</div>
-                    <div class="action-icon glow-button" onclick="sharePost()">📤</div>
+                    <div class="action-icon" onclick="likePost(this)">❤️</div>
+                    <div class="action-icon" onclick="showModal('comments')">💬</div>
+                    <div class="action-icon" onclick="sharePost()">📤</div>
                 </div>
-                <div class="action-icon glow-button" onclick="savePost()">🔖</div>
+                <div class="action-icon" onclick="savePost()">🔖</div>
             </div>
             
             <div class="post-content">
@@ -1404,10 +1804,10 @@
                     <span class="hashtag">#JomBro</span>
                 </div>
                 <div class="challenge-buttons">
-                    <button class="challenge-btn btn-accept glow-button" onclick="acceptChallenge(1, 500)">
+                    <button class="challenge-btn btn-accept" onclick="acceptChallenge(1, 500)">
                         ✅ Accept Challenge
                     </button>
-                    <button class="challenge-btn btn-decline glow-button" onclick="declineChallenge(1)">
+                    <button class="challenge-btn btn-decline" onclick="declineChallenge(1)">
                         Pass
                     </button>
                 </div>
@@ -1440,18 +1840,18 @@
                 </div>
                 
                 <div class="floating-actions">
-                    <div class="floating-btn glow-button" onclick="likePost(this)">❤️</div>
-                    <div class="floating-btn glow-button" onclick="sharePost()">📤</div>
+                    <div class="floating-btn" onclick="likePost(this)">❤️</div>
+                    <div class="floating-btn" onclick="sharePost()">📤</div>
                 </div>
             </div>
             
             <div class="post-actions">
                 <div class="action-group">
-                    <div class="action-icon glow-button" onclick="likePost(this)">❤️</div>
-                    <div class="action-icon glow-button" onclick="showModal('comments')">💬</div>
-                    <div class="action-icon glow-button" onclick="sharePost()">📤</div>
+                    <div class="action-icon" onclick="likePost(this)">❤️</div>
+                    <div class="action-icon" onclick="showModal('comments')">💬</div>
+                    <div class="action-icon" onclick="sharePost()">📤</div>
                 </div>
-                <div class="action-icon glow-button" onclick="savePost()">🔖</div>
+                <div class="action-icon" onclick="savePost()">🔖</div>
             </div>
             
             <div class="post-content">
@@ -1464,10 +1864,10 @@
                     <span class="hashtag">#Malaysia</span>
                 </div>
                 <div class="challenge-buttons">
-                    <button class="challenge-btn btn-accept glow-button" onclick="acceptChallenge(2, 800)">
+                    <button class="challenge-btn btn-accept" onclick="acceptChallenge(2, 800)">
                         ✅ Accept Challenge
                     </button>
-                    <button class="challenge-btn btn-decline glow-button" onclick="declineChallenge(2)">
+                    <button class="challenge-btn btn-decline" onclick="declineChallenge(2)">
                         Pass
                     </button>
                 </div>
@@ -1488,7 +1888,7 @@
                         <p>3 hours ago</p>
                     </div>
                 </div>
-                <div class="post-menu glow-button">⋯</div>
+                <div class="post-menu">⋯</div>
             </div>
             
             <div class="post-image">
@@ -1500,18 +1900,18 @@
                 </div>
                 
                 <div class="floating-actions">
-                    <div class="floating-btn glow-button" onclick="likePost(this)">❤️</div>
-                    <div class="floating-btn glow-button" onclick="sharePost()">📤</div>
+                    <div class="floating-btn" onclick="likePost(this)">❤️</div>
+                    <div class="floating-btn" onclick="sharePost()">📤</div>
                 </div>
             </div>
             
             <div class="post-actions">
                 <div class="action-group">
-                    <div class="action-icon glow-button" onclick="likePost(this)">❤️</div>
-                    <div class="action-icon glow-button" onclick="showModal('comments')">💬</div>
-                    <div class="action-icon glow-button" onclick="sharePost()">📤</div>
+                    <div class="action-icon" onclick="likePost(this)">❤️</div>
+                    <div class="action-icon" onclick="showModal('comments')">💬</div>
+                    <div class="action-icon" onclick="sharePost()">📤</div>
                 </div>
-                <div class="action-icon glow-button" onclick="savePost()">🔖</div>
+                <div class="action-icon" onclick="savePost()">🔖</div>
             </div>
             
             <div class="post-content">
@@ -1524,10 +1924,10 @@
                     <span class="hashtag">#Professional</span>
                 </div>
                 <div class="challenge-buttons">
-                    <button class="challenge-btn btn-accept glow-button" onclick="acceptChallenge(3, 600)">
+                    <button class="challenge-btn btn-accept" onclick="acceptChallenge(3, 600)">
                         ✅ Accept Challenge
                     </button>
-                    <button class="challenge-btn btn-decline glow-button" onclick="declineChallenge(3)">
+                    <button class="challenge-btn btn-decline" onclick="declineChallenge(3)">
                         Pass
                     </button>
                 </div>
@@ -1548,7 +1948,7 @@
                         <p>Urgent • Outstanding Compounds</p>
                     </div>
                 </div>
-                <div class="post-menu glow-button">⋯</div>
+                <div class="post-menu">⋯</div>
             </div>
             
             <div class="post-content">
@@ -1561,10 +1961,10 @@
                     <span class="hashtag" style="color: #FF3040;">#UrgentAction</span>
                 </div>
                 <div class="challenge-buttons">
-                    <button class="challenge-btn glow-button" style="background: #FF3040; color: white;" onclick="showModal('compounds')">
+                    <button class="challenge-btn" style="background: #FF3040; color: white;" onclick="showModal('compounds')">
                         🔧 Fix Compounds Now
                     </button>
-                    <button class="challenge-btn btn-decline glow-button">
+                    <button class="challenge-btn btn-decline">
                         ⏰ Remind Me Later
                     </button>
                 </div>
@@ -1614,30 +2014,30 @@
 
     <!-- Settings Overlay Controls (shown when in background mode) -->
     <div class="settings-overlay-controls" id="overlayControls">
-        <div class="overlay-control-btn exit glow-button" onclick="exitScreensaverSettings()">✕ Exit Settings</div>
-        <div class="overlay-control-btn theme glow-button" onclick="cycleScreensaverTheme()">🎨 Switch Theme</div>
-        <div class="overlay-control-btn glow-button" onclick="toggleScreensaverEffects()">✨ Toggle Effects</div>
+        <div class="overlay-control-btn exit" onclick="exitScreensaverSettings()">✕ Exit Settings</div>
+        <div class="overlay-control-btn theme" onclick="cycleScreensaverTheme()">🎨 Switch Theme</div>
+        <div class="overlay-control-btn" onclick="toggleScreensaverEffects()">✨ Toggle Effects</div>
     </div>
 
     <!-- Instagram Bottom Navigation -->
     <div class="bottom-nav">
-        <div class="nav-item active glow-button">
+        <div class="nav-item active">
             <div class="nav-icon">🏠</div>
             <div>Home</div>
         </div>
-        <div class="nav-item glow-button" onclick="showModal('search')">
+        <div class="nav-item" onclick="showModal('search')">
             <div class="nav-icon">🔍</div>
             <div>Search</div>
         </div>
-        <div class="nav-item glow-button" onclick="showModal('create')">
+        <div class="nav-item" onclick="showModal('create')">
             <div class="nav-icon">➕</div>
             <div>Create</div>
         </div>
-        <div class="nav-item glow-button" onclick="showModal('activity')">
+        <div class="nav-item" onclick="showModal('activity')">
             <div class="nav-icon">❤️</div>
             <div>Activity</div>
         </div>
-        <div class="nav-item glow-button" onclick="showModal('profile')">
+        <div class="nav-item" onclick="showModal('profile')">
             <div class="nav-icon">👤</div>
             <div>Profile</div>
         </div>
@@ -1707,9 +2107,9 @@
         </div>
     </div>
 
-    <!-- Enhanced Settings Modal -->
+    <!-- Enhanced Settings Modal with Teen Skin Support -->
     <div id="settingsModal" class="modal">
-        <div class="modal-content dark-glass">
+        <div class="modal-content dark-glass" id="settingsModalContent">
             <div class="modal-title">⚙️ App Settings</div>
             
             <div class="form-group">
@@ -1733,6 +2133,15 @@
             </div>
             
             <div class="form-group">
+                <label class="form-label">Teen Skin Mode</label>
+                <select class="form-control" id="teenSkinMode">
+                    <option value="disabled">Disabled</option>
+                    <option value="enabled">Enabled</option>
+                    <option value="auto-screensaver">Auto with Screensaver</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
                 <label class="form-label">Notifications</label>
                 <select class="form-control" id="notifications">
                     <option value="all">All Notifications</option>
@@ -1749,26 +2158,18 @@
                 </select>
             </div>
             
-            <div class="form-group">
-                <label class="form-label">Settings Mode</label>
-                <select class="form-control" id="settingsMode">
-                    <option value="overlay" selected>Translucent Overlay</option>
-                    <option value="standard">Standard Modal</option>
-                </select>
-            </div>
-            
-            <button class="btn-primary" onclick="saveSettings()">
+            <button class="btn-primary glow-btn" onclick="saveSettings()">
                 💾 Save Settings
             </button>
-            <button class="btn-secondary" onclick="hideModal('settings')">
+            <button class="btn-secondary glow-btn" onclick="hideModal('settings')">
                 Cancel
             </button>
         </div>
     </div>
 
-    <!-- Enhanced Screensaver Edit Modal -->
+    <!-- Enhanced Screensaver Edit Modal with Teen Skin Support -->
     <div id="screensaverEditModal" class="modal">
-        <div class="modal-content dark-glass">
+        <div class="modal-content dark-glass" id="screensaverEditModalContent">
             <div class="modal-title">🎨 Customize Screensaver</div>
             
             <div class="form-group">
@@ -1798,6 +2199,16 @@
             </div>
             
             <div class="form-group">
+                <label class="form-label">Teen Skin Glow</label>
+                <select class="form-control" id="teenGlowIntensity">
+                    <option value="subtle">Subtle Glow</option>
+                    <option value="medium" selected>Medium Glow</option>
+                    <option value="intense">Intense Glow</option>
+                    <option value="rainbow">Rainbow Mode</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
                 <label class="form-label">Effect Intensity</label>
                 <select class="form-control" id="effectIntensity">
                     <option value="light">Light</option>
@@ -1822,10 +2233,10 @@
                 </select>
             </div>
             
-            <button class="btn-primary" onclick="applyScreensaverSettings()">
+            <button class="btn-primary glow-btn" onclick="applyScreensaverSettings()">
                 🎨 Apply Changes
             </button>
-            <button class="btn-secondary" onclick="hideModal('screensaverEdit')">
+            <button class="btn-secondary glow-btn" onclick="hideModal('screensaverEdit')">
                 Cancel
             </button>
         </div>
@@ -1854,13 +2265,24 @@
             showStats: true
         };
         
-        // App settings with enhanced features
+        // App settings with teen skin support
         let appSettings = {
             theme: 'light',
             timeout: 30000,
             notifications: 'all',
             haptics: 'enabled',
-            settingsMode: 'overlay'
+            settingsMode: 'overlay',
+            teenSkinMode: 'disabled'
+        };
+
+        // Enhanced screensaver settings with teen skin
+        let screensaverSettings = {
+            theme: 'light-theme',
+            effects: 'none',
+            intensity: 'medium',
+            showClock: true,
+            showStats: true,
+            teenGlowIntensity: 'medium'
         };
         
         let stats = {
@@ -2172,15 +2594,7 @@
             resetIdleTimer();
         }
 
-        // Enhanced Screensaver Functions
-        async function toggleScreensaver() {
-            if (screensaverActive) {
-                exitScreensaver();
-            } else {
-                await activateScreensaver();
-            }
-        }
-
+        // Enhanced Screensaver Functions with Teen Skin
         async function activateScreensaver() {
             try {
                 screensaverActive = true;
@@ -2191,6 +2605,9 @@
                 screensaver.classList.add('active');
                 
                 document.getElementById('screensaverBtn').textContent = '☀️ Wake';
+                if (teenSkinActive) {
+                    document.getElementById('teenScreensaverBtn').textContent = '☀️ Wake';
+                }
                 
                 if ('wakeLock' in navigator) {
                     wakeLock = await navigator.wakeLock.request('screen');
@@ -2204,6 +2621,11 @@
                 document.getElementById('screensaverClock').style.display = screensaverSettings.showClock ? 'block' : 'none';
                 document.querySelector('.screensaver-stats').style.display = screensaverSettings.showStats ? 'grid' : 'none';
                 
+                // Auto-activate teen skin if enabled
+                if (appSettings.teenSkinMode === 'auto-screensaver' && !teenSkinActive) {
+                    activateTeenSkin();
+                }
+                
                 showToast('🌙 Enhanced screensaver activated');
                 
             } catch (err) {
@@ -2216,6 +2638,9 @@
             screensaverActive = false;
             document.getElementById('screensaverMode').classList.remove('active');
             document.getElementById('screensaverBtn').textContent = '🌙 Sleep';
+            if (teenSkinActive) {
+                document.getElementById('teenScreensaverBtn').textContent = '🌙 Dream';
+            }
             
             // Clear effects
             document.getElementById('screensaverEffects').innerHTML = '';
@@ -2227,6 +2652,76 @@
             
             resetIdleTimer();
             showToast('☀️ Welcome back to JomBro!');
+        }
+
+        // Enhanced save settings with teen skin
+        function saveSettings() {
+            // Get teen skin settings
+            appSettings.teenSkinMode = document.getElementById('teenSkinMode').value;
+            
+            // Save all settings to localStorage
+            localStorage.setItem('jombroAppSettings', JSON.stringify(appSettings));
+            localStorage.setItem('jombroTeenSkinSettings', JSON.stringify(teenSkinSettings));
+            
+            hideModal('settings');
+            showToast('💾 Settings saved successfully!');
+        }
+
+        function applyScreensaverSettings() {
+            const theme = document.getElementById('screensaverTheme').value;
+            const effects = document.getElementById('backgroundEffects').value;
+            const intensity = document.getElementById('effectIntensity').value;
+            const showClock = document.getElementById('showClock').value === 'true';
+            const showStats = document.getElementById('showStats').value === 'true';
+            const teenGlowIntensity = document.getElementById('teenGlowIntensity').value;
+            
+            screensaverSettings = {
+                theme, effects, intensity, showClock, showStats, teenGlowIntensity
+            };
+            
+            // Apply settings
+            applyScreensaverTheme();
+            
+            if (screensaverActive) {
+                createScreensaverEffects();
+                
+                // Show/hide clock and stats
+                document.getElementById('screensaverClock').style.display = showClock ? 'block' : 'none';
+                document.querySelector('.screensaver-stats').style.display = showStats ? 'grid' : 'none';
+            }
+            
+            // Update teen skin colors if active
+            if (teenSkinActive) {
+                updateTeenGlowColors();
+                document.getElementById('teenFloatingEffects').innerHTML = '';
+                createTeenFloatingParticles();
+            }
+            
+            // Save settings
+            localStorage.setItem('jombroScreensaverSettings', JSON.stringify(screensaverSettings));
+            
+            hideModal('screensaverEdit');
+            showToast('🎨 Screensaver customized successfully!');
+        }
+
+        // Enhanced load settings with teen skin
+        function loadSettings() {
+            const savedAppSettings = localStorage.getItem('jombroAppSettings');
+            const savedScreensaverSettings = localStorage.getItem('jombroScreensaverSettings');
+            const savedTeenSkinSettings = localStorage.getItem('jombroTeenSkinSettings');
+            
+            if (savedAppSettings) {
+                appSettings = { ...appSettings, ...JSON.parse(savedAppSettings) };
+                maxIdleTime = appSettings.timeout === 'never' ? Infinity : parseInt(appSettings.timeout);
+            }
+            
+            if (savedScreensaverSettings) {
+                screensaverSettings = { ...screensaverSettings, ...JSON.parse(savedScreensaverSettings) };
+            }
+            
+            if (savedTeenSkinSettings) {
+                teenSkinSettings = { ...teenSkinSettings, ...JSON.parse(savedTeenSkinSettings) };
+            }
         }
 
         function startScreensaverClock() {
@@ -2277,7 +2772,231 @@
             }
         }
 
-        // Enhanced modal functions with translucent dark mode
+        // Teen Skin System Variables
+        let teenSkinActive = false;
+        let teenSkinSettings = {
+            mode: 'disabled',
+            glowIntensity: 'medium',
+            autoWithScreensaver: false
+        };
+
+        // Teen Skin Control Functions
+        function toggleTeenSkin() {
+            if (teenSkinActive) {
+                deactivateTeenSkin();
+            } else {
+                activateTeenSkin();
+            }
+        }
+
+        function activateTeenSkin() {
+            teenSkinActive = true;
+            
+            // Show teen skin overlay
+            document.getElementById('teenSkinOverlay').classList.add('active');
+            document.getElementById('teenFloatingEffects').classList.add('active');
+            document.getElementById('teenControls').classList.add('active');
+            
+            // Update toggle button
+            document.getElementById('teenSkinToggle').textContent = '✨ EXIT GLOW';
+            document.getElementById('teenSkinToggle').style.borderColor = 'rgba(255, 0, 100, 0.6)';
+            document.getElementById('teenSkinToggle').style.color = '#FF0064';
+            document.getElementById('teenSkinToggle').style.textShadow = '0 0 10px #FF0064';
+            
+            // Hide regular controls
+            document.querySelector('.light-controls').style.display = 'none';
+            
+            // Apply glow to existing elements
+            applyTeenGlowEffects();
+            
+            // Start floating particles
+            createTeenFloatingParticles();
+            
+            // Update button colors based on current theme
+            updateTeenGlowColors();
+            
+            showToast('🌟 Teen Glow Skin Activated!');
+        }
+
+        function deactivateTeenSkin() {
+            teenSkinActive = false;
+            
+            // Hide teen skin overlay
+            document.getElementById('teenSkinOverlay').classList.remove('active');
+            document.getElementById('teenFloatingEffects').classList.remove('active');
+            document.getElementById('teenControls').classList.remove('active');
+            
+            // Update toggle button
+            document.getElementById('teenSkinToggle').textContent = '🌟 GLOW MODE';
+            document.getElementById('teenSkinToggle').style.borderColor = 'rgba(0, 255, 150, 0.5)';
+            document.getElementById('teenSkinToggle').style.color = '#00FF96';
+            document.getElementById('teenSkinToggle').style.textShadow = '0 0 10px #00FF96';
+            
+            // Show regular controls
+            document.querySelector('.light-controls').style.display = 'flex';
+            
+            // Remove glow effects
+            removeTeenGlowEffects();
+            
+            // Clear floating particles
+            document.getElementById('teenFloatingEffects').innerHTML = '';
+            
+            showToast('☀️ Normal Mode Restored');
+        }
+
+        function applyTeenGlowEffects() {
+            // Apply glow to main interface elements
+            const elements = document.querySelectorAll('.action-btn, .challenge-btn, .floating-btn, .nav-item');
+            elements.forEach(el => {
+                el.classList.add('glow-element');
+            });
+        }
+
+        function removeTeenGlowEffects() {
+            // Remove glow from main interface elements
+            const elements = document.querySelectorAll('.glow-element');
+            elements.forEach(el => {
+                el.classList.remove('glow-element');
+            });
+        }
+
+        function updateTeenGlowColors() {
+            const theme = screensaverSettings.theme;
+            const buttons = document.querySelectorAll('.teen-control-btn, .glow-btn');
+            
+            // Remove all theme classes
+            buttons.forEach(btn => {
+                btn.classList.remove('space-glow', 'ocean-glow', 'sunset-glow', 'forest-glow');
+            });
+            
+            // Apply theme-specific glow
+            switch(theme) {
+                case 'space-theme':
+                    buttons.forEach(btn => btn.classList.add('space-glow'));
+                    break;
+                case 'ocean-theme':
+                    buttons.forEach(btn => btn.classList.add('ocean-glow'));
+                    break;
+                case 'sunset-theme':
+                    buttons.forEach(btn => btn.classList.add('sunset-glow'));
+                    break;
+                case 'forest-theme':
+                    buttons.forEach(btn => btn.classList.add('forest-glow'));
+                    break;
+                default:
+                    // Default green glow for light/dark themes
+                    break;
+            }
+        }
+
+        function createTeenFloatingParticles() {
+            const container = document.getElementById('teenFloatingEffects');
+            const theme = screensaverSettings.theme;
+            
+            function addParticle() {
+                if (!teenSkinActive) return;
+                
+                const particle = document.createElement('div');
+                particle.className = 'teen-particle';
+                
+                // Theme-based particle colors
+                switch(theme) {
+                    case 'space-theme':
+                        particle.classList.add('purple');
+                        break;
+                    case 'ocean-theme':
+                        particle.classList.add('blue');
+                        break;
+                    case 'sunset-theme':
+                        particle.classList.add('orange');
+                        break;
+                    default:
+                        // Default green
+                        break;
+                }
+                
+                particle.style.left = Math.random() * 100 + '%';
+                particle.style.animationDuration = (6 + Math.random() * 4) + 's';
+                particle.style.animationDelay = Math.random() * 2 + 's';
+                
+                container.appendChild(particle);
+                
+                setTimeout(() => {
+                    if (container.contains(particle)) {
+                        container.removeChild(particle);
+                    }
+                }, 10000);
+            }
+            
+            // Create initial particles
+            for (let i = 0; i < 20; i++) {
+                setTimeout(addParticle, i * 200);
+            }
+            
+            // Continue creating particles
+            const particleInterval = setInterval(() => {
+                if (teenSkinActive) {
+                    addParticle();
+                } else {
+                    clearInterval(particleInterval);
+                }
+            }, 1000);
+        }
+
+        function showTeenModal(type) {
+            if (teenSkinActive) {
+                const modal = document.getElementById(type + 'Modal');
+                const content = document.getElementById(type + 'ModalContent');
+                
+                // Apply teen skin styling
+                content.classList.add('teen-modal');
+                modal.classList.add('show');
+                
+                // Apply glow to form elements
+                const formElements = content.querySelectorAll('.btn-primary, .btn-secondary');
+                formElements.forEach(el => {
+                    el.classList.add('glow-btn');
+                });
+                
+                updateTeenGlowColors();
+            } else {
+                showModal(type);
+            }
+        }
+
+        function cycleTeenTheme() {
+            const themes = ['light-theme', 'dark-theme', 'space-theme', 'ocean-theme', 'sunset-theme', 'forest-theme'];
+            const currentTheme = screensaverSettings.theme;
+            const currentIndex = themes.indexOf(currentTheme);
+            const nextTheme = themes[(currentIndex + 1) % themes.length];
+            
+            screensaverSettings.theme = nextTheme;
+            
+            if (screensaverActive) {
+                applyScreensaverTheme();
+                createScreensaverEffects();
+            }
+            
+            // Update teen skin colors
+            updateTeenGlowColors();
+            
+            // Recreate particles with new colors
+            if (teenSkinActive) {
+                document.getElementById('teenFloatingEffects').innerHTML = '';
+                createTeenFloatingParticles();
+            }
+            
+            const themeNames = {
+                'light-theme': 'Light ✨',
+                'dark-theme': 'Dark 🌌',
+                'space-theme': 'Space 🚀',
+                'ocean-theme': 'Ocean 🌊',
+                'sunset-theme': 'Sunset 🌅',
+                'forest-theme': 'Forest 🌲'
+            };
+            
+            showToast(`🌈 Theme: ${themeNames[nextTheme]}`);
+        }
         let isSettingsOverlayMode = false;
 
         function showModal(type) {
@@ -2490,215 +3209,11 @@
             });
         });
 
-        // Teen Skin System Variables
-        let teenSkinActive = false;
-        let currentSkin = 'off';
-        let skinParticles = [];
-
-        // Teen Skin Functions
-        function toggleTeenSkinMode() {
-            teenSkinActive = !teenSkinActive;
-            const toggle = document.getElementById('teenSkinToggle');
-            const panel = document.getElementById('skinControlPanel');
-            
-            if (teenSkinActive) {
-                // Activate dark skin mode
-                document.body.classList.add('dark-skin-mode');
-                panel.classList.add('show');
-                toggle.textContent = '🌌 Skin: On';
-                
-                // Apply current skin if not off
-                if (currentSkin !== 'off') {
-                    applySkin(currentSkin);
-                }
-                
-                showToast('🌌 Teen skin mode activated!');
-            } else {
-                // Deactivate skin mode
-                document.body.classList.remove('dark-skin-mode');
-                panel.classList.remove('show');
-                toggle.textContent = '🌌 Skin: Off';
-                
-                // Remove skin overlay
-                const overlay = document.getElementById('appSkinOverlay');
-                overlay.classList.remove('active');
-                overlay.className = 'app-skin-overlay';
-                clearSkinParticles();
-                
-                showToast('☀️ Normal mode restored');
-            }
-        }
-
-        function setSkin(skinType) {
-            currentSkin = skinType;
-            
-            // Update active skin button
-            document.querySelectorAll('.skin-btn').forEach(btn => {
-                btn.classList.remove('active');
-            });
-            document.querySelector(`[data-skin="${skinType}"]`).classList.add('active');
-            
-            if (teenSkinActive) {
-                applySkin(skinType);
-            }
-            
-            const skinNames = {
-                'off': 'None',
-                'space': 'Space',
-                'underwater': 'Underwater',
-                'sea': 'Sea Depths'
-            };
-            
-            showToast(`🎨 Skin: ${skinNames[skinType]}`);
-        }
-
-        function applySkin(skinType) {
-            const overlay = document.getElementById('appSkinOverlay');
-            clearSkinParticles();
-            
-            if (skinType === 'off') {
-                overlay.classList.remove('active');
-                overlay.className = 'app-skin-overlay';
-                return;
-            }
-            
-            // Apply skin overlay
-            overlay.className = `app-skin-overlay ${skinType}-skin active`;
-            
-            // Create skin particles
-            createSkinParticles(skinType);
-        }
-
-        function createSkinParticles(skinType) {
-            const overlay = document.getElementById('appSkinOverlay');
-            const particleCount = 15;
-            
-            for (let i = 0; i < particleCount; i++) {
-                const particle = document.createElement('div');
-                particle.className = 'skin-particle';
-                
-                // Randomize particle properties
-                const size = Math.random() * 8 + 4;
-                particle.style.width = size + 'px';
-                particle.style.height = size + 'px';
-                particle.style.left = Math.random() * 100 + '%';
-                particle.style.top = Math.random() * 100 + '%';
-                particle.style.animationDelay = Math.random() * 8 + 's';
-                particle.style.animationDuration = (6 + Math.random() * 4) + 's';
-                
-                overlay.appendChild(particle);
-                skinParticles.push(particle);
-            }
-        }
-
-        function clearSkinParticles() {
-            skinParticles.forEach(particle => {
-                if (particle.parentNode) {
-                    particle.parentNode.removeChild(particle);
-                }
-            });
-            skinParticles = [];
-        }
-
-        // Enhanced Glow Button System
-        function addRippleEffect(event) {
-            const button = event.currentTarget;
-            const rect = button.getBoundingClientRect();
-            const ripple = document.createElement('span');
-            
-            const size = Math.max(button.offsetWidth, button.offsetHeight);
-            const x = event.clientX - rect.left - size / 2;
-            const y = event.clientY - rect.top - size / 2;
-            
-            ripple.className = 'ripple-effect';
-            ripple.style.width = ripple.style.height = size + 'px';
-            ripple.style.left = x + 'px';
-            ripple.style.top = y + 'px';
-            
-            button.appendChild(ripple);
-            
-            setTimeout(() => {
-                if (ripple.parentNode) {
-                    ripple.parentNode.removeChild(ripple);
-                }
-            }, 600);
-        }
-
-        // Add ripple effect to all glow buttons
-        function initializeGlowButtons() {
-            document.querySelectorAll('.glow-button').forEach(button => {
-                button.addEventListener('touchstart', addRippleEffect);
-                button.addEventListener('mousedown', addRippleEffect);
-            });
-        }
-
-        // Enhanced button interactions with haptic feedback
-        function enhanceButtonFeedback(element) {
-            if (isIOSDevice && navigator.vibrate && appSettings.haptics === 'enabled') {
-                // Different haptic patterns based on button type
-                if (element.classList.contains('floating-btn')) {
-                    navigator.vibrate([50, 10, 50]); // Double pulse
-                } else if (element.classList.contains('action-btn')) {
-                    navigator.vibrate([100, 20, 100, 20, 100]); // Triple pulse
-                } else {
-                    navigator.vibrate([75]); // Single pulse
-                }
-            }
-        }
-
-        // Enhanced accept/decline functions with glow effects
-        function acceptChallenge(id, points) {
-            if (completedChallenges.includes(id)) return;
-            
-            userPoints += points;
-            completedChallenges.push(id);
-            stats.challenges++;
-            updatePointsDisplay();
-            
-            // Enhanced feedback
-            enhanceButtonFeedback(event.target);
-            
-            // Visual feedback
-            const button = event.target;
-            button.closest('.post-card').style.transform = 'scale(0.98)';
-            button.closest('.post-card').style.filter = 'brightness(1.1)';
-            
-            setTimeout(() => {
-                button.closest('.post-card').style.transform = 'scale(1)';
-                button.closest('.post-card').style.filter = 'brightness(1)';
-            }, 200);
-            
-            showToast(`🎉 Challenge accepted! +${points} points!`);
-            resetIdleTimer();
-        }
-
-        function declineChallenge(id) {
-            enhanceButtonFeedback(event.target);
-            showToast('👋 Challenge declined');
-            resetIdleTimer();
-        }
-
-        function likePost(element) {
-            element.classList.toggle('liked');
-            element.style.color = element.classList.contains('liked') ? '#ED4956' : '#262626';
-            
-            enhanceButtonFeedback(element);
-            
-            showToast(element.classList.contains('liked') ? '❤️ Liked!' : '🤍 Unliked');
-        }
-
-        function updatePointsDisplay() {
-            const pointsText = userPoints >= 1000 ? (userPoints/1000).toFixed(1) + 'K' : userPoints.toString();
-            document.getElementById('userPoints').textContent = pointsText;
-            stats.points = userPoints;
-        }
-
-        // Initialize
+        // Enhanced initialization with teen skin support
         loadSettings(); // Load saved settings first
         updatePointsDisplay();
         createLightEffects();
         resetIdleTimer();
-        initializeGlowButtons(); // Initialize glow button system
         
         // Apply loaded theme
         if (appSettings.theme !== 'light') {
@@ -2706,44 +3221,38 @@
             changeAppTheme();
         }
         
+        // Auto-activate teen skin if enabled
+        if (appSettings.teenSkinMode === 'enabled') {
+            activateTeenSkin();
+        }
+        
         // Set up form values from saved settings
         document.getElementById('screensaverTimeout').value = appSettings.timeout;
         document.getElementById('notifications').value = appSettings.notifications;
         document.getElementById('haptics').value = appSettings.haptics;
-        document.getElementById('settingsMode').value = appSettings.settingsMode;
+        document.getElementById('teenSkinMode').value = appSettings.teenSkinMode;
         document.getElementById('screensaverTheme').value = screensaverSettings.theme;
         document.getElementById('backgroundEffects').value = screensaverSettings.effects;
         document.getElementById('effectIntensity').value = screensaverSettings.intensity;
+        document.getElementById('teenGlowIntensity').value = screensaverSettings.teenGlowIntensity;
         document.getElementById('showClock').value = screensaverSettings.showClock.toString();
         document.getElementById('showStats').value = screensaverSettings.showStats.toString();
         
-        // Initialize teen skin system
         setTimeout(() => {
-            const deviceInfo = isIOSDevice ? ' Teen skin system with glow effects ready!' : '';
-            showToast(`🌌 Welcome to JomBro!${deviceInfo}`);
+            const deviceInfo = isIOSDevice ? ' Glow-in-the-Dark Teen Skin available!' : '';
+            showToast(`🌟 Welcome to JomBro!${deviceInfo}`);
         }, 2000);
 
         setInterval(updateScreensaverStats, 10000);
 
-        // Enhanced navigation switching with glow effects
-        document.querySelectorAll('.nav-item').forEach(item => {
-            item.addEventListener('click', function() {
-                document.querySelectorAll('.nav-item').forEach(nav => nav.classList.remove('active'));
-                this.classList.add('active');
-                enhanceButtonFeedback(this);
-                resetIdleTimer();
-            });
-        });
-
-        // Auto-reinitialize glow buttons when DOM changes
-        const observer = new MutationObserver(() => {
-            setTimeout(initializeGlowButtons, 100);
-        });
-
-        observer.observe(document.body, { 
-            childList: true, 
-            subtree: true 
-        });
+        // Enhanced toggle screensaver function
+        async function toggleScreensaver() {
+            if (screensaverActive) {
+                exitScreensaver();
+            } else {
+                await activateScreensaver();
+            }
+        }
     </script>
 </body>
 </html>
