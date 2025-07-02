@@ -72,6 +72,7 @@
             user-select: none;
             -webkit-font-smoothing: antialiased;
             -moz-osx-font-smoothing: grayscale;
+            touch-action: manipulation;
         }
 
         html {
@@ -122,7 +123,7 @@
             background: linear-gradient(to bottom, #228B22 0%, #006400 30%, #004225 70%, #001a0d 100%);
         }
 
-        /* Starfield Background */
+        /* Starfield Background - No Animation */
         .starfield {
             position: fixed;
             top: 0;
@@ -137,7 +138,6 @@
                 radial-gradient(2px 2px at 160px 30px, #ddd, transparent);
             background-repeat: repeat;
             background-size: 200px 100px;
-            animation: starTwinkle 8s linear infinite, starDrift 60s linear infinite;
             z-index: 0;
         }
 
@@ -154,7 +154,7 @@
             z-index: 2;
         }
 
-        /* iPhone 15 Pro Max Main Container */
+        /* Main Container - Full Coverage */
         .main-container {
             position: fixed;
             top: 0;
@@ -166,7 +166,8 @@
             flex-direction: column;
             width: 100vw;
             height: 100vh;
-            height: 100svh;
+            height: 100dvh;
+            overflow: hidden;
         }
 
         /* iPhone 15 Pro Max Header - 99.8% Transparent */
@@ -238,6 +239,7 @@
                 inset 0 1px 0 rgba(255, 255, 255, 0.4),
                 0 0 25px rgba(255, 255, 255, 0.3);
             position: relative;
+            touch-action: manipulation;
         }
 
         .round-btn:hover {
@@ -348,6 +350,7 @@
             min-width: 80px;
             text-align: center;
             cursor: pointer;
+            touch-action: manipulation;
         }
 
         .story-circle {
@@ -404,24 +407,31 @@
                 1px 1px 2px rgba(0, 0, 0, 0.8);
         }
 
-        /* iPhone 15 Pro Max Feed Section */
+        /* iPhone 15 Pro Max Feed Section - Adjusted for new bottom nav */
         .dark-feed {
             position: fixed;
             top: calc(var(--safe-area-top) + 240px);
             left: 0;
             right: 0;
-            bottom: 120px;
+            bottom: calc(80px + env(safe-area-inset-bottom, 34px));
             overflow: hidden;
             z-index: 100;
             padding: 0 20px;
             perspective: 1000px;
         }
 
+        /* iPhone 15 Pro Max Specific Feed */
+        @media screen and (min-width: 428px) and (max-width: 432px) and (min-height: 926px) {
+            .dark-feed {
+                bottom: calc(80px + 34px);
+            }
+        }
+
         /* PWA Mode Feed */
         @media all and (display-mode: standalone) {
             .dark-feed {
                 top: calc(env(safe-area-inset-top, 0px) + 240px);
-                bottom: calc(120px + env(safe-area-inset-bottom, 0px));
+                bottom: calc(80px + env(safe-area-inset-bottom, 34px));
             }
         }
 
@@ -503,6 +513,7 @@
                 inset 0 1px 0 rgba(255, 255, 255, 0.4),
                 0 0 30px rgba(255, 255, 255, 0.3);
             position: relative;
+            touch-action: manipulation;
         }
 
         .points-btn {
@@ -736,6 +747,7 @@
             position: relative;
             overflow: hidden;
             text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.6);
+            touch-action: manipulation;
         }
 
         .btn-accept {
@@ -760,7 +772,7 @@
                 0 0 20px rgba(255, 255, 255, 0.03);
         }
 
-        /* Bottom Navigation - 99.8% Transparent */
+        /* Bottom Navigation - Full Coverage for iPhone 15 Pro Max */
         .dark-nav {
             position: fixed;
             bottom: 0;
@@ -770,24 +782,70 @@
             backdrop-filter: blur(30px);
             -webkit-backdrop-filter: blur(30px);
             border: 1px solid rgba(255, 255, 255, 0.002);
-            border-radius: 28px 28px 0 0;
+            border-bottom: none;
+            border-radius: 0;
             display: flex;
             justify-content: space-around;
-            padding: 20px calc(var(--safe-area-left) + 20px) calc(20px + var(--safe-area-bottom)) calc(var(--safe-area-right) + 20px);
+            padding: 20px 20px calc(env(safe-area-inset-bottom, 34px) + 20px) 20px;
             z-index: 1000;
             width: 100vw;
+            min-height: calc(80px + env(safe-area-inset-bottom, 34px));
             box-shadow: 
                 0 -8px 32px rgba(0, 0, 0, 0.002),
                 inset 0 1px 0 rgba(255, 255, 255, 0.002);
         }
 
-        /* PWA Mode Bottom Navigation */
+        /* Add pseudo-element to ensure full bottom coverage */
+        .dark-nav::after {
+            content: '';
+            position: absolute;
+            bottom: calc(-1 * env(safe-area-inset-bottom, 34px));
+            left: 0;
+            right: 0;
+            height: env(safe-area-inset-bottom, 34px);
+            background: rgba(0, 0, 0, 0.002);
+            z-index: -1;
+        }
+
+        /* Add another layer for complete bottom coverage */
+        .dark-nav::before {
+            content: '';
+            position: absolute;
+            bottom: calc(-1 * env(safe-area-inset-bottom, 34px) - 10px);
+            left: 0;
+            right: 0;
+            height: calc(env(safe-area-inset-bottom, 34px) + 20px);
+            background: radial-gradient(ellipse at center, #0f0f23 0%, #000000 70%);
+            z-index: -2;
+        }
+
+        /* iPhone 15 Pro Max Specific Bottom Nav */
+        @media screen and (min-width: 428px) and (max-width: 432px) and (min-height: 926px) {
+            .dark-nav {
+                padding: 20px 20px calc(34px + 20px) 20px;
+                min-height: calc(80px + 34px);
+            }
+            
+            .dark-nav::after {
+                height: 34px;
+                bottom: -34px;
+            }
+
+            .dark-nav::before {
+                height: 54px;
+                bottom: -44px;
+            }
+        }
+
+        /* PWA Mode Bottom Navigation - Full Coverage */
         @media all and (display-mode: standalone) {
             .dark-nav {
-                padding: 20px 20px calc(20px + env(safe-area-inset-bottom, 0px)) 20px;
+                padding: 20px 20px calc(env(safe-area-inset-bottom, 34px) + 20px) 20px;
                 bottom: 0;
                 border-radius: 0;
                 margin: 0;
+                min-height: calc(80px + env(safe-area-inset-bottom, 34px));
+                background: rgba(0, 0, 0, 0.002);
             }
         }
 
@@ -805,6 +863,7 @@
             background: rgba(255, 255, 255, 0.002);
             backdrop-filter: blur(15px);
             text-shadow: 1px 1px 2px rgba(0, 0, 0, 1);
+            touch-action: manipulation;
         }
 
         .nav-icon {
@@ -948,7 +1007,7 @@
             text-shadow: 1px 1px 2px rgba(0, 0, 0, 1);
         }
 
-        /* Toast - 99.8% Transparent */
+        /* Toast - Instant Response */
         .toast {
             position: fixed;
             top: calc(var(--safe-area-top) + 160px);
@@ -966,13 +1025,17 @@
             z-index: 3000;
             transform: translateY(-100px);
             opacity: 0;
-            transition: all 0.3s ease;
             text-shadow: 
                 0 0 20px rgba(0, 255, 150, 0.8),
                 1px 1px 2px rgba(0, 0, 0, 1);
             box-shadow: 
                 0 8px 16px rgba(0, 0, 0, 0.002),
                 0 0 30px rgba(0, 255, 150, 0.3);
+        }
+
+        .toast.show {
+            transform: translateY(0);
+            opacity: 1;
         }
 
         /* PWA Mode Toast */
@@ -1162,26 +1225,10 @@
             width: 100vw;
         }
 
-        /* Install Button Styling */
+        /* Install Button Styling - No Animation */
         .install-btn {
             background: rgba(0, 255, 150, 0.1) !important;
             border-color: rgba(0, 255, 150, 0.8) !important;
-            animation: installPulse 2s ease-in-out infinite;
-        }
-
-        @keyframes installPulse {
-            0%, 100% { 
-                box-shadow: 
-                    0 8px 16px rgba(0, 0, 0, 0.002),
-                    inset 0 1px 0 rgba(255, 255, 255, 0.4),
-                    0 0 25px rgba(0, 255, 150, 0.3);
-            }
-            50% { 
-                box-shadow: 
-                    0 8px 16px rgba(0, 0, 0, 0.002),
-                    inset 0 1px 0 rgba(255, 255, 255, 0.4),
-                    0 0 35px rgba(0, 255, 150, 0.6);
-            }
         }
 
         /* Landscape Mode Handling */
@@ -1721,22 +1768,15 @@
             }
         }
 
-        // Prevent zoom on double tap
+        // Prevent zoom on double tap - instant response
         let lastTouchEnd = 0;
         document.addEventListener('touchend', function (event) {
-            const now = (new Date()).getTime();
+            const now = Date.now();
             if (now - lastTouchEnd <= 300) {
                 event.preventDefault();
             }
             lastTouchEnd = now;
         }, false);
-
-        // Handle orientation changes
-        window.addEventListener('orientationchange', function() {
-            setTimeout(() => {
-                window.scrollTo(0, 0);
-            }, 100);
-        });
 
         function generateInitialChallenges() {
             challengeData = [];
@@ -1928,9 +1968,8 @@
             currentPage = (currentPage + 1) % challengeData.length;
             updateCurrentChallenge();
             
-            setTimeout(() => {
-                isFlipping = false;
-            }, 800);
+            // Instant response - no delay
+            isFlipping = false;
         }
 
         function previousChallenge() {
@@ -1940,9 +1979,8 @@
             currentPage = currentPage === 0 ? challengeData.length - 1 : currentPage - 1;
             updateCurrentChallenge();
             
-            setTimeout(() => {
-                isFlipping = false;
-            }, 800);
+            // Instant response - no delay
+            isFlipping = false;
         }
 
         function setupSwipeGestures() {
@@ -2082,29 +2120,19 @@
         function createFloatingHeart() {
             const heart = document.createElement('div');
             heart.textContent = '❤️';
-            heart.style.position = 'fixed';
-            heart.style.right = '50px';
-            heart.style.bottom = '200px';
-            heart.style.fontSize = '24px';
-            heart.style.zIndex = '3000';
-            heart.style.pointerEvents = 'none';
-            heart.style.animation = 'heartFloat 2s ease-out forwards';
+            heart.className = 'instant-heart';
 
             document.body.appendChild(heart);
 
+            // Quick cleanup
             setTimeout(() => {
                 heart.remove();
-            }, 2000);
+            }, 1000);
         }
 
-        // Navigation Functions
+        // Navigation Functions - Instant Response
         function navigateAction(element, action) {
-            // Add visual feedback
-            element.style.transform = 'translateY(-8px) scale(1.1)';
-            setTimeout(() => {
-                element.style.transform = '';
-            }, 200);
-
+            // Immediate action - no visual delays
             switch(action) {
                 case 'create':
                     showModal('create');
@@ -2127,6 +2155,7 @@
             // Add active class to clicked item
             element.classList.add('active');
 
+            // Immediate navigation - no delays
             switch(section) {
                 case 'home':
                     // Already on home
@@ -2256,20 +2285,25 @@
             }, 3000);
         }
 
-        // Close modals when clicking outside
+        // Close modals when clicking outside - instant
         document.addEventListener('click', (e) => {
             if (e.target.classList.contains('modal')) {
                 e.target.classList.remove('show');
             }
         });
 
-        // Add CSS for floating heart animation
+        // Add CSS for instant heart display - no animation
         const style = document.createElement('style');
         style.textContent = `
-            @keyframes heartFloat {
-                0% { transform: translateX(-50%) translateY(0) scale(1); opacity: 1; }
-                50% { transform: translateX(-50%) translateY(-20px) scale(1.2); opacity: 0.8; }
-                100% { transform: translateX(-50%) translateY(-40px) scale(0.8); opacity: 0; }
+            .instant-heart {
+                position: fixed;
+                right: 50px;
+                bottom: 200px;
+                font-size: 24px;
+                z-index: 3000;
+                pointer-events: none;
+                opacity: 1;
+                color: #FF1493;
             }
         `;
         document.head.appendChild(style);
