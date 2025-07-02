@@ -1538,6 +1538,129 @@
             color: #FF1493;
         }
 
+        /* Rating Stars */
+        .rating-stars {
+            display: flex;
+            gap: 8px;
+            margin: 10px 0;
+        }
+
+        .star {
+            font-size: 24px;
+            cursor: pointer;
+            opacity: 0.3;
+            transition: opacity 0.2s ease;
+        }
+
+        .star:hover {
+            opacity: 1;
+        }
+
+        /* Unread notification styling */
+        .leaderboard-item.unread {
+            border-left: 4px solid #00FF96;
+        }
+
+        /* Login modal improvements */
+        .form-control::placeholder {
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        .form-control::-webkit-input-placeholder {
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        .form-control::-moz-placeholder {
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        .form-control:-ms-input-placeholder {
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        /* Tab button transitions */
+        .btn-primary, .btn-secondary {
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 16px rgba(0, 255, 150, 0.4);
+        }
+
+        .btn-secondary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 16px rgba(255, 255, 255, 0.2);
+        }
+
+        /* Group and friend item improvements */
+        .leaderboard-item {
+            transition: all 0.3s ease;
+        }
+
+        .leaderboard-item:hover {
+            transform: translateY(-2px);
+            background: rgba(0, 255, 150, 0.05);
+        }
+
+        /* VIP badge styling */
+        .vip-badge {
+            background: linear-gradient(45deg, #FFD700, #FF6B47);
+            color: #000;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+            margin-left: 8px;
+            animation: vipGlow 2s ease-in-out infinite;
+        }
+
+        @keyframes vipGlow {
+            0%, 100% { box-shadow: 0 0 10px rgba(255, 215, 0, 0.5); }
+            50% { box-shadow: 0 0 20px rgba(255, 107, 71, 0.8); }
+        }
+
+        /* Challenge completion modal */
+        .challenge-completion-preview {
+            max-width: 100%;
+            max-height: 200px;
+            border-radius: 12px;
+            margin-top: 10px;
+        }
+
+        /* Loading animations */
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        .loading {
+            animation: pulse 1.5s ease-in-out infinite;
+        }
+
+        /* Mobile optimizations */
+        @media screen and (max-width: 480px) {
+            .modal-content {
+                margin: 10px;
+                max-width: calc(100% - 20px);
+            }
+            
+            .background-grid {
+                grid-template-columns: repeat(auto-fit, minmax(90px, 1fr));
+                gap: 12px;
+            }
+            
+            .dark-header-icons {
+                gap: 12px;
+            }
+            
+            .round-btn {
+                width: 38px;
+                height: 38px;
+                font-size: 16px;
+            }
+        }
+
         /* Responsive adjustments */
         @media screen and (max-width: 432px) {
             .dark-header {
@@ -1591,12 +1714,14 @@
             <div class="dark-logo">JomBro</div>
             <div class="dark-header-icons">
                 <div class="round-btn" onclick="navigateAction(this, 'create')">➕</div>
+                <div class="round-btn" onclick="showGroups()">👥</div>
+                <div class="round-btn" onclick="showFriends()">👤</div>
                 <div class="round-btn" onclick="showBackgroundSettings()">🎨</div>
-                <div class="round-btn" onclick="navigateAction(this, 'notifications')">
+                <div class="round-btn" onclick="showNotifications()">
                     🔔
-                    <div class="notification-badge" id="notificationCount">7</div>
+                    <div class="notification-badge" id="notificationCount">0</div>
                 </div>
-                <div class="round-btn" onclick="navigateAction(this, 'messages')">💬</div>
+                <div class="round-btn" onclick="showSettings()">⚙️</div>
             </div>
         </div>
 
@@ -1894,6 +2019,291 @@
         </div>
     </div>
 
+    <!-- Login Modal -->
+    <div id="loginModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-title">🚀 Welcome to JomBro</div>
+            
+            <div id="loginContent">
+                <div class="form-group">
+                    <label class="form-label">Email or Username</label>
+                    <input type="text" class="form-control" id="loginEmail" placeholder="Enter your email or username">
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Password</label>
+                    <input type="password" class="form-control" id="loginPassword" placeholder="Enter your password">
+                </div>
+                
+                <button class="btn-primary" onclick="loginUser()">🔐 Login</button>
+                <button class="btn-secondary" onclick="showRegister()">📝 Create Account</button>
+                
+                <div style="text-align: center; margin: 20px 0; color: rgba(255,255,255,0.5);">
+                    OR
+                </div>
+                
+                <button class="btn-primary" onclick="socialLogin('google')" style="background: rgba(219, 68, 55, 0.8);">
+                    🔍 Login with Google
+                </button>
+                <button class="btn-primary" onclick="socialLogin('facebook')" style="background: rgba(66, 103, 178, 0.8);">
+                    📘 Login with Facebook
+                </button>
+                <button class="btn-primary" onclick="guestLogin()">
+                    👤 Continue as Guest
+                </button>
+            </div>
+            
+            <div id="registerContent" style="display: none;">
+                <div class="form-group">
+                    <label class="form-label">Full Name</label>
+                    <input type="text" class="form-control" id="registerName" placeholder="Enter your full name">
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Email</label>
+                    <input type="email" class="form-control" id="registerEmail" placeholder="Enter your email">
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Username</label>
+                    <input type="text" class="form-control" id="registerUsername" placeholder="Choose a username">
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Password</label>
+                    <input type="password" class="form-control" id="registerPassword" placeholder="Create a password">
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Country</label>
+                    <select class="form-control" id="registerCountry">
+                        <option value="MY">Malaysia</option>
+                        <option value="SG">Singapore</option>
+                        <option value="TH">Thailand</option>
+                        <option value="ID">Indonesia</option>
+                        <option value="PH">Philippines</option>
+                        <option value="VN">Vietnam</option>
+                        <option value="OTHER">Other</option>
+                    </select>
+                </div>
+                
+                <button class="btn-primary" onclick="registerUser()">🎮 Join JomBro</button>
+                <button class="btn-secondary" onclick="showLogin()">🔙 Back to Login</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Groups Modal -->
+    <div id="groupsModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-title">👥 Groups</div>
+            
+            <div style="display: flex; gap: 10px; margin-bottom: 20px;">
+                <button class="btn-primary" onclick="showGroupTab('my')" id="myGroupsTab">My Groups</button>
+                <button class="btn-secondary" onclick="showGroupTab('discover')" id="discoverGroupsTab">Discover</button>
+                <button class="btn-secondary" onclick="showGroupTab('create')" id="createGroupTab">Create</button>
+            </div>
+            
+            <div id="myGroupsContent">
+                <div id="userGroupsList">
+                    <!-- User's groups will be populated here -->
+                </div>
+            </div>
+            
+            <div id="discoverGroupsContent" style="display: none;">
+                <div class="form-group">
+                    <input type="text" class="form-control" id="groupSearchInput" placeholder="Search groups..." onkeyup="searchGroups()">
+                </div>
+                <div id="publicGroupsList">
+                    <!-- Public groups will be populated here -->
+                </div>
+            </div>
+            
+            <div id="createGroupContent" style="display: none;">
+                <div class="form-group">
+                    <label class="form-label">Group Name</label>
+                    <input type="text" class="form-control" id="newGroupName" placeholder="Enter group name">
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Description</label>
+                    <textarea class="form-control" id="newGroupDescription" rows="3" placeholder="Describe your group..."></textarea>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Privacy</label>
+                    <select class="form-control" id="newGroupPrivacy">
+                        <option value="public">Public - Anyone can join</option>
+                        <option value="private">Private - Invite only</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Category</label>
+                    <select class="form-control" id="newGroupCategory">
+                        <option value="general">General</option>
+                        <option value="fitness">Fitness & Health</option>
+                        <option value="adventure">Adventure</option>
+                        <option value="social">Social</option>
+                        <option value="business">Business</option>
+                        <option value="education">Education</option>
+                        <option value="gaming">Gaming</option>
+                    </select>
+                </div>
+                
+                <button class="btn-primary" onclick="createGroup()">🎯 Create Group</button>
+            </div>
+            
+            <button class="btn-secondary" onclick="hideModal('groups')">Close</button>
+        </div>
+    </div>
+
+    <!-- Group Details Modal -->
+    <div id="groupDetailsModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-title" id="groupDetailsTitle">Group Details</div>
+            
+            <div id="groupDetailsContent">
+                <!-- Group details will be populated here -->
+            </div>
+            
+            <button class="btn-secondary" onclick="hideModal('groupDetails')">Close</button>
+        </div>
+    </div>
+
+    <!-- Friends Modal -->
+    <div id="friendsModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-title">👥 Friends</div>
+            
+            <div style="display: flex; gap: 10px; margin-bottom: 20px;">
+                <button class="btn-primary" onclick="showFriendsTab('list')" id="friendsListTab">Friends</button>
+                <button class="btn-secondary" onclick="showFriendsTab('requests')" id="friendsRequestsTab">Requests</button>
+                <button class="btn-secondary" onclick="showFriendsTab('find')" id="findFriendsTab">Find</button>
+            </div>
+            
+            <div id="friendsListContent">
+                <div id="friendsList">
+                    <!-- Friends list will be populated here -->
+                </div>
+            </div>
+            
+            <div id="friendsRequestsContent" style="display: none;">
+                <div id="friendRequestsList">
+                    <!-- Friend requests will be populated here -->
+                </div>
+            </div>
+            
+            <div id="findFriendsContent" style="display: none;">
+                <div class="form-group">
+                    <input type="text" class="form-control" id="friendSearchInput" placeholder="Search users..." onkeyup="searchUsers()">
+                </div>
+                <div id="userSearchResults">
+                    <!-- Search results will be populated here -->
+                </div>
+            </div>
+            
+            <button class="btn-secondary" onclick="hideModal('friends')">Close</button>
+        </div>
+    </div>
+
+    <!-- Challenge Completion Modal -->
+    <div id="challengeCompletionModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-title">📸 Complete Challenge</div>
+            
+            <div id="challengeCompletionContent">
+                <div class="form-group">
+                    <label class="form-label">Upload Photo/Video</label>
+                    <input type="file" class="form-control" id="challengeMedia" accept="image/*,video/*">
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Description</label>
+                    <textarea class="form-control" id="challengeCompletionDesc" rows="3" placeholder="Tell us about your experience..."></textarea>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Rating (1-5 stars)</label>
+                    <div class="rating-stars">
+                        <span class="star" onclick="setRating(1)">⭐</span>
+                        <span class="star" onclick="setRating(2)">⭐</span>
+                        <span class="star" onclick="setRating(3)">⭐</span>
+                        <span class="star" onclick="setRating(4)">⭐</span>
+                        <span class="star" onclick="setRating(5)">⭐</span>
+                    </div>
+                </div>
+                
+                <button class="btn-primary" onclick="submitChallengeCompletion()">🏆 Submit & Claim Reward</button>
+                <button class="btn-secondary" onclick="hideModal('challengeCompletion')">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Notifications Modal -->
+    <div id="notificationsModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-title">🔔 Notifications</div>
+            
+            <div id="notificationsList">
+                <!-- Notifications will be populated here -->
+            </div>
+            
+            <button class="btn-secondary" onclick="hideModal('notifications')">Close</button>
+        </div>
+    </div>
+
+    <!-- Achievements Modal -->
+    <div id="achievementsModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-title">🏆 Achievements</div>
+            
+            <div id="achievementsList">
+                <!-- Achievements will be populated here -->
+            </div>
+            
+            <button class="btn-secondary" onclick="hideModal('achievements')">Close</button>
+        </div>
+    </div>
+
+    <!-- Settings Modal -->
+    <div id="settingsModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-title">⚙️ Settings</div>
+            
+            <div class="form-group">
+                <label class="form-label">Notifications</label>
+                <select class="form-control" id="notificationSettings">
+                    <option value="all">All Notifications</option>
+                    <option value="important">Important Only</option>
+                    <option value="none">None</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">Privacy</label>
+                <select class="form-control" id="privacySettings">
+                    <option value="public">Public Profile</option>
+                    <option value="friends">Friends Only</option>
+                    <option value="private">Private</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">Language</label>
+                <select class="form-control" id="languageSettings">
+                    <option value="en">English</option>
+                    <option value="ms">Bahasa Malaysia</option>
+                    <option value="zh">中文</option>
+                    <option value="ta">தமிழ்</option>
+                </select>
+            </div>
+            
+            <button class="btn-primary" onclick="saveSettings()">💾 Save Settings</button>
+            <button class="btn-secondary" onclick="hideModal('settings')">Cancel</button>
+        </div>
+    </div>
+
     <!-- Toast -->
     <div id="toast" class="toast">
         <span id="toastText">Success!</span>
@@ -1935,19 +2345,204 @@
                 'sofia_rodriguez', 
                 'ryan_kumar',
                 'emma_thompson'
-            ]
+            ],
+            groups: ['adventure_seekers', 'business_network'],
+            isLoggedIn: false,
+            settings: {
+                notifications: 'all',
+                privacy: 'public',
+                language: 'en'
+            }
         };
 
         let challengeData = [];
         let leaderboardData = [];
+        let groupsData = [];
+        let friendsData = [];
+        let notificationsData = [];
+        let achievementsData = [];
         let currentPage = 0;
         let totalPages = 0;
         let isFlipping = false;
         let currentBackground = 'space';
         let deferredPrompt;
+        let currentChallenge = null;
+        let selectedRating = 0;
 
         // Initialize the advanced system
         document.addEventListener('DOMContentLoaded', function() {
+            // Check if user is logged in
+            checkUserLogin();
+            
+            if (playerData.isLoggedIn) {
+                initializeAdvancedSystem();
+                updatePlayerDisplay();
+                generateInitialChallenges();
+                populateLeaderboard();
+                createStories();
+                setupSwipeGestures();
+                initializePWA();
+                loadGroups();
+                loadFriends();
+                loadNotifications();
+                loadAchievements();
+                
+                // Initialize default background effects
+                hideAllBackgroundEffects();
+                createBackgroundEffects(currentBackground);
+            } else {
+                showLoginModal();
+            }
+        });
+
+        // Authentication System
+        function checkUserLogin() {
+            const savedUser = localStorage.getItem('jombro_user');
+            if (savedUser) {
+                const userData = JSON.parse(savedUser);
+                playerData = { ...playerData, ...userData, isLoggedIn: true };
+            }
+        }
+
+        function showLoginModal() {
+            showModal('login');
+        }
+
+        function showLogin() {
+            document.getElementById('loginContent').style.display = 'block';
+            document.getElementById('registerContent').style.display = 'none';
+        }
+
+        function showRegister() {
+            document.getElementById('loginContent').style.display = 'none';
+            document.getElementById('registerContent').style.display = 'block';
+        }
+
+        function loginUser() {
+            const email = document.getElementById('loginEmail').value;
+            const password = document.getElementById('loginPassword').value;
+
+            if (!email || !password) {
+                showToast('❌ Please enter both email and password!');
+                return;
+            }
+
+            // Simulate login API call
+            setTimeout(() => {
+                // For demo, accept any email/password
+                playerData.isLoggedIn = true;
+                playerData.email = email;
+                
+                // Save to localStorage
+                localStorage.setItem('jombro_user', JSON.stringify(playerData));
+                
+                hideModal('login');
+                showToast('🎉 Welcome back to JomBro!');
+                
+                // Initialize app after login
+                initializeAdvancedSystem();
+                updatePlayerDisplay();
+                generateInitialChallenges();
+                populateLeaderboard();
+                createStories();
+                setupSwipeGestures();
+                initializePWA();
+                loadGroups();
+                loadFriends();
+                loadNotifications();
+                loadAchievements();
+                
+                hideAllBackgroundEffects();
+                createBackgroundEffects(currentBackground);
+            }, 1000);
+        }
+
+        function registerUser() {
+            const name = document.getElementById('registerName').value;
+            const email = document.getElementById('registerEmail').value;
+            const username = document.getElementById('registerUsername').value;
+            const password = document.getElementById('registerPassword').value;
+            const country = document.getElementById('registerCountry').value;
+
+            if (!name || !email || !username || !password) {
+                showToast('❌ Please fill in all required fields!');
+                return;
+            }
+
+            // Simulate registration API call
+            setTimeout(() => {
+                playerData.displayName = name;
+                playerData.email = email;
+                playerData.username = username;
+                playerData.location = getCountryName(country);
+                playerData.isLoggedIn = true;
+                playerData.tokens = 1000; // Welcome bonus
+                playerData.level = 1;
+                playerData.rank = 'Novice';
+                
+                // Save to localStorage
+                localStorage.setItem('jombro_user', JSON.stringify(playerData));
+                
+                hideModal('login');
+                showToast('🎉 Welcome to JomBro! You received 1000 welcome tokens!');
+                
+                // Initialize app after registration
+                initializeAdvancedSystem();
+                updatePlayerDisplay();
+                generateInitialChallenges();
+                populateLeaderboard();
+                createStories();
+                setupSwipeGestures();
+                initializePWA();
+                loadGroups();
+                loadFriends();
+                loadNotifications();
+                loadAchievements();
+                
+                hideAllBackgroundEffects();
+                createBackgroundEffects(currentBackground);
+            }, 1000);
+        }
+
+        function socialLogin(provider) {
+            showToast(`🔐 Connecting to ${provider}...`);
+            
+            // Simulate social login
+            setTimeout(() => {
+                playerData.isLoggedIn = true;
+                playerData.displayName = `${provider} User`;
+                playerData.email = `user@${provider}.com`;
+                
+                localStorage.setItem('jombro_user', JSON.stringify(playerData));
+                
+                hideModal('login');
+                showToast(`🎉 Successfully logged in with ${provider}!`);
+                
+                initializeAdvancedSystem();
+                updatePlayerDisplay();
+                generateInitialChallenges();
+                populateLeaderboard();
+                createStories();
+                setupSwipeGestures();
+                initializePWA();
+                loadGroups();
+                loadFriends();
+                loadNotifications();
+                loadAchievements();
+                
+                hideAllBackgroundEffects();
+                createBackgroundEffects(currentBackground);
+            }, 1500);
+        }
+
+        function guestLogin() {
+            playerData.isLoggedIn = true;
+            playerData.displayName = 'Guest Player';
+            playerData.username = 'guest_' + Date.now();
+            
+            hideModal('login');
+            showToast('👤 Playing as guest! Register to save progress.');
+            
             initializeAdvancedSystem();
             updatePlayerDisplay();
             generateInitialChallenges();
@@ -1955,11 +2550,811 @@
             createStories();
             setupSwipeGestures();
             initializePWA();
+            loadGroups();
+            loadFriends();
+            loadNotifications();
+            loadAchievements();
             
-            // Initialize default background effects
             hideAllBackgroundEffects();
             createBackgroundEffects(currentBackground);
-        });
+        }
+
+        function logout() {
+            localStorage.removeItem('jombro_user');
+            playerData.isLoggedIn = false;
+            showToast('👋 Logged out successfully!');
+            location.reload();
+        }
+
+        function getCountryName(code) {
+            const countries = {
+                'MY': 'Malaysia',
+                'SG': 'Singapore',
+                'TH': 'Thailand',
+                'ID': 'Indonesia',
+                'PH': 'Philippines',
+                'VN': 'Vietnam'
+            };
+            return countries[code] || 'Other';
+        }
+
+        // Groups System
+        function loadGroups() {
+            // Sample groups data
+            groupsData = [
+                {
+                    id: 'adventure_seekers',
+                    name: 'Adventure Seekers',
+                    description: 'For those who love extreme challenges and adventures!',
+                    category: 'adventure',
+                    privacy: 'public',
+                    members: 247,
+                    avatar: '🏔️',
+                    owner: 'marcus_chen',
+                    challenges: 45,
+                    isMember: true
+                },
+                {
+                    id: 'business_network',
+                    name: 'Business Network',
+                    description: 'Professional networking and business challenges',
+                    category: 'business',
+                    privacy: 'private',
+                    members: 156,
+                    avatar: '💼',
+                    owner: 'sofia_rodriguez',
+                    challenges: 23,
+                    isMember: true
+                },
+                {
+                    id: 'fitness_warriors',
+                    name: 'Fitness Warriors',
+                    description: 'Health and fitness challenges for everyone',
+                    category: 'fitness',
+                    privacy: 'public',
+                    members: 892,
+                    avatar: '💪',
+                    owner: 'ryan_kumar',
+                    challenges: 67,
+                    isMember: false
+                },
+                {
+                    id: 'social_butterflies',
+                    name: 'Social Butterflies',
+                    description: 'Fun social challenges and meetups',
+                    category: 'social',
+                    privacy: 'public',
+                    members: 534,
+                    avatar: '🦋',
+                    owner: 'emma_thompson',
+                    challenges: 89,
+                    isMember: false
+                }
+            ];
+        }
+
+        function showGroups() {
+            populateMyGroups();
+            populateDiscoverGroups();
+            showModal('groups');
+        }
+
+        function showGroupTab(tab) {
+            // Reset tab buttons
+            document.getElementById('myGroupsTab').className = 'btn-secondary';
+            document.getElementById('discoverGroupsTab').className = 'btn-secondary';
+            document.getElementById('createGroupTab').className = 'btn-secondary';
+            
+            // Hide all content
+            document.getElementById('myGroupsContent').style.display = 'none';
+            document.getElementById('discoverGroupsContent').style.display = 'none';
+            document.getElementById('createGroupContent').style.display = 'none';
+            
+            // Show selected tab
+            if (tab === 'my') {
+                document.getElementById('myGroupsTab').className = 'btn-primary';
+                document.getElementById('myGroupsContent').style.display = 'block';
+            } else if (tab === 'discover') {
+                document.getElementById('discoverGroupsTab').className = 'btn-primary';
+                document.getElementById('discoverGroupsContent').style.display = 'block';
+            } else if (tab === 'create') {
+                document.getElementById('createGroupTab').className = 'btn-primary';
+                document.getElementById('createGroupContent').style.display = 'block';
+            }
+        }
+
+        function populateMyGroups() {
+            const container = document.getElementById('userGroupsList');
+            const userGroups = groupsData.filter(group => group.isMember);
+            
+            container.innerHTML = '';
+            
+            if (userGroups.length === 0) {
+                container.innerHTML = '<p style="text-align: center; color: rgba(255,255,255,0.7);">You haven\'t joined any groups yet!</p>';
+                return;
+            }
+            
+            userGroups.forEach(group => {
+                const groupElement = document.createElement('div');
+                groupElement.className = 'leaderboard-item';
+                groupElement.innerHTML = `
+                    <div style="font-size: 40px; margin-right: 16px;">${group.avatar}</div>
+                    <div class="player-details">
+                        <div class="player-name">${group.name}</div>
+                        <div class="player-rank-title">${group.members} members • ${group.challenges} challenges</div>
+                    </div>
+                    <button class="btn-primary" onclick="viewGroup('${group.id}')" style="padding: 8px 16px; font-size: 14px;">View</button>
+                `;
+                container.appendChild(groupElement);
+            });
+        }
+
+        function populateDiscoverGroups() {
+            const container = document.getElementById('publicGroupsList');
+            const publicGroups = groupsData.filter(group => group.privacy === 'public' && !group.isMember);
+            
+            container.innerHTML = '';
+            
+            publicGroups.forEach(group => {
+                const groupElement = document.createElement('div');
+                groupElement.className = 'leaderboard-item';
+                groupElement.innerHTML = `
+                    <div style="font-size: 40px; margin-right: 16px;">${group.avatar}</div>
+                    <div class="player-details">
+                        <div class="player-name">${group.name}</div>
+                        <div class="player-rank-title">${group.members} members • ${group.challenges} challenges</div>
+                    </div>
+                    <button class="btn-primary" onclick="joinGroup('${group.id}')" style="padding: 8px 16px; font-size: 14px;">Join</button>
+                `;
+                container.appendChild(groupElement);
+            });
+        }
+
+        function searchGroups() {
+            const searchTerm = document.getElementById('groupSearchInput').value.toLowerCase();
+            const container = document.getElementById('publicGroupsList');
+            const filteredGroups = groupsData.filter(group => 
+                group.privacy === 'public' && 
+                !group.isMember &&
+                (group.name.toLowerCase().includes(searchTerm) || 
+                 group.description.toLowerCase().includes(searchTerm))
+            );
+            
+            container.innerHTML = '';
+            
+            filteredGroups.forEach(group => {
+                const groupElement = document.createElement('div');
+                groupElement.className = 'leaderboard-item';
+                groupElement.innerHTML = `
+                    <div style="font-size: 40px; margin-right: 16px;">${group.avatar}</div>
+                    <div class="player-details">
+                        <div class="player-name">${group.name}</div>
+                        <div class="player-rank-title">${group.members} members • ${group.challenges} challenges</div>
+                    </div>
+                    <button class="btn-primary" onclick="joinGroup('${group.id}')" style="padding: 8px 16px; font-size: 14px;">Join</button>
+                `;
+                container.appendChild(groupElement);
+            });
+        }
+
+        function createGroup() {
+            const name = document.getElementById('newGroupName').value;
+            const description = document.getElementById('newGroupDescription').value;
+            const privacy = document.getElementById('newGroupPrivacy').value;
+            const category = document.getElementById('newGroupCategory').value;
+
+            if (!name || !description) {
+                showToast('❌ Please fill in group name and description!');
+                return;
+            }
+
+            const newGroup = {
+                id: 'group_' + Date.now(),
+                name: name,
+                description: description,
+                category: category,
+                privacy: privacy,
+                members: 1,
+                avatar: getCategoryAvatar(category),
+                owner: playerData.username,
+                challenges: 0,
+                isMember: true
+            };
+
+            groupsData.push(newGroup);
+            
+            // Clear form
+            document.getElementById('newGroupName').value = '';
+            document.getElementById('newGroupDescription').value = '';
+            
+            showToast('🎉 Group created successfully!');
+            populateMyGroups();
+            showGroupTab('my');
+        }
+
+        function getCategoryAvatar(category) {
+            const avatars = {
+                'general': '🌟',
+                'fitness': '💪',
+                'adventure': '🏔️',
+                'social': '🦋',
+                'business': '💼',
+                'education': '📚',
+                'gaming': '🎮'
+            };
+            return avatars[category] || '🌟';
+        }
+
+        function joinGroup(groupId) {
+            const group = groupsData.find(g => g.id === groupId);
+            if (group) {
+                group.isMember = true;
+                group.members++;
+                showToast(`🎉 Joined ${group.name}!`);
+                populateMyGroups();
+                populateDiscoverGroups();
+            }
+        }
+
+        function viewGroup(groupId) {
+            const group = groupsData.find(g => g.id === groupId);
+            if (group) {
+                document.getElementById('groupDetailsTitle').textContent = group.name;
+                document.getElementById('groupDetailsContent').innerHTML = `
+                    <div style="text-align: center; margin-bottom: 30px;">
+                        <div style="font-size: 80px; margin-bottom: 20px;">${group.avatar}</div>
+                        <h2 style="color: #fff; margin-bottom: 10px;">${group.name}</h2>
+                        <p style="color: rgba(255, 255, 255, 0.7); margin-bottom: 20px;">${group.description}</p>
+                        <div style="display: flex; justify-content: center; gap: 20px;">
+                            <div style="text-align: center;">
+                                <div style="font-size: 24px; color: #00FF96; font-weight: 700;">${group.members}</div>
+                                <div style="color: rgba(255, 255, 255, 0.7); font-size: 14px;">Members</div>
+                            </div>
+                            <div style="text-align: center;">
+                                <div style="font-size: 24px; color: #FFD700; font-weight: 700;">${group.challenges}</div>
+                                <div style="color: rgba(255, 255, 255, 0.7); font-size: 14px;">Challenges</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div style="margin-bottom: 20px;">
+                        <h3 style="color: #fff; margin-bottom: 15px;">📊 Group Stats</h3>
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                            <div>Category: <span style="color: #4FC3F7;">${group.category}</span></div>
+                            <div>Privacy: <span style="color: #FF6B47;">${group.privacy}</span></div>
+                            <div>Owner: <span style="color: #FFD700;">${group.owner}</span></div>
+                            <div>Created: <span style="color: #00FF96;">Jan 2024</span></div>
+                        </div>
+                    </div>
+                `;
+                
+                hideModal('groups');
+                showModal('groupDetails');
+            }
+        }
+
+        // Friends System
+        function loadFriends() {
+            friendsData = [
+                {
+                    id: 'marcus_chen',
+                    name: 'Marcus Chen',
+                    username: 'marcus_chen',
+                    avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=80&h=80&fit=crop&crop=face',
+                    status: 'online',
+                    level: 42,
+                    isFriend: true
+                },
+                {
+                    id: 'sofia_rodriguez',
+                    name: 'Sofia Rodriguez',
+                    username: 'sofia_rodriguez',
+                    avatar: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=80&h=80&fit=crop&crop=face',
+                    status: 'offline',
+                    level: 19,
+                    isFriend: true
+                },
+                {
+                    id: 'ryan_kumar',
+                    name: 'Ryan Kumar',
+                    username: 'ryan_kumar',
+                    avatar: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=80&h=80&fit=crop&crop=face',
+                    status: 'online',
+                    level: 16,
+                    isFriend: true
+                },
+                {
+                    id: 'emma_thompson',
+                    name: 'Emma Thompson',
+                    username: 'emma_thompson',
+                    avatar: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=80&h=80&fit=crop&crop=face',
+                    status: 'away',
+                    level: 23,
+                    isFriend: true
+                }
+            ];
+        }
+
+        function showFriends() {
+            populateFriendsList();
+            populateFriendRequests();
+            showModal('friends');
+        }
+
+        function showFriendsTab(tab) {
+            // Reset tab buttons
+            document.getElementById('friendsListTab').className = 'btn-secondary';
+            document.getElementById('friendsRequestsTab').className = 'btn-secondary';
+            document.getElementById('findFriendsTab').className = 'btn-secondary';
+            
+            // Hide all content
+            document.getElementById('friendsListContent').style.display = 'none';
+            document.getElementById('friendsRequestsContent').style.display = 'none';
+            document.getElementById('findFriendsContent').style.display = 'none';
+            
+            // Show selected tab
+            if (tab === 'list') {
+                document.getElementById('friendsListTab').className = 'btn-primary';
+                document.getElementById('friendsListContent').style.display = 'block';
+            } else if (tab === 'requests') {
+                document.getElementById('friendsRequestsTab').className = 'btn-primary';
+                document.getElementById('friendsRequestsContent').style.display = 'block';
+            } else if (tab === 'find') {
+                document.getElementById('findFriendsTab').className = 'btn-primary';
+                document.getElementById('findFriendsContent').style.display = 'block';
+            }
+        }
+
+        function populateFriendsList() {
+            const container = document.getElementById('friendsList');
+            const friends = friendsData.filter(friend => friend.isFriend);
+            
+            container.innerHTML = '';
+            
+            friends.forEach(friend => {
+                const statusColor = friend.status === 'online' ? '#00FF96' : friend.status === 'away' ? '#FFD700' : '#888';
+                const friendElement = document.createElement('div');
+                friendElement.className = 'leaderboard-item';
+                friendElement.innerHTML = `
+                    <img src="${friend.avatar}" alt="${friend.name}" class="player-avatar">
+                    <div class="player-details">
+                        <div class="player-name">${friend.name}</div>
+                        <div class="player-rank-title">Level ${friend.level} • <span style="color: ${statusColor};">${friend.status}</span></div>
+                    </div>
+                    <button class="btn-primary" onclick="challengeFriend('${friend.id}')" style="padding: 8px 16px; font-size: 14px;">Challenge</button>
+                `;
+                container.appendChild(friendElement);
+            });
+        }
+
+        function populateFriendRequests() {
+            const container = document.getElementById('friendRequestsList');
+            // Sample friend requests
+            const requests = [
+                {
+                    id: 'req_1',
+                    name: 'Alex Johnson',
+                    username: 'alex_j',
+                    avatar: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=80&h=80&fit=crop&crop=face',
+                    mutualFriends: 3
+                },
+                {
+                    id: 'req_2',
+                    name: 'Sarah Kim',
+                    username: 'sarah_k',
+                    avatar: 'https://images.unsplash.com/photo-1494790108755-2616b612b786?w=80&h=80&fit=crop&crop=face',
+                    mutualFriends: 1
+                }
+            ];
+            
+            container.innerHTML = '';
+            
+            requests.forEach(request => {
+                const requestElement = document.createElement('div');
+                requestElement.className = 'leaderboard-item';
+                requestElement.innerHTML = `
+                    <img src="${request.avatar}" alt="${request.name}" class="player-avatar">
+                    <div class="player-details">
+                        <div class="player-name">${request.name}</div>
+                        <div class="player-rank-title">${request.mutualFriends} mutual friends</div>
+                    </div>
+                    <div style="display: flex; gap: 8px;">
+                        <button class="btn-primary" onclick="acceptFriendRequest('${request.id}')" style="padding: 6px 12px; font-size: 12px;">Accept</button>
+                        <button class="btn-secondary" onclick="declineFriendRequest('${request.id}')" style="padding: 6px 12px; font-size: 12px;">Decline</button>
+                    </div>
+                `;
+                container.appendChild(requestElement);
+            });
+        }
+
+        function searchUsers() {
+            const searchTerm = document.getElementById('friendSearchInput').value.toLowerCase();
+            const container = document.getElementById('userSearchResults');
+            
+            if (searchTerm.length < 2) {
+                container.innerHTML = '<p style="text-align: center; color: rgba(255,255,255,0.7);">Enter at least 2 characters to search</p>';
+                return;
+            }
+            
+            // Sample search results
+            const searchResults = [
+                {
+                    id: 'user_1',
+                    name: 'John Doe',
+                    username: 'john_doe',
+                    avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=80&h=80&fit=crop&crop=face',
+                    mutualFriends: 2,
+                    isFriend: false
+                },
+                {
+                    id: 'user_2',
+                    name: 'Jane Smith',
+                    username: 'jane_smith',
+                    avatar: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=80&h=80&fit=crop&crop=face',
+                    mutualFriends: 0,
+                    isFriend: false
+                }
+            ].filter(user => 
+                user.name.toLowerCase().includes(searchTerm) || 
+                user.username.toLowerCase().includes(searchTerm)
+            );
+            
+            container.innerHTML = '';
+            
+            searchResults.forEach(user => {
+                const userElement = document.createElement('div');
+                userElement.className = 'leaderboard-item';
+                userElement.innerHTML = `
+                    <img src="${user.avatar}" alt="${user.name}" class="player-avatar">
+                    <div class="player-details">
+                        <div class="player-name">${user.name}</div>
+                        <div class="player-rank-title">@${user.username} • ${user.mutualFriends} mutual friends</div>
+                    </div>
+                    <button class="btn-primary" onclick="sendFriendRequest('${user.id}')" style="padding: 8px 16px; font-size: 14px;">Add Friend</button>
+                `;
+                container.appendChild(userElement);
+            });
+        }
+
+        function challengeFriend(friendId) {
+            const friend = friendsData.find(f => f.id === friendId);
+            if (friend) {
+                showToast(`🎯 Challenge sent to ${friend.name}!`);
+                showModal('create');
+            }
+        }
+
+        function acceptFriendRequest(requestId) {
+            showToast('✅ Friend request accepted!');
+            populateFriendRequests();
+            populateFriendsList();
+        }
+
+        function declineFriendRequest(requestId) {
+            showToast('❌ Friend request declined');
+            populateFriendRequests();
+        }
+
+        function sendFriendRequest(userId) {
+            showToast('📤 Friend request sent!');
+        }
+
+        // Notifications System
+        function loadNotifications() {
+            notificationsData = [
+                {
+                    id: 'notif_1',
+                    type: 'challenge_completed',
+                    title: 'Challenge Completed!',
+                    message: 'Marcus Chen completed your "Coffee Shop Poetry" challenge',
+                    timestamp: new Date(Date.now() - 2 * 60 * 60 * 1000),
+                    read: false,
+                    avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=40&h=40&fit=crop&crop=face'
+                },
+                {
+                    id: 'notif_2',
+                    type: 'friend_request',
+                    title: 'New Friend Request',
+                    message: 'Sarah Kim sent you a friend request',
+                    timestamp: new Date(Date.now() - 5 * 60 * 60 * 1000),
+                    read: false,
+                    avatar: 'https://images.unsplash.com/photo-1494790108755-2616b612b786?w=40&h=40&fit=crop&crop=face'
+                },
+                {
+                    id: 'notif_3',
+                    type: 'group_invite',
+                    title: 'Group Invitation',
+                    message: 'You were invited to join "Fitness Warriors" group',
+                    timestamp: new Date(Date.now() - 24 * 60 * 60 * 1000),
+                    read: true,
+                    avatar: '💪'
+                },
+                {
+                    id: 'notif_4',
+                    type: 'achievement',
+                    title: 'Achievement Unlocked!',
+                    message: 'You unlocked "Social Butterfly" achievement',
+                    timestamp: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000),
+                    read: true,
+                    avatar: '🏆'
+                },
+                {
+                    id: 'notif_5',
+                    type: 'challenge_invitation',
+                    title: 'Challenge Invitation',
+                    message: 'Emma Thompson challenged you to "Random Acts of Kindness"',
+                    timestamp: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000),
+                    read: true,
+                    avatar: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=40&h=40&fit=crop&crop=face'
+                }
+            ];
+            
+            updateNotificationCount();
+        }
+
+        function updateNotificationCount() {
+            const unreadCount = notificationsData.filter(n => !n.read).length;
+            const badge = document.getElementById('notificationCount');
+            if (badge) {
+                badge.textContent = unreadCount;
+                badge.style.display = unreadCount > 0 ? 'flex' : 'none';
+            }
+        }
+
+        function showNotifications() {
+            populateNotifications();
+            
+            // Mark all notifications as read
+            notificationsData.forEach(notification => {
+                notification.read = true;
+            });
+            updateNotificationCount();
+            
+            showModal('notifications');
+        }
+
+        function populateNotifications() {
+            const container = document.getElementById('notificationsList');
+            container.innerHTML = '';
+            
+            notificationsData.forEach(notification => {
+                const timeAgo = getTimeAgo(notification.timestamp);
+                const avatarElement = notification.avatar.startsWith('http') ? 
+                    `<img src="${notification.avatar}" alt="Avatar" style="width: 40px; height: 40px; border-radius: 20px; margin-right: 16px;">` :
+                    `<div style="font-size: 40px; margin-right: 16px;">${notification.avatar}</div>`;
+                
+                const notificationElement = document.createElement('div');
+                notificationElement.className = `leaderboard-item ${!notification.read ? 'unread' : ''}`;
+                notificationElement.style.backgroundColor = !notification.read ? 'rgba(0, 255, 150, 0.05)' : '';
+                notificationElement.innerHTML = `
+                    ${avatarElement}
+                    <div class="player-details">
+                        <div class="player-name">${notification.title}</div>
+                        <div class="player-rank-title">${notification.message}</div>
+                        <div style="font-size: 12px; color: rgba(255,255,255,0.5);">${timeAgo}</div>
+                    </div>
+                    ${!notification.read ? '<div style="width: 8px; height: 8px; background: #00FF96; border-radius: 50%;"></div>' : ''}
+                `;
+                container.appendChild(notificationElement);
+            });
+        }
+
+        function getTimeAgo(timestamp) {
+            const now = new Date();
+            const diff = now - timestamp;
+            const hours = Math.floor(diff / (1000 * 60 * 60));
+            const days = Math.floor(hours / 24);
+            
+            if (days > 0) return `${days}d ago`;
+            if (hours > 0) return `${hours}h ago`;
+            return 'Just now';
+        }
+
+        // Achievements System
+        function loadAchievements() {
+            achievementsData = [
+                {
+                    id: 'first_challenge',
+                    name: 'First Challenge',
+                    description: 'Complete your first challenge',
+                    icon: '🎯',
+                    unlocked: true,
+                    unlockedDate: '2024-01-20'
+                },
+                {
+                    id: 'social_butterfly',
+                    name: 'Social Butterfly',
+                    description: 'Complete 10 social challenges',
+                    icon: '🦋',
+                    unlocked: true,
+                    unlockedDate: '2024-02-15'
+                },
+                {
+                    id: 'business_champion',
+                    name: 'Business Champion',
+                    description: 'Complete 5 business partnership challenges',
+                    icon: '💼',
+                    unlocked: true,
+                    unlockedDate: '2024-03-01'
+                },
+                {
+                    id: 'streak_master',
+                    name: 'Streak Master',
+                    description: 'Maintain a 7-day challenge streak',
+                    icon: '🔥',
+                    unlocked: true,
+                    unlockedDate: '2024-03-10'
+                },
+                {
+                    id: 'token_millionaire',
+                    name: 'Token Millionaire',
+                    description: 'Earn 1,000,000 tokens',
+                    icon: '💰',
+                    unlocked: false,
+                    progress: 47832,
+                    total: 1000000
+                },
+                {
+                    id: 'group_leader',
+                    name: 'Group Leader',
+                    description: 'Create and lead a group with 100+ members',
+                    icon: '👑',
+                    unlocked: false,
+                    progress: 0,
+                    total: 1
+                },
+                {
+                    id: 'challenge_creator',
+                    name: 'Challenge Creator',
+                    description: 'Create 50 challenges',
+                    icon: '⚡',
+                    unlocked: false,
+                    progress: 67,
+                    total: 50
+                },
+                {
+                    id: 'legendary_gladiator',
+                    name: 'Legendary Gladiator',
+                    description: 'Reach the highest rank in JomBro',
+                    icon: '🏆',
+                    unlocked: false,
+                    progress: 0,
+                    total: 1
+                }
+            ];
+        }
+
+        function showAchievements() {
+            populateAchievements();
+            showModal('achievements');
+        }
+
+        function populateAchievements() {
+            const container = document.getElementById('achievementsList');
+            container.innerHTML = '';
+            
+            achievementsData.forEach(achievement => {
+                const achievementElement = document.createElement('div');
+                achievementElement.className = 'leaderboard-item';
+                achievementElement.style.backgroundColor = achievement.unlocked ? 'rgba(0, 255, 150, 0.05)' : 'rgba(255, 255, 255, 0.02)';
+                achievementElement.style.opacity = achievement.unlocked ? '1' : '0.6';
+                
+                let progressText = '';
+                if (!achievement.unlocked && achievement.progress !== undefined) {
+                    const percentage = Math.min(100, (achievement.progress / achievement.total) * 100);
+                    progressText = `<div style="margin-top: 8px;"><div style="background: rgba(255,255,255,0.1); border-radius: 10px; height: 6px;"><div style="background: #00FF96; border-radius: 10px; height: 100%; width: ${percentage}%;"></div></div><div style="font-size: 12px; color: rgba(255,255,255,0.7); margin-top: 4px;">${achievement.progress.toLocaleString()} / ${achievement.total.toLocaleString()}</div></div>`;
+                }
+                
+                achievementElement.innerHTML = `
+                    <div style="font-size: 40px; margin-right: 16px; filter: ${achievement.unlocked ? 'none' : 'grayscale(1)'};">${achievement.icon}</div>
+                    <div class="player-details">
+                        <div class="player-name">${achievement.name}</div>
+                        <div class="player-rank-title">${achievement.description}</div>
+                        ${achievement.unlocked ? `<div style="font-size: 12px; color: #00FF96;">Unlocked on ${achievement.unlockedDate}</div>` : ''}
+                        ${progressText}
+                    </div>
+                    ${achievement.unlocked ? '<div style="color: #00FF96; font-size: 24px;">✅</div>' : ''}
+                `;
+                container.appendChild(achievementElement);
+            });
+        }
+
+        // Challenge Completion System
+        function showChallengeCompletion(challengeId) {
+            currentChallenge = challengeData.find(c => c.id === challengeId);
+            if (currentChallenge) {
+                showModal('challengeCompletion');
+            }
+        }
+
+        function setRating(rating) {
+            selectedRating = rating;
+            const stars = document.querySelectorAll('.star');
+            stars.forEach((star, index) => {
+                star.style.opacity = index < rating ? '1' : '0.3';
+            });
+        }
+
+        function submitChallengeCompletion() {
+            const description = document.getElementById('challengeCompletionDesc').value;
+            const mediaFile = document.getElementById('challengeMedia').files[0];
+            
+            if (!description) {
+                showToast('❌ Please add a description!');
+                return;
+            }
+            
+            if (selectedRating === 0) {
+                showToast('❌ Please rate your experience!');
+                return;
+            }
+            
+            // Simulate submission
+            setTimeout(() => {
+                // Award tokens
+                playerData.tokens += currentChallenge.tokens;
+                playerData.completedChallenges++;
+                
+                // Update player stats
+                updatePlayerDisplay();
+                
+                hideModal('challengeCompletion');
+                showToast(`🎉 Challenge completed! You earned ${currentChallenge.tokens.toLocaleString()} tokens!`);
+                
+                // Check for achievements
+                checkAchievements();
+                
+            }, 1500);
+        }
+
+        function checkAchievements() {
+            // Check for new achievements based on player progress
+            achievementsData.forEach(achievement => {
+                if (!achievement.unlocked) {
+                    let shouldUnlock = false;
+                    
+                    switch(achievement.id) {
+                        case 'challenge_creator':
+                            if (playerData.createdChallenges >= 50) {
+                                shouldUnlock = true;
+                            }
+                            break;
+                        case 'token_millionaire':
+                            if (playerData.totalEarned >= 1000000) {
+                                shouldUnlock = true;
+                            }
+                            break;
+                    }
+                    
+                    if (shouldUnlock) {
+                        achievement.unlocked = true;
+                        achievement.unlockedDate = new Date().toISOString().split('T')[0];
+                        showToast(`🏆 Achievement Unlocked: ${achievement.name}!`);
+                    }
+                }
+            });
+        }
+
+        // Settings System
+        function showSettings() {
+            // Populate current settings
+            document.getElementById('notificationSettings').value = playerData.settings.notifications;
+            document.getElementById('privacySettings').value = playerData.settings.privacy;
+            document.getElementById('languageSettings').value = playerData.settings.language;
+            
+            showModal('settings');
+        }
+
+        function saveSettings() {
+            playerData.settings.notifications = document.getElementById('notificationSettings').value;
+            playerData.settings.privacy = document.getElementById('privacySettings').value;
+            playerData.settings.language = document.getElementById('languageSettings').value;
+            
+            // Save to localStorage
+            localStorage.setItem('jombro_user', JSON.stringify(playerData));
+            
+            hideModal('settings');
+            showToast('⚙️ Settings saved successfully!');
+        }
 
         function initializeAdvancedSystem() {
             console.log('🚀 JomBro Advanced Challenge System Initialized!');
@@ -2320,7 +3715,13 @@
         function acceptChallenge(challengeId) {
             const challenge = challengeData.find(c => c.id === challengeId);
             if (challenge) {
-                showToast(`🚀 Challenge "${challenge.title}" accepted! Get ready to earn ${challenge.tokens.toLocaleString()} tokens!`);
+                showToast(`🚀 Challenge "${challenge.title}" accepted! Good luck!`);
+                
+                // Show completion modal after a delay (simulate doing the challenge)
+                setTimeout(() => {
+                    showChallengeCompletion(challengeId);
+                }, 3000);
+                
                 nextChallenge();
             }
         }
@@ -2331,7 +3732,10 @@
         }
 
         function shareChallenge() {
-            showToast('📤 Challenge shared with friends!');
+            const currentChallengeData = challengeData[currentPage];
+            if (currentChallengeData) {
+                showToast(`📤 "${currentChallengeData.title}" shared with friends!`);
+            }
         }
 
         function bookmarkChallenge() {
@@ -2364,10 +3768,14 @@
 
             challengeData.unshift(newChallenge);
             totalPages = challengeData.length;
+            playerData.createdChallenges++;
             updateChallengeDisplay();
 
             hideModal('create');
             showToast('✨ Challenge created successfully!');
+            
+            // Update localStorage
+            localStorage.setItem('jombro_user', JSON.stringify(playerData));
         }
 
         function purchaseTokens() {
@@ -2377,8 +3785,22 @@
             hideModal('shop');
             showToast(`💳 Purchase successful! ${tokenPackage} tokens added to your account!`);
             
+            // Update player tokens
             playerData.tokens += parseInt(tokenPackage);
+            playerData.totalEarned += parseInt(tokenPackage);
+            
+            // Handle VIP upgrade
+            if (vipPackage) {
+                playerData.vipStatus = vipPackage.includes('vvip') ? 'vvip' : 'vip';
+                const months = vipPackage.includes('3') ? 3 : 1;
+                const expiryDate = new Date();
+                expiryDate.setMonth(expiryDate.getMonth() + months);
+                playerData.vipExpiry = expiryDate.toISOString();
+                showToast(`👑 ${playerData.vipStatus.toUpperCase()} membership activated!`);
+            }
+            
             updatePlayerDisplay();
+            localStorage.setItem('jombro_user', JSON.stringify(playerData));
         }
 
         function createFloatingHeart() {
@@ -2400,7 +3822,7 @@
                     showModal('create');
                     break;
                 case 'notifications':
-                    showToast('🔔 7 new notifications! Challenge completions, friend requests, and rewards awaiting!');
+                    showNotifications();
                     break;
                 case 'messages':
                     showToast('💬 3 new messages from friends about ongoing challenges!');
@@ -2457,11 +3879,13 @@
 
         function showProfile() {
             const profileContent = document.getElementById('profileContent');
+            const vipBadge = playerData.vipStatus !== 'none' ? `<span style="background: linear-gradient(45deg, #FFD700, #FF6B47); color: #000; padding: 4px 8px; border-radius: 12px; font-size: 12px; font-weight: 600; margin-left: 8px;">${playerData.vipStatus.toUpperCase()}</span>` : '';
+            
             profileContent.innerHTML = `
                 <div style="text-align: center; margin-bottom: 30px;">
                     <img src="${playerData.avatar}" alt="${playerData.displayName}" 
                          style="width: 120px; height: 120px; border-radius: 60px; border: 4px solid rgba(0, 255, 150, 0.5); margin-bottom: 20px;">
-                    <h2 style="color: #fff; margin-bottom: 5px;">${playerData.displayName}</h2>
+                    <h2 style="color: #fff; margin-bottom: 5px;">${playerData.displayName}${vipBadge}</h2>
                     <p style="color: #FFD700; font-weight: 600;">${playerData.rank}</p>
                     <p style="color: rgba(255, 255, 255, 0.7); margin-bottom: 20px;">${playerData.bio}</p>
                 </div>
@@ -2475,6 +3899,14 @@
                         <div style="font-size: 24px; color: #FFD700; font-weight: 700;">${playerData.level}</div>
                         <div style="color: rgba(255, 255, 255, 0.7); font-size: 14px;">Level</div>
                     </div>
+                    <div style="text-align: center; padding: 20px; background: rgba(0, 0, 0, 0.001); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 16px;">
+                        <div style="font-size: 24px; color: #4FC3F7; font-weight: 700;">${playerData.followers.toLocaleString()}</div>
+                        <div style="color: rgba(255, 255, 255, 0.7); font-size: 14px;">Followers</div>
+                    </div>
+                    <div style="text-align: center; padding: 20px; background: rgba(0, 0, 0, 0.001); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 16px;">
+                        <div style="font-size: 24px; color: #FF6B47; font-weight: 700;">${playerData.friends.length}</div>
+                        <div style="color: rgba(255, 255, 255, 0.7); font-size: 14px;">Friends</div>
+                    </div>
                 </div>
                 
                 <div style="margin-bottom: 20px;">
@@ -2485,6 +3917,12 @@
                         <div>Win Rate: <span style="color: #FFD700;">${playerData.winRate}%</span></div>
                         <div>Streak: <span style="color: #FF6B47;">${playerData.streakCurrent}</span></div>
                     </div>
+                </div>
+                
+                <div style="display: flex; gap: 10px; margin-top: 20px;">
+                    <button class="btn-primary" onclick="showAchievements(); hideModal('profile');">🏆 Achievements</button>
+                    <button class="btn-primary" onclick="showFriends(); hideModal('profile');">👥 Friends</button>
+                    <button class="btn-secondary" onclick="logout()">🚪 Logout</button>
                 </div>
             `;
 
@@ -3119,6 +4557,16 @@
         console.log('⚡ Performance Mode: Optimized');
         console.log('🔧 Error Handling: Enhanced');
         console.log('📶 Offline Support: Enabled');
+        console.log('🔐 User Authentication: Active');
+        console.log('👥 Groups System: Functional');
+        console.log('👤 Friends System: Operational');
+        console.log('🔔 Notifications: Live');
+        console.log('🏆 Achievements: Unlocked');
+        console.log('📸 Challenge Completion: Ready');
+        console.log('⚙️ Settings Management: Available');
+        console.log('💳 Token Economy: Active');
+        console.log('👑 VIP System: Premium');
+        console.log('🎯 All Game Functions: ACTIVATED!');
     </script>
 </body>
 </html>
