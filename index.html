@@ -8,21 +8,20 @@
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="apple-mobile-web-app-title" content="JomBro">
+    <meta name="apple-mobile-web-app-title" content="JomBro Beta">
     <meta name="format-detection" content="telephone=no">
     <meta name="theme-color" content="#000000">
     
-    <title>JomBro - Challenge Platform</title>
+    <title>JomBro Beta - Testing Mode</title>
 
     <style>
-        /* ===== FIXED MOBILE-FIRST DESIGN SYSTEM ===== */
+        /* ===== JOMBRO BETA TESTING STYLES ===== */
         :root {
             --safe-area-top: env(safe-area-inset-top, 0px);
             --safe-area-bottom: env(safe-area-inset-bottom, 0px);
             --safe-area-left: env(safe-area-inset-left, 0px);
             --safe-area-right: env(safe-area-inset-right, 0px);
             
-            /* FIXED: Proper touch targets and spacing */
             --header-height: 60px;
             --nav-height: 84px;
             --content-padding: 20px;
@@ -30,7 +29,7 @@
             --button-radius: 26px;
             --touch-target: 44px;
             
-            /* Color System - Ultra Transparent Glass */
+            /* Color System */
             --primary: #00FF96;
             --secondary: #405DE6;
             --accent: #FFD700;
@@ -42,6 +41,11 @@
             --border-light: rgba(255, 255, 255, 0.08);
             --text-primary: #FFFFFF;
             --text-secondary: rgba(255, 255, 255, 0.8);
+            
+            /* Beta Testing Colors */
+            --beta-primary: #ff6b35;
+            --beta-secondary: #4fc3f7;
+            --beta-success: #66bb6a;
         }
 
         * {
@@ -67,7 +71,7 @@
             color: var(--text-primary);
         }
 
-        /* ===== ENHANCED STARFIELD BACKGROUND ===== */
+        /* ===== STARFIELD BACKGROUND ===== */
         .starfield {
             position: fixed;
             top: 0;
@@ -85,163 +89,28 @@
             z-index: 0;
         }
 
-        /* ===== ENHANCED BLINKING STARS WITH 3 SIZES ===== */
-        .animated-stars {
+        /* ===== BETA TESTING BANNER ===== */
+        .beta-banner {
             position: fixed;
-            top: 0;
+            top: var(--safe-area-top);
             left: 0;
             right: 0;
-            bottom: 0;
-            pointer-events: none;
-            z-index: 1;
-            overflow: hidden;
+            background: linear-gradient(135deg, var(--beta-primary), var(--beta-secondary));
+            color: white;
+            padding: 8px 20px;
+            text-align: center;
+            font-size: 12px;
+            font-weight: bold;
+            z-index: 1001;
+            animation: pulse 2s ease-in-out infinite;
         }
 
-        .star-particle {
-            position: absolute;
-            background: #ffffff;
-            border-radius: 50%;
-            animation: starBlink 3s ease-in-out infinite, starMove 20s linear infinite;
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.8; }
         }
 
-        /* Small Stars */
-        .star-particle.small {
-            width: 1px; 
-            height: 1px;
-            animation-duration: 2.8s, 25s;
-        }
-
-        /* Medium Stars */
-        .star-particle.medium {
-            width: 2.5px; 
-            height: 2.5px;
-            animation-duration: 3.2s, 30s;
-        }
-
-        /* Large Stars */
-        .star-particle.large {
-            width: 4px; 
-            height: 4px;
-            animation-duration: 3.8s, 35s;
-            box-shadow: 0 0 6px rgba(255, 255, 255, 0.3);
-        }
-
-        /* Passing Planet */
-        .planet {
-            position: absolute;
-            width: 8px;
-            height: 8px;
-            border-radius: 50%;
-            background: linear-gradient(45deg, #FF6B47, #FF8E53);
-            box-shadow: 0 0 12px rgba(255, 107, 71, 0.4);
-            top: 30%;
-            left: -20px;
-            animation: planetPass 45s linear infinite;
-            animation-delay: 10s;
-        }
-
-        .planet:nth-child(12) {
-            background: linear-gradient(45deg, #4A90E2, #7BB3F0);
-            box-shadow: 0 0 12px rgba(74, 144, 226, 0.4);
-            top: 70%;
-            animation-delay: 60s;
-            animation-duration: 50s;
-        }
-
-        .planet:nth-child(13) {
-            background: linear-gradient(45deg, #9B59B6, #BB6BD9);
-            box-shadow: 0 0 12px rgba(155, 89, 182, 0.4);
-            top: 50%;
-            animation-delay: 120s;
-            animation-duration: 55s;
-        }
-
-        /* Individual Star Positions & Timings */
-        .star-particle:nth-child(1) {
-            top: 15%; left: 10%;
-            animation-delay: 0s, 0s;
-        }
-
-        .star-particle:nth-child(2) {
-            top: 25%; left: 80%;
-            animation-delay: 0.5s, 2s;
-        }
-
-        .star-particle:nth-child(3) {
-            top: 40%; left: 20%;
-            animation-delay: 1s, 4s;
-        }
-
-        .star-particle:nth-child(4) {
-            top: 60%; left: 90%;
-            animation-delay: 1.5s, 6s;
-        }
-
-        .star-particle:nth-child(5) {
-            top: 70%; left: 15%;
-            animation-delay: 2s, 8s;
-        }
-
-        .star-particle:nth-child(6) {
-            top: 35%; left: 60%;
-            animation-delay: 2.5s, 10s;
-        }
-
-        .star-particle:nth-child(7) {
-            top: 80%; left: 70%;
-            animation-delay: 0.2s, 12s;
-        }
-
-        .star-particle:nth-child(8) {
-            top: 20%; left: 45%;
-            animation-delay: 0.8s, 14s;
-        }
-
-        .star-particle:nth-child(9) {
-            top: 90%; left: 25%;
-            animation-delay: 1.2s, 16s;
-        }
-
-        .star-particle:nth-child(10) {
-            top: 50%; left: 85%;
-            animation-delay: 1.8s, 18s;
-        }
-
-        @keyframes starBlink {
-            0%, 100% { opacity: 0.3; transform: scale(1); }
-            50% { opacity: 1; transform: scale(1.2); }
-        }
-
-        @keyframes starMove {
-            0% { transform: translateX(-10px) translateY(-10px); }
-            25% { transform: translateX(10px) translateY(10px); }
-            50% { transform: translateX(5px) translateY(-5px); }
-            75% { transform: translateX(-5px) translateY(5px); }
-            100% { transform: translateX(-10px) translateY(-10px); }
-        }
-
-        @keyframes planetPass {
-            0% { 
-                left: -20px; 
-                opacity: 0;
-                transform: scale(0.8);
-            }
-            5% { 
-                opacity: 1;
-                transform: scale(1);
-            }
-            95% { 
-                opacity: 1;
-                transform: scale(1);
-            }
-            100% { 
-                left: calc(100% + 20px); 
-                opacity: 0;
-                transform: scale(0.8);
-            }
-        }
-
-        /* ===== FIXED MAIN CONTAINER ===== */
+        /* ===== MAIN CONTAINER ===== */
         .app-container {
             position: fixed;
             top: 0;
@@ -255,12 +124,13 @@
                 rgba(0, 255, 150, 0.05) 0%, 
                 transparent 50%, 
                 rgba(64, 93, 230, 0.05) 100%);
+            padding-top: 35px; /* Space for beta banner */
         }
 
-        /* ===== ULTRA TRANSPARENT GLASS HEADER ===== */
+        /* ===== HEADER ===== */
         .header {
             position: fixed;
-            top: var(--safe-area-top);
+            top: calc(var(--safe-area-top) + 35px);
             left: 0;
             right: 0;
             height: var(--header-height);
@@ -291,10 +161,11 @@
 
         .logo-slogan {
             font-size: 10px;
-            color: var(--text-secondary);
-            font-weight: 300;
+            color: var(--beta-primary);
+            font-weight: 600;
             margin-top: 2px;
             line-height: 1.2;
+            text-transform: uppercase;
         }
 
         .header-actions {
@@ -303,7 +174,6 @@
             align-items: center;
         }
 
-        /* ULTRA TRANSPARENT GLASS: Proper touch targets for buttons */
         .header-btn {
             min-width: var(--touch-target);
             min-height: var(--touch-target);
@@ -330,15 +200,10 @@
             color: var(--bg-dark);
         }
 
-        .header-btn:hover {
-            background: rgba(0, 255, 150, 0.15);
-            border-color: var(--primary);
-        }
-
-        /* ULTRA TRANSPARENT GLASS: Player info positioning and alignment */
+        /* ===== PLAYER INFO ===== */
         .player-info {
             position: fixed;
-            top: calc(var(--safe-area-top) + var(--header-height) + 12px);
+            top: calc(var(--safe-area-top) + var(--header-height) + 47px);
             right: var(--content-padding);
             background: var(--bg-card);
             border: 1px solid var(--border-light);
@@ -349,122 +214,6 @@
             backdrop-filter: blur(25px);
             -webkit-backdrop-filter: blur(25px);
         }
-
-        /* ===== ULTRA TRANSPARENT GLASS LIVE CHALLENGERS ===== */
-        .live-challengers {
-            position: fixed;
-            top: calc(var(--safe-area-top) + var(--header-height) + 12px);
-            left: var(--content-padding);
-            right: 140px; /* Space for player info */
-            background: var(--bg-card);
-            border: 1px solid var(--border-light);
-            border-radius: 16px;
-            padding: 12px;
-            z-index: 950;
-            backdrop-filter: blur(25px);
-            -webkit-backdrop-filter: blur(25px);
-        }
-
-        .live-challengers-header {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            margin-bottom: 8px;
-        }
-
-        .live-indicator {
-            width: 8px;
-            height: 8px;
-            background: var(--error);
-            border-radius: 50%;
-            animation: pulse 1.5s ease-in-out infinite;
-        }
-
-        .live-title {
-            font-size: 11px;
-            font-weight: 700;
-            color: var(--text-primary);
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-
-        .live-count {
-            font-size: 10px;
-            color: var(--text-secondary);
-            margin-left: auto;
-        }
-
-        .challengers-container {
-            display: flex;
-            gap: 8px;
-            overflow-x: auto;
-            overflow-y: hidden;
-            scroll-behavior: smooth;
-            -webkit-overflow-scrolling: touch;
-            scrollbar-width: none;
-            -ms-overflow-style: none;
-            padding-bottom: 2px;
-        }
-
-        .challengers-container::-webkit-scrollbar {
-            display: none;
-        }
-
-        .challenger-avatar {
-            flex-shrink: 0;
-            width: 36px;
-            height: 36px;
-            border-radius: 18px;
-            background: linear-gradient(45deg, var(--primary), var(--secondary));
-            padding: 2px;
-            position: relative;
-            cursor: pointer;
-            transition: all 0.2s ease;
-        }
-
-        .challenger-avatar:hover {
-            transform: scale(1.1);
-        }
-
-        .challenger-avatar-inner {
-            width: 100%;
-            height: 100%;
-            border-radius: 50%;
-            background: var(--bg-dark);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            overflow: hidden;
-            font-size: 12px;
-            font-weight: 700;
-            color: var(--text-primary);
-        }
-
-        .challenger-avatar img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            border-radius: 50%;
-        }
-
-        .challenger-status {
-            position: absolute;
-            bottom: -2px;
-            right: -2px;
-            width: 12px;
-            height: 12px;
-            border-radius: 6px;
-            border: 2px solid var(--bg-dark);
-            font-size: 8px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .status-active { background: var(--success); }
-        .status-challenge { background: var(--primary); }
-        .status-treasure { background: var(--accent); }
-        .status-group { background: var(--secondary); }
 
         .player-rank {
             color: var(--accent);
@@ -483,26 +232,35 @@
             gap: 4px;
         }
 
-        /* ===== FIXED MAIN CONTENT AREA ===== */
+        .beta-badge {
+            background: var(--beta-primary);
+            color: white;
+            padding: 2px 6px;
+            border-radius: 8px;
+            font-size: 8px;
+            font-weight: bold;
+            margin-top: 4px;
+        }
+
+        /* ===== CONTENT AREA ===== */
         .content-area {
             position: fixed;
-            top: calc(var(--safe-area-top) + var(--header-height));
+            top: calc(var(--safe-area-top) + var(--header-height) + 35px);
             left: 0;
             right: 0;
             bottom: calc(var(--nav-height) + var(--safe-area-bottom));
             padding: var(--content-padding);
-            padding-top: 90px; /* Space for player info and live challengers */
+            padding-top: 90px;
             overflow: hidden;
         }
 
-        /* ===== FIXED CHALLENGE CARD LAYOUT ===== */
+        /* ===== CHALLENGE CONTAINER ===== */
         .challenge-container {
             position: relative;
             width: 100%;
             height: 100%;
         }
 
-        /* ===== ULTRA TRANSPARENT GLASS CHALLENGE CARDS ===== */
         .challenge-card {
             position: absolute;
             top: 0;
@@ -527,19 +285,6 @@
             z-index: 10;
         }
 
-        .challenge-card.next {
-            opacity: 0.7;
-            transform: translateY(20px) scale(0.95);
-            z-index: 5;
-        }
-
-        .challenge-card.prev {
-            opacity: 0.3;
-            transform: translateY(-20px) scale(0.95);
-            z-index: 1;
-        }
-
-        /* ===== FIXED CHALLENGE HEADER ===== */
         .challenge-header {
             padding: 20px;
             border-bottom: 1px solid var(--border-light);
@@ -574,18 +319,6 @@
             font-size: 16px;
         }
 
-        .challenge-avatar img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            border-radius: 50%;
-        }
-
-        .challenge-user-info {
-            flex: 1;
-            min-width: 0;
-        }
-
         .challenge-username {
             font-size: 16px;
             font-weight: 700;
@@ -601,25 +334,11 @@
             font-weight: 700;
             text-transform: uppercase;
             letter-spacing: 0.5px;
-        }
-
-        .challenge-type.daily { 
-            background: rgba(0, 255, 150, 0.2); 
-            color: var(--primary); 
-            border: 1px solid rgba(0, 255, 150, 0.3);
-        }
-        .challenge-type.business { 
-            background: rgba(255, 107, 53, 0.2); 
-            color: #FF6B35; 
+            background: rgba(255, 107, 53, 0.2);
+            color: var(--beta-primary);
             border: 1px solid rgba(255, 107, 53, 0.3);
         }
-        .challenge-type.treasure { 
-            background: rgba(255, 215, 0, 0.2); 
-            color: var(--accent); 
-            border: 1px solid rgba(255, 215, 0, 0.3);
-        }
 
-        /* ===== FIXED CHALLENGE CONTENT ===== */
         .challenge-content {
             flex: 1;
             padding: 20px;
@@ -663,11 +382,6 @@
             font-weight: 600;
         }
 
-        .challenge-hashtag:active {
-            background: rgba(79, 195, 247, 0.2);
-            transform: scale(0.95);
-        }
-
         .challenge-reward {
             background: rgba(0, 255, 150, 0.1);
             border: 1px solid rgba(0, 255, 150, 0.3);
@@ -697,22 +411,21 @@
             font-weight: 700;
             text-transform: uppercase;
             letter-spacing: 0.5px;
+            background: rgba(0, 255, 150, 0.8);
+            color: #000;
         }
 
-        .difficulty-easy { background: rgba(0, 255, 150, 0.8); color: #000; }
-        .difficulty-medium { background: rgba(255, 193, 7, 0.8); color: #000; }
-        .difficulty-hard { background: rgba(255, 87, 34, 0.8); color: #fff; }
-        .difficulty-epic { background: rgba(156, 39, 176, 0.8); color: #fff; }
-        .difficulty-legendary { background: linear-gradient(45deg, #FFD700, #FF6B47); color: #000; }
-
-        .real-rewards {
-            font-size: 13px;
-            color: var(--accent);
-            margin-top: 8px;
-            font-weight: 600;
+        .beta-note {
+            background: rgba(255, 107, 53, 0.1);
+            border: 1px solid var(--beta-primary);
+            border-radius: 12px;
+            padding: 12px;
+            text-align: center;
+            margin: 12px 0;
+            font-size: 12px;
+            color: var(--beta-primary);
         }
 
-        /* ===== FIXED CHALLENGE ACTIONS ===== */
         .challenge-actions {
             padding: 20px;
             border-top: 1px solid var(--border-light);
@@ -741,20 +454,14 @@
         }
 
         .btn-accept {
-            background: #F8BBD9;
-            color: #2D1B3D;
-            box-shadow: 0 4px 12px rgba(248, 187, 217, 0.02), 0 0 20px rgba(248, 187, 217, 0.02);
+            background: var(--beta-primary);
+            color: white;
+            box-shadow: 0 4px 12px rgba(255, 107, 53, 0.3);
         }
 
         .btn-accept:active {
-            background: #F5A6C8;
+            background: #e55a2b;
             transform: translateY(1px);
-            box-shadow: 0 2px 8px rgba(248, 187, 217, 0.025), 0 0 25px rgba(248, 187, 217, 0.025);
-        }
-
-        .btn-accept:hover {
-            background: #F9C6DD;
-            box-shadow: 0 6px 16px rgba(248, 187, 217, 0.022), 0 0 30px rgba(248, 187, 217, 0.022);
         }
 
         .btn-decline {
@@ -763,72 +470,230 @@
             color: var(--text-primary);
         }
 
-        .btn-decline:active {
-            background: rgba(255, 255, 255, 0.2);
-            transform: translateY(1px);
+        /* ===== MOCK PAYMENT MODAL ===== */
+        .mock-payment-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.9);
+            backdrop-filter: blur(10px);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 3000;
+            padding: 20px;
         }
 
-        /* ===== FIXED SIDE ACTIONS ===== */
-        .side-actions {
-            position: fixed;
-            right: var(--content-padding);
-            bottom: calc(var(--nav-height) + var(--safe-area-bottom) + 20px);
+        .mock-payment-modal.show {
+            display: flex;
+            animation: modalFadeIn 0.3s ease;
+        }
+
+        .mock-payment-content {
+            background: var(--bg-card);
+            border: 1px solid var(--border-light);
+            border-radius: 24px;
+            padding: 30px;
+            width: 100%;
+            max-width: 400px;
+            backdrop-filter: blur(20px);
+            text-align: center;
+        }
+
+        .mock-payment-title {
+            font-size: 22px;
+            font-weight: 800;
+            color: var(--beta-primary);
+            margin-bottom: 10px;
+        }
+
+        .beta-warning {
+            background: rgba(255, 107, 53, 0.1);
+            border: 1px solid var(--beta-primary);
+            border-radius: 12px;
+            padding: 12px;
+            margin: 15px 0;
+            font-size: 12px;
+            color: var(--beta-primary);
+            font-weight: 600;
+        }
+
+        .package-info {
+            background: rgba(0, 255, 150, 0.1);
+            border: 1px solid var(--primary);
+            border-radius: 16px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+
+        .package-tokens {
+            font-size: 24px;
+            font-weight: 800;
+            color: var(--primary);
+            margin-bottom: 8px;
+        }
+
+        .package-price {
+            font-size: 16px;
+            color: var(--text-secondary);
+        }
+
+        .mock-payment-options {
             display: flex;
             flex-direction: column;
             gap: 12px;
-            z-index: 200;
+            margin: 25px 0;
         }
 
-        .action-btn {
-            min-width: var(--touch-target);
-            min-height: var(--touch-target);
-            width: 52px;
-            height: 52px;
-            background: var(--bg-card);
-            backdrop-filter: blur(20px);
-            border: 1px solid var(--border-light);
-            border-radius: 26px;
+        .mock-payment-btn {
+            padding: 15px 20px;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s ease;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 20px;
-            cursor: pointer;
-            color: var(--text-primary);
-            transition: all 0.2s ease;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+            gap: 10px;
         }
 
-        .action-btn:active {
+        .mock-tng-btn {
+            background: linear-gradient(135deg, #1e88e5, #1565c0);
+            color: white;
+        }
+
+        .mock-grab-btn {
+            background: linear-gradient(135deg, #00b14f, #00a040);
+            color: white;
+        }
+
+        .mock-card-btn {
+            background: linear-gradient(135deg, #6c757d, #5a6268);
+            color: white;
+        }
+
+        .mock-payment-btn:active {
             transform: scale(0.95);
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
         }
 
-        .action-btn:hover {
-            border-color: var(--primary);
-            background: rgba(0, 255, 150, 0.1);
+        .mock-close-btn {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid var(--border-light);
+            color: var(--text-primary);
+            padding: 12px 24px;
+            border-radius: 12px;
+            cursor: pointer;
+            margin-top: 15px;
         }
 
-        .points-btn {
-            height: 64px;
-            flex-direction: column;
-            background: rgba(0, 255, 150, 0.1);
-            border-color: var(--primary);
-            padding: 8px;
+        /* ===== BETA FEEDBACK MODAL ===== */
+        .feedback-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.9);
+            backdrop-filter: blur(10px);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 3000;
+            padding: 20px;
         }
 
-        .points-number {
-            font-size: 14px;
+        .feedback-modal.show {
+            display: flex;
+            animation: modalFadeIn 0.3s ease;
+        }
+
+        .feedback-content {
+            background: var(--bg-card);
+            border: 1px solid var(--border-light);
+            border-radius: 24px;
+            padding: 30px;
+            width: 100%;
+            max-width: 450px;
+            backdrop-filter: blur(20px);
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+
+        .feedback-title {
+            font-size: 22px;
             font-weight: 800;
-            color: var(--primary);
-            line-height: 1;
+            color: var(--beta-primary);
+            margin-bottom: 20px;
+            text-align: center;
         }
 
-        .points-label {
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-label {
+            display: block;
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 8px;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 12px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--border-light);
+            border-radius: 8px;
+            color: var(--text-primary);
+            font-size: 14px;
+            outline: none;
+            transition: all 0.2s ease;
+        }
+
+        .form-control:focus {
+            border-color: var(--beta-primary);
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .rating-stars {
+            display: flex;
+            justify-content: center;
+            gap: 8px;
+            margin: 15px 0;
+        }
+
+        .star {
+            font-size: 28px;
+            cursor: pointer;
+            opacity: 0.3;
+            transition: all 0.2s ease;
+            padding: 5px;
+        }
+
+        .star.active {
+            opacity: 1;
+            transform: scale(1.1);
+        }
+
+        .submit-feedback-btn {
+            width: 100%;
+            padding: 15px;
+            background: var(--beta-primary);
+            color: white;
+            border: none;
+            border-radius: 12px;
             font-size: 16px;
-            margin-top: 2px;
+            font-weight: 700;
+            cursor: pointer;
+            margin-bottom: 10px;
         }
 
-        /* ===== FIXED BOTTOM NAVIGATION ===== */
+        /* ===== BOTTOM NAVIGATION ===== */
         .bottom-nav {
             position: fixed;
             bottom: 0;
@@ -861,14 +726,10 @@
         }
 
         .nav-item.active {
-            background: rgba(0, 255, 150, 0.1);
-            border: 1px solid rgba(0, 255, 150, 0.3);
-            color: var(--primary);
+            background: rgba(255, 107, 53, 0.1);
+            border: 1px solid rgba(255, 107, 53, 0.3);
+            color: var(--beta-primary);
             transform: translateY(-2px);
-        }
-
-        .nav-item:active {
-            transform: scale(0.95);
         }
 
         .nav-icon {
@@ -883,278 +744,14 @@
             letter-spacing: 0.5px;
         }
 
-        /* ===== FIXED CHALLENGE DETAIL PAGE ===== */
-        .challenge-page {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: var(--bg-dark);
-            z-index: 2000;
-            display: none;
-            flex-direction: column;
-            overflow: hidden;
-        }
-
-        .challenge-page.show {
-            display: flex;
-            animation: slideInFromRight 0.3s ease;
-        }
-
-        .challenge-page-header {
-            height: calc(var(--header-height) + var(--safe-area-top));
-            background: var(--bg-card);
-            border-bottom: 1px solid var(--border-light);
-            display: flex;
-            align-items: flex-end;
-            padding: 0 var(--content-padding) 12px;
-            padding-top: var(--safe-area-top);
-        }
-
-        .back-btn {
-            min-width: var(--touch-target);
-            min-height: var(--touch-target);
-            width: 40px;
-            height: 40px;
-            background: rgba(255, 255, 255, 0.1);
-            border: 1px solid var(--border-light);
-            border-radius: 20px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            color: var(--text-primary);
-            margin-right: 16px;
-            font-size: 18px;
-            transition: all 0.2s ease;
-        }
-
-        .back-btn:active {
-            transform: scale(0.95);
-            background: var(--primary);
-            color: var(--bg-dark);
-        }
-
-        .challenge-page-title {
-            font-size: 18px;
-            font-weight: 700;
-            color: #FF4444;
-        }
-
-        .challenge-page-content {
-            flex: 1;
-            overflow-y: auto;
-            padding: var(--content-padding);
-        }
-
-        .challenge-detail-card {
-            background: var(--bg-card);
-            border: 1px solid var(--border-light);
-            border-radius: 20px;
-            padding: 24px;
-            margin-bottom: 20px;
-        }
-
-        .challenge-detail-title {
-            font-size: 24px;
-            font-weight: 800;
-            color: #FF4444;
-            margin-bottom: 16px;
-            line-height: 1.3;
-        }
-
-        .challenge-detail-description {
-            font-size: 16px;
-            line-height: 1.6;
-            color: var(--text-secondary);
-            margin-bottom: 20px;
-        }
-
-        .challenge-requirements {
-            background: rgba(0, 255, 150, 0.05);
-            border: 1px solid rgba(0, 255, 150, 0.2);
-            border-radius: 16px;
-            padding: 20px;
-            margin-bottom: 20px;
-        }
-
-        .requirements-title {
-            color: var(--primary);
-            font-size: 18px;
-            font-weight: 700;
-            margin-bottom: 16px;
-        }
-
-        .requirements-list {
-            list-style: none;
-            padding: 0;
-        }
-
-        .requirements-list li {
-            padding: 8px 0;
-            padding-left: 24px;
-            position: relative;
-            color: var(--text-secondary);
-            font-size: 15px;
-        }
-
-        .requirements-list li:before {
-            content: "✓";
-            position: absolute;
-            left: 0;
-            color: var(--primary);
-            font-weight: bold;
-            font-size: 16px;
-        }
-
-        .challenge-stats {
-            display: grid;
-            grid-template-columns: 1fr 1fr 1fr;
-            gap: 16px;
-            margin: 24px 0;
-        }
-
-        .stat-item {
-            text-align: center;
-            padding: 20px 12px;
-            border-radius: 16px;
-            border: 1px solid var(--border-light);
-            background: rgba(255, 255, 255, 0.02);
-        }
-
-        .stat-value {
-            font-size: 22px;
-            font-weight: 800;
-            margin-bottom: 8px;
-        }
-
-        .stat-label {
-            font-size: 12px;
-            color: var(--text-secondary);
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-
-        /* ===== FIXED MODAL SYSTEM ===== */
-        .modal {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(0, 0, 0, 0.9);
-            backdrop-filter: blur(10px);
-            display: none;
-            align-items: center;
-            justify-content: center;
-            z-index: 3000;
-            padding: 20px;
-        }
-
-        .modal.show {
-            display: flex;
-            animation: modalFadeIn 0.3s ease;
-        }
-
-        .modal-content {
-            background: var(--bg-card);
-            border: 1px solid var(--border-light);
-            border-radius: 24px;
-            padding: 28px;
-            width: 100%;
-            max-width: 400px;
-            max-height: 90vh;
-            overflow-y: auto;
-            backdrop-filter: blur(20px);
-        }
-
-        .modal-title {
-            font-size: 22px;
-            font-weight: 800;
-            text-align: center;
-            color: var(--text-primary);
-            margin-bottom: 28px;
-        }
-
-        .form-group {
-            margin-bottom: 20px;
-        }
-
-        .form-label {
-            display: block;
-            font-size: 15px;
-            font-weight: 700;
-            color: var(--text-primary);
-            margin-bottom: 8px;
-        }
-
-        .form-control {
-            width: 100%;
-            padding: 16px;
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid var(--border-light);
-            border-radius: 16px;
-            color: var(--text-primary);
-            font-size: 16px;
-            outline: none;
-            transition: all 0.2s ease;
-        }
-
-        .form-control:focus {
-            border-color: var(--primary);
-            background: rgba(255, 255, 255, 0.1);
-            box-shadow: 0 0 0 2px rgba(0, 255, 150, 0.2);
-        }
-
-        .form-control::placeholder {
-            color: var(--text-secondary);
-        }
-
-        .btn-primary, .btn-secondary {
-            width: 100%;
-            height: var(--button-height);
-            border: none;
-            border-radius: var(--button-radius);
-            font-size: 16px;
-            font-weight: 700;
-            cursor: pointer;
-            margin-bottom: 12px;
-            transition: all 0.2s ease;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-
-        .btn-primary {
-            background: var(--primary);
-            color: var(--bg-dark);
-            box-shadow: 0 4px 12px rgba(0, 255, 150, 0.3);
-        }
-
-        .btn-primary:active {
-            transform: translateY(1px);
-            box-shadow: 0 2px 8px rgba(0, 255, 150, 0.4);
-        }
-
-        .btn-secondary {
-            background: rgba(255, 255, 255, 0.1);
-            border: 1px solid var(--border-light);
-            color: var(--text-primary);
-        }
-
-        .btn-secondary:active {
-            background: rgba(255, 255, 255, 0.2);
-            transform: translateY(1px);
-        }
-
-        /* ===== FIXED TOAST NOTIFICATIONS ===== */
+        /* ===== TOAST NOTIFICATIONS ===== */
         .toast {
             position: fixed;
-            top: calc(var(--safe-area-top) + var(--header-height) + 20px);
+            top: calc(var(--safe-area-top) + 100px);
             left: var(--content-padding);
             right: var(--content-padding);
             background: var(--bg-card);
-            border: 1px solid var(--primary);
+            border: 1px solid var(--beta-primary);
             border-radius: 16px;
             padding: 16px 20px;
             font-size: 15px;
@@ -1173,135 +770,24 @@
             opacity: 1;
         }
 
-        .toast.error {
-            border-color: var(--error);
-            background: rgba(255, 107, 107, 0.1);
-        }
-
         .toast.success {
-            border-color: var(--success);
-            background: rgba(76, 175, 80, 0.1);
+            border-color: var(--beta-success);
+            background: rgba(102, 187, 106, 0.1);
         }
 
-        /* ===== FIXED RATING SYSTEM ===== */
-        .rating-stars {
-            display: flex;
-            justify-content: center;
-            gap: 12px;
-            margin: 20px 0;
-        }
-
-        .star {
-            font-size: 32px;
-            cursor: pointer;
-            opacity: 0.3;
-            transition: all 0.2s ease;
-            min-width: var(--touch-target);
-            min-height: var(--touch-target);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .star.active, .star:hover {
-            opacity: 1;
-            transform: scale(1.1);
-        }
-
-        /* ===== FIXED ANIMATIONS ===== */
-        @keyframes slideInFromRight {
-            from { transform: translateX(100%); }
-            to { transform: translateX(0); }
-        }
-
+        /* ===== ANIMATIONS ===== */
         @keyframes modalFadeIn {
             from { opacity: 0; transform: scale(0.9); }
             to { opacity: 1; transform: scale(1); }
         }
 
-        @keyframes pulse {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.5; }
-        }
-
-        /* ===== FIXED RESPONSIVE DESIGN ===== */
-        
-        /* iPhone SE (375px) */
-        @media screen and (max-width: 375px) {
+        /* ===== RESPONSIVE DESIGN ===== */
+        @media (max-width: 375px) {
             :root {
                 --content-padding: 16px;
                 --header-height: 56px;
                 --nav-height: 80px;
             }
-            
-            .challenge-title { font-size: 20px; }
-            .challenge-description { font-size: 15px; }
-            .header-btn { width: 36px; height: 36px; font-size: 16px; }
-            .action-btn { width: 48px; height: 48px; }
-            .logo-text { font-size: 20px; }
-            .logo-slogan { font-size: 8px; }
-        }
-
-        /* iPhone 12/13/14 (390px) */
-        @media screen and (min-width: 376px) and (max-width: 430px) {
-            .challenge-card { border-radius: 28px; }
-            .challenge-content { padding: 24px; }
-        }
-
-        /* iPhone 14 Plus/Max (428px+) */
-        @media screen and (min-width: 431px) {
-            .challenge-title { font-size: 26px; }
-            .challenge-description { font-size: 18px; }
-            .modal-content { max-width: 480px; }
-        }
-
-        /* Landscape optimizations */
-        @media screen and (orientation: landscape) and (max-height: 500px) {
-            .challenge-content { padding: 16px; gap: 12px; }
-            .challenge-header { padding: 16px; }
-            .challenge-actions { padding: 16px; }
-            .nav-height { height: 72px; }
-        }
-
-        /* Smooth scrolling */
-        .challenge-content, .challenge-page-content, .modal-content {
-            scroll-behavior: smooth;
-            -webkit-overflow-scrolling: touch;
-        }
-
-        /* Loading states */
-        .loading {
-            animation: pulse 1.5s ease-in-out infinite;
-        }
-
-        /* Focus states for accessibility */
-        button:focus-visible, 
-        .nav-item:focus-visible,
-        .header-btn:focus-visible,
-        .action-btn:focus-visible {
-            outline: 2px solid var(--primary);
-            outline-offset: 2px;
-        }
-
-        /* FIXED: Remove unwanted numbers and clean text */
-        .clean-text {
-            font-variant-numeric: normal;
-        }
-
-        /* FIXED: Better icon alignment */
-        .icon-center {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        /* FIXED: Proper spacing for content */
-        .content-spacing {
-            margin-bottom: 1rem;
-        }
-
-        .content-spacing:last-child {
-            margin-bottom: 0;
         }
     </style>
 </head>
@@ -1309,21 +795,9 @@
     <!-- Starfield Background -->
     <div class="starfield"></div>
 
-    <!-- Animated Blinking Stars with 3 Sizes + Passing Planets -->
-    <div class="animated-stars">
-        <div class="star-particle small"></div>
-        <div class="star-particle medium"></div>
-        <div class="star-particle small"></div>
-        <div class="star-particle large"></div>
-        <div class="star-particle small"></div>
-        <div class="star-particle medium"></div>
-        <div class="star-particle large"></div>
-        <div class="star-particle small"></div>
-        <div class="star-particle medium"></div>
-        <div class="star-particle large"></div>
-        <div class="planet"></div>
-        <div class="planet"></div>
-        <div class="planet"></div>
+    <!-- Beta Testing Banner -->
+    <div class="beta-banner">
+        🧪 BETA TESTING MODE - Mock Payments Only
     </div>
 
     <!-- Main App Container -->
@@ -1333,54 +807,29 @@
         <div class="header">
             <div class="logo">
                 <div class="logo-text">JomBro</div>
-                <div class="logo-slogan">Let's Go! Let's Go!</div>
+                <div class="logo-slogan">Beta Testing</div>
             </div>
             <div class="header-actions">
-                <div class="header-btn icon-center" onclick="showHowToPlay()" title="How to Play">❓</div>
-                <div class="header-btn icon-center" onclick="showLiveActivity()" title="Live Activity">⚡</div>
-                <div class="header-btn icon-center" onclick="showModal('create')" title="Create Challenge">➕</div>
-                <div class="header-btn icon-center" onclick="showModal('createGroup')" title="Create Group">👥</div>
-                <div class="header-btn icon-center" onclick="showNotifications()" title="Notifications">🔔</div>
-                <div class="header-btn icon-center" onclick="showModal('settings')" title="Settings">⚙️</div>
+                <div class="header-btn" onclick="showBetaFeedback()">💬</div>
+                <div class="header-btn" onclick="showBetaInfo()">❓</div>
+                <div class="header-btn" onclick="resetBetaAccount()">🔄</div>
             </div>
         </div>
 
         <!-- Player Info -->
         <div class="player-info">
-            <div class="player-rank" id="playerRank">Elite Gladiator</div>
-            <div class="player-tokens" id="playerTokens">
+            <div class="player-rank" id="playerRank">Beta Tester</div>
+            <div class="player-tokens">
                 <span>🪙</span>
-                <span id="tokenAmount">15,247</span>
+                <span id="tokenAmount">999,999</span>
             </div>
-        </div>
-
-        <!-- Live Challengers -->
-        <div class="live-challengers">
-            <div class="live-challengers-header">
-                <div class="live-indicator"></div>
-                <div class="live-title">Live</div>
-                <div class="live-count" id="liveCount">12 active</div>
-            </div>
-            <div class="challengers-container" id="challengersContainer">
-                <!-- Live challengers will be populated here -->
-            </div>
+            <div class="beta-badge">UNLIMITED</div>
         </div>
 
         <!-- Main Content Area -->
         <div class="content-area">
             <div class="challenge-container" id="challengeContainer">
                 <!-- Challenge cards will be dynamically generated -->
-            </div>
-
-            <!-- Side Actions -->
-            <div class="side-actions">
-                <div class="action-btn points-btn" onclick="likeChallenge()">
-                    <div class="points-number" id="currentChallengePoints">2.5K</div>
-                    <div class="points-label">❤️</div>
-                </div>
-                <div class="action-btn icon-center" onclick="showComments()">💬</div>
-                <div class="action-btn icon-center" onclick="bookmarkChallenge()">🔖</div>
-                <div class="action-btn icon-center" onclick="shareChallenge()">📤</div>
             </div>
         </div>
 
@@ -1390,21 +839,17 @@
                 <div class="nav-icon">🏠</div>
                 <div class="nav-label">Home</div>
             </div>
-            <div class="nav-item" onclick="navAction(this, 'leaderboard')">
-                <div class="nav-icon">🏆</div>
-                <div class="nav-label">Ranks</div>
+            <div class="nav-item" onclick="navAction(this, 'challenges')">
+                <div class="nav-icon">⚡</div>
+                <div class="nav-label">Test</div>
             </div>
-            <div class="nav-item" onclick="navAction(this, 'create')">
-                <div class="nav-icon">➕</div>
-                <div class="nav-label">Create</div>
+            <div class="nav-item" onclick="navAction(this, 'tokens')">
+                <div class="nav-icon">💎</div>
+                <div class="nav-label">Tokens</div>
             </div>
-            <div class="nav-item" onclick="navAction(this, 'groups')">
-                <div class="nav-icon">👥</div>
-                <div class="nav-label">Groups</div>
-            </div>
-            <div class="nav-item" onclick="navAction(this, 'shop')">
-                <div class="nav-icon">🛍️</div>
-                <div class="nav-label">Shop</div>
+            <div class="nav-item" onclick="navAction(this, 'feedback')">
+                <div class="nav-icon">💬</div>
+                <div class="nav-label">Feedback</div>
             </div>
             <div class="nav-item" onclick="navAction(this, 'profile')">
                 <div class="nav-icon">👤</div>
@@ -1413,67 +858,43 @@
         </div>
     </div>
 
-    <!-- Challenge Detail Page -->
-    <div class="challenge-page" id="challengePage">
-        <div class="challenge-page-header">
-            <div class="back-btn icon-center" onclick="closeChallengeePage()">←</div>
-            <div class="challenge-page-title">Challenge Details</div>
-        </div>
-        <div class="challenge-page-content">
-            <div class="challenge-detail-card">
-                <div class="challenge-detail-title" id="challengeDetailTitle">Loading...</div>
-                <div class="challenge-detail-description" id="challengeDetailDescription">Loading details...</div>
-                
-                <div class="challenge-requirements">
-                    <div class="requirements-title">📋 Requirements</div>
-                    <ul class="requirements-list" id="challengeRequirementsList">
-                        <li>Loading requirements...</li>
-                    </ul>
-                </div>
-
-                <div class="challenge-stats">
-                    <div class="stat-item">
-                        <div class="stat-value" style="color: var(--primary);" id="challengeDetailTokens">0</div>
-                        <div class="stat-label">Tokens</div>
-                    </div>
-                    <div class="stat-item">
-                        <div class="stat-value" style="color: var(--accent);" id="challengeDetailDifficulty">Easy</div>
-                        <div class="stat-label">Difficulty</div>
-                    </div>
-                    <div class="stat-item">
-                        <div class="stat-value" style="color: #4FC3F7;" id="challengeDetailDuration">30m</div>
-                        <div class="stat-label">Duration</div>
-                    </div>
-                </div>
-
-                <div class="challenge-actions">
-                    <button class="challenge-btn btn-accept" onclick="startChallenge()">
-                        🚀 Start Challenge
-                    </button>
-                    <button class="challenge-btn btn-decline" onclick="closeChallengeePage()">
-                        Cancel
-                    </button>
-                </div>
+    <!-- Mock Payment Modal -->
+    <div id="mockPaymentModal" class="mock-payment-modal">
+        <div class="mock-payment-content">
+            <div class="mock-payment-title">🧪 Mock Payment Demo</div>
+            <div class="beta-warning">
+                ⚠️ This is a demonstration. No real payment will be processed.
             </div>
+            
+            <div class="package-info" id="packageInfo">
+                <div class="package-tokens" id="packageTokens">500 Tokens</div>
+                <div class="package-price" id="packagePrice">RM 5.99</div>
+            </div>
+
+            <div class="mock-payment-options">
+                <button class="mock-payment-btn mock-tng-btn" onclick="mockTNGPayment()">
+                    🚗 Touch 'n Go eWallet (DEMO)
+                </button>
+                <button class="mock-payment-btn mock-grab-btn" onclick="mockGrabPayment()">
+                    🚗 GrabPay (DEMO)
+                </button>
+                <button class="mock-payment-btn mock-card-btn" onclick="mockCardPayment()">
+                    💳 Credit Card (DEMO)
+                </button>
+            </div>
+
+            <button class="mock-close-btn" onclick="closeMockPayment()">Cancel</button>
         </div>
     </div>
 
-    <!-- Challenge Completion Modal -->
-    <div id="challengeCompletionModal" class="modal">
-        <div class="modal-content">
-            <div class="modal-title">📸 Complete Challenge</div>
+    <!-- Beta Feedback Modal -->
+    <div id="feedbackModal" class="feedback-modal">
+        <div class="feedback-content">
+            <div class="feedback-title">📝 Beta Testing Feedback</div>
+            
             <div class="form-group">
-                <label class="form-label">Upload Photo/Video</label>
-                <input type="file" class="form-control" id="challengeMedia" accept="image/*,video/*">
-            </div>
-            <div class="form-group">
-                <label class="form-label">Describe Your Experience</label>
-                <textarea class="form-control" id="challengeCompletionDesc" rows="4" 
-                    placeholder="Tell us about your experience..."></textarea>
-            </div>
-            <div class="form-group">
-                <label class="form-label">Rate Your Experience</label>
-                <div class="rating-stars">
+                <label class="form-label">How was this challenge?</label>
+                <div class="rating-stars" id="challengeRating">
                     <span class="star" onclick="setRating(1)">⭐</span>
                     <span class="star" onclick="setRating(2)">⭐</span>
                     <span class="star" onclick="setRating(3)">⭐</span>
@@ -1481,600 +902,185 @@
                     <span class="star" onclick="setRating(5)">⭐</span>
                 </div>
             </div>
-            <button class="btn-primary" onclick="submitChallengeCompletion()">🤖 Submit for Review</button>
-            <button class="btn-secondary" onclick="hideModal('challengeCompletion')">Cancel</button>
-        </div>
-    </div>
 
-    <!-- Create Challenge Modal -->
-    <div id="createModal" class="modal">
-        <div class="modal-content">
-            <div class="modal-title">✨ Create Challenge</div>
             <div class="form-group">
-                <label class="form-label">Challenge Title</label>
-                <input type="text" class="form-control" id="challengeTitle" placeholder="Enter title...">
+                <label class="form-label">What did you like?</label>
+                <textarea class="form-control" id="likeFeedback" rows="3" 
+                    placeholder="What worked well in this challenge?"></textarea>
             </div>
+
             <div class="form-group">
-                <label class="form-label">Description</label>
-                <textarea class="form-control" id="challengeDesc" rows="4" placeholder="Describe your challenge..."></textarea>
+                <label class="form-label">What could be improved?</label>
+                <textarea class="form-control" id="improveFeedback" rows="3" 
+                    placeholder="Any suggestions for improvement?"></textarea>
             </div>
+
             <div class="form-group">
-                <label class="form-label">Difficulty & Reward</label>
-                <select class="form-control" id="challengePoints">
-                    <option value="500">Easy - 500 Tokens</option>
-                    <option value="1200">Medium - 1,200 Tokens</option>
-                    <option value="2500">Hard - 2,500 Tokens</option>
-                    <option value="5000">Epic - 5,000 Tokens</option>
-                    <option value="10000">Legendary - 10,000 Tokens</option>
+                <label class="form-label">App Performance (1-5)</label>
+                <select class="form-control" id="performanceFeedback">
+                    <option value="">Select rating...</option>
+                    <option value="5">5 - Excellent</option>
+                    <option value="4">4 - Good</option>
+                    <option value="3">3 - Average</option>
+                    <option value="2">2 - Poor</option>
+                    <option value="1">1 - Very Poor</option>
                 </select>
             </div>
-            <button class="btn-primary" onclick="createChallenge()">🚀 Create</button>
-            <button class="btn-secondary" onclick="hideModal('create')">Cancel</button>
-        </div>
-    </div>
 
-    <!-- Create Group Modal -->
-    <div id="createGroupModal" class="modal">
-        <div class="modal-content">
-            <div class="modal-title">👥 Create Group</div>
-            <div class="form-group">
-                <label class="form-label">Group Name</label>
-                <input type="text" class="form-control" id="groupName" placeholder="Enter group name...">
-            </div>
-            <div class="form-group">
-                <label class="form-label">Group Description</label>
-                <textarea class="form-control" id="groupDesc" rows="3" placeholder="Describe your group..."></textarea>
-            </div>
-            <div class="form-group">
-                <label class="form-label">Competition Type</label>
-                <select class="form-control" id="groupType">
-                    <option value="weekly">Weekly Competition</option>
-                    <option value="monthly">Monthly Competition</option>
-                    <option value="challenge">Challenge-Based</option>
-                    <option value="custom">Custom Duration</option>
-                </select>
-            </div>
-            <div class="form-group">
-                <label class="form-label">Point System</label>
-                <select class="form-control" id="pointSystem">
-                    <option value="standard">Standard (+100 win, -50 loss)</option>
-                    <option value="aggressive">Aggressive (+200 win, -100 loss)</option>
-                    <option value="winner-takes-all">Winner Takes All</option>
-                    <option value="custom">Custom Points</option>
-                </select>
-            </div>
-            <div class="form-group">
-                <label class="form-label">Group Privacy</label>
-                <select class="form-control" id="groupPrivacy">
-                    <option value="public">Public - Anyone can join</option>
-                    <option value="private">Private - Invite only</option>
-                    <option value="friends">Friends only</option>
-                </select>
-            </div>
-            <div class="form-group">
-                <label class="form-label">Winner Rewards</label>
-                <textarea class="form-control" id="winnerRewards" rows="2" placeholder="e.g., 10,000 tokens, Special badge, Real prize..."></textarea>
-            </div>
-            <button class="btn-primary" onclick="createGroup()">🚀 Create Group</button>
-            <button class="btn-secondary" onclick="hideModal('createGroup')">Cancel</button>
-        </div>
-    </div>
-
-    <!-- Groups Management Modal -->
-    <div id="groupsModal" class="modal">
-        <div class="modal-content">
-            <div class="modal-title">👥 My Groups</div>
-            <div style="margin-bottom: 20px;">
-                <div style="display: flex; gap: 8px; margin-bottom: 16px;">
-                    <button class="btn-primary" style="flex: 1; margin: 0;" onclick="showModal('createGroup'); hideModal('groups')">➕ Create Group</button>
-                    <button class="btn-secondary" style="flex: 1; margin: 0;" onclick="joinRandomGroup()">🎲 Join Random</button>
-                </div>
-            </div>
-            
-            <div id="groupsList" style="max-height: 300px; overflow-y: auto;">
-                <!-- Groups will be populated here -->
-            </div>
-            
-            <button class="btn-secondary" onclick="hideModal('groups')">Close</button>
-        </div>
-    </div>
-
-    <!-- Group Details Modal -->
-    <div id="groupDetailsModal" class="modal">
-        <div class="modal-content">
-            <div class="modal-title" id="groupDetailsTitle">Group Details</div>
-            
-            <!-- Live Leaderboard -->
-            <div style="background: rgba(0, 255, 150, 0.1); border: 1px solid var(--primary); border-radius: 12px; padding: 16px; margin-bottom: 16px;">
-                <h4 style="color: var(--primary); margin-bottom: 12px;">🏆 Live Leaderboard</h4>
-                <div id="groupLeaderboard">
-                    <!-- Leaderboard will be populated here -->
-                </div>
-            </div>
-
-            <!-- Live Activity Feed -->
-            <div style="background: rgba(255, 255, 255, 0.02); border: 1px solid var(--border-light); border-radius: 12px; padding: 16px; margin-bottom: 16px;">
-                <h4 style="color: var(--text-primary); margin-bottom: 12px;">⚡ Live Activity</h4>
-                <div id="groupActivity" style="max-height: 150px; overflow-y: auto;">
-                    <!-- Activity feed will be populated here -->
-                </div>
-            </div>
-
-            <!-- Group Stats -->
-            <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; margin-bottom: 16px;">
-                <div style="text-align: center; padding: 12px; background: rgba(0, 255, 150, 0.1); border-radius: 8px;">
-                    <div style="color: var(--primary); font-size: 18px; font-weight: 700;" id="groupMemberCount">0</div>
-                    <div style="font-size: 12px; color: var(--text-secondary);">Members</div>
-                </div>
-                <div style="text-align: center; padding: 12px; background: rgba(255, 215, 0, 0.1); border-radius: 8px;">
-                    <div style="color: var(--accent); font-size: 18px; font-weight: 700;" id="groupTotalPoints">0</div>
-                    <div style="font-size: 12px; color: var(--text-secondary);">Total Points</div>
-                </div>
-                <div style="text-align: center; padding: 12px; background: rgba(255, 107, 107, 0.1); border-radius: 8px;">
-                    <div style="color: #FF6B6B; font-size: 18px; font-weight: 700;" id="groupDaysLeft">0</div>
-                    <div style="font-size: 12px; color: var(--text-secondary);">Days Left</div>
-                </div>
-            </div>
-
-            <div style="display: flex; gap: 8px;">
-                <button class="btn-primary" style="flex: 1; margin: 0;" onclick="inviteToGroup()">📤 Invite Friends</button>
-                <button class="btn-secondary" style="flex: 1; margin: 0;" onclick="leaveGroup()">🚪 Leave Group</button>
-            </div>
-            
-            <button class="btn-secondary" onclick="hideModal('groupDetails')" style="margin-top: 8px;">Close</button>
-        </div>
-    </div>
-
-    <!-- Settings Modal -->
-    <div id="settingsModal" class="modal">
-        <div class="modal-content">
-            <div class="modal-title">⚙️ Settings</div>
-            <div class="form-group">
-                <label class="form-label">🤖 AI Review API Key</label>
-                <input type="password" class="form-control" id="openaiApiKey" 
-                    placeholder="Enter your OpenAI API Key">
-            </div>
-            <div class="form-group">
-                <label class="form-label">🎨 Theme</label>
-                <select class="form-control" id="backgroundTheme">
-                    <option value="space">🌌 Space</option>
-                    <option value="ocean">🌊 Ocean</option>
-                    <option value="forest">🌲 Forest</option>
-                    <option value="city">🏙️ City</option>
-                </select>
-            </div>
-            <button class="btn-primary" onclick="saveSettings()">💾 Save</button>
-            <button class="btn-secondary" onclick="hideModal('settings')">Cancel</button>
+            <button class="submit-feedback-btn" onclick="submitBetaFeedback()">
+                📤 Submit Feedback
+            </button>
+            <button class="mock-close-btn" onclick="closeBetaFeedback()">Close</button>
         </div>
     </div>
 
     <!-- Toast Notification -->
     <div id="toast" class="toast">
-        <span id="toastText">Ready!</span>
+        <span id="toastText">Ready for testing!</span>
     </div>
 
     <script>
-        // ===== FIXED JOMBRO JAVASCRIPT =====
+        // ===== JOMBRO BETA TESTING JAVASCRIPT =====
 
-        // Global state
-        let playerData = {
-            username: 'alexandra_stone',
-            displayName: 'Alexandra Stone',
-            avatar: 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="50" cy="50" r="40" fill="%2300FF96"/><text x="50" y="55" text-anchor="middle" fill="white" font-size="20">AS</text></svg>',
-            tokens: 15247,
-            rank: 'Elite Gladiator',
-            completedChallenges: 143,
-            level: 27
+        // Beta testing configuration
+        const BETA_CONFIG = {
+            testingMode: true,
+            unlimitedTokens: true,
+            mockPayments: true,
+            feedbackEnabled: true,
+            debugMode: true
         };
 
-        let challengeData = [];
-        let groupData = [];
-        let liveChallengers = [];
-        let currentPage = 0;
-        let currentChallenge = null;
-        let currentGroup = null;
-        let selectedRating = 0;
-        let appSettings = { openaiApiKey: '', backgroundTheme: 'space' };
-        let groupUpdateInterval = null;
-        let liveChallengeUpdateInterval = null;
+        // Beta tester data
+        let betaPlayerData = {
+            username: 'beta_tester',
+            displayName: 'Beta Tester',
+            tokens: 999999,
+            rank: 'Beta Tester',
+            completedChallenges: 0,
+            feedback: []
+        };
 
-        // Initialize app
+        // Sample challenges for testing
+        let betaChallengeData = [
+            {
+                id: 'beta_001',
+                title: "Coffee Shop Challenge",
+                description: "Visit a coffee shop and ask the barista to write their favorite quote on your cup! This is a fun way to connect with people and brighten someone's day. Perfect for testing the social aspects of JomBro.",
+                hashtags: ["#Coffee", "#Social", "#BetaTest"],
+                difficulty: "easy",
+                tokens: 500,
+                type: "beta",
+                creator: "JomBro Team",
+                avatar: 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="50" cy="50" r="40" fill="%23FFD700"/><text x="50" y="55" text-anchor="middle" fill="white" font-size="30">☕</text></svg>',
+                duration: "20 min",
+                testFocus: "Social interaction, user experience"
+            },
+            {
+                id: 'beta_002',
+                title: "Photo Scavenger Hunt",
+                description: "Take photos of 5 different colored cars in your neighborhood! This challenge tests the photo submission feature and helps us understand how users interact with camera functionality.",
+                hashtags: ["#Photo", "#Scavenger", "#BetaTest"],
+                difficulty: "medium",
+                tokens: 1200,
+                type: "beta",
+                creator: "JomBro Team",
+                avatar: 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="50" cy="50" r="40" fill="%234FC3F7"/><text x="50" y="55" text-anchor="middle" fill="white" font-size="30">📸</text></svg>',
+                duration: "30 min",
+                testFocus: "Photo upload, UI flow"
+            },
+            {
+                id: 'beta_003',
+                title: "Random Act of Kindness",
+                description: "Do something nice for a stranger today! Buy someone's coffee, help carry groceries, or simply give a genuine compliment. This tests the feel-good factor of JomBro challenges.",
+                hashtags: ["#Kindness", "#Community", "#BetaTest"],
+                difficulty: "easy",
+                tokens: 800,
+                type: "beta",
+                creator: "JomBro Team",
+                avatar: 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="50" cy="50" r="40" fill="%23FF6B47"/><text x="50" y="55" text-anchor="middle" fill="white" font-size="30">❤️</text></svg>',
+                duration: "15 min",
+                testFocus: "Emotional engagement, completion tracking"
+            },
+            {
+                id: 'beta_004',
+                title: "Public Speaking Mini Challenge",
+                description: "Record a 30-second video of yourself explaining why you love your city! This tests video submission features and helps us understand user comfort with content creation.",
+                hashtags: ["#Video", "#Speaking", "#BetaTest"],
+                difficulty: "hard",
+                tokens: 2000,
+                type: "beta",
+                creator: "JomBro Team",
+                avatar: 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="50" cy="50" r="40" fill="%23E91E63"/><text x="50" y="55" text-anchor="middle" fill="white" font-size="30">🎤</text></svg>',
+                duration: "45 min",
+                testFocus: "Video features, user confidence"
+            },
+            {
+                id: 'beta_005',
+                title: "Local Business Discovery",
+                description: "Find a local business you've never visited before and try their signature item! Take a photo and write a mini review. This tests local discovery features.",
+                hashtags: ["#Local", "#Business", "#BetaTest"],
+                difficulty: "medium",
+                tokens: 1500,
+                type: "beta",
+                creator: "JomBro Team",
+                avatar: 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="50" cy="50" r="40" fill="%2300B14F"/><text x="50" y="55" text-anchor="middle" fill="white" font-size="30">🏪</text></svg>',
+                duration: "60 min",
+                testFocus: "Location features, review system"
+            }
+        ];
+
+        let currentPage = 0;
+        let selectedRating = 0;
+        let currentTestChallenge = null;
+
+        // ===== INITIALIZATION =====
         document.addEventListener('DOMContentLoaded', function() {
-            console.log('🚀 JomBro Mobile App Starting...');
-            loadSettings();
-            generateSampleChallenges();
-            generateSampleGroups();
-            generateLiveChallengers();
-            updatePlayerDisplay();
+            console.log('🧪 JomBro Beta Testing Mode Started');
+            initializeBetaTesting();
             updateChallengeDisplay();
-            updateLiveChallengers();
-            startLiveChallengeUpdates();
-            setTimeout(() => showToast('🎉 Welcome to JomBro!', 'success'), 1000);
+            showToast('🎉 Welcome to JomBro Beta Testing!', 'success');
         });
 
-        // Generate sample challenges
-        function generateSampleChallenges() {
-            challengeData = [
-                {
-                    id: 'daily_001',
-                    title: "Coffee Shop Poetry Challenge",
-                    description: "Visit any coffee shop and ask the barista to write a short poem on your cup or napkin! This is a wonderful way to connect with people and brighten someone's day. Take a photo and share your experience.",
-                    hashtags: ["#CoffeePoetry", "#Connection", "#JomBro"],
-                    difficulty: "easy",
-                    tokens: 500,
-                    type: "daily",
-                    creator: "JomBro AI",
-                    avatar: 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="50" cy="50" r="40" fill="%23FFD700"/><text x="50" y="55" text-anchor="middle" fill="white" font-size="30">☕</text></svg>',
-                    requirements: [
-                        "Visit any coffee shop",
-                        "Ask barista to write a poem",
-                        "Take a photo with coffee",
-                        "Share your experience",
-                        "Rate the experience"
-                    ],
-                    duration: "30 min",
-                    likes: 2547
-                },
-                {
-                    id: 'business_001',
-                    title: "McDonald's Random Order Adventure",
-                    description: "💰 BUSINESS PARTNERSHIP: Close your eyes and point at the menu to order! Create a fun surprise meal experience. Perfect for food adventurers who love surprises!",
-                    hashtags: ["#McDonalds", "#SurpriseMenu", "#Food"],
-                    difficulty: "medium",
-                    tokens: 1800,
-                    realRewards: "RM 50 McDonald's Voucher",
-                    type: "business",
-                    creator: "McDonald's Malaysia",
-                    avatar: 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="50" cy="50" r="40" fill="%23FF6B47"/><text x="50" y="55" text-anchor="middle" fill="white" font-size="30">🍟</text></svg>',
-                    requirements: [
-                        "Visit McDonald's",
-                        "Close eyes and point at menu",
-                        "Order what you pointed at",
-                        "Take reaction photos",
-                        "Write a review"
-                    ],
-                    duration: "45 min",
-                    likes: 4832
-                },
-                {
-                    id: 'adventure_001',
-                    title: "Urban Explorer Challenge",
-                    description: "🗺️ Discover 3 hidden gems in your city that aren't on tourist maps! Document each location and share the stories behind them. Perfect for curious adventurers!",
-                    hashtags: ["#UrbanExplorer", "#HiddenGems", "#Adventure"],
-                    difficulty: "hard",
-                    tokens: 2500,
-                    type: "daily",
-                    creator: "Adventure Mike",
-                    avatar: 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="50" cy="50" r="40" fill="%234FC3F7"/><text x="50" y="55" text-anchor="middle" fill="white" font-size="30">🗺️</text></svg>',
-                    requirements: [
-                        "Find 3 hidden local spots",
-                        "Take photos at each location",
-                        "Document the history",
-                        "Interview locals",
-                        "Create a mini-guide"
-                    ],
-                    duration: "2 hours",
-                    likes: 1893
-                },
-                {
-                    id: 'treasure_001',
-                    title: "TREASURE: City Hunt Championship",
-                    description: "🏆 MONTHLY TREASURE: Complete a city-wide scavenger hunt! Solve clues, find QR codes, and compete for amazing prizes! This month's grand prize is incredible!",
-                    hashtags: ["#TreasureHunt", "#Competition", "#Monthly"],
-                    difficulty: "legendary",
-                    tokens: 25000,
-                    realRewards: "iPhone 15 Pro Max + RM 5,000",
-                    type: "treasure",
-                    creator: "JomBro Treasure",
-                    avatar: 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="50" cy="50" r="40" fill="%23FFD700"/><text x="50" y="55" text-anchor="middle" fill="white" font-size="30">🏆</text></svg>',
-                    requirements: [
-                        "Download treasure map",
-                        "Solve 10 clues",
-                        "Scan QR codes",
-                        "Complete mini-challenges",
-                        "Submit all proofs"
-                    ],
-                    duration: "6 hours",
-                    likes: 15782
-                },
-                {
-                    id: 'fitness_001',
-                    title: "Public Workout Inspiration",
-                    description: "💪 Do 30 push-ups in a public place and inspire 2 people to join you! Spread fitness motivation in your community and make new workout buddies!",
-                    hashtags: ["#PublicWorkout", "#Fitness", "#Inspiration"],
-                    difficulty: "medium",
-                    tokens: 1200,
-                    type: "daily",
-                    creator: "Fitness Ryan",
-                    avatar: 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="50" cy="50" r="40" fill="%23FF6B47"/><text x="50" y="55" text-anchor="middle" fill="white" font-size="30">💪</text></svg>',
-                    requirements: [
-                        "Choose busy public location",
-                        "Do 30 push-ups",
-                        "Invite 2 people to join",
-                        "Record reactions",
-                        "Share fitness tips"
-                    ],
-                    duration: "20 min",
-                    likes: 3241
-                }
-            ];
-        }
-
-        // Generate sample groups
-        function generateSampleGroups() {
-            groupData = [
-                {
-                    id: 'group_001',
-                    name: 'Weekend Warriors',
-                    description: 'Weekend challenge enthusiasts competing for glory!',
-                    type: 'weekly',
-                    pointSystem: 'standard',
-                    privacy: 'public',
-                    winnerRewards: '5,000 tokens, Winner badge, RM 100 voucher',
-                    createdBy: 'alexandra_stone',
-                    createdAt: Date.now() - 86400000 * 3,
-                    endDate: Date.now() + 86400000 * 4,
-                    members: [
-                        { username: 'alexandra_stone', displayName: 'Alexandra Stone', points: 850, trend: '+120', lastActive: Date.now() - 3600000 },
-                        { username: 'mike_challenger', displayName: 'Mike C.', points: 720, trend: '+85', lastActive: Date.now() - 1800000 },
-                        { username: 'sarah_explorer', displayName: 'Sarah E.', points: 650, trend: '-30', lastActive: Date.now() - 7200000 },
-                        { username: 'david_fitness', displayName: 'David F.', points: 580, trend: '+200', lastActive: Date.now() - 600000 },
-                        { username: 'lisa_creative', displayName: 'Lisa C.', points: 520, trend: '-75', lastActive: Date.now() - 14400000 }
-                    ],
-                    activity: [
-                        { type: 'point_gain', user: 'David F.', amount: 200, challenge: 'Fitness Challenge', time: Date.now() - 600000 },
-                        { type: 'point_gain', user: 'Alexandra Stone', amount: 120, challenge: 'Coffee Poetry', time: Date.now() - 1800000 },
-                        { type: 'point_loss', user: 'Sarah E.', amount: -30, challenge: 'Failed Urban Explorer', time: Date.now() - 3600000 },
-                        { type: 'point_gain', user: 'Mike C.', amount: 85, challenge: 'McDonalds Random', time: Date.now() - 7200000 }
-                    ]
-                },
-                {
-                    id: 'group_002',
-                    name: 'Elite Gladiators',
-                    description: 'Top-tier challengers competing for ultimate prizes!',
-                    type: 'monthly',
-                    pointSystem: 'aggressive',
-                    privacy: 'private',
-                    winnerRewards: '25,000 tokens, Elite badge, iPhone 15 Pro',
-                    createdBy: 'dragon_master',
-                    createdAt: Date.now() - 86400000 * 15,
-                    endDate: Date.now() + 86400000 * 15,
-                    members: [
-                        { username: 'dragon_master', displayName: 'Dragon Master', points: 2850, trend: '+400', lastActive: Date.now() - 1800000 },
-                        { username: 'shadow_ninja', displayName: 'Shadow Ninja', points: 2720, trend: '+350', lastActive: Date.now() - 3600000 },
-                        { username: 'alexandra_stone', displayName: 'Alexandra Stone', points: 2650, trend: '+280', lastActive: Date.now() - 600000 },
-                        { username: 'phoenix_rising', displayName: 'Phoenix Rising', points: 2580, trend: '+150', lastActive: Date.now() - 7200000 }
-                    ],
-                    activity: [
-                        { type: 'point_gain', user: 'Dragon Master', amount: 400, challenge: 'Treasure Hunt', time: Date.now() - 1800000 },
-                        { type: 'point_gain', user: 'Shadow Ninja', amount: 350, challenge: 'Epic Adventure', time: Date.now() - 3600000 },
-                        { type: 'point_gain', user: 'Alexandra Stone', amount: 280, challenge: 'Business Challenge', time: Date.now() - 7200000 }
-                    ]
-                },
-                {
-                    id: 'group_003',
-                    name: 'Fitness Fanatics',
-                    description: 'Dedicated to fitness and health challenges!',
-                    type: 'challenge',
-                    pointSystem: 'winner-takes-all',
-                    privacy: 'public',
-                    winnerRewards: '10,000 tokens, Fitness gear, Gym membership',
-                    createdBy: 'fitness_ryan',
-                    createdAt: Date.now() - 86400000 * 7,
-                    endDate: Date.now() + 86400000 * 7,
-                    members: [
-                        { username: 'fitness_ryan', displayName: 'Fitness Ryan', points: 1450, trend: '+300', lastActive: Date.now() - 1800000 },
-                        { username: 'alexandra_stone', displayName: 'Alexandra Stone', points: 1200, trend: '+180', lastActive: Date.now() - 3600000 },
-                        { username: 'workout_warrior', displayName: 'Workout Warrior', points: 1100, trend: '+220', lastActive: Date.now() - 7200000 },
-                        { username: 'gym_hero', displayName: 'Gym Hero', points: 980, trend: '-50', lastActive: Date.now() - 14400000 }
-                    ],
-                    activity: [
-                        { type: 'point_gain', user: 'Fitness Ryan', amount: 300, challenge: 'Public Workout', time: Date.now() - 1800000 },
-                        { type: 'point_gain', user: 'Workout Warrior', amount: 220, challenge: 'Marathon Training', time: Date.now() - 3600000 },
-                        { type: 'point_gain', user: 'Alexandra Stone', amount: 180, challenge: 'Yoga Challenge', time: Date.now() - 7200000 }
-                    ]
-                }
-            ];
-        }
-
-        // Generate live challengers
-        function generateLiveChallengers() {
-            const names = [
-                { username: 'mike_explorer', displayName: 'Mike E.', initials: 'ME', activity: 'challenge' },
-                { username: 'sarah_fitness', displayName: 'Sarah F.', initials: 'SF', activity: 'active' },
-                { username: 'david_creative', displayName: 'David C.', initials: 'DC', activity: 'treasure' },
-                { username: 'lisa_adventurer', displayName: 'Lisa A.', initials: 'LA', activity: 'group' },
-                { username: 'james_warrior', displayName: 'James W.', initials: 'JW', activity: 'challenge' },
-                { username: 'emma_champion', displayName: 'Emma C.', initials: 'EC', activity: 'active' },
-                { username: 'ryan_beast', displayName: 'Ryan B.', initials: 'RB', activity: 'treasure' },
-                { username: 'nina_ninja', displayName: 'Nina N.', initials: 'NN', activity: 'challenge' },
-                { username: 'alex_master', displayName: 'Alex M.', initials: 'AM', activity: 'group' },
-                { username: 'zoe_legend', displayName: 'Zoe L.', initials: 'ZL', activity: 'active' },
-                { username: 'tom_hero', displayName: 'Tom H.', initials: 'TH', activity: 'challenge' },
-                { username: 'kate_phoenix', displayName: 'Kate P.', initials: 'KP', activity: 'treasure' },
-                { username: 'leo_dragon', displayName: 'Leo D.', initials: 'LD', activity: 'group' },
-                { username: 'maya_storm', displayName: 'Maya S.', initials: 'MS', activity: 'active' },
-                { username: 'finn_blade', displayName: 'Finn B.', initials: 'FB', activity: 'challenge' }
-            ];
-
-            liveChallengers = names.map(challenger => ({
-                ...challenger,
-                lastSeen: Date.now() - Math.random() * 300000, // Within last 5 minutes
-                currentChallenge: challengeData[Math.floor(Math.random() * challengeData.length)]?.title || 'Unknown Challenge',
-                avatar: `data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="50" cy="50" r="40" fill="%23${Math.floor(Math.random()*16777215).toString(16).padStart(6, '0')}"/><text x="50" y="55" text-anchor="middle" fill="white" font-size="16">${challenger.initials}</text></svg>`
-            }));
-        }
-
-        // Update live challengers display
-        function updateLiveChallengers() {
-            const container = document.getElementById('challengersContainer');
-            const countElement = document.getElementById('liveCount');
+        function initializeBetaTesting() {
+            // Set beta testing indicators
+            document.title = 'JomBro Beta - Testing Mode';
             
-            if (!container || !countElement) return;
-
-            // Shuffle and show random subset
-            const activeChallengers = liveChallengers
-                .sort(() => Math.random() - 0.5)
-                .slice(0, 8 + Math.floor(Math.random() * 4)); // 8-12 challengers
-
-            countElement.textContent = `${activeChallengers.length} active`;
-
-            container.innerHTML = activeChallengers.map(challenger => {
-                const statusClass = `status-${challenger.activity}`;
-                const statusEmoji = {
-                    'active': '🟢',
-                    'challenge': '⚡',
-                    'treasure': '💎',
-                    'group': '👥'
-                }[challenger.activity] || '🟢';
-
-                return `
-                    <div class="challenger-avatar" onclick="showChallengerInfo('${challenger.username}')" title="${challenger.displayName}">
-                        <div class="challenger-avatar-inner">
-                            <img src="${challenger.avatar}" alt="${challenger.initials}">
-                        </div>
-                        <div class="challenger-status ${statusClass}">${statusEmoji}</div>
-                    </div>
-                `;
-            }).join('');
-        }
-
-        // Start live challenge updates
-        function startLiveChallengeUpdates() {
-            // Update every 8 seconds
-            liveChallengeUpdateInterval = setInterval(() => {
-                // Simulate activity changes
-                liveChallengers.forEach(challenger => {
-                    if (Math.random() < 0.2) { // 20% chance to change activity
-                        const activities = ['active', 'challenge', 'treasure', 'group'];
-                        challenger.activity = activities[Math.floor(Math.random() * activities.length)];
-                        challenger.lastSeen = Date.now();
-                    }
-                });
-                
-                updateLiveChallengers();
-            }, 8000);
-        }
-
-        // Show challenger info popup
-        function showChallengerInfo(username) {
-            const challenger = liveChallengers.find(c => c.username === username);
-            if (!challenger) return;
-
-            const timeAgo = getTimeAgo(challenger.lastSeen);
-            const activityText = {
-                'active': 'Browsing challenges',
-                'challenge': `Doing: ${challenger.currentChallenge}`,
-                'treasure': 'In treasure hunt',
-                'group': 'Competing in group'
-            }[challenger.activity] || 'Active';
-
-            const modal = document.createElement('div');
-            modal.className = 'modal show';
-            modal.innerHTML = `
-                <div class="modal-content">
-                    <div style="text-align: center; margin-bottom: 20px;">
-                        <div style="width: 60px; height: 60px; margin: 0 auto 12px;">
-                            <img src="${challenger.avatar}" alt="${challenger.initials}" style="width: 100%; height: 100%; border-radius: 50%;">
-                        </div>
-                        <div style="font-weight: 700; font-size: 18px; margin-bottom: 4px;">${challenger.displayName}</div>
-                        <div style="color: var(--text-secondary); font-size: 12px; margin-bottom: 8px;">@${challenger.username}</div>
-                        <div style="color: var(--primary); font-size: 14px; font-weight: 600;">${activityText}</div>
-                    </div>
-                    
-                    <div style="background: rgba(255, 255, 255, 0.05); border-radius: 12px; padding: 16px; margin-bottom: 16px;">
-                        <div style="display: flex; justify-content: space-between; align-items: center;">
-                            <div style="color: var(--text-secondary); font-size: 12px;">Last seen</div>
-                            <div style="color: var(--text-primary); font-size: 12px; font-weight: 600;">${timeAgo}</div>
-                        </div>
-                    </div>
-                    
-                    <div style="display: flex; gap: 8px;">
-                        <button class="btn-primary" style="flex: 1; margin: 0;" onclick="challengeUser('${challenger.username}'); this.closest('.modal').remove();">
-                            ⚡ Challenge
-                        </button>
-                        <button class="btn-secondary" style="flex: 1; margin: 0;" onclick="followUser('${challenger.username}'); this.closest('.modal').remove();">
-                            👤 Follow
-                        </button>
-                    </div>
-                    
-                    <button class="btn-secondary" onclick="this.closest('.modal').remove()" style="margin-top: 8px;">Close</button>
-                </div>
-            `;
-            document.body.appendChild(modal);
-        }
-
-        // Challenge user function
-        function challengeUser(username) {
-            const challenger = liveChallengers.find(c => c.username === username);
-            if (!challenger) return;
-            
-            showToast(`⚡ Challenge sent to ${challenger.displayName}!`, 'success');
-            playerData.tokens += 10; // Bonus for social interaction
+            // Initialize beta user data
             updatePlayerDisplay();
-        }
-
-        // Follow user function
-        function followUser(username) {
-            const challenger = liveChallengers.find(c => c.username === username);
-            if (!challenger) return;
             
-            showToast(`👤 Now following ${challenger.displayName}!`, 'success');
+            // Log beta session
+            console.log('Beta Testing Session Started:', {
+                timestamp: new Date().toISOString(),
+                userAgent: navigator.userAgent,
+                config: BETA_CONFIG
+            });
         }
 
-        // FIXED: Update player display with proper formatting
-        function updatePlayerDisplay() {
-            try {
-                const rankElement = document.getElementById('playerRank');
-                const tokenElement = document.getElementById('tokenAmount');
-                
-                if (rankElement) {
-                    rankElement.textContent = playerData.rank;
-                }
-                
-                if (tokenElement) {
-                    tokenElement.textContent = playerData.tokens.toLocaleString();
-                }
-            } catch (error) {
-                console.error('Error updating player display:', error);
-            }
-        }
-
-        // FIXED: Update challenge display with proper formatting
+        // ===== CHALLENGE DISPLAY =====
         function updateChallengeDisplay() {
-            try {
-                const container = document.getElementById('challengeContainer');
-                if (!container) return;
-                
-                container.innerHTML = '';
+            const container = document.getElementById('challengeContainer');
+            if (!container) return;
+            
+            container.innerHTML = '';
+            
+            betaChallengeData.forEach((challenge, index) => {
+                const card = createBetaChallengeCard(challenge, index);
+                container.appendChild(card);
+            });
 
-                challengeData.forEach((challenge, index) => {
-                    const card = createChallengeCard(challenge, index);
-                    container.appendChild(card);
-                });
-
-                updateCurrentChallenge();
-            } catch (error) {
-                console.error('Error updating challenge display:', error);
-            }
+            updateCurrentChallenge();
         }
 
-        // FIXED: Create challenge card with proper formatting
-        function createChallengeCard(challenge, index) {
+        function createBetaChallengeCard(challenge, index) {
             const card = document.createElement('div');
-            card.className = `challenge-card ${index === currentPage ? 'current' : (index === currentPage + 1 ? 'next' : 'prev')}`;
+            card.className = `challenge-card ${index === currentPage ? 'current' : ''}`;
 
             const getDifficultyClass = (difficulty) => ({
                 'easy': 'difficulty-easy',
                 'medium': 'difficulty-medium', 
-                'hard': 'difficulty-hard',
-                'epic': 'difficulty-epic',
-                'legendary': 'difficulty-legendary'
+                'hard': 'difficulty-hard'
             }[difficulty] || 'difficulty-easy');
-
-            // FIXED: Clean token display without random numbers
-            const tokenDisplay = challenge.tokens.toLocaleString();
-            const likesDisplay = challenge.likes ? formatNumber(challenge.likes) : '0';
 
             card.innerHTML = `
                 <div class="challenge-header">
@@ -2086,35 +1092,38 @@
                         </div>
                         <div class="challenge-user-info">
                             <div class="challenge-username">${challenge.creator}</div>
-                            <span class="challenge-type ${challenge.type}">${challenge.type}</span>
+                            <span class="challenge-type ${challenge.type}">Beta Test</span>
                         </div>
                     </div>
                 </div>
                 
                 <div class="challenge-content">
-                    <div class="challenge-title content-spacing">${challenge.title}</div>
-                    <div class="challenge-description content-spacing">${challenge.description}</div>
+                    <div class="challenge-title">${challenge.title}</div>
+                    <div class="challenge-description">${challenge.description}</div>
                     
-                    <div class="challenge-hashtags content-spacing">
+                    <div class="beta-note">
+                        🎯 <strong>Testing Focus:</strong> ${challenge.testFocus}
+                    </div>
+                    
+                    <div class="challenge-hashtags">
                         ${challenge.hashtags.map(tag => `<span class="challenge-hashtag">${tag}</span>`).join('')}
                     </div>
                     
-                    <div class="challenge-reward content-spacing">
+                    <div class="challenge-reward">
                         <div class="reward-amount">
                             <span>🪙</span>
-                            <span>${tokenDisplay} Tokens</span>
+                            <span>${challenge.tokens.toLocaleString()} Test Tokens</span>
                         </div>
                         <span class="reward-difficulty ${getDifficultyClass(challenge.difficulty)}">${challenge.difficulty.toUpperCase()}</span>
-                        ${challenge.realRewards ? `<div class="real-rewards">🎁 ${challenge.realRewards}</div>` : ''}
                     </div>
                 </div>
                 
                 <div class="challenge-actions">
-                    <button class="challenge-btn btn-accept" onclick="acceptChallengeWithPage('${challenge.id}')">
-                        🚀 Accept Challenge
+                    <button class="challenge-btn btn-accept" onclick="startBetaChallenge('${challenge.id}')">
+                        🧪 Test This Challenge
                     </button>
                     <button class="challenge-btn btn-decline" onclick="nextChallenge()">
-                        Skip
+                        Skip to Next
                     </button>
                 </div>
             `;
@@ -2122,227 +1131,108 @@
             return card;
         }
 
-        // FIXED: Format numbers properly
-        function formatNumber(num) {
-            if (num >= 1000000) {
-                return (num / 1000000).toFixed(1) + 'M';
-            } else if (num >= 1000) {
-                return (num / 1000).toFixed(1) + 'K';
-            }
-            return num.toString();
-        }
-
-        // FIXED: Update current challenge with proper like count
         function updateCurrentChallenge() {
-            try {
-                const cards = document.querySelectorAll('.challenge-card');
-                cards.forEach((card, index) => {
-                    card.className = 'challenge-card';
-                    if (index === currentPage) {
-                        card.classList.add('current');
-                    } else if (index === currentPage + 1) {
-                        card.classList.add('next');
-                    } else {
-                        card.classList.add('prev');
-                    }
-                });
-
-                // FIXED: Update points display properly
-                if (challengeData[currentPage]) {
-                    const pointsEl = document.getElementById('currentChallengePoints');
-                    if (pointsEl) {
-                        const likes = challengeData[currentPage].likes || 0;
-                        pointsEl.textContent = formatNumber(likes);
-                    }
+            const cards = document.querySelectorAll('.challenge-card');
+            cards.forEach((card, index) => {
+                card.className = 'challenge-card';
+                if (index === currentPage) {
+                    card.classList.add('current');
                 }
-            } catch (error) {
-                console.error('Error updating current challenge:', error);
-            }
+            });
         }
 
-        // Accept challenge with detail page
-        function acceptChallengeWithPage(challengeId) {
-            try {
-                const challenge = challengeData.find(c => c.id === challengeId) || challengeData[currentPage];
-                if (!challenge) return;
-                
-                currentChallenge = challenge;
-                
-                // FIXED: Populate challenge page with clean data
-                const titleEl = document.getElementById('challengeDetailTitle');
-                const descEl = document.getElementById('challengeDetailDescription');
-                const tokensEl = document.getElementById('challengeDetailTokens');
-                const difficultyEl = document.getElementById('challengeDetailDifficulty');
-                const durationEl = document.getElementById('challengeDetailDuration');
-                
-                if (titleEl) titleEl.textContent = challenge.title;
-                if (descEl) descEl.textContent = challenge.description;
-                if (tokensEl) tokensEl.textContent = challenge.tokens.toLocaleString();
-                if (difficultyEl) difficultyEl.textContent = challenge.difficulty.charAt(0).toUpperCase() + challenge.difficulty.slice(1);
-                if (durationEl) durationEl.textContent = challenge.duration || '30m';
-                
-                // FIXED: Populate requirements properly
-                const requirementsList = document.getElementById('challengeRequirementsList');
-                if (requirementsList && challenge.requirements) {
-                    requirementsList.innerHTML = '';
-                    challenge.requirements.forEach(req => {
-                        const li = document.createElement('li');
-                        li.textContent = req;
-                        requirementsList.appendChild(li);
-                    });
-                }
-                
-                // Show challenge page
-                document.getElementById('challengePage').classList.add('show');
-                showToast('📋 Challenge details loaded!', 'success');
-            } catch (error) {
-                console.error('Error accepting challenge:', error);
-                showToast('❌ Error loading challenge!', 'error');
-            }
-        }
-
-        // Close challenge page
-        function closeChallengeePage() {
-            try {
-                document.getElementById('challengePage').classList.remove('show');
-            } catch (error) {
-                console.error('Error closing challenge page:', error);
-            }
-        }
-
-        // Start challenge
-        function startChallenge() {
-            try {
-                closeChallengeePage();
-                showToast('🚀 Challenge started! Complete it and submit for review.', 'success');
-                setTimeout(() => showModal('challengeCompletion'), 2000);
-            } catch (error) {
-                console.error('Error starting challenge:', error);
-            }
-        }
-
-        // Next challenge
         function nextChallenge() {
-            try {
-                currentPage = (currentPage + 1) % challengeData.length;
-                updateCurrentChallenge();
-                showToast('⏭️ Next challenge!');
-            } catch (error) {
-                console.error('Error loading next challenge:', error);
-            }
+            currentPage = (currentPage + 1) % betaChallengeData.length;
+            updateCurrentChallenge();
+            showToast('⏭️ Next test challenge!');
         }
 
-        // FIXED: Submit challenge completion with proper validation
-        async function submitChallengeCompletion() {
-            try {
-                const description = document.getElementById('challengeCompletionDesc').value;
-                
-                if (!description.trim()) {
-                    showToast('❌ Please describe what you did!', 'error');
-                    return;
-                }
-
-                if (selectedRating === 0) {
-                    showToast('❌ Please rate your experience!', 'error');
-                    return;
-                }
-
-                showToast('🤖 AI reviewing submission...');
-                
-                // Generate mock review
-                const reviewResult = generateMockReview(description);
-                
-                // Award tokens
-                playerData.tokens += reviewResult.tokensAwarded;
-                playerData.completedChallenges++;
-                
-                updatePlayerDisplay();
-                showReviewResults(reviewResult);
-                
-            } catch (error) {
-                console.error('Submission failed:', error);
-                showToast('❌ Submission failed!', 'error');
-            }
+        // ===== BETA CHALLENGE TESTING =====
+        function startBetaChallenge(challengeId) {
+            const challenge = betaChallengeData.find(c => c.id === challengeId);
+            if (!challenge) return;
             
-            hideModal('challengeCompletion');
-            resetChallengeForm();
+            currentTestChallenge = challenge;
+            
+            // Simulate "accepting" the challenge
+            showToast('🚀 Challenge accepted! Complete it and tap feedback to review.', 'success');
+            
+            // Simulate completion after 3 seconds (for demo)
+            setTimeout(() => {
+                showBetaFeedback();
+            }, 3000);
         }
 
-        // Generate mock review
-        function generateMockReview(description) {
-            const wordCount = description.split(' ').length;
-            const hasDetails = description.length > 100;
-            const hasEmotions = /exciting|fun|amazing|awesome|great|love|enjoy|fantastic/.test(description.toLowerCase());
+        // ===== MOCK PAYMENT SYSTEM =====
+        function showMockTokenPurchase() {
+            const packages = [
+                { tokens: 500, price: 'RM 5.99' },
+                { tokens: 1200, price: 'RM 11.99' },
+                { tokens: 2500, price: 'RM 23.99' },
+                { tokens: 5000, price: 'RM 47.99' }
+            ];
             
-            let score = 50;
-            if (wordCount > 20) score += 15;
-            if (hasDetails) score += 15; 
-            if (hasEmotions) score += 10;
-            if (selectedRating >= 4) score += 10;
+            const randomPackage = packages[Math.floor(Math.random() * packages.length)];
             
-            score = Math.min(score, 95);
+            document.getElementById('packageTokens').textContent = `${randomPackage.tokens} Tokens`;
+            document.getElementById('packagePrice').textContent = randomPackage.price;
             
-            return calculateTokenReward(score);
+            document.getElementById('mockPaymentModal').classList.add('show');
         }
 
-        // Calculate token reward
-        function calculateTokenReward(score) {
-            let percentage;
-            if (score >= 90) percentage = 1.0;
-            else if (score >= 80) percentage = 0.9;
-            else if (score >= 70) percentage = 0.8;
-            else if (score >= 60) percentage = 0.7;
-            else if (score >= 50) percentage = 0.5;
-            else percentage = 0.3;
-
-            const tokensAwarded = Math.floor(currentChallenge.tokens * percentage);
-            
-            let feedback;
-            if (score >= 85) feedback = "🎉 Exceptional work! You've mastered this challenge!";
-            else if (score >= 70) feedback = "👍 Great job! You completed this challenge well!";
-            else if (score >= 50) feedback = "⭐ Good effort! You're getting the hang of it!";
-            else feedback = "💪 Keep trying! Practice makes perfect!";
-            
-            return { 
-                overallScore: score, 
-                tokensAwarded, 
-                percentage: Math.round(percentage * 100), 
-                feedback 
-            };
+        function mockTNGPayment() {
+            showToast('🧪 TNG Payment Demo - Processing...', 'info');
+            setTimeout(() => {
+                showToast('✅ Mock TNG Payment Successful!', 'success');
+                processMockPayment();
+            }, 2000);
         }
 
-        // FIXED: Show review results with proper formatting
-        function showReviewResults(result) {
-            const modal = document.createElement('div');
-            modal.className = 'modal show';
-            modal.innerHTML = `
-                <div class="modal-content">
-                    <div style="text-align: center; padding: 20px;">
-                        <div style="font-size: 48px; margin-bottom: 16px;">
-                            ${result.overallScore >= 80 ? '🎉' : result.overallScore >= 60 ? '⭐' : '💪'}
-                        </div>
-                        <h2 style="margin-bottom: 12px;">
-                            ${result.overallScore >= 80 ? 'Excellent!' : result.overallScore >= 60 ? 'Great Job!' : 'Nice Try!'}
-                        </h2>
-                        <div style="background: rgba(0, 255, 150, 0.1); border: 1px solid var(--primary); padding: 16px; border-radius: 12px; margin: 16px 0;">
-                            <div style="font-size: 20px; color: var(--primary); font-weight: 800;">
-                                +${result.tokensAwarded.toLocaleString()} Tokens
-                            </div>
-                            <div style="color: var(--text-secondary); font-size: 12px; margin-top: 4px;">
-                                ${result.percentage}% of maximum reward
-                            </div>
-                        </div>
-                        <p style="color: var(--text-secondary); margin-bottom: 20px; line-height: 1.5;">${result.feedback}</p>
-                    </div>
-                    <button class="btn-primary" onclick="this.closest('.modal').remove(); nextChallenge();">
-                        🚀 Next Challenge
-                    </button>
-                </div>
-            `;
-            document.body.appendChild(modal);
+        function mockGrabPayment() {
+            showToast('🧪 GrabPay Demo - Processing...', 'info');
+            setTimeout(() => {
+                showToast('✅ Mock GrabPay Payment Successful!', 'success');
+                processMockPayment();
+            }, 2500);
         }
 
-        // FIXED: Set rating with proper visual feedback
+        function mockCardPayment() {
+            showToast('🧪 Card Payment Demo - Processing...', 'info');
+            setTimeout(() => {
+                showToast('✅ Mock Card Payment Successful!', 'success');
+                processMockPayment();
+            }, 2000);
+        }
+
+        function processMockPayment() {
+            // Close payment modal
+            closeMockPayment();
+            
+            // Show success feedback
+            showToast('💎 Test tokens added! This would be real tokens in production.', 'success');
+            
+            // Log the test
+            logBetaAction('mock_payment', {
+                package: document.getElementById('packageTokens').textContent,
+                price: document.getElementById('packagePrice').textContent,
+                timestamp: Date.now()
+            });
+        }
+
+        function closeMockPayment() {
+            document.getElementById('mockPaymentModal').classList.remove('show');
+        }
+
+        // ===== BETA FEEDBACK SYSTEM =====
+        function showBetaFeedback() {
+            document.getElementById('feedbackModal').classList.add('show');
+        }
+
+        function closeBetaFeedback() {
+            document.getElementById('feedbackModal').classList.remove('show');
+            resetFeedbackForm();
+        }
+
         function setRating(rating) {
             selectedRating = rating;
             const stars = document.querySelectorAll('.star');
@@ -2355,868 +1245,158 @@
             });
         }
 
-        // Reset challenge form
-        function resetChallengeForm() {
+        function submitBetaFeedback() {
+            const likeFeedback = document.getElementById('likeFeedback').value;
+            const improveFeedback = document.getElementById('improveFeedback').value;
+            const performanceRating = document.getElementById('performanceFeedback').value;
+            
+            if (selectedRating === 0) {
+                showToast('⭐ Please rate the challenge first!', 'error');
+                return;
+            }
+            
+            const feedback = {
+                challengeId: currentTestChallenge?.id || 'general',
+                challengeRating: selectedRating,
+                liked: likeFeedback,
+                improvements: improveFeedback,
+                performance: performanceRating,
+                timestamp: Date.now(),
+                userAgent: navigator.userAgent,
+                viewport: `${window.innerWidth}x${window.innerHeight}`
+            };
+            
+            // Store feedback
+            betaPlayerData.feedback.push(feedback);
+            
+            // Log to console (in production, send to server)
+            console.log('🧪 Beta Feedback Collected:', feedback);
+            
+            showToast('🎉 Thank you for your feedback! This helps improve JomBro.', 'success');
+            closeBetaFeedback();
+            
+            // Move to next challenge after feedback
+            setTimeout(() => {
+                nextChallenge();
+            }, 2000);
+        }
+
+        function resetFeedbackForm() {
             selectedRating = 0;
             document.querySelectorAll('.star').forEach(star => star.classList.remove('active'));
-            const descEl = document.getElementById('challengeCompletionDesc');
-            const mediaEl = document.getElementById('challengeMedia');
-            if (descEl) descEl.value = '';
-            if (mediaEl) mediaEl.value = '';
+            document.getElementById('likeFeedback').value = '';
+            document.getElementById('improveFeedback').value = '';
+            document.getElementById('performanceFeedback').value = '';
         }
 
-        // FIXED: Create challenge with proper validation
-        function createChallenge() {
-            try {
-                const titleEl = document.getElementById('challengeTitle');
-                const descEl = document.getElementById('challengeDesc');
-                const pointsEl = document.getElementById('challengePoints');
-                
-                const title = titleEl ? titleEl.value : '';
-                const description = descEl ? descEl.value : '';
-                const tokens = pointsEl ? parseInt(pointsEl.value) : 500;
-
-                if (!title.trim() || !description.trim()) {
-                    showToast('❌ Please fill in title and description!', 'error');
-                    return;
-                }
-
-                const newChallenge = {
-                    id: 'user_' + Date.now(),
-                    title: title,
-                    description: description,
-                    hashtags: ["#UserChallenge", "#JomBro"],
-                    difficulty: tokens >= 5000 ? "epic" : tokens >= 2500 ? "hard" : "medium",
-                    tokens: tokens,
-                    type: "daily",
-                    creator: playerData.displayName,
-                    avatar: playerData.avatar,
-                    requirements: ["Complete the challenge", "Document experience", "Rate experience"],
-                    duration: "Variable",
-                    likes: 0
-                };
-
-                challengeData.unshift(newChallenge);
-                updateChallengeDisplay();
-                hideModal('create');
-                showToast('✨ Challenge created successfully!', 'success');
-                
-                // FIXED: Clear form properly
-                if (titleEl) titleEl.value = '';
-                if (descEl) descEl.value = '';
-                if (pointsEl) pointsEl.value = '500';
-            } catch (error) {
-                console.error('Error creating challenge:', error);
-                showToast('❌ Error creating challenge!', 'error');
-            }
+        // ===== UTILITY FUNCTIONS =====
+        function updatePlayerDisplay() {
+            document.getElementById('tokenAmount').textContent = betaPlayerData.tokens.toLocaleString();
         }
 
-        // FIXED: Like challenge with proper feedback
-        function likeChallenge() {
-            try {
-                if (challengeData[currentPage]) {
-                    challengeData[currentPage].likes = (challengeData[currentPage].likes || 0) + 1;
-                    updateCurrentChallenge();
-                    showToast('❤️ Liked! +5 tokens', 'success');
-                    playerData.tokens += 5;
-                    updatePlayerDisplay();
-                }
-            } catch (error) {
-                showToast('❌ Error liking challenge!', 'error');
-            }
+        function logBetaAction(action, data) {
+            const logEntry = {
+                action: action,
+                data: data,
+                timestamp: Date.now(),
+                challenge: currentTestChallenge?.id || null
+            };
+            
+            console.log('🧪 Beta Action:', logEntry);
+            
+            // In production, send to analytics server
+            // analytics.track('beta_action', logEntry);
         }
 
-        // FIXED: Share challenge with proper fallback
-        function shareChallenge() {
-            try {
-                const challenge = challengeData[currentPage];
-                if (!challenge) return;
-                
-                if (navigator.share) {
-                    navigator.share({
-                        title: challenge.title,
-                        text: challenge.description,
-                        url: window.location.href
-                    }).then(() => {
-                        showToast('📤 Shared successfully! +10 tokens', 'success');
-                        playerData.tokens += 10;
-                        updatePlayerDisplay();
-                    }).catch(() => fallbackShare());
-                } else {
-                    fallbackShare();
-                }
-            } catch (error) {
-                fallbackShare();
-            }
-        }
-
-        function fallbackShare() {
-            showToast('📋 Challenge copied to clipboard!', 'success');
-            playerData.tokens += 5;
-            updatePlayerDisplay();
-        }
-
-        // FIXED: Bookmark challenge with proper feedback
-        function bookmarkChallenge() {
-            try {
-                const challenge = challengeData[currentPage];
-                
-                showToast('🔖 Bookmarked successfully!', 'success');
-            } catch (error) {
-                showToast('❌ Error bookmarking!', 'error');
-            }
-        }
-
-        // FIXED: Show comments with proper layout
-        function showComments() {
-            const commentsHTML = `
-                <div class="modal show" id="commentsModal">
-                    <div class="modal-content">
-                        <div class="modal-title">💬 Comments</div>
-                        <div style="max-height: 200px; overflow-y: auto; margin-bottom: 16px;">
-                            <div style="background: rgba(255, 255, 255, 0.05); padding: 12px; border-radius: 8px; margin-bottom: 8px;">
-                                <div style="font-weight: 600; margin-bottom: 4px;">Mike C.</div>
-                                <div style="font-size: 14px; color: var(--text-secondary);">Amazing challenge! Really enjoyed this one 🔥</div>
-                            </div>
-                            <div style="background: rgba(255, 255, 255, 0.05); padding: 12px; border-radius: 8px;">
-                                <div style="font-weight: 600; margin-bottom: 4px;">Sarah L.</div>
-                                <div style="font-size: 14px; color: var(--text-secondary);">Just completed this! So much fun ⭐</div>
-                            </div>
+        function showBetaInfo() {
+            const modal = document.createElement('div');
+            modal.className = 'feedback-modal show';
+            modal.innerHTML = `
+                <div class="feedback-content">
+                    <div class="feedback-title">🧪 Beta Testing Info</div>
+                    <div style="text-align: left; line-height: 1.6;">
+                        <h4 style="color: var(--beta-primary); margin-bottom: 10px;">What to Test:</h4>
+                        <ul style="margin-left: 20px; margin-bottom: 15px;">
+                            <li>Challenge variety and quality</li>
+                            <li>App navigation and usability</li>
+                            <li>Payment flow simulation</li>
+                            <li>Overall user experience</li>
+                        </ul>
+                        
+                        <h4 style="color: var(--beta-primary); margin-bottom: 10px;">How to Help:</h4>
+                        <ul style="margin-left: 20px; margin-bottom: 15px;">
+                            <li>Try different challenges</li>
+                            <li>Test payment flows</li>
+                            <li>Provide honest feedback</li>
+                            <li>Report any bugs or issues</li>
+                        </ul>
+                        
+                        <div style="background: rgba(255, 107, 53, 0.1); padding: 12px; border-radius: 8px; margin-top: 15px;">
+                            <strong>Remember:</strong> This is mock testing. No real payments are processed!
                         </div>
-                        <div class="form-group">
-                            <textarea class="form-control" id="newComment" rows="2" placeholder="Add a comment..."></textarea>
-                        </div>
-                        <button class="btn-primary" onclick="postComment()">💬 Post Comment</button>
-                        <button class="btn-secondary" onclick="document.getElementById('commentsModal').remove()">Close</button>
                     </div>
+                    <button class="mock-close-btn" onclick="this.closest('.feedback-modal').remove()">Got it!</button>
                 </div>
             `;
-            document.body.insertAdjacentHTML('beforeend', commentsHTML);
+            document.body.appendChild(modal);
         }
 
-        function postComment() {
-            const commentEl = document.getElementById('newComment');
-            const comment = commentEl ? commentEl.value : '';
-            
-            if (!comment.trim()) {
-                showToast('❌ Please enter a comment!', 'error');
-                return;
-            }
-            
-            showToast('💬 Comment posted! +5 tokens', 'success');
-            playerData.tokens += 5;
+        function resetBetaAccount() {
+            betaPlayerData.tokens = 999999;
+            betaPlayerData.completedChallenges = 0;
+            currentPage = 0;
             updatePlayerDisplay();
-            
-            const modal = document.getElementById('commentsModal');
-            if (modal) modal.remove();
+            updateCurrentChallenge();
+            showToast('🔄 Beta account reset!', 'success');
         }
 
-        // FIXED: Navigation with proper state management
         function navAction(element, section) {
-            try {
-                document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
-                element.classList.add('active');
-                
-                switch(section) {
-                    case 'home':
-                        showToast('🏠 Home');
-                        break;
-                    case 'leaderboard':
-                        showLeaderboard();
-                        break;
-                    case 'create':
-                        showCreateMenu();
-                        break;
-                    case 'groups':
-                        showGroups();
-                        break;
-                    case 'shop':
-                        showShop();
-                        break;
-                    case 'profile':
-                        showProfile();
-                        break;
-                }
-            } catch (error) {
-                showToast('❌ Navigation error!', 'error');
+            document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
+            element.classList.add('active');
+            
+            switch(section) {
+                case 'home':
+                    showToast('🏠 Home');
+                    break;
+                case 'challenges':
+                    nextChallenge();
+                    break;
+                case 'tokens':
+                    showMockTokenPurchase();
+                    break;
+                case 'feedback':
+                    showBetaFeedback();
+                    break;
+                case 'profile':
+                    showBetaInfo();
+                    break;
             }
         }
 
-        // Show create menu
-        function showCreateMenu() {
-            const modal = document.createElement('div');
-            modal.className = 'modal show';
-            modal.innerHTML = `
-                <div class="modal-content">
-                    <div class="modal-title">✨ Create</div>
-                    <div style="display: flex; flex-direction: column; gap: 12px;">
-                        <button class="btn-primary" onclick="this.closest('.modal').remove(); showModal('create');">
-                            ➕ Create Challenge
-                        </button>
-                        <button class="btn-primary" onclick="this.closest('.modal').remove(); showModal('createGroup');">
-                            👥 Create Group
-                        </button>
-                    </div>
-                    <button class="btn-secondary" onclick="this.closest('.modal').remove()">Cancel</button>
-                </div>
-            `;
-            document.body.appendChild(modal);
-        }
-
-        // Show groups
-        function showGroups() {
-            updateGroupsList();
-            showModal('groups');
-        }
-
-        // Update groups list
-        function updateGroupsList() {
-            const groupsList = document.getElementById('groupsList');
-            if (!groupsList) return;
-
-            const userGroups = groupData.filter(group => 
-                group.members.some(member => member.username === playerData.username)
-            );
-
-            if (userGroups.length === 0) {
-                groupsList.innerHTML = `
-                    <div style="text-align: center; padding: 20px; color: var(--text-secondary);">
-                        <div style="font-size: 48px; margin-bottom: 12px;">👥</div>
-                        <p>You haven't joined any groups yet!</p>
-                    </div>
-                `;
-                return;
-            }
-
-            groupsList.innerHTML = userGroups.map(group => {
-                const userMember = group.members.find(member => member.username === playerData.username);
-                const userRank = group.members.sort((a, b) => b.points - a.points).findIndex(member => member.username === playerData.username) + 1;
-                const daysLeft = Math.ceil((group.endDate - Date.now()) / (86400000));
-                
-                return `
-                    <div style="background: rgba(255, 255, 255, 0.05); border: 1px solid var(--border-light); border-radius: 12px; padding: 16px; margin-bottom: 12px; cursor: pointer;" onclick="showGroupDetails('${group.id}')">
-                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-                            <div style="font-weight: 700; font-size: 16px;">${group.name}</div>
-                            <div style="color: var(--accent); font-size: 12px;">Rank #${userRank}</div>
-                        </div>
-                        <div style="font-size: 12px; color: var(--text-secondary); margin-bottom: 8px;">${group.description}</div>
-                        <div style="display: flex; justify-content: space-between; align-items: center;">
-                            <div style="font-size: 12px;">
-                                <span style="color: var(--primary);">Your Points: ${userMember.points.toLocaleString()}</span>
-                                <span style="margin-left: 8px; color: ${userMember.trend.startsWith('+') ? 'var(--success)' : 'var(--error)'};">${userMember.trend}</span>
-                            </div>
-                            <div style="font-size: 12px; color: var(--text-secondary);">${daysLeft} days left</div>
-                        </div>
-                    </div>
-                `;
-            }).join('');
-        }
-
-        // Create group
-        function createGroup() {
-            try {
-                const nameEl = document.getElementById('groupName');
-                const descEl = document.getElementById('groupDesc');
-                const typeEl = document.getElementById('groupType');
-                const pointSystemEl = document.getElementById('pointSystem');
-                const privacyEl = document.getElementById('groupPrivacy');
-                const rewardsEl = document.getElementById('winnerRewards');
-                
-                const name = nameEl ? nameEl.value : '';
-                const description = descEl ? descEl.value : '';
-                const type = typeEl ? typeEl.value : 'weekly';
-                const pointSystem = pointSystemEl ? pointSystemEl.value : 'standard';
-                const privacy = privacyEl ? privacyEl.value : 'public';
-                const rewards = rewardsEl ? rewardsEl.value : '';
-
-                if (!name.trim() || !description.trim()) {
-                    showToast('❌ Please fill in name and description!', 'error');
-                    return;
-                }
-
-                const duration = type === 'weekly' ? 7 : type === 'monthly' ? 30 : 14;
-                const newGroup = {
-                    id: 'group_' + Date.now(),
-                    name: name,
-                    description: description,
-                    type: type,
-                    pointSystem: pointSystem,
-                    privacy: privacy,
-                    winnerRewards: rewards || 'Bragging rights and group recognition',
-                    createdBy: playerData.username,
-                    createdAt: Date.now(),
-                    endDate: Date.now() + (duration * 86400000),
-                    members: [
-                        { 
-                            username: playerData.username, 
-                            displayName: playerData.displayName, 
-                            points: 0, 
-                            trend: '+0', 
-                            lastActive: Date.now() 
-                        }
-                    ],
-                    activity: [
-                        { 
-                            type: 'group_created', 
-                            user: playerData.displayName, 
-                            amount: 0, 
-                            challenge: 'Group Created', 
-                            time: Date.now() 
-                        }
-                    ]
-                };
-
-                groupData.unshift(newGroup);
-                hideModal('createGroup');
-                showToast('✨ Group created successfully!', 'success');
-                
-                // Clear form
-                if (nameEl) nameEl.value = '';
-                if (descEl) descEl.value = '';
-                if (rewardsEl) rewardsEl.value = '';
-                
-                // Show the new group
-                setTimeout(() => showGroupDetails(newGroup.id), 1000);
-            } catch (error) {
-                console.error('Error creating group:', error);
-                showToast('❌ Error creating group!', 'error');
-            }
-        }
-
-        // Show group details
-        function showGroupDetails(groupId) {
-            const group = groupData.find(g => g.id === groupId);
-            if (!group) return;
-
-            currentGroup = group;
-            
-            // Update group details
-            document.getElementById('groupDetailsTitle').textContent = group.name;
-            document.getElementById('groupMemberCount').textContent = group.members.length;
-            document.getElementById('groupTotalPoints').textContent = group.members.reduce((total, member) => total + member.points, 0).toLocaleString();
-            document.getElementById('groupDaysLeft').textContent = Math.ceil((group.endDate - Date.now()) / (86400000));
-            
-            // Update leaderboard
-            updateGroupLeaderboard(group);
-            
-            // Update activity feed
-            updateGroupActivity(group);
-            
-            // Start live updates
-            startGroupLiveUpdates(group);
-            
-            showModal('groupDetails');
-        }
-
-        // Update group leaderboard
-        function updateGroupLeaderboard(group) {
-            const leaderboard = document.getElementById('groupLeaderboard');
-            if (!leaderboard) return;
-
-            const sortedMembers = [...group.members].sort((a, b) => b.points - a.points);
-            
-            leaderboard.innerHTML = sortedMembers.map((member, index) => {
-                const isCurrentUser = member.username === playerData.username;
-                const trendColor = member.trend.startsWith('+') ? 'var(--success)' : member.trend.startsWith('-') ? 'var(--error)' : 'var(--text-secondary)';
-                const rankEmoji = index === 0 ? '🥇' : index === 1 ? '🥈' : index === 2 ? '🥉' : `#${index + 1}`;
-                
-                return `
-                    <div style="display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid var(--border-light); ${isCurrentUser ? 'background: rgba(0, 255, 150, 0.1); border-radius: 8px; padding: 8px 12px; margin: 4px 0;' : ''}">
-                        <div style="display: flex; align-items: center; gap: 8px;">
-                            <div style="font-size: 16px; min-width: 30px;">${rankEmoji}</div>
-                            <div>
-                                <div style="font-weight: 600; font-size: 14px;">${member.displayName}</div>
-                                <div style="font-size: 10px; color: var(--text-secondary);">${getTimeAgo(member.lastActive)}</div>
-                            </div>
-                        </div>
-                        <div style="text-align: right;">
-                            <div style="font-weight: 700; color: var(--primary);">${member.points.toLocaleString()}</div>
-                            <div style="font-size: 10px; color: ${trendColor};">${member.trend}</div>
-                        </div>
-                    </div>
-                `;
-            }).join('');
-        }
-
-        // Update group activity
-        function updateGroupActivity(group) {
-            const activity = document.getElementById('groupActivity');
-            if (!activity) return;
-
-            const sortedActivity = [...group.activity].sort((a, b) => b.time - a.time).slice(0, 10);
-            
-            activity.innerHTML = sortedActivity.map(item => {
-                const timeAgo = getTimeAgo(item.time);
-                const icon = item.type === 'point_gain' ? '📈' : item.type === 'point_loss' ? '📉' : '⚡';
-                const color = item.type === 'point_gain' ? 'var(--success)' : item.type === 'point_loss' ? 'var(--error)' : 'var(--primary)';
-                
-                return `
-                    <div style="padding: 8px 0; border-bottom: 1px solid var(--border-light); font-size: 12px;">
-                        <div style="display: flex; align-items: center; gap: 8px;">
-                            <div style="font-size: 14px;">${icon}</div>
-                            <div style="flex: 1;">
-                                <strong>${item.user}</strong> ${item.type === 'point_gain' ? 'gained' : item.type === 'point_loss' ? 'lost' : 'action'} 
-                                <span style="color: ${color}; font-weight: 700;">${item.amount > 0 ? '+' : ''}${item.amount} points</span>
-                                ${item.challenge ? ` from ${item.challenge}` : ''}
-                            </div>
-                        </div>
-                        <div style="color: var(--text-secondary); font-size: 10px; margin-top: 2px;">${timeAgo}</div>
-                    </div>
-                `;
-            }).join('');
-        }
-
-        // Start group live updates
-        function startGroupLiveUpdates(group) {
-            // Clear existing interval
-            if (groupUpdateInterval) {
-                clearInterval(groupUpdateInterval);
-            }
-
-            // Update every 10 seconds
-            groupUpdateInterval = setInterval(() => {
-                simulateGroupActivity(group);
-                updateGroupLeaderboard(group);
-                updateGroupActivity(group);
-            }, 10000);
-        }
-
-        // Simulate group activity for demo
-        function simulateGroupActivity(group) {
-            const actions = [
-                { type: 'point_gain', points: [50, 100, 150, 200, 250] },
-                { type: 'point_loss', points: [-25, -50, -75, -100] },
-                { type: 'point_gain', points: [300, 400, 500] }
-            ];
-
-            // Randomly update a member
-            if (Math.random() < 0.3) { // 30% chance
-                const member = group.members[Math.floor(Math.random() * group.members.length)];
-                const action = actions[Math.floor(Math.random() * actions.length)];
-                const points = action.points[Math.floor(Math.random() * action.points.length)];
-                
-                member.points += points;
-                member.trend = points > 0 ? `+${points}` : `${points}`;
-                member.lastActive = Date.now();
-                
-                // Add to activity feed
-                group.activity.unshift({
-                    type: action.type,
-                    user: member.displayName,
-                    amount: points,
-                    challenge: 'Live Challenge',
-                    time: Date.now()
-                });
-                
-                // Keep only recent activity
-                if (group.activity.length > 50) {
-                    group.activity = group.activity.slice(0, 50);
-                }
-            }
-        }
-
-        // Helper function to get time ago
-        function getTimeAgo(timestamp) {
-            const now = Date.now();
-            const diff = now - timestamp;
-            const minutes = Math.floor(diff / 60000);
-            const hours = Math.floor(diff / 3600000);
-            const days = Math.floor(diff / 86400000);
-            
-            if (days > 0) return `${days}d ago`;
-            if (hours > 0) return `${hours}h ago`;
-            if (minutes > 0) return `${minutes}m ago`;
-            return 'Just now';
-        }
-
-        // Join random group
-        function joinRandomGroup() {
-            const availableGroups = groupData.filter(group => 
-                group.privacy === 'public' && 
-                !group.members.some(member => member.username === playerData.username)
-            );
-
-            if (availableGroups.length === 0) {
-                showToast('❌ No available groups to join!', 'error');
-                return;
-            }
-
-            const randomGroup = availableGroups[Math.floor(Math.random() * availableGroups.length)];
-            
-            // Add user to group
-            randomGroup.members.push({
-                username: playerData.username,
-                displayName: playerData.displayName,
-                points: 0,
-                trend: '+0',
-                lastActive: Date.now()
-            });
-
-            // Add activity
-            randomGroup.activity.unshift({
-                type: 'member_joined',
-                user: playerData.displayName,
-                amount: 0,
-                challenge: 'Joined Group',
-                time: Date.now()
-            });
-
-            hideModal('groups');
-            showToast('✅ Joined group successfully!', 'success');
-            setTimeout(() => showGroupDetails(randomGroup.id), 1000);
-        }
-
-        // Invite to group
-        function inviteToGroup() {
-            if (!currentGroup) return;
-            
-            const modal = document.createElement('div');
-            modal.className = 'modal show';
-            modal.innerHTML = `
-                <div class="modal-content">
-                    <div class="modal-title">📤 Invite Friends</div>
-                    <div style="text-align: center; margin-bottom: 20px;">
-                        <div style="background: rgba(0, 255, 150, 0.1); border: 1px solid var(--primary); border-radius: 12px; padding: 16px; margin-bottom: 16px;">
-                            <div style="font-size: 14px; font-weight: 600; margin-bottom: 8px;">Group Invite Code</div>
-                            <div style="font-size: 18px; font-weight: 800; color: var(--primary); letter-spacing: 2px;">${currentGroup.id.toUpperCase()}</div>
-                        </div>
-                        <p style="color: var(--text-secondary); font-size: 14px; line-height: 1.5;">
-                            Share this code with friends to invite them to your group!
-                        </p>
-                    </div>
-                    <button class="btn-primary" onclick="copyInviteCode('${currentGroup.id}')">📋 Copy Invite Code</button>
-                    <button class="btn-secondary" onclick="this.closest('.modal').remove()">Close</button>
-                </div>
-            `;
-            document.body.appendChild(modal);
-        }
-
-        // Copy invite code
-        function copyInviteCode(groupId) {
-            const inviteText = `Join my JomBro group! Use invite code: ${groupId.toUpperCase()}`;
-            
-            showToast('📋 Invite code copied!', 'success');
-        }
-
-        // Leave group
-        function leaveGroup() {
-            if (!currentGroup) return;
-            
-            const modal = document.createElement('div');
-            modal.className = 'modal show';
-            modal.innerHTML = `
-                <div class="modal-content">
-                    <div class="modal-title">🚪 Leave Group</div>
-                    <div style="text-align: center; margin-bottom: 20px;">
-                        <p style="color: var(--text-secondary); line-height: 1.5; margin-bottom: 16px;">
-                            Are you sure you want to leave <strong>${currentGroup.name}</strong>?
-                        </p>
-                        <div style="background: rgba(255, 107, 107, 0.1); border: 1px solid var(--error); border-radius: 12px; padding: 12px;">
-                            <div style="color: var(--error); font-size: 12px;">
-                                ⚠️ You will lose all your points and rankings in this group!
-                            </div>
-                        </div>
-                    </div>
-                    <button class="btn-secondary" onclick="confirmLeaveGroup()" style="background: var(--error); color: white;">🚪 Leave Group</button>
-                    <button class="btn-secondary" onclick="this.closest('.modal').remove()">Cancel</button>
-                </div>
-            `;
-            document.body.appendChild(modal);
-        }
-
-        // Confirm leave group
-        function confirmLeaveGroup() {
-            if (!currentGroup) return;
-            
-            // Remove user from group
-            currentGroup.members = currentGroup.members.filter(member => member.username !== playerData.username);
-            
-            // Add leave activity
-            currentGroup.activity.unshift({
-                type: 'member_left',
-                user: playerData.displayName,
-                amount: 0,
-                challenge: 'Left Group',
-                time: Date.now()
-            });
-            
-            // Close modals
-            document.querySelectorAll('.modal.show').forEach(modal => modal.remove());
-            
-            showToast('👋 Left group successfully!', 'success');
-            currentGroup = null;
-            
-            // Clear live updates
-            if (groupUpdateInterval) {
-                clearInterval(groupUpdateInterval);
-                groupUpdateInterval = null;
-            }
-        }
-
-        // FIXED: Show leaderboard with proper formatting
-        function showLeaderboard() {
-            const modal = document.createElement('div');
-            modal.className = 'modal show';
-            modal.innerHTML = `
-                <div class="modal-content">
-                    <div class="modal-title">🏆 Leaderboard</div>
-                    <div style="background: rgba(255, 215, 0, 0.1); padding: 12px; border-radius: 8px; margin-bottom: 16px; text-align: center;">
-                        <div style="color: var(--accent); font-weight: 700;">Your Rank: #47</div>
-                        <div style="color: var(--text-secondary); font-size: 12px;">${playerData.rank}</div>
-                    </div>
-                    <div style="max-height: 200px; overflow-y: auto;">
-                        <div style="display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid var(--border-light);">
-                            <div>🥇 Dragon Master</div>
-                            <div style="color: var(--primary);">89,240</div>
-                        </div>
-                        <div style="display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid var(--border-light);">
-                            <div>🥈 Shadow Ninja</div>
-                            <div style="color: var(--primary);">76,850</div>
-                        </div>
-                        <div style="display: flex; justify-content: space-between; padding: 8px 0;">
-                            <div>🥉 Phoenix Rising</div>
-                            <div style="color: var(--primary);">65,120</div>
-                        </div>
-                    </div>
-                    <button class="btn-secondary" onclick="this.closest('.modal').remove()">Close</button>
-                </div>
-            `;
-            document.body.appendChild(modal);
-        }
-
-        // FIXED: Show shop with proper formatting
-        function showShop() {
-            const modal = document.createElement('div');
-            modal.className = 'modal show';
-            modal.innerHTML = `
-                <div class="modal-content">
-                    <div class="modal-title">🛍️ Token Shop</div>
-                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 16px;">
-                        <div style="background: rgba(0, 255, 150, 0.1); padding: 16px; border-radius: 8px; text-align: center;">
-                            <div style="font-size: 24px; margin-bottom: 8px;">☕</div>
-                            <div style="font-size: 12px; margin-bottom: 4px;">Coffee Voucher</div>
-                            <div style="color: var(--primary); font-weight: 700;">🪙 500</div>
-                        </div>
-                        <div style="background: rgba(255, 215, 0, 0.1); padding: 16px; border-radius: 8px; text-align: center;">
-                            <div style="font-size: 24px; margin-bottom: 8px;">🎁</div>
-                            <div style="font-size: 12px; margin-bottom: 4px;">Mystery Box</div>
-                            <div style="color: var(--primary); font-weight: 700;">🪙 2,500</div>
-                        </div>
-                    </div>
-                    <div style="background: rgba(0, 0, 0, 0.3); padding: 16px; border-radius: 8px; margin-bottom: 16px; text-align: center;">
-                        <div style="font-weight: 600;">Your Balance: 🪙 ${playerData.tokens.toLocaleString()}</div>
-                    </div>
-                    <button class="btn-secondary" onclick="this.closest('.modal').remove()">Close</button>
-                </div>
-            `;
-            document.body.appendChild(modal);
-        }
-
-        // FIXED: Show profile with proper data
-        function showProfile() {
-            const modal = document.createElement('div');
-            modal.className = 'modal show';
-            modal.innerHTML = `
-                <div class="modal-content">
-                    <div class="modal-title">👤 Profile</div>
-                    <div style="text-align: center; margin-bottom: 20px;">
-                        <div style="width: 60px; height: 60px; border-radius: 30px; background: linear-gradient(45deg, var(--primary), var(--secondary)); margin: 0 auto 12px; display: flex; align-items: center; justify-content: center; font-size: 20px;">AS</div>
-                        <div style="font-weight: 700; margin-bottom: 4px;">${playerData.displayName}</div>
-                        <div style="color: var(--accent); font-size: 14px;">${playerData.rank}</div>
-                    </div>
-                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
-                        <div style="text-align: center; padding: 12px; background: rgba(0, 255, 150, 0.1); border-radius: 8px;">
-                            <div style="color: var(--primary); font-size: 18px; font-weight: 700;">${playerData.tokens.toLocaleString()}</div>
-                            <div style="font-size: 12px; color: var(--text-secondary);">Tokens</div>
-                        </div>
-                        <div style="text-align: center; padding: 12px; background: rgba(255, 215, 0, 0.1); border-radius: 8px;">
-                            <div style="color: var(--accent); font-size: 18px; font-weight: 700;">${playerData.completedChallenges}</div>
-                            <div style="font-size: 12px; color: var(--text-secondary);">Challenges</div>
-                        </div>
-                    </div>
-                    <button class="btn-secondary" onclick="this.closest('.modal').remove()" style="margin-top: 16px;">Close</button>
-                </div>
-            `;
-            document.body.appendChild(modal);
-        }
-
-        // Modal functions
-        function showModal(modalId) {
-            try {
-                const modal = document.getElementById(modalId + 'Modal');
-                if (modal) {
-                    modal.classList.add('show');
-                }
-            } catch (error) {
-                showToast('❌ Error opening modal!', 'error');
-            }
-        }
-
-        function hideModal(modalId) {
-            try {
-                const modal = document.getElementById(modalId + 'Modal');
-                if (modal) {
-                    modal.classList.remove('show');
-                    
-                    // Stop group live updates when closing group details
-                    if (modalId === 'groupDetails' && groupUpdateInterval) {
-                        clearInterval(groupUpdateInterval);
-                        groupUpdateInterval = null;
-                    }
-                }
-            } catch (error) {
-                console.error('Error hiding modal:', error);
-            }
-        }
-
-        // FIXED: Show how to play with proper formatting
-        function showHowToPlay() {
-            const modal = document.createElement('div');
-            modal.className = 'modal show';
-            modal.innerHTML = `
-                <div class="modal-content">
-                    <div class="modal-title">❓ How to Play</div>
-                    <div style="max-height: 300px; overflow-y: auto;">
-                        <h3 style="color: var(--primary); margin-bottom: 8px;">🎯 Getting Started</h3>
-                        <p style="color: var(--text-secondary); line-height: 1.5; margin-bottom: 16px;">
-                            1. Browse challenges by swiping<br>
-                            2. Accept challenges you like<br>
-                            3. Complete them in real life<br>
-                            4. Submit proof for review<br>
-                            5. Earn tokens and rewards!
-                        </p>
-                        <h3 style="color: var(--accent); margin-bottom: 8px;">🏆 Challenge Types</h3>
-                        <p style="color: var(--text-secondary); line-height: 1.5;">
-                            <strong>Daily:</strong> Fun everyday challenges<br>
-                            <strong>Business:</strong> Partner challenges with real rewards<br>
-                            <strong>Treasure:</strong> Special monthly competitions
-                        </p>
-                    </div>
-                    <button class="btn-primary" onclick="this.closest('.modal').remove()">🚀 Start Playing!</button>
-                </div>
-            `;
-            document.body.appendChild(modal);
-        }
-
-        function showLiveActivity() {
-            const modal = document.createElement('div');
-            modal.className = 'modal show';
-            modal.innerHTML = `
-                <div class="modal-content">
-                    <div class="modal-title">⚡ Live Activity</div>
-                    <div style="max-height: 300px; overflow-y: auto;">
-                        <div style="background: rgba(0, 255, 150, 0.1); padding: 12px; border-radius: 8px; margin-bottom: 8px;">
-                            <div style="font-weight: 600; margin-bottom: 4px;">🎉 Alex completed Coffee Poetry!</div>
-                            <div style="font-size: 12px; color: var(--text-secondary);">2 min ago • +500 tokens</div>
-                        </div>
-                        <div style="background: rgba(255, 215, 0, 0.1); padding: 12px; border-radius: 8px; margin-bottom: 8px;">
-                            <div style="font-weight: 600; margin-bottom: 4px;">🏆 Sarah reached Elite rank!</div>
-                            <div style="font-size: 12px; color: var(--text-secondary);">5 min ago • Level 27</div>
-                        </div>
-                        <div style="background: rgba(255, 107, 107, 0.1); padding: 12px; border-radius: 8px;">
-                            <div style="font-weight: 600; margin-bottom: 4px;">🔥 Mike started 15-day streak!</div>
-                            <div style="font-size: 12px; color: var(--text-secondary);">8 min ago</div>
-                        </div>
-                    </div>
-                    <button class="btn-secondary" onclick="this.closest('.modal').remove()">Close</button>
-                </div>
-            `;
-            document.body.appendChild(modal);
-        }
-
-        function showNotifications() {
-            const modal = document.createElement('div');
-            modal.className = 'modal show';
-            modal.innerHTML = `
-                <div class="modal-content">
-                    <div class="modal-title">🔔 Notifications</div>
-                    <div style="max-height: 300px; overflow-y: auto;">
-                        <div style="background: rgba(0, 255, 150, 0.1); padding: 12px; border-radius: 8px; margin-bottom: 8px;">
-                            <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 4px;">
-                                <div>🎯</div>
-                                <div style="font-weight: 600;">New Challenge Available!</div>
-                                <div style="background: var(--error); color: white; font-size: 8px; padding: 2px 4px; border-radius: 4px; margin-left: auto;">NEW</div>
-                            </div>
-                            <div style="font-size: 12px; color: var(--text-secondary);">Midnight Food Hunt - 3,000 tokens</div>
-                        </div>
-                        <div style="background: rgba(255, 215, 0, 0.1); padding: 12px; border-radius: 8px;">
-                            <div style="font-weight: 600; margin-bottom: 4px;">💰 Reward Ready!</div>
-                            <div style="font-size: 12px; color: var(--text-secondary);">Your McDonald's voucher is ready</div>
-                        </div>
-                    </div>
-                    <button class="btn-secondary" onclick="this.closest('.modal').remove()">Close</button>
-                </div>
-            `;
-            document.body.appendChild(modal);
-        }
-
-        // Settings functions
-        function loadSettings() {
-            try {
-                const saved = localStorage.getItem('jombro_settings');
-                if (saved) {
-                    appSettings = { ...appSettings, ...JSON.parse(saved) };
-                    const apiKeyEl = document.getElementById('openaiApiKey');
-                    const themeEl = document.getElementById('backgroundTheme');
-                    if (apiKeyEl && appSettings.openaiApiKey) {
-                        apiKeyEl.value = appSettings.openaiApiKey;
-                    }
-                    if (themeEl && appSettings.backgroundTheme) {
-                        themeEl.value = appSettings.backgroundTheme;
-                    }
-                }
-            } catch (error) {
-                console.error('Error loading settings:', error);
-            }
-        }
-
-        function saveSettings() {
-            try {
-                const apiKeyEl = document.getElementById('openaiApiKey');
-                const themeEl = document.getElementById('backgroundTheme');
-                
-                appSettings.openaiApiKey = apiKeyEl ? apiKeyEl.value : '';
-                appSettings.backgroundTheme = themeEl ? themeEl.value : 'space';
-                
-                localStorage.setItem('jombro_settings', JSON.stringify(appSettings));
-                hideModal('settings');
-                showToast('⚙️ Settings saved successfully!', 'success');
-            } catch (error) {
-                showToast('❌ Error saving settings!', 'error');
-            }
-        }
-
-        // FIXED: Toast function with proper type handling
         function showToast(message, type = 'info') {
-            try {
-                const toast = document.getElementById('toast');
-                const toastText = document.getElementById('toastText');
-                
-                if (!toast || !toastText) return;
-                
-                toastText.textContent = message;
-                toast.className = `toast ${type}`;
-                toast.classList.add('show');
-                
-                setTimeout(() => toast.classList.remove('show'), 3000);
-            } catch (error) {
-                console.error('Error showing toast:', error);
-            }
+            const toast = document.getElementById('toast');
+            const toastText = document.getElementById('toastText');
+            
+            toastText.textContent = message;
+            toast.className = `toast ${type}`;
+            toast.classList.add('show');
+            
+            setTimeout(() => toast.classList.remove('show'), 3000);
         }
 
-        // FIXED: Touch/swipe handling for mobile
+        // ===== TOUCH/SWIPE HANDLING =====
         let startY = 0;
         let startX = 0;
 
         document.addEventListener('touchstart', (e) => {
-            if (e.target.closest('.modal') || e.target.closest('.challenge-page')) return;
+            if (e.target.closest('.mock-payment-modal') || e.target.closest('.feedback-modal')) return;
             startY = e.touches[0].clientY;
             startX = e.touches[0].clientX;
         }, { passive: true });
 
         document.addEventListener('touchend', (e) => {
             if (!startY || !startX) return;
-            if (e.target.closest('.modal') || e.target.closest('.challenge-page')) return;
+            if (e.target.closest('.mock-payment-modal') || e.target.closest('.feedback-modal')) return;
 
             const endY = e.changedTouches[0].clientY;
             const deltaY = startY - endY;
@@ -3224,12 +1404,7 @@
             if (Math.abs(deltaY) > 50) {
                 if (e.target.closest('.content-area')) {
                     if (deltaY > 0) {
-                        nextChallenge(); // Swipe up
-                    } else {
-                        // Swipe down for previous
-                        currentPage = currentPage === 0 ? challengeData.length - 1 : currentPage - 1;
-                        updateCurrentChallenge();
-                        showToast('⏮️ Previous challenge!');
+                        nextChallenge();
                     }
                 }
             }
@@ -3238,73 +1413,17 @@
             startX = 0;
         }, { passive: true });
 
-        // Prevent zoom on double tap
-        let lastTouchEnd = 0;
-        document.addEventListener('touchend', function (event) {
-            const now = Date.now();
-            if (now - lastTouchEnd <= 300) {
-                event.preventDefault();
-            }
-            lastTouchEnd = now;
-        }, false);
-
-        // Close modals on outside click
-        document.addEventListener('click', (e) => {
-            if (e.target.classList.contains('modal')) {
-                e.target.classList.remove('show');
-            }
-        });
-
-        // Auto-save progress
+        // ===== AUTO-SAVE BETA DATA =====
         setInterval(() => {
-            try {
-                localStorage.setItem('jombro_player_data', JSON.stringify(playerData));
-                localStorage.setItem('jombro_group_data', JSON.stringify(groupData));
-            } catch (error) {
-                console.error('Error auto-saving:', error);
+            if (betaPlayerData.feedback.length > 0) {
+                localStorage.setItem('jombro_beta_feedback', JSON.stringify(betaPlayerData.feedback));
             }
         }, 30000);
 
-        // Load saved data
-        try {
-            const savedPlayer = localStorage.getItem('jombro_player_data');
-            if (savedPlayer) {
-                const savedData = JSON.parse(savedPlayer);
-                playerData = { ...playerData, ...savedData };
-            }
-
-            const savedGroups = localStorage.getItem('jombro_group_data');
-            if (savedGroups) {
-                const savedGroupData = JSON.parse(savedGroups);
-                groupData = [...groupData, ...savedGroupData];
-            }
-        } catch (error) {
-            console.error('Error loading saved data:', error);
-        }
-
-        // Cleanup on page unload
-        window.addEventListener('beforeunload', () => {
-            if (groupUpdateInterval) {
-                clearInterval(groupUpdateInterval);
-            }
-            if (liveChallengeUpdateInterval) {
-                clearInterval(liveChallengeUpdateInterval);
-            }
-        });
-
-        console.log('✅ JomBro Mobile App Initialized');
-        console.log('📱 Interface & alignment fixed');
-        console.log('🎯 All buttons properly sized');
-        console.log('🚀 Icons properly activated');
-        console.log('🔢 Clean number formatting');
-        console.log('👥 Enhanced group system with live updates');
-        console.log('🏆 Competitive point tracking active');
-        console.log('⚡ Real-time leaderboard updates');
-        console.log('➕ Separate create challenge & group buttons');
-        console.log('🔴 Live challengers with round avatars active');
-        console.log('📱 Horizontal slide view for live users');
-        console.log('⚡ Real-time status updates every 8 seconds');
-
+        console.log('✅ JomBro Beta Testing Ready');
+        console.log('🧪 Mock payments enabled');
+        console.log('📝 Feedback collection active');
+        console.log('🎯 Testing mode: Full simulation');
     </script>
 </body>
 </html>
