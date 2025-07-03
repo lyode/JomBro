@@ -871,18 +871,31 @@
         </div>
     </div>
 
-    <!-- Enhanced Groups Modal -->
+    <!-- Enhanced Social Hub Modal (Groups + Friends) -->
     <div id="groupsModal" class="modal">
         <div class="modal-content" style="max-width: 450px;">
-            <div class="modal-title">👥 My Groups</div>
+            <div class="modal-title">👥 Social Hub</div>
             
-            <div style="margin-bottom: 20px;">
+            <!-- Social Tabs -->
+            <div style="display: flex; gap: 4px; margin-bottom: 20px; background: rgba(255, 255, 255, 0.05); border-radius: 12px; padding: 4px;">
+                <div class="social-tab active" onclick="switchSocialTab(this, 'groups')" data-tab="groups">
+                    <span>👥 Groups</span>
+                </div>
+                <div class="social-tab" onclick="switchSocialTab(this, 'friends')" data-tab="friends">
+                    <span>👫 Friends</span>
+                </div>
+                <div class="social-tab" onclick="switchSocialTab(this, 'discover')" data-tab="discover">
+                    <span>🌟 Discover</span>
+                </div>
+            </div>
+
+            <!-- Groups Tab Content -->
+            <div id="groupsTab" class="social-tab-content">
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
-                    <div style="font-size: 14px; color: var(--text-secondary);">Active Groups</div>
+                    <div style="font-size: 14px; color: var(--text-secondary);">My Groups</div>
                     <button class="btn-primary" onclick="showModal('createGroup')" style="padding: 6px 12px; font-size: 12px;">+ Create Group</button>
                 </div>
                 
-                <!-- My Groups -->
                 <div id="myGroupsList">
                     <div style="border: 1px solid var(--primary-green); border-radius: 12px; padding: 16px; margin-bottom: 12px; background: rgba(0, 255, 150, 0.05);">
                         <div style="display: flex; justify-content: between; align-items: start; margin-bottom: 8px;">
@@ -898,7 +911,7 @@
                         </div>
                     </div>
                     
-                    <div style="border: 1px solid var(--border-color); border-radius: 12px; padding: 16px; margin-bottom: 12px;">
+                    <div style="border: 1px solid var(--border-color); border-radius: 12px; padding: 16px;">
                         <div style="display: flex; justify-content: between; align-items: start; margin-bottom: 8px;">
                             <div>
                                 <div style="font-weight: 600; margin-bottom: 4px;">🏢 Office Champions</div>
@@ -912,10 +925,147 @@
                         </div>
                     </div>
                 </div>
+            </div>
+
+            <!-- Friends Tab Content -->
+            <div id="friendsTab" class="social-tab-content" style="display: none;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+                    <div style="font-size: 14px; color: var(--text-secondary);">My Friends (12)</div>
+                    <button class="btn-primary" onclick="showAddFriend()" style="padding: 6px 12px; font-size: 12px;">+ Add Friend</button>
+                </div>
+
+                <!-- Friend Search -->
+                <div style="margin-bottom: 16px;">
+                    <input type="text" class="form-input" placeholder="🔍 Search friends..." style="padding: 8px 12px; font-size: 14px;">
+                </div>
+
+                <!-- Active Friends -->
+                <div style="margin-bottom: 20px;">
+                    <div style="font-size: 12px; color: var(--text-secondary); margin-bottom: 8px;">ONLINE NOW (4)</div>
+                    <div style="display: flex; gap: 8px; overflow-x: auto; padding-bottom: 8px;">
+                        <div style="min-width: 60px; text-align: center; cursor: pointer;" onclick="viewFriendProfile('alex')">
+                            <div style="width: 48px; height: 48px; border-radius: 24px; background: linear-gradient(45deg, var(--primary-green), #00d4ff); margin: 0 auto 4px; display: flex; align-items: center; justify-content: center; font-size: 20px; position: relative;">
+                                👨
+                                <div style="position: absolute; bottom: 2px; right: 2px; width: 12px; height: 12px; background: var(--primary-green); border: 2px solid var(--dark-bg); border-radius: 50%;"></div>
+                            </div>
+                            <div style="font-size: 10px; color: var(--text-secondary);">Alex</div>
+                        </div>
+                        <div style="min-width: 60px; text-align: center; cursor: pointer;" onclick="viewFriendProfile('maria')">
+                            <div style="width: 48px; height: 48px; border-radius: 24px; background: linear-gradient(45deg, #ff6b9d, #c44569); margin: 0 auto 4px; display: flex; align-items: center; justify-content: center; font-size: 20px; position: relative;">
+                                👩
+                                <div style="position: absolute; bottom: 2px; right: 2px; width: 12px; height: 12px; background: var(--primary-green); border: 2px solid var(--dark-bg); border-radius: 50%;"></div>
+                            </div>
+                            <div style="font-size: 10px; color: var(--text-secondary);">Maria</div>
+                        </div>
+                        <div style="min-width: 60px; text-align: center; cursor: pointer;" onclick="viewFriendProfile('john')">
+                            <div style="width: 48px; height: 48px; border-radius: 24px; background: linear-gradient(45deg, #4834d4, #686de0); margin: 0 auto 4px; display: flex; align-items: center; justify-content: center; font-size: 20px; position: relative;">
+                                👨‍💼
+                                <div style="position: absolute; bottom: 2px; right: 2px; width: 12px; height: 12px; background: var(--primary-green); border: 2px solid var(--dark-bg); border-radius: 50%;"></div>
+                            </div>
+                            <div style="font-size: 10px; color: var(--text-secondary);">John</div>
+                        </div>
+                        <div style="min-width: 60px; text-align: center; cursor: pointer;" onclick="viewFriendProfile('lisa')">
+                            <div style="width: 48px; height: 48px; border-radius: 24px; background: linear-gradient(45deg, #f8b500, #fbc531); margin: 0 auto 4px; display: flex; align-items: center; justify-content: center; font-size: 20px; position: relative;">
+                                👩‍🎨
+                                <div style="position: absolute; bottom: 2px; right: 2px; width: 12px; height: 12px; background: var(--primary-green); border: 2px solid var(--dark-bg); border-radius: 50%;"></div>
+                            </div>
+                            <div style="font-size: 10px; color: var(--text-secondary);">Lisa</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Friend Activity Feed -->
+                <div style="margin-bottom: 20px;">
+                    <div style="font-size: 12px; color: var(--text-secondary); margin-bottom: 12px;">RECENT ACTIVITY</div>
+                    
+                    <div style="border: 1px solid var(--border-color); border-radius: 12px; padding: 12px; margin-bottom: 8px;">
+                        <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 6px;">
+                            <div style="width: 32px; height: 32px; border-radius: 16px; background: linear-gradient(45deg, var(--primary-green), #00d4ff); display: flex; align-items: center; justify-content: center; font-size: 14px;">👨</div>
+                            <div>
+                                <div style="font-size: 13px; font-weight: 500;">Alex completed "Coffee Shop Poetry"</div>
+                                <div style="font-size: 11px; color: var(--text-secondary);">+500 tokens • 2 hours ago</div>
+                            </div>
+                        </div>
+                        <div style="display: flex; gap: 6px;">
+                            <button style="background: rgba(0, 255, 150, 0.2); border: 1px solid var(--primary-green); color: var(--primary-green); padding: 4px 8px; border-radius: 6px; font-size: 10px; cursor: pointer;">👍 Like</button>
+                            <button style="background: rgba(255, 179, 217, 0.2); border: 1px solid #ffb3d9; color: #ffb3d9; padding: 4px 8px; border-radius: 6px; font-size: 10px; cursor: pointer;">🚀 Try This</button>
+                        </div>
+                    </div>
+
+                    <div style="border: 1px solid var(--border-color); border-radius: 12px; padding: 12px; margin-bottom: 8px;">
+                        <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 6px;">
+                            <div style="width: 32px; height: 32px; border-radius: 16px; background: linear-gradient(45deg, #ff6b9d, #c44569); display: flex; align-items: center; justify-content: center; font-size: 14px;">👩</div>
+                            <div>
+                                <div style="font-size: 13px; font-weight: 500;">Maria created "City Art Hunt"</div>
+                                <div style="font-size: 11px; color: var(--text-secondary);">1,200 tokens • 5 hours ago</div>
+                            </div>
+                        </div>
+                        <div style="display: flex; gap: 6px;">
+                            <button style="background: rgba(255, 179, 217, 0.2); border: 1px solid #ffb3d9; color: #ffb3d9; padding: 4px 8px; border-radius: 6px; font-size: 10px; cursor: pointer;">🚀 Accept</button>
+                            <button style="background: rgba(255, 255, 255, 0.1); border: 1px solid var(--border-color); color: var(--text-secondary); padding: 4px 8px; border-radius: 6px; font-size: 10px; cursor: pointer;">📤 Share</button>
+                        </div>
+                    </div>
+
+                    <div style="border: 1px solid var(--border-color); border-radius: 12px; padding: 12px;">
+                        <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 6px;">
+                            <div style="width: 32px; height: 32px; border-radius: 16px; background: linear-gradient(45deg, #4834d4, #686de0); display: flex; align-items: center; justify-content: center; font-size: 14px;">👨‍💼</div>
+                            <div>
+                                <div style="font-size: 13px; font-weight: 500;">John earned "Fitness Master" badge</div>
+                                <div style="font-size: 11px; color: var(--text-secondary);">1 day ago</div>
+                            </div>
+                        </div>
+                        <div style="display: flex; gap: 6px;">
+                            <button style="background: rgba(0, 255, 150, 0.2); border: 1px solid var(--primary-green); color: var(--primary-green); padding: 4px 8px; border-radius: 6px; font-size: 10px; cursor: pointer;">🎉 Congrats</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Friend Challenges -->
+                <div style="background: rgba(255, 179, 217, 0.05); border: 1px solid rgba(255, 179, 217, 0.2); border-radius: 12px; padding: 12px;">
+                    <div style="color: #ffb3d9; font-weight: 600; margin-bottom: 8px;">🎯 Challenge Friends</div>
+                    <div style="color: var(--text-secondary); font-size: 12px; margin-bottom: 8px;">Send the current challenge to your friends!</div>
+                    <button style="background: #ffb3d9; color: #000; padding: 6px 12px; border-radius: 6px; font-size: 11px; font-weight: 600; border: none; cursor: pointer;" onclick="challengeFriends()">📤 Send to Friends</button>
+                </div>
+            </div>
+
+            <!-- Discover Tab Content -->
+            <div id="discoverTab" class="social-tab-content" style="display: none;">
+                <div style="font-size: 14px; color: var(--text-secondary); margin-bottom: 16px;">Find New Connections</div>
                 
+                <!-- Suggested Friends -->
+                <div style="margin-bottom: 20px;">
+                    <div style="font-size: 12px; color: var(--text-secondary); margin-bottom: 12px;">SUGGESTED FRIENDS</div>
+                    
+                    <div style="border: 1px solid var(--border-color); border-radius: 12px; padding: 12px; margin-bottom: 8px;">
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <div style="display: flex; align-items: center; gap: 10px;">
+                                <div style="width: 40px; height: 40px; border-radius: 20px; background: linear-gradient(45deg, #ff9ff3, #f368e0); display: flex; align-items: center; justify-content: center; font-size: 18px;">👩‍💻</div>
+                                <div>
+                                    <div style="font-weight: 500; margin-bottom: 2px;">Sarah Chen</div>
+                                    <div style="font-size: 11px; color: var(--text-secondary);">Mutual: Alex, Maria • 847 tokens</div>
+                                </div>
+                            </div>
+                            <button style="background: var(--primary-green); color: #000; padding: 6px 12px; border-radius: 6px; font-size: 11px; font-weight: 600; border: none; cursor: pointer;" onclick="addFriend('sarah')">+ Add</button>
+                        </div>
+                    </div>
+
+                    <div style="border: 1px solid var(--border-color); border-radius: 12px; padding: 12px;">
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <div style="display: flex; align-items: center; gap: 10px;">
+                                <div style="width: 40px; height: 40px; border-radius: 20px; background: linear-gradient(45deg, #55a3ff, #3742fa); display: flex; align-items: center; justify-content: center; font-size: 18px;">👨‍🚀</div>
+                                <div>
+                                    <div style="font-weight: 500; margin-bottom: 2px;">Mike Rodriguez</div>
+                                    <div style="font-size: 11px; color: var(--text-secondary);">From: Fitness Warriors • 1,203 tokens</div>
+                                </div>
+                            </div>
+                            <button style="background: var(--primary-green); color: #000; padding: 6px 12px; border-radius: 6px; font-size: 11px; font-weight: 600; border: none; cursor: pointer;" onclick="addFriend('mike')">+ Add</button>
+                        </div>
+                    </div>
+                </div>
+
                 <!-- Discover Groups -->
-                <div style="margin-top: 24px;">
-                    <div style="font-size: 14px; color: var(--text-secondary); margin-bottom: 16px;">Discover Groups</div>
+                <div>
+                    <div style="font-size: 12px; color: var(--text-secondary); margin-bottom: 12px;">DISCOVER GROUPS</div>
                     
                     <div style="border: 1px solid var(--border-color); border-radius: 12px; padding: 16px; margin-bottom: 12px;">
                         <div style="display: flex; justify-content: between; align-items: start; margin-bottom: 8px;">
@@ -941,7 +1091,7 @@
                 </div>
             </div>
             
-            <button class="btn-secondary" onclick="hideModal('groups')">Close</button>
+            <button class="btn-secondary" onclick="hideModal('groups')" style="margin-top: 16px;">Close</button>
         </div>
     </div>
 
