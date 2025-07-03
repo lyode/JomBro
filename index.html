@@ -126,17 +126,17 @@
 
         .logo-text {
             font-size: 24px;
-            font-weight: 800;
-            color: var(--primary);
-            text-shadow: 0 0 10px rgba(0, 255, 150, 0.5);
+            font-weight: 300;
+            color: var(--text-primary);
             line-height: 1;
         }
 
         .logo-slogan {
-            font-size: 11px;
+            font-size: 10px;
             color: var(--text-secondary);
-            font-style: italic;
+            font-weight: 300;
             margin-top: 2px;
+            line-height: 1.2;
         }
 
         .header-actions {
@@ -954,7 +954,8 @@
             .challenge-description { font-size: 15px; }
             .header-btn { width: 36px; height: 36px; font-size: 16px; }
             .action-btn { width: 48px; height: 48px; }
-            .logo-text { font-size: 22px; }
+            .logo-text { font-size: 20px; }
+            .logo-slogan { font-size: 8px; }
         }
 
         /* iPhone 12/13/14 (390px) */
@@ -1031,13 +1032,13 @@
         <div class="header">
             <div class="logo">
                 <div class="logo-text">JomBro</div>
-                <div class="logo-slogan">lai lai lai!</div>
+                <div class="logo-slogan">Come-on Bro, Let's Go, Let's Go!</div>
             </div>
             <div class="header-actions">
                 <div class="header-btn icon-center" onclick="showHowToPlay()" title="How to Play">❓</div>
                 <div class="header-btn icon-center" onclick="showLiveActivity()" title="Live Activity">⚡</div>
-                <div class="header-btn icon-center" onclick="showModal('create')" title="Create">➕</div>
-                <div class="header-btn icon-center" onclick="showModal('groups')" title="Groups">👥</div>
+                <div class="header-btn icon-center" onclick="showModal('create')" title="Create Challenge">➕</div>
+                <div class="header-btn icon-center" onclick="showModal('createGroup')" title="Create Group">👥</div>
                 <div class="header-btn icon-center" onclick="showNotifications()" title="Notifications">🔔</div>
                 <div class="header-btn icon-center" onclick="showModal('settings')" title="Settings">⚙️</div>
             </div>
@@ -1083,6 +1084,10 @@
             <div class="nav-item" onclick="navAction(this, 'create')">
                 <div class="nav-icon">➕</div>
                 <div class="nav-label">Create</div>
+            </div>
+            <div class="nav-item" onclick="navAction(this, 'groups')">
+                <div class="nav-icon">👥</div>
+                <div class="nav-label">Groups</div>
             </div>
             <div class="nav-item" onclick="navAction(this, 'shop')">
                 <div class="nav-icon">🛍️</div>
@@ -1195,18 +1200,115 @@
         </div>
     </div>
 
-    <!-- Groups Modal -->
+    <!-- Create Group Modal -->
+    <div id="createGroupModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-title">👥 Create Group</div>
+            <div class="form-group">
+                <label class="form-label">Group Name</label>
+                <input type="text" class="form-control" id="groupName" placeholder="Enter group name...">
+            </div>
+            <div class="form-group">
+                <label class="form-label">Group Description</label>
+                <textarea class="form-control" id="groupDesc" rows="3" placeholder="Describe your group..."></textarea>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Competition Type</label>
+                <select class="form-control" id="groupType">
+                    <option value="weekly">Weekly Competition</option>
+                    <option value="monthly">Monthly Competition</option>
+                    <option value="challenge">Challenge-Based</option>
+                    <option value="custom">Custom Duration</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Point System</label>
+                <select class="form-control" id="pointSystem">
+                    <option value="standard">Standard (+100 win, -50 loss)</option>
+                    <option value="aggressive">Aggressive (+200 win, -100 loss)</option>
+                    <option value="winner-takes-all">Winner Takes All</option>
+                    <option value="custom">Custom Points</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Group Privacy</label>
+                <select class="form-control" id="groupPrivacy">
+                    <option value="public">Public - Anyone can join</option>
+                    <option value="private">Private - Invite only</option>
+                    <option value="friends">Friends only</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Winner Rewards</label>
+                <textarea class="form-control" id="winnerRewards" rows="2" placeholder="e.g., 10,000 tokens, Special badge, Real prize..."></textarea>
+            </div>
+            <button class="btn-primary" onclick="createGroup()">🚀 Create Group</button>
+            <button class="btn-secondary" onclick="hideModal('createGroup')">Cancel</button>
+        </div>
+    </div>
+
+    <!-- Groups Management Modal -->
     <div id="groupsModal" class="modal">
         <div class="modal-content">
-            <div class="modal-title">👥 Groups</div>
-            <div style="text-align: center; padding: 20px;">
-                <div style="font-size: 48px; margin-bottom: 16px;">🚧</div>
-                <h3 style="margin-bottom: 12px;">Coming Soon!</h3>
-                <p style="color: var(--text-secondary); line-height: 1.5; margin-bottom: 20px;">
-                    Join communities, create teams, and compete together!
-                </p>
+            <div class="modal-title">👥 My Groups</div>
+            <div style="margin-bottom: 20px;">
+                <div style="display: flex; gap: 8px; margin-bottom: 16px;">
+                    <button class="btn-primary" style="flex: 1; margin: 0;" onclick="showModal('createGroup'); hideModal('groups')">➕ Create Group</button>
+                    <button class="btn-secondary" style="flex: 1; margin: 0;" onclick="joinRandomGroup()">🎲 Join Random</button>
+                </div>
             </div>
+            
+            <div id="groupsList" style="max-height: 300px; overflow-y: auto;">
+                <!-- Groups will be populated here -->
+            </div>
+            
             <button class="btn-secondary" onclick="hideModal('groups')">Close</button>
+        </div>
+    </div>
+
+    <!-- Group Details Modal -->
+    <div id="groupDetailsModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-title" id="groupDetailsTitle">Group Details</div>
+            
+            <!-- Live Leaderboard -->
+            <div style="background: rgba(0, 255, 150, 0.1); border: 1px solid var(--primary); border-radius: 12px; padding: 16px; margin-bottom: 16px;">
+                <h4 style="color: var(--primary); margin-bottom: 12px;">🏆 Live Leaderboard</h4>
+                <div id="groupLeaderboard">
+                    <!-- Leaderboard will be populated here -->
+                </div>
+            </div>
+
+            <!-- Live Activity Feed -->
+            <div style="background: rgba(255, 255, 255, 0.02); border: 1px solid var(--border-light); border-radius: 12px; padding: 16px; margin-bottom: 16px;">
+                <h4 style="color: var(--text-primary); margin-bottom: 12px;">⚡ Live Activity</h4>
+                <div id="groupActivity" style="max-height: 150px; overflow-y: auto;">
+                    <!-- Activity feed will be populated here -->
+                </div>
+            </div>
+
+            <!-- Group Stats -->
+            <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; margin-bottom: 16px;">
+                <div style="text-align: center; padding: 12px; background: rgba(0, 255, 150, 0.1); border-radius: 8px;">
+                    <div style="color: var(--primary); font-size: 18px; font-weight: 700;" id="groupMemberCount">0</div>
+                    <div style="font-size: 12px; color: var(--text-secondary);">Members</div>
+                </div>
+                <div style="text-align: center; padding: 12px; background: rgba(255, 215, 0, 0.1); border-radius: 8px;">
+                    <div style="color: var(--accent); font-size: 18px; font-weight: 700;" id="groupTotalPoints">0</div>
+                    <div style="font-size: 12px; color: var(--text-secondary);">Total Points</div>
+                </div>
+                <div style="text-align: center; padding: 12px; background: rgba(255, 107, 107, 0.1); border-radius: 8px;">
+                    <div style="color: #FF6B6B; font-size: 18px; font-weight: 700;" id="groupDaysLeft">0</div>
+                    <div style="font-size: 12px; color: var(--text-secondary);">Days Left</div>
+                </div>
+            </div>
+
+            <div style="display: flex; gap: 8px;">
+                <button class="btn-primary" style="flex: 1; margin: 0;" onclick="inviteToGroup()">📤 Invite Friends</button>
+                <button class="btn-secondary" style="flex: 1; margin: 0;" onclick="leaveGroup()">🚪 Leave Group</button>
+            </div>
+            
+            <button class="btn-secondary" onclick="hideModal('groupDetails')" style="margin-top: 8px;">Close</button>
         </div>
     </div>
 
@@ -1253,16 +1355,20 @@
         };
 
         let challengeData = [];
+        let groupData = [];
         let currentPage = 0;
         let currentChallenge = null;
+        let currentGroup = null;
         let selectedRating = 0;
         let appSettings = { openaiApiKey: '', backgroundTheme: 'space' };
+        let groupUpdateInterval = null;
 
         // Initialize app
         document.addEventListener('DOMContentLoaded', function() {
             console.log('🚀 JomBro Mobile App Starting...');
             loadSettings();
             generateSampleChallenges();
+            generateSampleGroups();
             updatePlayerDisplay();
             updateChallengeDisplay();
             setTimeout(() => showToast('🎉 Welcome to JomBro!', 'success'), 1000);
@@ -1372,6 +1478,83 @@
                     ],
                     duration: "20 min",
                     likes: 3241
+                }
+            ];
+        }
+
+        // Generate sample groups
+        function generateSampleGroups() {
+            groupData = [
+                {
+                    id: 'group_001',
+                    name: 'Weekend Warriors',
+                    description: 'Weekend challenge enthusiasts competing for glory!',
+                    type: 'weekly',
+                    pointSystem: 'standard',
+                    privacy: 'public',
+                    winnerRewards: '5,000 tokens, Winner badge, RM 100 voucher',
+                    createdBy: 'alexandra_stone',
+                    createdAt: Date.now() - 86400000 * 3,
+                    endDate: Date.now() + 86400000 * 4,
+                    members: [
+                        { username: 'alexandra_stone', displayName: 'Alexandra Stone', points: 850, trend: '+120', lastActive: Date.now() - 3600000 },
+                        { username: 'mike_challenger', displayName: 'Mike C.', points: 720, trend: '+85', lastActive: Date.now() - 1800000 },
+                        { username: 'sarah_explorer', displayName: 'Sarah E.', points: 650, trend: '-30', lastActive: Date.now() - 7200000 },
+                        { username: 'david_fitness', displayName: 'David F.', points: 580, trend: '+200', lastActive: Date.now() - 600000 },
+                        { username: 'lisa_creative', displayName: 'Lisa C.', points: 520, trend: '-75', lastActive: Date.now() - 14400000 }
+                    ],
+                    activity: [
+                        { type: 'point_gain', user: 'David F.', amount: 200, challenge: 'Fitness Challenge', time: Date.now() - 600000 },
+                        { type: 'point_gain', user: 'Alexandra Stone', amount: 120, challenge: 'Coffee Poetry', time: Date.now() - 1800000 },
+                        { type: 'point_loss', user: 'Sarah E.', amount: -30, challenge: 'Failed Urban Explorer', time: Date.now() - 3600000 },
+                        { type: 'point_gain', user: 'Mike C.', amount: 85, challenge: 'McDonalds Random', time: Date.now() - 7200000 }
+                    ]
+                },
+                {
+                    id: 'group_002',
+                    name: 'Elite Gladiators',
+                    description: 'Top-tier challengers competing for ultimate prizes!',
+                    type: 'monthly',
+                    pointSystem: 'aggressive',
+                    privacy: 'private',
+                    winnerRewards: '25,000 tokens, Elite badge, iPhone 15 Pro',
+                    createdBy: 'dragon_master',
+                    createdAt: Date.now() - 86400000 * 15,
+                    endDate: Date.now() + 86400000 * 15,
+                    members: [
+                        { username: 'dragon_master', displayName: 'Dragon Master', points: 2850, trend: '+400', lastActive: Date.now() - 1800000 },
+                        { username: 'shadow_ninja', displayName: 'Shadow Ninja', points: 2720, trend: '+350', lastActive: Date.now() - 3600000 },
+                        { username: 'alexandra_stone', displayName: 'Alexandra Stone', points: 2650, trend: '+280', lastActive: Date.now() - 600000 },
+                        { username: 'phoenix_rising', displayName: 'Phoenix Rising', points: 2580, trend: '+150', lastActive: Date.now() - 7200000 }
+                    ],
+                    activity: [
+                        { type: 'point_gain', user: 'Dragon Master', amount: 400, challenge: 'Treasure Hunt', time: Date.now() - 1800000 },
+                        { type: 'point_gain', user: 'Shadow Ninja', amount: 350, challenge: 'Epic Adventure', time: Date.now() - 3600000 },
+                        { type: 'point_gain', user: 'Alexandra Stone', amount: 280, challenge: 'Business Challenge', time: Date.now() - 7200000 }
+                    ]
+                },
+                {
+                    id: 'group_003',
+                    name: 'Fitness Fanatics',
+                    description: 'Dedicated to fitness and health challenges!',
+                    type: 'challenge',
+                    pointSystem: 'winner-takes-all',
+                    privacy: 'public',
+                    winnerRewards: '10,000 tokens, Fitness gear, Gym membership',
+                    createdBy: 'fitness_ryan',
+                    createdAt: Date.now() - 86400000 * 7,
+                    endDate: Date.now() + 86400000 * 7,
+                    members: [
+                        { username: 'fitness_ryan', displayName: 'Fitness Ryan', points: 1450, trend: '+300', lastActive: Date.now() - 1800000 },
+                        { username: 'alexandra_stone', displayName: 'Alexandra Stone', points: 1200, trend: '+180', lastActive: Date.now() - 3600000 },
+                        { username: 'workout_warrior', displayName: 'Workout Warrior', points: 1100, trend: '+220', lastActive: Date.now() - 7200000 },
+                        { username: 'gym_hero', displayName: 'Gym Hero', points: 980, trend: '-50', lastActive: Date.now() - 14400000 }
+                    ],
+                    activity: [
+                        { type: 'point_gain', user: 'Fitness Ryan', amount: 300, challenge: 'Public Workout', time: Date.now() - 1800000 },
+                        { type: 'point_gain', user: 'Workout Warrior', amount: 220, challenge: 'Marathon Training', time: Date.now() - 3600000 },
+                        { type: 'point_gain', user: 'Alexandra Stone', amount: 180, challenge: 'Yoga Challenge', time: Date.now() - 7200000 }
+                    ]
                 }
             ];
         }
@@ -1886,7 +2069,10 @@
                         showLeaderboard();
                         break;
                     case 'create':
-                        showModal('create');
+                        showCreateMenu();
+                        break;
+                    case 'groups':
+                        showGroups();
                         break;
                     case 'shop':
                         showShop();
@@ -1897,6 +2083,425 @@
                 }
             } catch (error) {
                 showToast('❌ Navigation error!', 'error');
+            }
+        }
+
+        // Show create menu
+        function showCreateMenu() {
+            const modal = document.createElement('div');
+            modal.className = 'modal show';
+            modal.innerHTML = `
+                <div class="modal-content">
+                    <div class="modal-title">✨ Create</div>
+                    <div style="display: flex; flex-direction: column; gap: 12px;">
+                        <button class="btn-primary" onclick="this.closest('.modal').remove(); showModal('create');">
+                            ➕ Create Challenge
+                        </button>
+                        <button class="btn-primary" onclick="this.closest('.modal').remove(); showModal('createGroup');">
+                            👥 Create Group
+                        </button>
+                    </div>
+                    <button class="btn-secondary" onclick="this.closest('.modal').remove()">Cancel</button>
+                </div>
+            `;
+            document.body.appendChild(modal);
+        }
+
+        // Show groups
+        function showGroups() {
+            updateGroupsList();
+            showModal('groups');
+        }
+
+        // Update groups list
+        function updateGroupsList() {
+            const groupsList = document.getElementById('groupsList');
+            if (!groupsList) return;
+
+            const userGroups = groupData.filter(group => 
+                group.members.some(member => member.username === playerData.username)
+            );
+
+            if (userGroups.length === 0) {
+                groupsList.innerHTML = `
+                    <div style="text-align: center; padding: 20px; color: var(--text-secondary);">
+                        <div style="font-size: 48px; margin-bottom: 12px;">👥</div>
+                        <p>You haven't joined any groups yet!</p>
+                    </div>
+                `;
+                return;
+            }
+
+            groupsList.innerHTML = userGroups.map(group => {
+                const userMember = group.members.find(member => member.username === playerData.username);
+                const userRank = group.members.sort((a, b) => b.points - a.points).findIndex(member => member.username === playerData.username) + 1;
+                const daysLeft = Math.ceil((group.endDate - Date.now()) / (86400000));
+                
+                return `
+                    <div style="background: rgba(255, 255, 255, 0.05); border: 1px solid var(--border-light); border-radius: 12px; padding: 16px; margin-bottom: 12px; cursor: pointer;" onclick="showGroupDetails('${group.id}')">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                            <div style="font-weight: 700; font-size: 16px;">${group.name}</div>
+                            <div style="color: var(--accent); font-size: 12px;">Rank #${userRank}</div>
+                        </div>
+                        <div style="font-size: 12px; color: var(--text-secondary); margin-bottom: 8px;">${group.description}</div>
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <div style="font-size: 12px;">
+                                <span style="color: var(--primary);">Your Points: ${userMember.points.toLocaleString()}</span>
+                                <span style="margin-left: 8px; color: ${userMember.trend.startsWith('+') ? 'var(--success)' : 'var(--error)'};">${userMember.trend}</span>
+                            </div>
+                            <div style="font-size: 12px; color: var(--text-secondary);">${daysLeft} days left</div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // Create group
+        function createGroup() {
+            try {
+                const nameEl = document.getElementById('groupName');
+                const descEl = document.getElementById('groupDesc');
+                const typeEl = document.getElementById('groupType');
+                const pointSystemEl = document.getElementById('pointSystem');
+                const privacyEl = document.getElementById('groupPrivacy');
+                const rewardsEl = document.getElementById('winnerRewards');
+                
+                const name = nameEl ? nameEl.value : '';
+                const description = descEl ? descEl.value : '';
+                const type = typeEl ? typeEl.value : 'weekly';
+                const pointSystem = pointSystemEl ? pointSystemEl.value : 'standard';
+                const privacy = privacyEl ? privacyEl.value : 'public';
+                const rewards = rewardsEl ? rewardsEl.value : '';
+
+                if (!name.trim() || !description.trim()) {
+                    showToast('❌ Please fill in name and description!', 'error');
+                    return;
+                }
+
+                const duration = type === 'weekly' ? 7 : type === 'monthly' ? 30 : 14;
+                const newGroup = {
+                    id: 'group_' + Date.now(),
+                    name: name,
+                    description: description,
+                    type: type,
+                    pointSystem: pointSystem,
+                    privacy: privacy,
+                    winnerRewards: rewards || 'Bragging rights and group recognition',
+                    createdBy: playerData.username,
+                    createdAt: Date.now(),
+                    endDate: Date.now() + (duration * 86400000),
+                    members: [
+                        { 
+                            username: playerData.username, 
+                            displayName: playerData.displayName, 
+                            points: 0, 
+                            trend: '+0', 
+                            lastActive: Date.now() 
+                        }
+                    ],
+                    activity: [
+                        { 
+                            type: 'group_created', 
+                            user: playerData.displayName, 
+                            amount: 0, 
+                            challenge: 'Group Created', 
+                            time: Date.now() 
+                        }
+                    ]
+                };
+
+                groupData.unshift(newGroup);
+                hideModal('createGroup');
+                showToast('✨ Group created successfully!', 'success');
+                
+                // Clear form
+                if (nameEl) nameEl.value = '';
+                if (descEl) descEl.value = '';
+                if (rewardsEl) rewardsEl.value = '';
+                
+                // Show the new group
+                setTimeout(() => showGroupDetails(newGroup.id), 1000);
+            } catch (error) {
+                console.error('Error creating group:', error);
+                showToast('❌ Error creating group!', 'error');
+            }
+        }
+
+        // Show group details
+        function showGroupDetails(groupId) {
+            const group = groupData.find(g => g.id === groupId);
+            if (!group) return;
+
+            currentGroup = group;
+            
+            // Update group details
+            document.getElementById('groupDetailsTitle').textContent = group.name;
+            document.getElementById('groupMemberCount').textContent = group.members.length;
+            document.getElementById('groupTotalPoints').textContent = group.members.reduce((total, member) => total + member.points, 0).toLocaleString();
+            document.getElementById('groupDaysLeft').textContent = Math.ceil((group.endDate - Date.now()) / (86400000));
+            
+            // Update leaderboard
+            updateGroupLeaderboard(group);
+            
+            // Update activity feed
+            updateGroupActivity(group);
+            
+            // Start live updates
+            startGroupLiveUpdates(group);
+            
+            showModal('groupDetails');
+        }
+
+        // Update group leaderboard
+        function updateGroupLeaderboard(group) {
+            const leaderboard = document.getElementById('groupLeaderboard');
+            if (!leaderboard) return;
+
+            const sortedMembers = [...group.members].sort((a, b) => b.points - a.points);
+            
+            leaderboard.innerHTML = sortedMembers.map((member, index) => {
+                const isCurrentUser = member.username === playerData.username;
+                const trendColor = member.trend.startsWith('+') ? 'var(--success)' : member.trend.startsWith('-') ? 'var(--error)' : 'var(--text-secondary)';
+                const rankEmoji = index === 0 ? '🥇' : index === 1 ? '🥈' : index === 2 ? '🥉' : `#${index + 1}`;
+                
+                return `
+                    <div style="display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid var(--border-light); ${isCurrentUser ? 'background: rgba(0, 255, 150, 0.1); border-radius: 8px; padding: 8px 12px; margin: 4px 0;' : ''}">
+                        <div style="display: flex; align-items: center; gap: 8px;">
+                            <div style="font-size: 16px; min-width: 30px;">${rankEmoji}</div>
+                            <div>
+                                <div style="font-weight: 600; font-size: 14px;">${member.displayName}</div>
+                                <div style="font-size: 10px; color: var(--text-secondary);">${getTimeAgo(member.lastActive)}</div>
+                            </div>
+                        </div>
+                        <div style="text-align: right;">
+                            <div style="font-weight: 700; color: var(--primary);">${member.points.toLocaleString()}</div>
+                            <div style="font-size: 10px; color: ${trendColor};">${member.trend}</div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // Update group activity
+        function updateGroupActivity(group) {
+            const activity = document.getElementById('groupActivity');
+            if (!activity) return;
+
+            const sortedActivity = [...group.activity].sort((a, b) => b.time - a.time).slice(0, 10);
+            
+            activity.innerHTML = sortedActivity.map(item => {
+                const timeAgo = getTimeAgo(item.time);
+                const icon = item.type === 'point_gain' ? '📈' : item.type === 'point_loss' ? '📉' : '⚡';
+                const color = item.type === 'point_gain' ? 'var(--success)' : item.type === 'point_loss' ? 'var(--error)' : 'var(--primary)';
+                
+                return `
+                    <div style="padding: 8px 0; border-bottom: 1px solid var(--border-light); font-size: 12px;">
+                        <div style="display: flex; align-items: center; gap: 8px;">
+                            <div style="font-size: 14px;">${icon}</div>
+                            <div style="flex: 1;">
+                                <strong>${item.user}</strong> ${item.type === 'point_gain' ? 'gained' : item.type === 'point_loss' ? 'lost' : 'action'} 
+                                <span style="color: ${color}; font-weight: 700;">${item.amount > 0 ? '+' : ''}${item.amount} points</span>
+                                ${item.challenge ? ` from ${item.challenge}` : ''}
+                            </div>
+                        </div>
+                        <div style="color: var(--text-secondary); font-size: 10px; margin-top: 2px;">${timeAgo}</div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // Start group live updates
+        function startGroupLiveUpdates(group) {
+            // Clear existing interval
+            if (groupUpdateInterval) {
+                clearInterval(groupUpdateInterval);
+            }
+
+            // Update every 10 seconds
+            groupUpdateInterval = setInterval(() => {
+                simulateGroupActivity(group);
+                updateGroupLeaderboard(group);
+                updateGroupActivity(group);
+            }, 10000);
+        }
+
+        // Simulate group activity for demo
+        function simulateGroupActivity(group) {
+            const actions = [
+                { type: 'point_gain', points: [50, 100, 150, 200, 250] },
+                { type: 'point_loss', points: [-25, -50, -75, -100] },
+                { type: 'point_gain', points: [300, 400, 500] }
+            ];
+
+            // Randomly update a member
+            if (Math.random() < 0.3) { // 30% chance
+                const member = group.members[Math.floor(Math.random() * group.members.length)];
+                const action = actions[Math.floor(Math.random() * actions.length)];
+                const points = action.points[Math.floor(Math.random() * action.points.length)];
+                
+                member.points += points;
+                member.trend = points > 0 ? `+${points}` : `${points}`;
+                member.lastActive = Date.now();
+                
+                // Add to activity feed
+                group.activity.unshift({
+                    type: action.type,
+                    user: member.displayName,
+                    amount: points,
+                    challenge: 'Live Challenge',
+                    time: Date.now()
+                });
+                
+                // Keep only recent activity
+                if (group.activity.length > 50) {
+                    group.activity = group.activity.slice(0, 50);
+                }
+            }
+        }
+
+        // Helper function to get time ago
+        function getTimeAgo(timestamp) {
+            const now = Date.now();
+            const diff = now - timestamp;
+            const minutes = Math.floor(diff / 60000);
+            const hours = Math.floor(diff / 3600000);
+            const days = Math.floor(diff / 86400000);
+            
+            if (days > 0) return `${days}d ago`;
+            if (hours > 0) return `${hours}h ago`;
+            if (minutes > 0) return `${minutes}m ago`;
+            return 'Just now';
+        }
+
+        // Join random group
+        function joinRandomGroup() {
+            const availableGroups = groupData.filter(group => 
+                group.privacy === 'public' && 
+                !group.members.some(member => member.username === playerData.username)
+            );
+
+            if (availableGroups.length === 0) {
+                showToast('❌ No available groups to join!', 'error');
+                return;
+            }
+
+            const randomGroup = availableGroups[Math.floor(Math.random() * availableGroups.length)];
+            
+            // Add user to group
+            randomGroup.members.push({
+                username: playerData.username,
+                displayName: playerData.displayName,
+                points: 0,
+                trend: '+0',
+                lastActive: Date.now()
+            });
+
+            // Add activity
+            randomGroup.activity.unshift({
+                type: 'member_joined',
+                user: playerData.displayName,
+                amount: 0,
+                challenge: 'Joined Group',
+                time: Date.now()
+            });
+
+            hideModal('groups');
+            showToast('✅ Joined group successfully!', 'success');
+            setTimeout(() => showGroupDetails(randomGroup.id), 1000);
+        }
+
+        // Invite to group
+        function inviteToGroup() {
+            if (!currentGroup) return;
+            
+            const modal = document.createElement('div');
+            modal.className = 'modal show';
+            modal.innerHTML = `
+                <div class="modal-content">
+                    <div class="modal-title">📤 Invite Friends</div>
+                    <div style="text-align: center; margin-bottom: 20px;">
+                        <div style="background: rgba(0, 255, 150, 0.1); border: 1px solid var(--primary); border-radius: 12px; padding: 16px; margin-bottom: 16px;">
+                            <div style="font-size: 14px; font-weight: 600; margin-bottom: 8px;">Group Invite Code</div>
+                            <div style="font-size: 18px; font-weight: 800; color: var(--primary); letter-spacing: 2px;">${currentGroup.id.toUpperCase()}</div>
+                        </div>
+                        <p style="color: var(--text-secondary); font-size: 14px; line-height: 1.5;">
+                            Share this code with friends to invite them to your group!
+                        </p>
+                    </div>
+                    <button class="btn-primary" onclick="copyInviteCode('${currentGroup.id}')">📋 Copy Invite Code</button>
+                    <button class="btn-secondary" onclick="this.closest('.modal').remove()">Close</button>
+                </div>
+            `;
+            document.body.appendChild(modal);
+        }
+
+        // Copy invite code
+        function copyInviteCode(groupId) {
+            const inviteText = `Join my JomBro group! Use invite code: ${groupId.toUpperCase()}`;
+            
+            if (navigator.clipboard) {
+                navigator.clipboard.writeText(inviteText).then(() => {
+                    showToast('📋 Invite code copied!', 'success');
+                }).catch(() => {
+                    showToast('📋 Invite code ready to share!', 'success');
+                });
+            } else {
+                showToast('📋 Invite code ready to share!', 'success');
+            }
+        }
+
+        // Leave group
+        function leaveGroup() {
+            if (!currentGroup) return;
+            
+            const modal = document.createElement('div');
+            modal.className = 'modal show';
+            modal.innerHTML = `
+                <div class="modal-content">
+                    <div class="modal-title">🚪 Leave Group</div>
+                    <div style="text-align: center; margin-bottom: 20px;">
+                        <p style="color: var(--text-secondary); line-height: 1.5; margin-bottom: 16px;">
+                            Are you sure you want to leave <strong>${currentGroup.name}</strong>?
+                        </p>
+                        <div style="background: rgba(255, 107, 107, 0.1); border: 1px solid var(--error); border-radius: 12px; padding: 12px;">
+                            <div style="color: var(--error); font-size: 12px;">
+                                ⚠️ You will lose all your points and rankings in this group!
+                            </div>
+                        </div>
+                    </div>
+                    <button class="btn-secondary" onclick="confirmLeaveGroup()" style="background: var(--error); color: white;">🚪 Leave Group</button>
+                    <button class="btn-secondary" onclick="this.closest('.modal').remove()">Cancel</button>
+                </div>
+            `;
+            document.body.appendChild(modal);
+        }
+
+        // Confirm leave group
+        function confirmLeaveGroup() {
+            if (!currentGroup) return;
+            
+            // Remove user from group
+            currentGroup.members = currentGroup.members.filter(member => member.username !== playerData.username);
+            
+            // Add leave activity
+            currentGroup.activity.unshift({
+                type: 'member_left',
+                user: playerData.displayName,
+                amount: 0,
+                challenge: 'Left Group',
+                time: Date.now()
+            });
+            
+            // Close modals
+            document.querySelectorAll('.modal.show').forEach(modal => modal.remove());
+            
+            showToast('👋 Left group successfully!', 'success');
+            currentGroup = null;
+            
+            // Clear live updates
+            if (groupUpdateInterval) {
+                clearInterval(groupUpdateInterval);
+                groupUpdateInterval = null;
             }
         }
 
@@ -2004,6 +2609,12 @@
                 const modal = document.getElementById(modalId + 'Modal');
                 if (modal) {
                     modal.classList.remove('show');
+                    
+                    // Stop group live updates when closing group details
+                    if (modalId === 'groupDetails' && groupUpdateInterval) {
+                        clearInterval(groupUpdateInterval);
+                        groupUpdateInterval = null;
+                    }
                 }
             } catch (error) {
                 console.error('Error hiding modal:', error);
@@ -2200,27 +2811,45 @@
         setInterval(() => {
             try {
                 localStorage.setItem('jombro_player_data', JSON.stringify(playerData));
+                localStorage.setItem('jombro_group_data', JSON.stringify(groupData));
             } catch (error) {
                 console.error('Error auto-saving:', error);
             }
         }, 30000);
 
-        // Load saved player data
+        // Load saved data
         try {
-            const saved = localStorage.getItem('jombro_player_data');
-            if (saved) {
-                const savedData = JSON.parse(saved);
+            const savedPlayer = localStorage.getItem('jombro_player_data');
+            if (savedPlayer) {
+                const savedData = JSON.parse(savedPlayer);
                 playerData = { ...playerData, ...savedData };
             }
+
+            const savedGroups = localStorage.getItem('jombro_group_data');
+            if (savedGroups) {
+                const savedGroupData = JSON.parse(savedGroups);
+                groupData = [...groupData, ...savedGroupData];
+            }
         } catch (error) {
-            console.error('Error loading player data:', error);
+            console.error('Error loading saved data:', error);
         }
+
+        // Cleanup on page unload
+        window.addEventListener('beforeunload', () => {
+            if (groupUpdateInterval) {
+                clearInterval(groupUpdateInterval);
+            }
+        });
 
         console.log('✅ JomBro Mobile App Initialized');
         console.log('📱 Interface & alignment fixed');
         console.log('🎯 All buttons properly sized');
         console.log('🚀 Icons properly activated');
         console.log('🔢 Clean number formatting');
+        console.log('👥 Enhanced group system with live updates');
+        console.log('🏆 Competitive point tracking active');
+        console.log('⚡ Real-time leaderboard updates');
+        console.log('➕ Separate create challenge & group buttons');
 
     </script>
 </body>
