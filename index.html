@@ -638,7 +638,7 @@
         <div class="app-header">
             <div class="logo-section">
                 <div class="logo-text">JomBro</div>
-                <div class="logo-subtitle">Let's Go!</div>
+                <div class="logo-subtitle" id="logoSlogan">Let's Go! lyode</div>
             </div>
             <div class="header-actions">
                 <div class="header-btn" onclick="showHelp()">❓</div>
@@ -828,12 +828,12 @@
             
             <div class="form-group">
                 <label class="form-label">Display Name</label>
-                <input type="text" class="form-input" id="displayName" value="lyode">
+                <input type="text" class="form-input" id="displayName" value="lyode" placeholder="e.g., stonne">
             </div>
             
             <div class="form-group">
                 <label class="form-label">Username</label>
-                <input type="text" class="form-input" id="username" value="lyode">
+                <input type="text" class="form-input" id="username" value="lyode" placeholder="e.g., stonne">
             </div>
             
             <button class="btn-primary" onclick="saveSettings()">💾 Save Settings</button>
@@ -1230,6 +1230,7 @@
             if (name.trim()) player.name = name.trim();
             if (username.trim()) player.username = username.trim();
             
+            updatePlayerSlogan(); // Update slogan with new name
             hideModal('settings');
             showToast('⚙️ Settings saved!');
         }
@@ -1237,6 +1238,14 @@
         // ===== PLAYER DISPLAY =====
         function updatePlayerDisplay() {
             document.getElementById('playerTokens').textContent = player.tokens.toLocaleString();
+            updatePlayerSlogan();
+        }
+
+        function updatePlayerSlogan() {
+            const sloganElement = document.getElementById('logoSlogan');
+            if (sloganElement) {
+                sloganElement.textContent = `Let's Go! ${player.name}`;
+            }
         }
 
         // ===== ONBOARDING =====
@@ -1302,6 +1311,7 @@
             renderLivePlayers();
             displayCurrentChallenge();
             updatePlayerDisplay();
+            updatePlayerSlogan(); // Initialize personalized slogan
             checkFirstTime();
             
             // Update active count
