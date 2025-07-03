@@ -8,19 +8,19 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="theme-color" content="#000000">
     
-    <title>JomBro - Challenge App</title>
+    <title>JomBro - Social Challenge Platform</title>
 
     <style>
-        /* ===== FLOATING GLASS INTERFACE ===== */
+        /* ===== ENHANCED JOMBRO INTERFACE ===== */
         :root {
             --safe-area-top: env(safe-area-inset-top, 20px);
             --safe-area-bottom: env(safe-area-inset-bottom, 20px);
-            --glass-bg: rgba(15, 15, 30, 0.75);
-            --glass-border: rgba(255, 255, 255, 0.1);
-            --glass-blur: blur(20px);
-            --primary-glow: #00ffaa;
-            --accent-glow: #66d9ff;
-            --animation-speed: 0.4s;
+            --primary-green: #00ff96;
+            --dark-bg: #0a0a0a;
+            --card-bg: rgba(20, 20, 20, 0.95);
+            --border-color: rgba(255, 255, 255, 0.1);
+            --text-primary: #ffffff;
+            --text-secondary: rgba(255, 255, 255, 0.7);
         }
 
         * {
@@ -38,188 +38,49 @@
             position: fixed;
             width: 100%;
             font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', sans-serif;
+            background: var(--dark-bg);
+            color: var(--text-primary);
         }
 
-        /* ===== DEEP DARK BACKGROUND WITH PARTICLES ===== */
-        body {
-            background: radial-gradient(ellipse at center, #0a0a15 0%, #000000 70%);
-            color: #ffffff;
-            font-weight: 300;
-        }
-
-        /* ===== ANIMATED PARTICLE BACKGROUND ===== */
-        .particle-field {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100vw;
-            height: 100vh;
-            z-index: 1;
-            pointer-events: none;
-            overflow: hidden;
-        }
-
-        .particle {
-            position: absolute;
-            width: 3px;
-            height: 3px;
-            background: radial-gradient(circle, var(--primary-glow) 0%, transparent 70%);
-            border-radius: 50%;
-            opacity: 0;
-            animation: particleFloat 8s infinite ease-in-out;
-        }
-
-        .particle:nth-child(2n) {
-            background: radial-gradient(circle, var(--accent-glow) 0%, transparent 70%);
-            animation-duration: 12s;
-        }
-
-        .particle:nth-child(3n) {
-            width: 2px;
-            height: 2px;
-            animation-duration: 15s;
-        }
-
-        .particle:nth-child(4n) {
-            background: radial-gradient(circle, #ffffff 0%, transparent 70%);
-            animation-duration: 6s;
-        }
-
-        .particle:nth-child(5n) {
-            width: 4px;
-            height: 4px;
-            animation-duration: 10s;
-        }
-
-        @keyframes particleFloat {
-            0% {
-                opacity: 0;
-                transform: translateY(100vh) translateX(0) scale(0);
-            }
-            10% {
-                opacity: 1;
-                transform: translateY(80vh) translateX(20px) scale(1);
-            }
-            50% {
-                opacity: 0.8;
-                transform: translateY(50vh) translateX(-30px) scale(1.2);
-            }
-            90% {
-                opacity: 0.3;
-                transform: translateY(10vh) translateX(40px) scale(0.8);
-            }
-            100% {
-                opacity: 0;
-                transform: translateY(-10vh) translateX(0) scale(0);
-            }
-        }
-
-        /* ===== BLINKING DOTS LAYER ===== */
-        .blink-dots {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100vw;
-            height: 100vh;
-            z-index: 2;
-            pointer-events: none;
-        }
-
-        .blink-dot {
-            position: absolute;
-            width: 1px;
-            height: 1px;
-            background: #ffffff;
-            border-radius: 50%;
-            opacity: 0;
-            animation: blink 3s infinite ease-in-out;
-        }
-
-        .blink-dot:nth-child(2n) {
-            animation-delay: 1s;
-            background: var(--primary-glow);
-        }
-
-        .blink-dot:nth-child(3n) {
-            animation-delay: 2s;
-            background: var(--accent-glow);
-        }
-
-        @keyframes blink {
-            0%, 90% {
-                opacity: 0;
-                transform: scale(1);
-            }
-            45% {
-                opacity: 1;
-                transform: scale(1.5);
-            }
-        }
-
-        /* ===== FLOATING GLASS CONTAINER ===== */
-        .glass-container {
+        /* ===== MAIN CONTAINER ===== */
+        .app-container {
             position: fixed;
             top: 0;
             left: 0;
             right: 0;
             bottom: 0;
-            z-index: 100;
             display: flex;
             flex-direction: column;
-            pointer-events: none;
+            background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 100%);
         }
 
-        .glass-panel {
-            background: var(--glass-bg);
-            backdrop-filter: var(--glass-blur);
-            -webkit-backdrop-filter: var(--glass-blur);
-            border: 1px solid var(--glass-border);
-            box-shadow: 
-                0 8px 32px rgba(0, 0, 0, 0.3),
-                inset 0 1px 0 rgba(255, 255, 255, 0.1);
-            pointer-events: auto;
-            position: relative;
-        }
-
-        .glass-panel::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: linear-gradient(135deg, 
-                rgba(255, 255, 255, 0.1) 0%, 
-                transparent 30%, 
-                transparent 70%, 
-                rgba(255, 255, 255, 0.05) 100%);
-            border-radius: inherit;
-            pointer-events: none;
-        }
-
-        /* ===== FLOATING HEADER ===== */
-        .floating-header {
-            position: fixed;
-            top: calc(var(--safe-area-top) + 20px);
-            left: 20px;
-            right: 20px;
-            height: 60px;
-            border-radius: 30px;
-            z-index: 1000;
-            padding: 16px 24px;
+        /* ===== HEADER WITH LOGO ===== */
+        .app-header {
+            padding: calc(var(--safe-area-top) + 15px) 20px 15px 20px;
             display: flex;
-            align-items: center;
             justify-content: space-between;
-            transform: translateY(0);
-            animation: floatIn 0.8s ease-out;
+            align-items: center;
+            border-bottom: 1px solid var(--border-color);
+            background: rgba(10, 10, 10, 0.95);
+            backdrop-filter: blur(20px);
         }
 
-        .logo {
+        .logo-section {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .logo-text {
             font-size: 24px;
-            font-weight: 300;
-            color: #ffffff;
-            text-shadow: 0 0 20px var(--primary-glow);
-            letter-spacing: 1px;
+            font-weight: 700;
+            color: var(--text-primary);
+            letter-spacing: -0.5px;
+        }
+
+        .logo-subtitle {
+            font-size: 12px;
+            color: var(--text-secondary);
+            margin-top: -2px;
         }
 
         .header-actions {
@@ -227,361 +88,358 @@
             gap: 8px;
         }
 
-        .glass-button {
-            width: 36px;
-            height: 36px;
-            border-radius: 18px;
+        .header-btn {
+            width: 32px;
+            height: 32px;
+            border-radius: 16px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 16px;
             cursor: pointer;
-            color: rgba(255, 255, 255, 0.8);
-            transition: all var(--animation-speed) ease;
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(10px);
+            font-size: 16px;
+            color: var(--text-primary);
+            transition: all 0.2s ease;
         }
 
-        .glass-button:hover, .glass-button:active {
-            color: #ffffff;
-            background: rgba(255, 255, 255, 0.1);
-            border-color: rgba(255, 255, 255, 0.2);
-            transform: scale(1.05);
-            box-shadow: 0 0 20px rgba(0, 255, 170, 0.3);
+        .header-btn:hover {
+            background: rgba(0, 255, 150, 0.2);
+            border-color: var(--primary-green);
         }
 
-        /* ===== FLOATING PLAYER INFO ===== */
-        .floating-player {
-            position: fixed;
-            top: calc(var(--safe-area-top) + 90px);
-            right: 20px;
-            padding: 8px 16px;
-            border-radius: 20px;
-            z-index: 950;
-            text-align: center;
-            font-size: 12px;
-            min-width: 80px;
-            animation: floatIn 0.8s ease-out 0.2s both;
+        /* ===== LIVE PLAYERS SECTION ===== */
+        .live-section {
+            padding: 15px 20px;
+            border-bottom: 1px solid var(--border-color);
+            background: var(--card-bg);
         }
 
-        .player-rank {
-            color: var(--accent-glow);
-            font-weight: 500;
-            margin-bottom: 2px;
-            text-shadow: 0 0 10px var(--accent-glow);
+        .live-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
         }
 
-        .player-tokens {
-            color: var(--primary-glow);
+        .live-indicator {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 14px;
             font-weight: 600;
-            text-shadow: 0 0 10px var(--primary-glow);
+            color: var(--text-primary);
         }
 
-        /* ===== FLOATING CHALLENGE FEED ===== */
-        .floating-feed {
-            position: fixed;
-            top: calc(var(--safe-area-top) + 160px);
-            left: 20px;
-            right: 20px;
-            bottom: calc(100px + var(--safe-area-bottom));
-            z-index: 100;
-            border-radius: 24px;
-            padding: 24px;
-            overflow: hidden;
-            animation: floatIn 0.8s ease-out 0.4s both;
+        .live-dot {
+            width: 8px;
+            height: 8px;
+            background: #ff4757;
+            border-radius: 50%;
+            animation: pulse 2s infinite;
         }
 
-        .challenge-container {
+        .active-count {
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+
+        .player-status {
+            background: rgba(0, 255, 150, 0.15);
+            border: 1px solid var(--primary-green);
+            color: var(--primary-green);
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .tokens-display {
+            color: #ffa502;
+            font-weight: 700;
+        }
+
+        .live-players {
+            display: flex;
+            gap: 12px;
+            overflow-x: auto;
+            padding-bottom: 5px;
+        }
+
+        .player-avatar {
             position: relative;
+            flex-shrink: 0;
+        }
+
+        .avatar-ring {
+            width: 48px;
+            height: 48px;
+            border-radius: 24px;
+            background: linear-gradient(45deg, var(--primary-green), #00d4ff);
+            padding: 2px;
+            cursor: pointer;
+            transition: transform 0.2s ease;
+        }
+
+        .avatar-ring:hover {
+            transform: scale(1.05);
+        }
+
+        .avatar-inner {
             width: 100%;
             height: 100%;
-        }
-
-        .challenge-card {
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 100%;
-            padding: 0;
+            border-radius: 50%;
+            background: var(--dark-bg);
             display: flex;
-            flex-direction: column;
-            opacity: 0;
-            transform: translateY(20px) scale(0.95);
-            transition: all var(--animation-speed) ease;
-        }
-
-        .challenge-card.active {
-            opacity: 1;
-            transform: translateY(0) scale(1);
-            z-index: 10;
-        }
-
-        .challenge-content {
-            background: rgba(10, 10, 20, 0.6);
-            backdrop-filter: blur(15px);
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            border-radius: 20px;
-            padding: 24px;
-            height: 100%;
-            display: flex;
-            flex-direction: column;
-            position: relative;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
             overflow: hidden;
         }
 
-        .challenge-content::before {
-            content: '';
+        .avatar-status {
             position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: linear-gradient(135deg, 
-                rgba(0, 255, 170, 0.03) 0%, 
-                transparent 50%, 
-                rgba(102, 217, 255, 0.03) 100%);
-            border-radius: inherit;
-            pointer-events: none;
+            bottom: 2px;
+            right: 2px;
+            width: 12px;
+            height: 12px;
+            background: var(--primary-green);
+            border: 2px solid var(--dark-bg);
+            border-radius: 50%;
         }
 
-        .challenge-header {
+        /* ===== CHALLENGE CREATOR SECTION ===== */
+        .creator-section {
+            padding: 15px 20px;
+            border-bottom: 1px solid var(--border-color);
+            background: var(--card-bg);
+        }
+
+        .creator-info {
             display: flex;
             align-items: center;
             gap: 12px;
-            margin-bottom: 16px;
-            position: relative;
-            z-index: 1;
         }
 
-        .challenge-avatar {
+        .creator-avatar {
             width: 40px;
             height: 40px;
             border-radius: 20px;
-            background: linear-gradient(135deg, var(--primary-glow), var(--accent-glow));
+            background: linear-gradient(45deg, #00ff96, #00d4ff);
             display: flex;
             align-items: center;
             justify-content: center;
             font-size: 20px;
-            box-shadow: 0 0 20px rgba(0, 255, 170, 0.3);
         }
 
-        .challenge-user {
+        .creator-details {
             flex: 1;
         }
 
-        .challenge-username {
-            font-weight: 400;
+        .creator-name {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--text-primary);
             margin-bottom: 2px;
-            color: rgba(255, 255, 255, 0.9);
         }
 
-        .challenge-type {
-            font-size: 10px;
-            background: linear-gradient(90deg, var(--primary-glow), var(--accent-glow));
+        .creator-badge {
+            background: var(--primary-green);
             color: #000;
             padding: 2px 8px;
-            border-radius: 10px;
-            font-weight: 600;
+            border-radius: 8px;
+            font-size: 10px;
+            font-weight: 700;
             text-transform: uppercase;
         }
 
-        .challenge-body {
+        /* ===== MAIN CHALLENGE DISPLAY ===== */
+        .challenge-main {
             flex: 1;
+            padding: 20px;
             overflow-y: auto;
-            margin-bottom: 20px;
             position: relative;
-            z-index: 1;
         }
 
         .challenge-title {
-            font-size: 22px;
-            font-weight: 500;
-            color: #ffffff;
-            margin-bottom: 12px;
-            line-height: 1.3;
-            text-shadow: 0 0 30px rgba(255, 255, 255, 0.2);
+            font-size: 28px;
+            font-weight: 700;
+            color: var(--primary-green);
+            margin-bottom: 20px;
+            line-height: 1.2;
         }
 
         .challenge-description {
             font-size: 16px;
-            line-height: 1.5;
-            margin-bottom: 16px;
-            color: rgba(255, 255, 255, 0.85);
+            line-height: 1.6;
+            color: var(--text-primary);
+            margin-bottom: 20px;
         }
 
         .challenge-hashtags {
             display: flex;
             flex-wrap: wrap;
             gap: 8px;
-            margin-bottom: 16px;
+            margin-bottom: 20px;
         }
 
         .hashtag {
-            font-size: 13px;
-            color: var(--accent-glow);
-            background: rgba(102, 217, 255, 0.1);
-            padding: 4px 10px;
+            background: rgba(0, 212, 255, 0.15);
+            border: 1px solid rgba(0, 212, 255, 0.3);
+            color: #00d4ff;
+            padding: 6px 12px;
             border-radius: 12px;
-            border: 1px solid rgba(102, 217, 255, 0.2);
-        }
-
-        .challenge-reward {
-            background: linear-gradient(135deg, 
-                rgba(0, 255, 170, 0.1) 0%, 
-                rgba(102, 217, 255, 0.1) 100%);
-            border: 1px solid rgba(0, 255, 170, 0.3);
-            padding: 12px 16px;
-            border-radius: 16px;
-            text-align: center;
-            margin-bottom: 20px;
+            font-size: 13px;
             font-weight: 500;
-            color: #ffffff;
-            position: relative;
-            z-index: 1;
         }
 
-        .challenge-actions {
-            display: flex;
+        .challenge-meta {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
             gap: 12px;
-            position: relative;
-            z-index: 1;
+            margin-bottom: 30px;
         }
 
-        .glass-btn {
-            flex: 1;
-            padding: 14px 20px;
-            border-radius: 18px;
-            font-size: 16px;
-            font-weight: 500;
-            cursor: pointer;
-            border: none;
-            transition: all var(--animation-speed) ease;
-            backdrop-filter: blur(10px);
-            position: relative;
-            overflow: hidden;
-        }
-
-        .glass-btn::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, 
-                transparent, 
-                rgba(255, 255, 255, 0.1), 
-                transparent);
-            transition: left 0.5s ease;
-        }
-
-        .glass-btn:hover::before {
-            left: 100%;
-        }
-
-        .btn-primary {
-            background: linear-gradient(135deg, 
-                rgba(0, 255, 170, 0.2) 0%, 
-                rgba(102, 217, 255, 0.2) 100%);
-            border: 1px solid rgba(0, 255, 170, 0.4);
-            color: #ffffff;
-        }
-
-        .btn-primary:hover, .btn-primary:active {
-            background: linear-gradient(135deg, 
-                rgba(0, 255, 170, 0.3) 0%, 
-                rgba(102, 217, 255, 0.3) 100%);
-            border-color: rgba(0, 255, 170, 0.6);
-            transform: translateY(-2px);
-            box-shadow: 0 8px 25px rgba(0, 255, 170, 0.2);
-        }
-
-        .btn-secondary {
+        .meta-item {
             background: rgba(255, 255, 255, 0.05);
-            border: 1px solid rgba(255, 255, 255, 0.15);
-            color: rgba(255, 255, 255, 0.8);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 12px;
+            text-align: center;
         }
 
-        .btn-secondary:hover, .btn-secondary:active {
-            background: rgba(255, 255, 255, 0.1);
-            border-color: rgba(255, 255, 255, 0.25);
-            color: #ffffff;
-            transform: translateY(-2px);
+        .meta-value {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--primary-green);
+            margin-bottom: 4px;
         }
 
-        /* ===== FLOATING SIDE ACTIONS ===== */
-        .floating-actions {
+        .meta-label {
+            font-size: 11px;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        /* ===== SIDE ACTIONS ===== */
+        .side-actions {
             position: fixed;
             right: 20px;
-            bottom: calc(120px + var(--safe-area-bottom));
+            top: 50%;
+            transform: translateY(-50%);
             display: flex;
             flex-direction: column;
-            gap: 12px;
-            z-index: 200;
-            animation: floatIn 0.8s ease-out 0.6s both;
+            gap: 15px;
+            z-index: 100;
         }
 
-        .action-glass {
+        .side-btn {
             width: 48px;
             height: 48px;
             border-radius: 24px;
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 18px;
             cursor: pointer;
-            color: rgba(255, 255, 255, 0.8);
-            transition: all var(--animation-speed) ease;
-            background: rgba(10, 10, 20, 0.7);
-            backdrop-filter: blur(15px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            font-size: 20px;
+            color: var(--text-primary);
+            transition: all 0.2s ease;
+            backdrop-filter: blur(20px);
         }
 
-        .action-glass:hover, .action-glass:active {
-            background: rgba(0, 255, 170, 0.15);
-            border-color: rgba(0, 255, 170, 0.3);
-            color: #ffffff;
+        .side-btn:hover {
+            background: rgba(0, 255, 150, 0.2);
+            border-color: var(--primary-green);
             transform: scale(1.05);
-            box-shadow: 0 0 25px rgba(0, 255, 170, 0.3);
         }
 
-        .points-action {
+        .like-btn {
             height: 60px;
             flex-direction: column;
             padding: 8px;
-            background: rgba(0, 255, 170, 0.1);
-            border-color: rgba(0, 255, 170, 0.2);
+            background: rgba(0, 255, 150, 0.1);
+            border-color: var(--primary-green);
         }
 
-        .points-number {
-            font-size: 11px;
-            font-weight: 600;
-            line-height: 1;
-            color: var(--primary-glow);
+        .like-count {
+            font-size: 12px;
+            font-weight: 700;
+            color: var(--primary-green);
+            margin-bottom: 2px;
         }
 
-        .points-icon {
+        /* ===== ACTION BUTTONS ===== */
+        .action-section {
+            padding: 20px;
+            background: var(--card-bg);
+            border-top: 1px solid var(--border-color);
+        }
+
+        .action-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .btn-primary {
+            background: var(--primary-green);
+            color: #000;
+            border: none;
+            padding: 16px 24px;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 700;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            transition: all 0.2s ease;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .btn-primary:hover {
+            background: #00e085;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0, 255, 150, 0.3);
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.1);
+            color: var(--text-primary);
+            border: 1px solid var(--border-color);
+            padding: 14px 24px;
+            border-radius: 12px;
             font-size: 14px;
-            margin-top: 2px;
+            font-weight: 600;
+            cursor: pointer;
+            text-align: center;
+            transition: all 0.2s ease;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
         }
 
-        /* ===== FLOATING NAVIGATION ===== */
-        .floating-nav {
-            position: fixed;
-            bottom: var(--safe-area-bottom);
-            left: 20px;
-            right: 20px;
-            height: 70px;
-            border-radius: 35px;
-            z-index: 1000;
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.15);
+            border-color: rgba(255, 255, 255, 0.3);
+        }
+
+        /* ===== BOTTOM NAVIGATION ===== */
+        .bottom-nav {
+            padding: 12px 20px calc(var(--safe-area-bottom) + 12px) 20px;
+            background: rgba(10, 10, 10, 0.95);
+            backdrop-filter: blur(20px);
+            border-top: 1px solid var(--border-color);
             display: flex;
             justify-content: space-around;
             align-items: center;
-            padding: 12px 20px;
-            animation: floatIn 0.8s ease-out 0.8s both;
         }
 
         .nav-item {
@@ -590,994 +448,745 @@
             align-items: center;
             padding: 8px 12px;
             cursor: pointer;
-            color: rgba(255, 255, 255, 0.6);
-            font-size: 11px;
-            font-weight: 400;
-            transition: all var(--animation-speed) ease;
-            border-radius: 16px;
-            min-width: 50px;
+            border-radius: 12px;
+            transition: all 0.2s ease;
+            min-width: 60px;
         }
 
         .nav-item.active {
-            color: #ffffff;
-            background: rgba(0, 255, 170, 0.15);
-            border: 1px solid rgba(0, 255, 170, 0.2);
-            transform: translateY(-2px);
+            background: rgba(0, 255, 150, 0.15);
+            border: 1px solid var(--primary-green);
         }
 
         .nav-icon {
             font-size: 20px;
             margin-bottom: 4px;
-            transition: all var(--animation-speed) ease;
+            color: var(--text-secondary);
         }
 
         .nav-item.active .nav-icon {
-            transform: scale(1.1);
-            text-shadow: 0 0 15px var(--primary-glow);
+            color: var(--primary-green);
         }
 
-        /* ===== FLOATING MODALS ===== */
-        .glass-modal {
+        .nav-label {
+            font-size: 10px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .nav-item.active .nav-label {
+            color: var(--primary-green);
+        }
+
+        /* ===== MODALS ===== */
+        .modal {
             position: fixed;
             top: 0;
             left: 0;
             right: 0;
             bottom: 0;
-            background: rgba(0, 0, 0, 0.7);
-            backdrop-filter: blur(5px);
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(10px);
             display: none;
             align-items: center;
             justify-content: center;
-            z-index: 3000;
-            padding: 24px;
+            z-index: 1000;
+            padding: 20px;
         }
 
-        .glass-modal.show {
+        .modal.show {
             display: flex;
-            animation: modalFloat 0.4s ease-out;
+            animation: fadeIn 0.3s ease;
         }
 
-        .modal-glass {
-            background: rgba(10, 10, 25, 0.85);
-            backdrop-filter: blur(25px);
-            border: 1px solid rgba(255, 255, 255, 0.15);
-            border-radius: 24px;
-            padding: 28px;
+        .modal-content {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 24px;
             max-width: 90%;
             max-height: 80%;
             overflow-y: auto;
             width: 100%;
             max-width: 400px;
-            position: relative;
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
-        }
-
-        .modal-glass::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: linear-gradient(135deg, 
-                rgba(255, 255, 255, 0.05) 0%, 
-                transparent 50%, 
-                rgba(0, 255, 170, 0.03) 100%);
-            border-radius: inherit;
-            pointer-events: none;
         }
 
         .modal-title {
             font-size: 20px;
-            font-weight: 500;
+            font-weight: 700;
             margin-bottom: 20px;
             text-align: center;
-            color: #ffffff;
-            position: relative;
-            z-index: 1;
+            color: var(--text-primary);
         }
 
         .form-group {
             margin-bottom: 16px;
-            position: relative;
-            z-index: 1;
         }
 
         .form-label {
             display: block;
-            margin-bottom: 8px;
-            font-weight: 400;
+            margin-bottom: 6px;
             font-size: 14px;
-            color: rgba(255, 255, 255, 0.8);
+            font-weight: 600;
+            color: var(--text-primary);
         }
 
-        .glass-input {
+        .form-input {
             width: 100%;
             padding: 12px 16px;
             background: rgba(255, 255, 255, 0.05);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.15);
-            border-radius: 12px;
-            color: #ffffff;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            color: var(--text-primary);
             font-size: 16px;
             outline: none;
-            transition: all var(--animation-speed) ease;
+            transition: all 0.2s ease;
         }
 
-        .glass-input:focus {
-            border-color: rgba(0, 255, 170, 0.5);
+        .form-input:focus {
+            border-color: var(--primary-green);
             background: rgba(255, 255, 255, 0.08);
-            box-shadow: 0 0 20px rgba(0, 255, 170, 0.1);
         }
 
-        .glass-input::placeholder {
-            color: rgba(255, 255, 255, 0.4);
+        .form-input::placeholder {
+            color: var(--text-secondary);
         }
 
-        /* ===== FLOATING TOAST ===== */
-        .floating-toast {
+        /* ===== TOAST ===== */
+        .toast {
             position: fixed;
-            top: calc(var(--safe-area-top) + 180px);
+            top: calc(var(--safe-area-top) + 20px);
             left: 20px;
             right: 20px;
-            padding: 12px 20px;
-            border-radius: 16px;
+            background: var(--card-bg);
+            border: 1px solid var(--primary-green);
+            color: var(--text-primary);
+            padding: 16px 20px;
+            border-radius: 12px;
             font-size: 14px;
-            font-weight: 400;
+            font-weight: 500;
             text-align: center;
-            z-index: 4000;
+            z-index: 2000;
             transform: translateY(-100px);
             opacity: 0;
-            transition: all var(--animation-speed) ease;
-            background: rgba(10, 10, 25, 0.9);
+            transition: all 0.3s ease;
             backdrop-filter: blur(20px);
-            border: 1px solid rgba(0, 255, 170, 0.3);
-            color: #ffffff;
-            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
         }
 
-        .floating-toast.show {
+        .toast.show {
             transform: translateY(0);
             opacity: 1;
         }
 
-        .floating-toast.error {
-            border-color: rgba(255, 107, 107, 0.4);
-            background: rgba(25, 10, 10, 0.9);
-        }
-
-        /* ===== RATING STARS ===== */
-        .glass-stars {
-            display: flex;
-            gap: 8px;
-            justify-content: center;
-            margin: 16px 0;
-            position: relative;
-            z-index: 1;
-        }
-
-        .glass-star {
-            font-size: 24px;
-            cursor: pointer;
-            opacity: 0.3;
-            transition: all 0.3s ease;
-            filter: drop-shadow(0 0 5px rgba(255, 215, 0, 0.3));
-        }
-
-        .glass-star:hover, .glass-star.active {
-            opacity: 1;
-            transform: scale(1.1);
-            filter: drop-shadow(0 0 15px rgba(255, 215, 0, 0.8));
-        }
-
-        /* ===== FLOATING PAGES ===== */
-        .floating-page {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            z-index: 2000;
-            display: none;
-            padding: var(--safe-area-top) 20px calc(var(--safe-area-bottom) + 20px) 20px;
-            overflow-y: auto;
-        }
-
-        .floating-page.show {
-            display: block;
-            animation: pageSlide 0.5s ease-out;
-        }
-
-        .page-glass {
-            background: rgba(5, 5, 15, 0.9);
-            backdrop-filter: blur(30px);
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            border-radius: 24px;
-            padding: 24px;
-            margin-top: 20px;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .page-glass::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: linear-gradient(135deg, 
-                rgba(0, 255, 170, 0.02) 0%, 
-                transparent 50%, 
-                rgba(102, 217, 255, 0.02) 100%);
-            border-radius: inherit;
-            pointer-events: none;
+        .toast.error {
+            border-color: #ff4757;
+            background: rgba(255, 71, 87, 0.1);
         }
 
         /* ===== ANIMATIONS ===== */
-        @keyframes floatIn {
-            from {
-                opacity: 0;
-                transform: translateY(30px) scale(0.95);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0) scale(1);
-            }
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
         }
 
-        @keyframes modalFloat {
-            from {
-                opacity: 0;
-                transform: scale(0.9) translateY(20px);
-            }
-            to {
-                opacity: 1;
-                transform: scale(1) translateY(0);
-            }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: scale(0.95); }
+            to { opacity: 1; transform: scale(1); }
         }
 
-        @keyframes pageSlide {
-            from {
-                opacity: 0;
-                transform: translateX(100%);
-            }
-            to {
-                opacity: 1;
-                transform: translateX(0);
-            }
-        }
-
-        /* ===== RESPONSIVE OPTIMIZATION ===== */
-        @media screen and (max-width: 400px) {
-            .floating-header {
-                height: 56px;
-                padding: 12px 20px;
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 400px) {
+            .app-header {
+                padding: calc(var(--safe-area-top) + 10px) 16px 10px 16px;
             }
             
-            .logo {
-                font-size: 22px;
+            .logo-text {
+                font-size: 20px;
             }
             
-            .glass-button {
-                width: 32px;
-                height: 32px;
-                font-size: 14px;
+            .challenge-main {
+                padding: 16px;
             }
             
-            .floating-feed {
-                padding: 20px;
+            .challenge-title {
+                font-size: 24px;
             }
             
-            .challenge-content {
-                padding: 20px;
+            .side-actions {
+                right: 16px;
             }
         }
 
-        /* ===== PERFORMANCE OPTIMIZATIONS ===== */
-        .challenge-card {
-            will-change: transform, opacity;
-            contain: layout style;
+        /* ===== PERFORMANCE ===== */
+        .challenge-main {
+            will-change: scroll-position;
+            contain: layout style paint;
         }
 
-        @media (prefers-reduced-motion: reduce) {
-            .particle, .blink-dot {
-                animation: none !important;
-            }
-            * {
-                animation-duration: 0.01ms !important;
-                transition-duration: 0.01ms !important;
-            }
+        .live-players {
+            will-change: scroll-position;
         }
     </style>
 </head>
 <body>
-    <!-- Animated Particle Field -->
-    <div class="particle-field" id="particleField">
-        <!-- Particles generated by JS -->
-    </div>
+    <div class="app-container">
+        <!-- Header -->
+        <div class="app-header">
+            <div class="logo-section">
+                <div class="logo-text">JomBro</div>
+                <div class="logo-subtitle">Come on Bro, Let's Go!</div>
+            </div>
+            <div class="header-actions">
+                <div class="header-btn" onclick="showHelp()">❓</div>
+                <div class="header-btn" onclick="showNotifications()">🔔</div>
+                <div class="header-btn" onclick="showModal('create')">➕</div>
+                <div class="header-btn" onclick="showModal('groups')">👥</div>
+                <div class="header-btn" onclick="showModal('settings')">⚙️</div>
+            </div>
+        </div>
 
-    <!-- Blinking Dots Layer -->
-    <div class="blink-dots" id="blinkDots">
-        <!-- Blinking dots generated by JS -->
-    </div>
-
-    <!-- Floating Glass Interface -->
-    <div class="glass-container">
-        
-        <!-- Floating Header -->
-        <div class="floating-header glass-panel">
-            <div class="logo">JomBro</div>
-            <div style="display: flex; align-items: center; gap: 12px;">
-                <div id="challengeCounter" style="background: rgba(0, 255, 170, 0.15); border: 1px solid rgba(0, 255, 170, 0.3); color: var(--primary-glow); padding: 4px 10px; border-radius: 12px; font-size: 11px; font-weight: 500;">
-                    1/5
+        <!-- Live Players Section -->
+        <div class="live-section">
+            <div class="live-header">
+                <div class="live-indicator">
+                    <div class="live-dot"></div>
+                    <span>LIVE</span>
                 </div>
-                <div class="header-actions">
-                    <div class="glass-button" onclick="showHelp()" title="Help">❓</div>
-                    <div class="glass-button" onclick="showModal('create')" title="Create">➕</div>
-                    <div class="glass-button" onclick="showModal('settings')" title="Settings">⚙️</div>
+                <div class="active-count" id="activeCount">8 active</div>
+                <div class="player-status">
+                    <span>Elite Gladiator</span>
+                    <span class="tokens-display" id="playerTokens">15,247</span>
+                </div>
+            </div>
+            <div class="live-players" id="livePlayersContainer">
+                <!-- Dynamic player avatars -->
+            </div>
+        </div>
+
+        <!-- Challenge Creator -->
+        <div class="creator-section">
+            <div class="creator-info">
+                <div class="creator-avatar" id="creatorAvatar">🤖</div>
+                <div class="creator-details">
+                    <div class="creator-name" id="creatorName">JomBro AI</div>
+                    <div class="creator-badge" id="challengeType">DAILY</div>
                 </div>
             </div>
         </div>
 
-        <!-- Floating Player Info -->
-        <div class="floating-player glass-panel">
-            <div class="player-rank" id="playerRank">Elite</div>
-            <div class="player-tokens" id="playerTokens">🪙 15,247</div>
-        </div>
+        <!-- Main Challenge Display -->
+        <div class="challenge-main">
+            <div class="challenge-title" id="challengeTitle">Coffee Shop Poetry Challenge</div>
+            
+            <div class="challenge-description" id="challengeDescription">
+                Visit any coffee shop and ask the barista to write a short poem on your cup or napkin! This is a wonderful way to connect with people and brighten someone's day. Take a photo and share your experience.
+            </div>
 
-        <!-- Floating Challenge Feed -->
-        <div class="floating-feed glass-panel">
-            <div class="challenge-container" id="challengeContainer">
-                <!-- Challenge cards populated by JS -->
+            <div class="challenge-hashtags" id="challengeHashtags">
+                <span class="hashtag">#CoffeePoetry</span>
+                <span class="hashtag">#Connection</span>
+                <span class="hashtag">#JomBro</span>
+            </div>
+
+            <div class="challenge-meta">
+                <div class="meta-item">
+                    <div class="meta-value" id="challengeTokens">500</div>
+                    <div class="meta-label">Tokens</div>
+                </div>
+                <div class="meta-item">
+                    <div class="meta-value" id="challengeDifficulty">Easy</div>
+                    <div class="meta-label">Level</div>
+                </div>
+                <div class="meta-item">
+                    <div class="meta-value" id="challengeDuration">30m</div>
+                    <div class="meta-label">Duration</div>
+                </div>
             </div>
         </div>
 
-        <!-- Floating Side Actions -->
-        <div class="floating-actions">
-            <div class="action-glass points-action" onclick="likeChallenge()" title="Like">
-                <div class="points-number" id="currentPoints">2.5K</div>
-                <div class="points-icon">❤️</div>
+        <!-- Side Actions -->
+        <div class="side-actions">
+            <div class="side-btn like-btn" onclick="likeChallenge()">
+                <div class="like-count" id="likeCount">2.5K</div>
+                <div>❤️</div>
             </div>
-            <div class="action-glass" onclick="shareChallenge()" title="Share">📤</div>
-            <div class="action-glass" onclick="bookmarkChallenge()" title="Bookmark">🔖</div>
+            <div class="side-btn" onclick="shareChallenge()">💬</div>
+            <div class="side-btn" onclick="bookmarkChallenge()">🔖</div>
         </div>
 
-        <!-- Floating Navigation -->
-        <div class="floating-nav glass-panel">
+        <!-- Action Buttons -->
+        <div class="action-section">
+            <div class="action-buttons">
+                <button class="btn-primary" onclick="acceptChallenge()">
+                    🚀 ACCEPT CHALLENGE
+                </button>
+                <button class="btn-secondary" onclick="skipChallenge()">
+                    SKIP
+                </button>
+            </div>
+        </div>
+
+        <!-- Bottom Navigation -->
+        <div class="bottom-nav">
             <div class="nav-item active" onclick="navTo(this, 'home')">
                 <div class="nav-icon">🏠</div>
-                <div>Home</div>
+                <div class="nav-label">Home</div>
             </div>
-            <div class="nav-item" onclick="navTo(this, 'leaderboard')">
+            <div class="nav-item" onclick="navTo(this, 'ranks')">
                 <div class="nav-icon">🏆</div>
-                <div>Ranks</div>
+                <div class="nav-label">Ranks</div>
             </div>
             <div class="nav-item" onclick="navTo(this, 'create')">
                 <div class="nav-icon">➕</div>
-                <div>Create</div>
+                <div class="nav-label">Create</div>
+            </div>
+            <div class="nav-item" onclick="navTo(this, 'groups')">
+                <div class="nav-icon">👥</div>
+                <div class="nav-label">Groups</div>
+            </div>
+            <div class="nav-item" onclick="navTo(this, 'shop')">
+                <div class="nav-icon">🛍️</div>
+                <div class="nav-label">Shop</div>
             </div>
             <div class="nav-item" onclick="navTo(this, 'profile')">
                 <div class="nav-icon">👤</div>
-                <div>Profile</div>
+                <div class="nav-label">Profile</div>
             </div>
         </div>
     </div>
 
-    <!-- Floating Challenge Detail Page -->
-    <div class="floating-page" id="challengePage">
-        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px;">
-            <div class="glass-button" onclick="closePage()" style="width: 40px; height: 40px;">←</div>
-            <div style="font-size: 18px; color: var(--primary-glow); font-weight: 500;">Challenge Details</div>
-            <div style="width: 40px;"></div>
-        </div>
-
-        <div class="page-glass">
-            <div style="position: relative; z-index: 1;">
-                <div style="font-size: 22px; font-weight: 500; margin-bottom: 16px; color: #ffffff;" id="detailTitle">Challenge Title</div>
-                <div style="font-size: 16px; line-height: 1.6; margin-bottom: 20px; color: rgba(255, 255, 255, 0.8);" id="detailDescription">Challenge description...</div>
-
-                <div style="background: rgba(0, 255, 170, 0.05); border: 1px solid rgba(0, 255, 170, 0.2); border-radius: 12px; padding: 16px; margin-bottom: 20px;">
-                    <h3 style="color: var(--primary-glow); margin-bottom: 12px; font-size: 16px; font-weight: 500;">📋 Requirements:</h3>
-                    <ul id="requirementsList" style="list-style: none; padding: 0;">
-                        <li style="padding: 4px 0; color: rgba(255, 255, 255, 0.8); position: relative; padding-left: 20px;">Complete the challenge</li>
-                    </ul>
-                </div>
-
-                <div style="display: flex; gap: 12px; margin: 20px 0;">
-                    <div style="flex: 1; text-align: center; padding: 12px; background: rgba(0, 255, 170, 0.1); border: 1px solid rgba(0, 255, 170, 0.2); border-radius: 12px;">
-                        <div style="font-size: 18px; color: var(--primary-glow); font-weight: 600;" id="detailTokens">500</div>
-                        <div style="font-size: 11px; color: rgba(255, 255, 255, 0.6);">Tokens</div>
-                    </div>
-                    <div style="flex: 1; text-align: center; padding: 12px; background: rgba(102, 217, 255, 0.1); border: 1px solid rgba(102, 217, 255, 0.2); border-radius: 12px;">
-                        <div style="font-size: 18px; color: var(--accent-glow); font-weight: 600;" id="detailDifficulty">Easy</div>
-                        <div style="font-size: 11px; color: rgba(255, 255, 255, 0.6);">Level</div>
-                    </div>
-                </div>
-
-                <div style="display: flex; gap: 12px; margin-top: 24px;">
-                    <button class="glass-btn btn-primary" onclick="startChallenge()">🚀 Start Now</button>
-                    <button class="glass-btn btn-secondary" onclick="closePage()">Cancel</button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Floating Profile Page -->
-    <div class="floating-page" id="profilePage">
-        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px;">
-            <div class="glass-button" onclick="closeProfile()" style="width: 40px; height: 40px;">←</div>
-            <div style="font-size: 18px; color: var(--primary-glow); font-weight: 500;">My Profile</div>
-            <div style="width: 40px;"></div>
-        </div>
-
-        <div class="page-glass">
-            <div style="text-align: center; position: relative; z-index: 1;">
-                <div style="width: 80px; height: 80px; border-radius: 40px; background: linear-gradient(135deg, var(--primary-glow), var(--accent-glow)); margin: 0 auto 16px; display: flex; align-items: center; justify-content: center; font-size: 32px; box-shadow: 0 0 30px rgba(0, 255, 170, 0.3);">👤</div>
-                <div style="font-size: 22px; font-weight: 500; margin-bottom: 8px; color: #ffffff;" id="profileName">Alexandra Stone</div>
-                <div style="color: rgba(255, 255, 255, 0.6); margin-bottom: 24px;" id="profileUsername">@alexandra_stone</div>
-                
-                <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin: 24px 0;">
-                    <div style="background: rgba(0, 255, 170, 0.05); border: 1px solid rgba(0, 255, 170, 0.2); border-radius: 12px; padding: 16px 8px; text-align: center;">
-                        <div style="font-size: 18px; color: var(--primary-glow); font-weight: 600; margin-bottom: 4px;" id="profileTokens">15,247</div>
-                        <div style="font-size: 10px; color: rgba(255, 255, 255, 0.6);">🪙 Tokens</div>
-                    </div>
-                    <div style="background: rgba(102, 217, 255, 0.05); border: 1px solid rgba(102, 217, 255, 0.2); border-radius: 12px; padding: 16px 8px; text-align: center;">
-                        <div style="font-size: 18px; color: var(--accent-glow); font-weight: 600; margin-bottom: 4px;" id="profileChallenges">143</div>
-                        <div style="font-size: 10px; color: rgba(255, 255, 255, 0.6);">✅ Done</div>
-                    </div>
-                    <div style="background: rgba(255, 107, 71, 0.05); border: 1px solid rgba(255, 107, 71, 0.2); border-radius: 12px; padding: 16px 8px; text-align: center;">
-                        <div style="font-size: 18px; color: #FF6B47; font-weight: 600; margin-bottom: 4px;" id="profileStreak">12</div>
-                        <div style="font-size: 10px; color: rgba(255, 255, 255, 0.6);">🔥 Streak</div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Glass Modals -->
-    <div id="completionModal" class="glass-modal">
-        <div class="modal-glass">
+    <!-- Challenge Completion Modal -->
+    <div id="completionModal" class="modal">
+        <div class="modal-content">
             <div class="modal-title">📸 Complete Challenge</div>
             
             <div class="form-group">
                 <label class="form-label">Upload Photo/Video</label>
-                <input type="file" class="glass-input" id="mediaFile" accept="image/*,video/*">
+                <input type="file" class="form-input" id="challengeMedia" accept="image/*,video/*">
             </div>
             
             <div class="form-group">
                 <label class="form-label">Describe Your Experience</label>
-                <textarea class="glass-input" id="experienceDesc" rows="3" 
-                    placeholder="Tell us about your experience..."></textarea>
+                <textarea class="form-input" id="experienceDesc" rows="4" 
+                    placeholder="Tell us about your experience completing this challenge..."></textarea>
             </div>
             
             <div class="form-group">
                 <label class="form-label">Rate Your Experience</label>
-                <div class="glass-stars" id="ratingStars">
-                    <span class="glass-star" onclick="setRating(1)">⭐</span>
-                    <span class="glass-star" onclick="setRating(2)">⭐</span>
-                    <span class="glass-star" onclick="setRating(3)">⭐</span>
-                    <span class="glass-star" onclick="setRating(4)">⭐</span>
-                    <span class="glass-star" onclick="setRating(5)">⭐</span>
+                <div style="display: flex; gap: 8px; justify-content: center; margin: 16px 0;">
+                    <span class="star" onclick="setRating(1)" style="font-size: 24px; cursor: pointer; opacity: 0.3;">⭐</span>
+                    <span class="star" onclick="setRating(2)" style="font-size: 24px; cursor: pointer; opacity: 0.3;">⭐</span>
+                    <span class="star" onclick="setRating(3)" style="font-size: 24px; cursor: pointer; opacity: 0.3;">⭐</span>
+                    <span class="star" onclick="setRating(4)" style="font-size: 24px; cursor: pointer; opacity: 0.3;">⭐</span>
+                    <span class="star" onclick="setRating(5)" style="font-size: 24px; cursor: pointer; opacity: 0.3;">⭐</span>
                 </div>
             </div>
             
-            <button class="glass-btn btn-primary" onclick="submitCompletion()">🤖 Submit for Review</button>
-            <button class="glass-btn btn-secondary" onclick="hideModal('completion')">Cancel</button>
+            <button class="btn-primary" onclick="submitCompletion()">🤖 Submit for AI Review</button>
+            <button class="btn-secondary" onclick="hideModal('completion')">Cancel</button>
         </div>
     </div>
 
-    <div id="createModal" class="glass-modal">
-        <div class="modal-glass">
-            <div class="modal-title">✨ Create Challenge</div>
+    <!-- Create Challenge Modal -->
+    <div id="createModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-title">✨ Create New Challenge</div>
             
             <div class="form-group">
-                <label class="form-label">Title</label>
-                <input type="text" class="glass-input" id="newTitle" placeholder="Enter title...">
+                <label class="form-label">Challenge Title</label>
+                <input type="text" class="form-input" id="newTitle" placeholder="Enter an engaging title...">
             </div>
             
             <div class="form-group">
-                <label class="form-label">Description</label>
-                <textarea class="glass-input" id="newDesc" rows="3" placeholder="Describe your challenge..."></textarea>
+                <label class="form-label">Challenge Description</label>
+                <textarea class="form-input" id="newDesc" rows="4" placeholder="Describe your epic challenge in detail..."></textarea>
             </div>
             
             <div class="form-group">
-                <label class="form-label">Reward</label>
-                <select class="glass-input" id="newTokens">
+                <label class="form-label">Difficulty & Reward</label>
+                <select class="form-input" id="newTokens">
                     <option value="500">500 Tokens (Easy)</option>
                     <option value="1200">1,200 Tokens (Medium)</option>
                     <option value="2500">2,500 Tokens (Hard)</option>
+                    <option value="5000">5,000 Tokens (Epic)</option>
                 </select>
             </div>
             
-            <button class="glass-btn btn-primary" onclick="createChallenge()">🚀 Create</button>
-            <button class="glass-btn btn-secondary" onclick="hideModal('create')">Cancel</button>
+            <button class="btn-primary" onclick="createChallenge()">🚀 Create Challenge</button>
+            <button class="btn-secondary" onclick="hideModal('create')">Cancel</button>
         </div>
     </div>
 
-    <div id="settingsModal" class="glass-modal">
-        <div class="modal-glass">
+    <!-- Settings Modal -->
+    <div id="settingsModal" class="modal">
+        <div class="modal-content">
             <div class="modal-title">⚙️ Settings</div>
             
             <div class="form-group">
                 <label class="form-label">Display Name</label>
-                <input type="text" class="glass-input" id="displayName" value="Alexandra Stone">
+                <input type="text" class="form-input" id="displayName" value="Alexandra Stone">
             </div>
             
             <div class="form-group">
                 <label class="form-label">Username</label>
-                <input type="text" class="glass-input" id="username" value="alexandra_stone">
+                <input type="text" class="form-input" id="username" value="alexandra_stone">
             </div>
             
-            <button class="glass-btn btn-primary" onclick="saveSettings()">💾 Save</button>
-            <button class="glass-btn btn-secondary" onclick="hideModal('settings')">Cancel</button>
+            <button class="btn-primary" onclick="saveSettings()">💾 Save Settings</button>
+            <button class="btn-secondary" onclick="hideModal('settings')">Cancel</button>
         </div>
     </div>
 
-    <div id="welcomeModal" class="glass-modal">
-        <div class="modal-glass">
-            <div style="text-align: center; padding: 20px; position: relative; z-index: 1;">
+    <!-- Groups Modal -->
+    <div id="groupsModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-title">👥 Challenge Groups</div>
+            
+            <div style="margin-bottom: 20px;">
+                <div style="font-size: 14px; color: var(--text-secondary); margin-bottom: 16px;">
+                    Join groups to participate in exclusive challenges and compete with friends!
+                </div>
+                
+                <div style="border: 1px solid var(--border-color); border-radius: 12px; padding: 16px; margin-bottom: 12px;">
+                    <div style="font-weight: 600; margin-bottom: 8px;">🏢 Office Champions</div>
+                    <div style="font-size: 12px; color: var(--text-secondary); margin-bottom: 8px;">248 members • 15 active challenges</div>
+                    <button class="btn-primary" style="padding: 8px 16px; font-size: 12px;">Join Group</button>
+                </div>
+                
+                <div style="border: 1px solid var(--border-color); border-radius: 12px; padding: 16px;">
+                    <div style="font-weight: 600; margin-bottom: 8px;">🎯 Fitness Warriors</div>
+                    <div style="font-size: 12px; color: var(--text-secondary); margin-bottom: 8px;">156 members • 8 active challenges</div>
+                    <button class="btn-primary" style="padding: 8px 16px; font-size: 12px;">Join Group</button>
+                </div>
+            </div>
+            
+            <button class="btn-secondary" onclick="hideModal('groups')">Close</button>
+        </div>
+    </div>
+
+    <!-- Welcome Modal -->
+    <div id="welcomeModal" class="modal">
+        <div class="modal-content">
+            <div style="text-align: center; padding: 20px 0;">
                 <div style="font-size: 48px; margin-bottom: 16px;">🚀</div>
-                <h2 style="color: #ffffff; margin-bottom: 12px; font-weight: 500;">Welcome to JomBro!</h2>
-                <p style="color: rgba(255, 255, 255, 0.7); margin-bottom: 20px; line-height: 1.5;">
-                    Complete real-world challenges, earn tokens, and have fun!
+                <h2 style="color: var(--primary-green); margin-bottom: 12px;">Welcome to JomBro!</h2>
+                <p style="color: var(--text-secondary); margin-bottom: 20px; line-height: 1.6;">
+                    Join thousands of players completing real-world challenges, earning tokens, and having fun together!
                 </p>
+                
+                <div style="background: rgba(0, 255, 150, 0.1); border: 1px solid var(--primary-green); border-radius: 12px; padding: 16px; margin: 20px 0;">
+                    <div style="color: var(--primary-green); font-weight: 600; margin-bottom: 8px;">🎉 New Player Bonus</div>
+                    <div style="color: var(--text-secondary); font-size: 14px;">
+                        Get 1,000 free tokens to start your journey!
+                    </div>
+                </div>
             </div>
             
-            <button class="glass-btn btn-primary" onclick="startTutorial()">🎯 Let's Go!</button>
-            <button class="glass-btn btn-secondary" onclick="skipTutorial()">Skip</button>
+            <button class="btn-primary" onclick="startJourney()">🎯 Start My Journey!</button>
+            <button class="btn-secondary" onclick="skipWelcome()">Maybe Later</button>
         </div>
     </div>
 
-    <!-- Floating Toast -->
-    <div id="toast" class="floating-toast">
-        <span id="toastText">Ready!</span>
+    <!-- Toast Notification -->
+    <div id="toast" class="toast">
+        <span id="toastText">Ready to challenge!</span>
     </div>
 
     <script>
-        // ===== FLOATING GLASS JOMBRO SCRIPT =====
+        // ===== ENHANCED JOMBRO SYSTEM =====
 
-        // Cached DOM elements for performance
-        const elements = {};
-        const cache = (id) => elements[id] || (elements[id] = document.getElementById(id));
-
-        // Global state
+        // Global state management
         let player = {
             name: 'Alexandra Stone',
             username: 'alexandra_stone',
             tokens: 15247,
-            rank: 'Elite',
+            rank: 'Elite Gladiator',
+            level: 27,
             completed: 143,
             streak: 12
         };
 
-        let challenges = [];
+        let challenges = [
+            {
+                id: '1',
+                title: 'Coffee Shop Poetry Challenge',
+                description: 'Visit any coffee shop and ask the barista to write a short poem on your cup or napkin! This is a wonderful way to connect with people and brighten someone\'s day. Take a photo and share your experience.',
+                tokens: 500,
+                difficulty: 'Easy',
+                duration: '30m',
+                type: 'DAILY',
+                creator: 'JomBro AI',
+                avatar: '🤖',
+                hashtags: ['#CoffeePoetry', '#Connection', '#JomBro'],
+                likes: 2547,
+                requirements: [
+                    'Visit any coffee shop',
+                    'Ask barista for a poem',
+                    'Take a photo',
+                    'Share the experience'
+                ]
+            },
+            {
+                id: '2',
+                title: 'Random Menu Adventure',
+                description: 'Close your eyes and point at a menu to order something random! Document your surprise meal and rate the experience.',
+                tokens: 1200,
+                difficulty: 'Medium',
+                duration: '45m',
+                type: 'FOOD',
+                creator: 'Food Explorer',
+                avatar: '🍽️',
+                hashtags: ['#FoodAdventure', '#Surprise', '#Taste'],
+                likes: 1832,
+                requirements: [
+                    'Visit a restaurant',
+                    'Order randomly',
+                    'Document reaction',
+                    'Rate the meal'
+                ]
+            },
+            {
+                id: '3',
+                title: 'Public Compliment Mission',
+                description: 'Give genuine compliments to 5 strangers today. Spread positivity and make people smile!',
+                tokens: 800,
+                difficulty: 'Easy',
+                duration: '60m',
+                type: 'SOCIAL',
+                creator: 'Kindness Squad',
+                avatar: '😊',
+                hashtags: ['#Kindness', '#Compliments', '#Positivity'],
+                likes: 3421,
+                requirements: [
+                    'Approach 5 strangers',
+                    'Give genuine compliments',
+                    'Note their reactions',
+                    'Reflect on experience'
+                ]
+            }
+        ];
+
         let currentIndex = 0;
-        let currentChallenge = null;
         let selectedRating = 0;
 
-        // ===== BACKGROUND PARTICLE SYSTEM =====
-        function createParticles() {
-            const particleField = cache('particleField');
-            if (!particleField) return;
-
-            // Create floating particles
-            for (let i = 0; i < 15; i++) {
-                const particle = document.createElement('div');
-                particle.className = 'particle';
-                particle.style.left = Math.random() * 100 + '%';
-                particle.style.animationDelay = Math.random() * 8 + 's';
-                particleField.appendChild(particle);
-            }
-        }
-
-        function createBlinkingDots() {
-            const blinkDots = cache('blinkDots');
-            if (!blinkDots) return;
-
-            // Create blinking dots
-            for (let i = 0; i < 20; i++) {
-                const dot = document.createElement('div');
-                dot.className = 'blink-dot';
-                dot.style.left = Math.random() * 100 + '%';
-                dot.style.top = Math.random() * 100 + '%';
-                dot.style.animationDelay = Math.random() * 3 + 's';
-                blinkDots.appendChild(dot);
-            }
-        }
-
-        // ===== CHALLENGE DATA =====
-        function initChallenges() {
-            challenges = [
-                {
-                    id: '1',
-                    title: "Coffee Shop Poetry",
-                    description: "Ask a barista to write a poem on your cup! Spread joy and connect with people in your community.",
-                    tokens: 500,
-                    difficulty: "easy",
-                    type: "daily",
-                    creator: "JomBro",
-                    hashtags: ["#Coffee", "#Poetry", "#Connection"],
-                    requirements: [
-                        "Visit any coffee shop",
-                        "Ask barista for a poem",
-                        "Take a photo",
-                        "Share the experience"
-                    ]
-                },
-                {
-                    id: '2',
-                    title: "Random Menu Challenge",
-                    description: "Close your eyes and point at a menu to order! Try something completely new and rate your surprise meal.",
-                    tokens: 1200,
-                    difficulty: "medium",
-                    type: "business",
-                    creator: "Food Explorer",
-                    hashtags: ["#Food", "#Surprise", "#Adventure"],
-                    requirements: [
-                        "Go to any restaurant",
-                        "Close eyes and point at menu",
-                        "Order what you pointed at",
-                        "Document your reaction"
-                    ]
-                },
-                {
-                    id: '3',
-                    title: "Hidden Gems Hunt",
-                    description: "Discover 3 hidden gems in your city that tourists don't know about. Share these secret spots!",
-                    tokens: 2500,
-                    difficulty: "hard",
-                    type: "adventure",
-                    creator: "City Explorer",
-                    hashtags: ["#Hidden", "#Gems", "#Local"],
-                    requirements: [
-                        "Find 3 hidden local spots",
-                        "Take photos at each location",
-                        "Research their history",
-                        "Create a mini guide"
-                    ]
-                },
-                {
-                    id: '4',
-                    title: "Public Workout",
-                    description: "Do 30 push-ups in a public place and inspire others to join you! Spread fitness motivation.",
-                    tokens: 800,
-                    difficulty: "medium",
-                    type: "fitness",
-                    creator: "Fit Coach",
-                    hashtags: ["#Fitness", "#Public", "#Motivation"],
-                    requirements: [
-                        "Choose a public location",
-                        "Do 30 push-ups",
-                        "Invite others to join",
-                        "Document reactions"
-                    ]
-                },
-                {
-                    id: '5',
-                    title: "Compliment Challenge",
-                    description: "Give genuine compliments to 5 strangers today. Spread positivity and brighten people's day!",
-                    tokens: 600,
-                    difficulty: "easy",
-                    type: "social",
-                    creator: "Positivity Pro",
-                    hashtags: ["#Kindness", "#Compliments", "#Positive"],
-                    requirements: [
-                        "Approach 5 different people",
-                        "Give genuine compliments",
-                        "Note their reactions",
-                        "Reflect on the experience"
-                    ]
-                }
-            ];
-        }
+        // Live players data
+        let livePlayers = [
+            { name: 'Alex', avatar: '👨', status: 'online' },
+            { name: 'Maria', avatar: '👩', status: 'online' },
+            { name: 'John', avatar: '👨‍💼', status: 'online' },
+            { name: 'Lisa', avatar: '👩‍🎨', status: 'online' },
+            { name: 'Mike', avatar: '👨‍🚀', status: 'online' },
+            { name: 'Sarah', avatar: '👩‍💻', status: 'online' },
+            { name: 'David', avatar: '👨‍🎓', status: 'online' },
+            { name: 'Emma', avatar: '👩‍🔬', status: 'online' }
+        ];
 
         // ===== UTILITY FUNCTIONS =====
         function showToast(message, isError = false) {
-            const toast = cache('toast');
-            const text = cache('toastText');
-            if (!toast || !text) return;
+            const toast = document.getElementById('toast');
+            const text = document.getElementById('toastText');
             
             text.textContent = message;
-            toast.className = `floating-toast ${isError ? 'error' : ''}`;
+            toast.className = `toast ${isError ? 'error' : ''}`;
             toast.classList.add('show');
             
             setTimeout(() => toast.classList.remove('show'), 3000);
         }
 
         function showModal(id) {
-            const modal = cache(id + 'Modal');
-            if (modal) modal.classList.add('show');
+            document.getElementById(id + 'Modal').classList.add('show');
         }
 
         function hideModal(id) {
-            const modal = cache(id + 'Modal');
-            if (modal) modal.classList.remove('show');
+            document.getElementById(id + 'Modal').classList.remove('show');
         }
 
-        function updateElement(id, content) {
-            const el = cache(id);
-            if (el) el.textContent = content;
+        // ===== LIVE PLAYERS DISPLAY =====
+        function renderLivePlayers() {
+            const container = document.getElementById('livePlayersContainer');
+            container.innerHTML = livePlayers.map(player => `
+                <div class="player-avatar" onclick="showPlayerProfile('${player.name}')">
+                    <div class="avatar-ring">
+                        <div class="avatar-inner">${player.avatar}</div>
+                    </div>
+                    <div class="avatar-status"></div>
+                </div>
+            `).join('');
+        }
+
+        function showPlayerProfile(name) {
+            showToast(`👋 Viewing ${name}'s profile`);
         }
 
         // ===== CHALLENGE DISPLAY =====
-        function renderChallenge(challenge, index) {
-            const isActive = index === currentIndex;
-            
-            return `
-                <div class="challenge-card ${isActive ? 'active' : ''}" data-index="${index}">
-                    <div class="challenge-content">
-                        <div class="challenge-header">
-                            <div class="challenge-avatar">${getTypeIcon(challenge.type)}</div>
-                            <div class="challenge-user">
-                                <div class="challenge-username">${challenge.creator}</div>
-                                <div class="challenge-type">${challenge.type}</div>
-                            </div>
-                        </div>
-                        
-                        <div class="challenge-body">
-                            <div class="challenge-title">${challenge.title}</div>
-                            <div class="challenge-description">${challenge.description}</div>
-                            
-                            <div class="challenge-hashtags">
-                                ${challenge.hashtags.map(tag => `<span class="hashtag">${tag}</span>`).join('')}
-                            </div>
-                        </div>
-                        
-                        <div class="challenge-reward">
-                            🪙 ${challenge.tokens.toLocaleString()} Tokens • ${challenge.difficulty.toUpperCase()}
-                        </div>
-                        
-                        <div class="challenge-actions">
-                            <button class="glass-btn btn-primary" onclick="acceptChallenge('${challenge.id}')">
-                                🚀 Accept
-                            </button>
-                            <button class="glass-btn btn-secondary" onclick="nextChallenge()">
-                                Skip
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            `;
-        }
+        function displayCurrentChallenge() {
+            const challenge = challenges[currentIndex];
+            if (!challenge) return;
 
-        function getTypeIcon(type) {
-            const icons = {
-                daily: '☕',
-                business: '🍟',
-                adventure: '🗺️',
-                fitness: '💪',
-                social: '😊'
-            };
-            return icons[type] || '⭐';
-        }
+            document.getElementById('challengeTitle').textContent = challenge.title;
+            document.getElementById('challengeDescription').textContent = challenge.description;
+            document.getElementById('challengeTokens').textContent = challenge.tokens.toLocaleString();
+            document.getElementById('challengeDifficulty').textContent = challenge.difficulty;
+            document.getElementById('challengeDuration').textContent = challenge.duration;
+            document.getElementById('challengeType').textContent = challenge.type;
+            document.getElementById('creatorName').textContent = challenge.creator;
+            document.getElementById('creatorAvatar').textContent = challenge.avatar;
+            document.getElementById('likeCount').textContent = formatNumber(challenge.likes);
 
-        function updateChallengeDisplay() {
-            const container = cache('challengeContainer');
-            if (!container) return;
-            
-            container.innerHTML = challenges.map((challenge, index) => 
-                renderChallenge(challenge, index)
+            // Update hashtags
+            const hashtagsContainer = document.getElementById('challengeHashtags');
+            hashtagsContainer.innerHTML = challenge.hashtags.map(tag => 
+                `<span class="hashtag">${tag}</span>`
             ).join('');
-            
-            updateCounter();
-            updatePoints();
         }
 
-        function updateCounter() {
-            updateElement('challengeCounter', `${currentIndex + 1}/${challenges.length}`);
-        }
-
-        function updatePoints() {
-            if (challenges[currentIndex]) {
-                const tokens = challenges[currentIndex].tokens;
-                const display = tokens >= 1000 ? (tokens / 1000).toFixed(1) + 'K' : tokens;
-                updateElement('currentPoints', display);
+        function formatNumber(num) {
+            if (num >= 1000) {
+                return (num / 1000).toFixed(1) + 'K';
             }
+            return num.toString();
         }
 
-        // ===== NAVIGATION =====
-        function nextChallenge() {
-            currentIndex = (currentIndex + 1) % challenges.length;
-            updateChallengeDisplay();
-            showToast('⏭️ Next challenge');
-        }
-
-        function prevChallenge() {
-            currentIndex = currentIndex === 0 ? challenges.length - 1 : currentIndex - 1;
-            updateChallengeDisplay();
-            showToast('⏮️ Previous challenge');
-        }
-
-        function acceptChallenge(id) {
-            currentChallenge = challenges.find(c => c.id === id);
-            if (!currentChallenge) return;
-            
-            updateElement('detailTitle', currentChallenge.title);
-            updateElement('detailDescription', currentChallenge.description);
-            updateElement('detailTokens', currentChallenge.tokens.toLocaleString());
-            updateElement('detailDifficulty', currentChallenge.difficulty);
-            
-            const list = cache('requirementsList');
-            if (list) {
-                list.innerHTML = currentChallenge.requirements
-                    .map(req => `<li style="padding: 4px 0; color: rgba(255, 255, 255, 0.8); position: relative; padding-left: 20px;"><span style="position: absolute; left: 0; color: var(--primary-glow);">✓</span>${req}</li>`)
-                    .join('');
-            }
-            
-            cache('challengePage').classList.add('show');
-        }
-
-        function closePage() {
-            cache('challengePage').classList.remove('show');
-        }
-
-        function startChallenge() {
-            closePage();
-            showToast('🚀 Challenge started! Complete it and submit proof.');
+        // ===== CHALLENGE ACTIONS =====
+        function acceptChallenge() {
+            showToast('🚀 Challenge accepted! Complete it and submit proof.');
             setTimeout(() => showModal('completion'), 2000);
+        }
+
+        function skipChallenge() {
+            currentIndex = (currentIndex + 1) % challenges.length;
+            displayCurrentChallenge();
+            showToast('⏭️ Next challenge loaded!');
+        }
+
+        function likeChallenge() {
+            challenges[currentIndex].likes += 1;
+            document.getElementById('likeCount').textContent = formatNumber(challenges[currentIndex].likes);
+            showToast('❤️ Challenge liked!');
+        }
+
+        function shareChallenge() {
+            const challenge = challenges[currentIndex];
+            if (navigator.share) {
+                navigator.share({
+                    title: challenge.title,
+                    text: challenge.description,
+                    url: window.location.href
+                }).then(() => showToast('📤 Challenge shared!'))
+                .catch(() => showToast('📤 Share failed'));
+            } else {
+                showToast('📤 Challenge copied to share!');
+            }
+        }
+
+        function bookmarkChallenge() {
+            showToast('🔖 Challenge bookmarked!');
         }
 
         // ===== CHALLENGE COMPLETION =====
         function setRating(rating) {
             selectedRating = rating;
-            const stars = document.querySelectorAll('.glass-star');
+            const stars = document.querySelectorAll('.star');
             stars.forEach((star, index) => {
-                star.className = 'glass-star';
-                if (index < rating) star.classList.add('active');
+                star.style.opacity = index < rating ? '1' : '0.3';
             });
         }
 
         function submitCompletion() {
-            const desc = cache('experienceDesc');
-            if (!desc || !desc.value.trim()) {
+            const desc = document.getElementById('experienceDesc').value;
+            
+            if (!desc.trim()) {
                 showToast('Please describe your experience', true);
                 return;
             }
             
             if (selectedRating === 0) {
-                showToast('Please rate the challenge', true);
+                showToast('Please rate your experience', true);
                 return;
             }
             
-            showToast('🤖 AI reviewing submission...');
+            showToast('🤖 AI reviewing your submission...');
             
             setTimeout(() => {
-                const score = calculateScore(desc.value);
-                const tokens = Math.floor(currentChallenge.tokens * (score / 100));
+                const challenge = challenges[currentIndex];
+                const score = calculateScore(desc);
+                const tokensEarned = Math.floor(challenge.tokens * (score / 100));
                 
-                player.tokens += tokens;
+                player.tokens += tokensEarned;
                 player.completed++;
-                updatePlayerDisplay();
                 
-                showReviewResult(score, tokens);
+                updatePlayerDisplay();
+                showReviewResult(score, tokensEarned);
                 hideModal('completion');
-                resetForm();
-            }, 2000);
+                resetCompletionForm();
+            }, 3000);
         }
 
         function calculateScore(description) {
             let score = 50;
             if (description.length > 50) score += 20;
-            if (description.length > 100) score += 10;
+            if (description.length > 100) score += 15;
             if (selectedRating >= 4) score += 10;
-            if (/amazing|awesome|great|fun|love/.test(description.toLowerCase())) score += 10;
+            if (/amazing|awesome|great|fun|love|excellent/.test(description.toLowerCase())) score += 15;
             return Math.min(score, 95);
         }
 
         function showReviewResult(score, tokens) {
-            const emoji = score >= 80 ? '🎉' : score >= 60 ? '⭐' : '💪';
-            const title = score >= 80 ? 'Excellent!' : score >= 60 ? 'Great Job!' : 'Good Try!';
+            const emoji = score >= 85 ? '🎉' : score >= 70 ? '⭐' : score >= 50 ? '👍' : '💪';
+            const title = score >= 85 ? 'Outstanding!' : score >= 70 ? 'Excellent!' : score >= 50 ? 'Great Job!' : 'Good Effort!';
             
-            const modal = document.createElement('div');
-            modal.className = 'glass-modal show';
-            modal.innerHTML = `
-                <div class="modal-glass" style="text-align: center;">
-                    <div style="font-size: 48px; margin-bottom: 16px; position: relative; z-index: 1;">${emoji}</div>
-                    <h2 style="margin-bottom: 12px; color: #ffffff; font-weight: 500; position: relative; z-index: 1;">${title}</h2>
-                    
-                    <div style="background: rgba(0, 255, 170, 0.1); border: 1px solid var(--primary-glow); padding: 16px; border-radius: 12px; margin: 16px 0; position: relative; z-index: 1;">
-                        <div style="font-size: 20px; color: var(--primary-glow); font-weight: 600;">
-                            +${tokens.toLocaleString()} Tokens
-                        </div>
-                        <div style="font-size: 14px; color: rgba(255, 255, 255, 0.7);">
-                            Score: ${score}/100
-                        </div>
-                    </div>
-                    
-                    <button class="glass-btn btn-primary" onclick="this.closest('.glass-modal').remove(); nextChallenge();" style="position: relative; z-index: 1;">
-                        🚀 Next Challenge
-                    </button>
-                </div>
-            `;
-            document.body.appendChild(modal);
+            showToast(`${emoji} ${title} +${tokens.toLocaleString()} tokens earned!`);
         }
 
-        function resetForm() {
+        function resetCompletionForm() {
             selectedRating = 0;
-            document.querySelectorAll('.glass-star').forEach(star => star.className = 'glass-star');
-            
-            const desc = cache('experienceDesc');
-            const file = cache('mediaFile');
-            if (desc) desc.value = '';
-            if (file) file.value = '';
+            document.querySelectorAll('.star').forEach(star => star.style.opacity = '0.3');
+            document.getElementById('experienceDesc').value = '';
+            document.getElementById('challengeMedia').value = '';
         }
 
         // ===== CREATE CHALLENGE =====
         function createChallenge() {
-            const title = cache('newTitle');
-            const desc = cache('newDesc');
-            const tokens = cache('newTokens');
+            const title = document.getElementById('newTitle').value;
+            const desc = document.getElementById('newDesc').value;
+            const tokens = parseInt(document.getElementById('newTokens').value);
             
-            if (!title || !title.value.trim()) {
-                showToast('Please enter a title', true);
-                return;
-            }
-            
-            if (!desc || !desc.value.trim()) {
-                showToast('Please enter a description', true);
+            if (!title.trim() || !desc.trim()) {
+                showToast('Please fill in all fields', true);
                 return;
             }
             
             const newChallenge = {
                 id: Date.now().toString(),
-                title: title.value,
-                description: desc.value,
-                tokens: parseInt(tokens.value),
-                difficulty: tokens.value >= 2000 ? 'hard' : tokens.value >= 1000 ? 'medium' : 'easy',
-                type: 'user',
+                title: title,
+                description: desc,
+                tokens: tokens,
+                difficulty: tokens >= 2000 ? 'Hard' : tokens >= 1000 ? 'Medium' : 'Easy',
+                duration: '60m',
+                type: 'USER',
                 creator: player.name,
-                hashtags: ['#UserChallenge', '#JomBro'],
+                avatar: '👤',
+                hashtags: ['#UserChallenge', '#JomBro', '#Community'],
+                likes: 0,
                 requirements: [
                     'Complete the challenge as described',
-                    'Take photos/videos as proof',
-                    'Share your experience'
+                    'Document your experience',
+                    'Share with the community'
                 ]
             };
             
             challenges.unshift(newChallenge);
             currentIndex = 0;
-            updateChallengeDisplay();
+            displayCurrentChallenge();
             
             hideModal('create');
-            showToast('✨ Challenge created!');
+            showToast('✨ Challenge created successfully!');
             
             // Clear form
-            title.value = '';
-            desc.value = '';
-        }
-
-        // ===== SETTINGS =====
-        function saveSettings() {
-            const name = cache('displayName');
-            const username = cache('username');
-            
-            if (name && name.value.trim()) {
-                player.name = name.value.trim();
-            }
-            
-            if (username && username.value.trim()) {
-                player.username = username.value.trim();
-            }
-            
-            updatePlayerDisplay();
-            hideModal('settings');
-            showToast('⚙️ Settings saved!');
-        }
-
-        // ===== PROFILE =====
-        function showProfile() {
-            updateElement('profileName', player.name);
-            updateElement('profileUsername', `@${player.username}`);
-            updateElement('profileTokens', player.tokens.toLocaleString());
-            updateElement('profileChallenges', player.completed);
-            updateElement('profileStreak', player.streak);
-            
-            cache('profilePage').classList.add('show');
-        }
-
-        function closeProfile() {
-            cache('profilePage').classList.remove('show');
+            document.getElementById('newTitle').value = '';
+            document.getElementById('newDesc').value = '';
         }
 
         // ===== NAVIGATION =====
@@ -1587,72 +1196,82 @@
             );
             element.classList.add('active');
             
-            if (section === 'profile') {
-                showProfile();
-            } else if (section === 'create') {
-                showModal('create');
-            } else {
-                showToast(`📱 ${section}`);
+            switch(section) {
+                case 'home':
+                    showToast('🏠 Home');
+                    break;
+                case 'ranks':
+                    showToast('🏆 Leaderboard coming soon!');
+                    break;
+                case 'create':
+                    showModal('create');
+                    break;
+                case 'groups':
+                    showModal('groups');
+                    break;
+                case 'shop':
+                    showToast('🛍️ Token shop coming soon!');
+                    break;
+                case 'profile':
+                    showToast('👤 Profile page coming soon!');
+                    break;
+                default:
+                    showToast(`📱 ${section}`);
             }
+        }
+
+        // ===== SETTINGS =====
+        function saveSettings() {
+            const name = document.getElementById('displayName').value;
+            const username = document.getElementById('username').value;
+            
+            if (name.trim()) player.name = name.trim();
+            if (username.trim()) player.username = username.trim();
+            
+            hideModal('settings');
+            showToast('⚙️ Settings saved!');
         }
 
         // ===== PLAYER DISPLAY =====
         function updatePlayerDisplay() {
-            updateElement('playerRank', player.rank);
-            updateElement('playerTokens', `🪙 ${player.tokens.toLocaleString()}`);
-        }
-
-        // ===== ACTIONS =====
-        function likeChallenge() {
-            showToast('❤️ Liked!');
-        }
-
-        function shareChallenge() {
-            if (navigator.share && currentChallenge) {
-                navigator.share({
-                    title: currentChallenge.title,
-                    text: currentChallenge.description
-                }).then(() => showToast('📤 Shared!'))
-                .catch(() => showToast('📤 Share failed'));
-            } else {
-                showToast('📤 Shared!');
-            }
-        }
-
-        function bookmarkChallenge() {
-            showToast('🔖 Bookmarked!');
-        }
-
-        function showHelp() {
-            showToast('❓ Help coming soon!');
+            document.getElementById('playerTokens').textContent = player.tokens.toLocaleString();
         }
 
         // ===== ONBOARDING =====
-        function checkFirstLaunch() {
-            const hasLaunched = localStorage.getItem('jombro_launched');
-            if (!hasLaunched) {
-                setTimeout(() => showModal('welcome'), 1500);
+        function checkFirstTime() {
+            const hasVisited = localStorage.getItem('jombro_visited');
+            if (!hasVisited) {
+                setTimeout(() => showModal('welcome'), 1000);
             }
         }
 
-        function startTutorial() {
-            localStorage.setItem('jombro_launched', 'true');
+        function startJourney() {
+            localStorage.setItem('jombro_visited', 'true');
+            player.tokens += 1000;
+            updatePlayerDisplay();
             hideModal('welcome');
-            showToast('🎯 Swipe up/down to browse challenges!');
+            showToast('🎉 Welcome bonus: +1,000 tokens!');
         }
 
-        function skipTutorial() {
-            localStorage.setItem('jombro_launched', 'true');
+        function skipWelcome() {
+            localStorage.setItem('jombro_visited', 'true');
             hideModal('welcome');
         }
 
-        // ===== TOUCH HANDLING =====
+        // ===== HELPER FUNCTIONS =====
+        function showHelp() {
+            showToast('❓ Help guide coming soon!');
+        }
+
+        function showNotifications() {
+            showToast('🔔 No new notifications');
+        }
+
+        // ===== TOUCH GESTURES =====
         let startY = 0;
-        let startTime = 0;
 
         document.addEventListener('touchstart', (e) => {
             startY = e.touches[0].clientY;
-            startTime = Date.now();
         }, { passive: true });
 
         document.addEventListener('touchend', (e) => {
@@ -1660,14 +1279,16 @@
             
             const endY = e.changedTouches[0].clientY;
             const deltaY = startY - endY;
-            const deltaTime = Date.now() - startTime;
             
-            // Only handle quick swipes on feed
-            if (Math.abs(deltaY) > 50 && deltaTime < 300 && e.target.closest('.floating-feed')) {
+            // Swipe to next/previous challenge
+            if (Math.abs(deltaY) > 100 && e.target.closest('.challenge-main')) {
                 if (deltaY > 0) {
-                    nextChallenge();
+                    skipChallenge(); // Swipe up for next
                 } else {
-                    prevChallenge();
+                    // Previous challenge
+                    currentIndex = currentIndex === 0 ? challenges.length - 1 : currentIndex - 1;
+                    displayCurrentChallenge();
+                    showToast('⏮️ Previous challenge');
                 }
             }
             
@@ -1676,17 +1297,18 @@
 
         // ===== INITIALIZATION =====
         function init() {
-            initChallenges();
+            renderLivePlayers();
+            displayCurrentChallenge();
             updatePlayerDisplay();
-            updateChallengeDisplay();
-            createParticles();
-            createBlinkingDots();
-            checkFirstLaunch();
+            checkFirstTime();
             
-            console.log('Floating Glass JomBro initialized');
+            // Update active count
+            document.getElementById('activeCount').textContent = `${livePlayers.length} active`;
+            
+            console.log('Enhanced JomBro initialized');
         }
 
-        // Initialize when ready
+        // Start the app
         if (document.readyState === 'loading') {
             document.addEventListener('DOMContentLoaded', init);
         } else {
