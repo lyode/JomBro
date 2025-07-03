@@ -23,6 +23,15 @@
             --text-secondary: rgba(255, 255, 255, 0.7);
         }
 
+        // ===== HELPER FUNCTIONS =====
+        function showHelp() {
+            showToast('❓ Help guide coming soon!');
+        }
+
+        function showNotifications() {
+            showToast('🔔 No new notifications');
+        }
+
         * {
             margin: 0;
             padding: 0;
@@ -598,6 +607,27 @@
             to { opacity: 1; transform: scale(1); }
         }
 
+        /* ===== GROUP FEATURES ===== */
+        .icon-selector {
+            transition: all 0.2s ease;
+        }
+
+        .icon-selector:hover {
+            border-color: var(--primary-green) !important;
+            background: rgba(0, 255, 150, 0.05) !important;
+            transform: scale(1.05);
+        }
+
+        .group-card {
+            transition: all 0.2s ease;
+            cursor: pointer;
+        }
+
+        .group-card:hover {
+            background: rgba(255, 255, 255, 0.02);
+            border-color: rgba(255, 255, 255, 0.2);
+        }
+
         /* ===== RESPONSIVE ===== */
         @media (max-width: 400px) {
             .app-header {
@@ -740,7 +770,7 @@
                 <div class="nav-icon">🏆</div>
                 <div class="nav-label">Ranks</div>
             </div>
-            <div class="nav-item" onclick="navTo(this, 'create')">
+            <div class="nav-item" onclick="navTo(this, 'challenges')">
                 <div class="nav-icon">➕</div>
                 <div class="nav-label">Create</div>
             </div>
@@ -841,30 +871,145 @@
         </div>
     </div>
 
-    <!-- Groups Modal -->
+    <!-- Enhanced Groups Modal -->
     <div id="groupsModal" class="modal">
-        <div class="modal-content">
-            <div class="modal-title">👥 Challenge Groups</div>
+        <div class="modal-content" style="max-width: 450px;">
+            <div class="modal-title">👥 My Groups</div>
             
             <div style="margin-bottom: 20px;">
-                <div style="font-size: 14px; color: var(--text-secondary); margin-bottom: 16px;">
-                    Join groups to participate in exclusive challenges and compete with friends!
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+                    <div style="font-size: 14px; color: var(--text-secondary);">Active Groups</div>
+                    <button class="btn-primary" onclick="showModal('createGroup')" style="padding: 6px 12px; font-size: 12px;">+ Create Group</button>
                 </div>
                 
-                <div style="border: 1px solid var(--border-color); border-radius: 12px; padding: 16px; margin-bottom: 12px;">
-                    <div style="font-weight: 600; margin-bottom: 8px;">🏢 Office Champions</div>
-                    <div style="font-size: 12px; color: var(--text-secondary); margin-bottom: 8px;">248 members • 15 active challenges</div>
-                    <button class="btn-primary" style="padding: 8px 16px; font-size: 12px;">Join Group</button>
+                <!-- My Groups -->
+                <div id="myGroupsList">
+                    <div style="border: 1px solid var(--primary-green); border-radius: 12px; padding: 16px; margin-bottom: 12px; background: rgba(0, 255, 150, 0.05);">
+                        <div style="display: flex; justify-content: between; align-items: start; margin-bottom: 8px;">
+                            <div>
+                                <div style="font-weight: 600; color: var(--primary-green); margin-bottom: 4px;">🎯 Fitness Warriors</div>
+                                <div style="font-size: 12px; color: var(--text-secondary); margin-bottom: 8px;">Owner • 23 members • 5 active challenges</div>
+                            </div>
+                            <div style="background: var(--primary-green); color: #000; padding: 2px 6px; border-radius: 6px; font-size: 10px; font-weight: 600;">ADMIN</div>
+                        </div>
+                        <div style="display: flex; gap: 8px;">
+                            <button style="background: rgba(0, 255, 150, 0.2); border: 1px solid var(--primary-green); color: var(--primary-green); padding: 4px 8px; border-radius: 6px; font-size: 11px; cursor: pointer;">Manage</button>
+                            <button style="background: rgba(255, 255, 255, 0.1); border: 1px solid var(--border-color); color: var(--text-secondary); padding: 4px 8px; border-radius: 6px; font-size: 11px; cursor: pointer;">View</button>
+                        </div>
+                    </div>
+                    
+                    <div style="border: 1px solid var(--border-color); border-radius: 12px; padding: 16px; margin-bottom: 12px;">
+                        <div style="display: flex; justify-content: between; align-items: start; margin-bottom: 8px;">
+                            <div>
+                                <div style="font-weight: 600; margin-bottom: 4px;">🏢 Office Champions</div>
+                                <div style="font-size: 12px; color: var(--text-secondary); margin-bottom: 8px;">Member • 248 members • 15 active challenges</div>
+                            </div>
+                            <div style="background: #ffd700; color: #000; padding: 2px 6px; border-radius: 6px; font-size: 10px; font-weight: 600;">MEMBER</div>
+                        </div>
+                        <div style="display: flex; gap: 8px;">
+                            <button style="background: rgba(255, 255, 255, 0.1); border: 1px solid var(--border-color); color: var(--text-secondary); padding: 4px 8px; border-radius: 6px; font-size: 11px; cursor: pointer;">View Challenges</button>
+                            <button style="background: rgba(255, 107, 107, 0.2); border: 1px solid #ff6b6b; color: #ff6b6b; padding: 4px 8px; border-radius: 6px; font-size: 11px; cursor: pointer;">Leave</button>
+                        </div>
+                    </div>
                 </div>
                 
-                <div style="border: 1px solid var(--border-color); border-radius: 12px; padding: 16px;">
-                    <div style="font-weight: 600; margin-bottom: 8px;">🎯 Fitness Warriors</div>
-                    <div style="font-size: 12px; color: var(--text-secondary); margin-bottom: 8px;">156 members • 8 active challenges</div>
-                    <button class="btn-primary" style="padding: 8px 16px; font-size: 12px;">Join Group</button>
+                <!-- Discover Groups -->
+                <div style="margin-top: 24px;">
+                    <div style="font-size: 14px; color: var(--text-secondary); margin-bottom: 16px;">Discover Groups</div>
+                    
+                    <div style="border: 1px solid var(--border-color); border-radius: 12px; padding: 16px; margin-bottom: 12px;">
+                        <div style="display: flex; justify-content: between; align-items: start; margin-bottom: 8px;">
+                            <div>
+                                <div style="font-weight: 600; margin-bottom: 4px;">🎨 Creative Minds</div>
+                                <div style="font-size: 12px; color: var(--text-secondary); margin-bottom: 8px;">89 members • 8 active challenges</div>
+                                <div style="font-size: 11px; color: var(--text-secondary); line-height: 1.4;">Creative challenges for artists, designers, and makers</div>
+                            </div>
+                        </div>
+                        <button style="background: var(--primary-green); color: #000; padding: 6px 12px; border-radius: 6px; font-size: 11px; font-weight: 600; border: none; cursor: pointer;" onclick="joinGroup('creative')">Join Group</button>
+                    </div>
+                    
+                    <div style="border: 1px solid var(--border-color); border-radius: 12px; padding: 16px;">
+                        <div style="display: flex; justify-content: between; align-items: start; margin-bottom: 8px;">
+                            <div>
+                                <div style="font-weight: 600; margin-bottom: 4px;">🌍 World Explorers</div>
+                                <div style="font-size: 12px; color: var(--text-secondary); margin-bottom: 8px;">342 members • 12 active challenges</div>
+                                <div style="font-size: 11px; color: var(--text-secondary); line-height: 1.4;">Travel and adventure challenges around the globe</div>
+                            </div>
+                        </div>
+                        <button style="background: var(--primary-green); color: #000; padding: 6px 12px; border-radius: 6px; font-size: 11px; font-weight: 600; border: none; cursor: pointer;" onclick="joinGroup('explorers')">Join Group</button>
+                    </div>
                 </div>
             </div>
             
             <button class="btn-secondary" onclick="hideModal('groups')">Close</button>
+        </div>
+    </div>
+
+    <!-- Create Group Modal -->
+    <div id="createGroupModal" class="modal">
+        <div class="modal-content" style="max-width: 450px;">
+            <div class="modal-title">🎯 Create New Group</div>
+            
+            <div class="form-group">
+                <label class="form-label">Group Name</label>
+                <input type="text" class="form-input" id="groupName" placeholder="e.g., Fitness Warriors, Creative Minds...">
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">Group Icon</label>
+                <div style="display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 8px;">
+                    <div class="icon-selector" onclick="selectGroupIcon('🎯')" style="padding: 8px; border: 1px solid var(--border-color); border-radius: 8px; cursor: pointer; font-size: 20px;">🎯</div>
+                    <div class="icon-selector" onclick="selectGroupIcon('💪')" style="padding: 8px; border: 1px solid var(--border-color); border-radius: 8px; cursor: pointer; font-size: 20px;">💪</div>
+                    <div class="icon-selector" onclick="selectGroupIcon('🎨')" style="padding: 8px; border: 1px solid var(--border-color); border-radius: 8px; cursor: pointer; font-size: 20px;">🎨</div>
+                    <div class="icon-selector" onclick="selectGroupIcon('🏢')" style="padding: 8px; border: 1px solid var(--border-color); border-radius: 8px; cursor: pointer; font-size: 20px;">🏢</div>
+                    <div class="icon-selector" onclick="selectGroupIcon('🌍')" style="padding: 8px; border: 1px solid var(--border-color); border-radius: 8px; cursor: pointer; font-size: 20px;">🌍</div>
+                    <div class="icon-selector" onclick="selectGroupIcon('🎮')" style="padding: 8px; border: 1px solid var(--border-color); border-radius: 8px; cursor: pointer; font-size: 20px;">🎮</div>
+                    <div class="icon-selector" onclick="selectGroupIcon('📚')" style="padding: 8px; border: 1px solid var(--border-color); border-radius: 8px; cursor: pointer; font-size: 20px;">📚</div>
+                    <div class="icon-selector" onclick="selectGroupIcon('🍽️')" style="padding: 8px; border: 1px solid var(--border-color); border-radius: 8px; cursor: pointer; font-size: 20px;">🍽️</div>
+                </div>
+                <input type="hidden" id="selectedGroupIcon" value="🎯">
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">Group Description</label>
+                <textarea class="form-input" id="groupDesc" rows="3" placeholder="What's your group about? What kind of challenges will you create?"></textarea>
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">Group Privacy</label>
+                <select class="form-input" id="groupPrivacy">
+                    <option value="public">🌍 Public - Anyone can join</option>
+                    <option value="request">🔐 Request to Join - Admin approval required</option>
+                    <option value="invite">👥 Invite Only - Private group</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">Group Category</label>
+                <select class="form-input" id="groupCategory">
+                    <option value="fitness">💪 Fitness & Health</option>
+                    <option value="creative">🎨 Arts & Creative</option>
+                    <option value="professional">🏢 Professional & Work</option>
+                    <option value="travel">🌍 Travel & Adventure</option>
+                    <option value="social">👥 Social & Community</option>
+                    <option value="learning">📚 Learning & Education</option>
+                    <option value="gaming">🎮 Gaming & Tech</option>
+                    <option value="food">🍽️ Food & Cooking</option>
+                </select>
+            </div>
+            
+            <div style="background: rgba(0, 255, 150, 0.1); border: 1px solid var(--primary-green); border-radius: 12px; padding: 16px; margin: 20px 0;">
+                <div style="color: var(--primary-green); font-weight: 600; margin-bottom: 8px;">✨ Group Benefits</div>
+                <div style="color: var(--text-secondary); font-size: 12px; line-height: 1.4;">
+                    • Create exclusive challenges for your group<br>
+                    • Group leaderboards and competitions<br>
+                    • Private group chat and discussions<br>
+                    • Special group achievements and rewards
+                </div>
+            </div>
+            
+            <button class="btn-primary" onclick="createGroup()">🚀 Create Group</button>
+            <button class="btn-secondary" onclick="hideModal('createGroup')">Cancel</button>
         </div>
     </div>
 
@@ -1205,6 +1350,9 @@
                 case 'ranks':
                     showToast('🏆 Leaderboard coming soon!');
                     break;
+                case 'challenges':
+                    showModal('create');
+                    break;
                 case 'create':
                     showModal('create');
                     break;
@@ -1269,13 +1417,125 @@
             hideModal('welcome');
         }
 
-        // ===== HELPER FUNCTIONS =====
-        function showHelp() {
-            showToast('❓ Help guide coming soon!');
+        // ===== ENHANCED GROUP MANAGEMENT =====
+        let selectedGroupIcon = '🎯';
+        let userGroups = [
+            {
+                id: 'fitness_warriors',
+                name: 'Fitness Warriors',
+                icon: '🎯',
+                members: 23,
+                challenges: 5,
+                role: 'admin',
+                description: 'Daily fitness challenges for warriors'
+            },
+            {
+                id: 'office_champions',
+                name: 'Office Champions',
+                icon: '🏢',
+                members: 248,
+                challenges: 15,
+                role: 'member',
+                description: 'Workplace challenges and team building'
+            }
+        ];
+
+        function selectGroupIcon(icon) {
+            selectedGroupIcon = icon;
+            document.getElementById('selectedGroupIcon').value = icon;
+            
+            // Update visual selection
+            document.querySelectorAll('.icon-selector').forEach(el => {
+                el.style.borderColor = 'var(--border-color)';
+                el.style.background = 'transparent';
+            });
+            
+            event.target.style.borderColor = 'var(--primary-green)';
+            event.target.style.background = 'rgba(0, 255, 150, 0.1)';
         }
 
-        function showNotifications() {
-            showToast('🔔 No new notifications');
+        function createGroup() {
+            const name = document.getElementById('groupName').value;
+            const desc = document.getElementById('groupDesc').value;
+            const privacy = document.getElementById('groupPrivacy').value;
+            const category = document.getElementById('groupCategory').value;
+            
+            if (!name.trim()) {
+                showToast('Please enter a group name', true);
+                return;
+            }
+            
+            if (!desc.trim()) {
+                showToast('Please add a group description', true);
+                return;
+            }
+            
+            const newGroup = {
+                id: Date.now().toString(),
+                name: name.trim(),
+                icon: selectedGroupIcon,
+                description: desc.trim(),
+                privacy: privacy,
+                category: category,
+                members: 1,
+                challenges: 0,
+                role: 'admin',
+                created: new Date().toISOString()
+            };
+            
+            userGroups.unshift(newGroup);
+            
+            hideModal('createGroup');
+            showToast(`🎉 Group "${name}" created successfully!`);
+            
+            // Clear form
+            document.getElementById('groupName').value = '';
+            document.getElementById('groupDesc').value = '';
+            selectedGroupIcon = '🎯';
+            
+            // Reset icon selection
+            document.querySelectorAll('.icon-selector').forEach(el => {
+                el.style.borderColor = 'var(--border-color)';
+                el.style.background = 'transparent';
+            });
+        }
+
+        function joinGroup(groupId) {
+            const groupNames = {
+                'creative': 'Creative Minds',
+                'explorers': 'World Explorers'
+            };
+            
+            const groupName = groupNames[groupId] || 'Unknown Group';
+            showToast(`🎉 Joined "${groupName}" successfully!`);
+            
+            // Add to user groups (simplified)
+            const newMembership = {
+                id: groupId,
+                name: groupName,
+                icon: groupId === 'creative' ? '🎨' : '🌍',
+                members: groupId === 'creative' ? 90 : 343,
+                challenges: groupId === 'creative' ? 9 : 13,
+                role: 'member'
+            };
+            
+            userGroups.push(newMembership);
+        }
+
+        function leaveGroup(groupId) {
+            if (confirm('Are you sure you want to leave this group?')) {
+                showToast('👋 Left group successfully');
+                // Remove from userGroups array
+                userGroups = userGroups.filter(group => group.id !== groupId);
+            }
+        }
+
+        function manageGroup(groupId) {
+            showToast('🔧 Group management coming soon!');
+        }
+
+        function viewGroupChallenges(groupId) {
+            showToast('📋 Group challenges coming soon!');
         }
 
         // ===== TOUCH GESTURES =====
