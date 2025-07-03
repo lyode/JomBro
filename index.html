@@ -828,44 +828,6 @@
             margin-top: 2px;
         }
 
-        /* ===== MUSIC CONTROL BUTTON ===== */
-        .music-control {
-            position: fixed;
-            bottom: calc(var(--nav-height) + var(--safe-area-bottom) + 20px);
-            left: var(--content-padding);
-            width: 52px;
-            height: 52px;
-            background: var(--bg-card);
-            backdrop-filter: blur(25px);
-            -webkit-backdrop-filter: blur(25px);
-            border: 1px solid var(--border-light);
-            border-radius: 26px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 20px;
-            cursor: pointer;
-            color: var(--text-primary);
-            transition: all 0.2s ease;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-            z-index: 200;
-        }
-
-        .music-control:active {
-            transform: scale(0.95);
-        }
-
-        .music-control.playing {
-            border-color: var(--primary);
-            background: rgba(0, 255, 150, 0.1);
-            animation: musicPulse 2s ease-in-out infinite;
-        }
-
-        @keyframes musicPulse {
-            0%, 100% { box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1), 0 0 0 0 rgba(0, 255, 150, 0.4); }
-            50% { box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1), 0 0 0 10px rgba(0, 255, 150, 0); }
-        }
-
         /* ===== FIXED BOTTOM NAVIGATION ===== */
         .bottom-nav {
             position: fixed;
@@ -1449,19 +1411,7 @@
                 <div class="nav-label">Profile</div>
             </div>
         </div>
-
-        <!-- Music Control -->
-        <div class="music-control" id="musicControl" onclick="toggleMusic()" title="Toggle Music">
-            <span id="musicIcon">🎵</span>
-        </div>
     </div>
-
-    <!-- Background Music -->
-    <audio id="backgroundMusic" loop>
-        <source src="data:audio/mpeg;base64,SUQzBAAAAAABEVRYWFgAAAAtAAADY29tbWVudABCaWdTb3VuZEJhbmsuY29tIC8gTGFTb25vdGhlcXVlLm9yZwBURU5DAAAAHQAAAC5MYXZmNTcuODMuMTAwAAAAAAAAAAAAAAAK" type="audio/mpeg">
-        <!-- Placeholder for mysterious ambient music -->
-        <!-- Replace with actual music file: src="path/to/mysterious-ambient-music.mp3" -->
-    </audio>
 
     <!-- Challenge Detail Page -->
     <div class="challenge-page" id="challengePage">
@@ -1727,8 +1677,6 @@
         let appSettings = { openaiApiKey: '', backgroundTheme: 'space' };
         let groupUpdateInterval = null;
         let liveChallengeUpdateInterval = null;
-        let backgroundMusic = null;
-        let musicPlaying = false;
 
         // Initialize app
         document.addEventListener('DOMContentLoaded', function() {
@@ -1741,7 +1689,6 @@
             updateChallengeDisplay();
             updateLiveChallengers();
             startLiveChallengeUpdates();
-            initializeMusic();
             setTimeout(() => showToast('🎉 Welcome to JomBro!', 'success'), 1000);
         });
 
@@ -2073,109 +2020,6 @@
             if (!challenger) return;
             
             showToast(`👤 Now following ${challenger.displayName}!`, 'success');
-        }
-
-        // ===== MYSTERIOUS BACKGROUND MUSIC SYSTEM ===== 
-        function initializeMusic() {
-            backgroundMusic = document.getElementById('backgroundMusic');
-            const musicControl = document.getElementById('musicControl');
-            
-            // Create mysterious ambient sounds using Web Audio API as fallback
-            if (!backgroundMusic.src || backgroundMusic.src.includes('data:audio')) {
-                createMysteriousAmbience();
-            }
-            
-            // Set volume to subtle level
-            if (backgroundMusic) {
-                backgroundMusic.volume = 0.15;
-                
-                // Try to autoplay (will only work after user interaction)
-                backgroundMusic.play().catch(() => {
-                    // Autoplay blocked, wait for user interaction
-                    console.log('🎵 Music ready - click music button to play');
-                });
-            }
-        }
-
-        function toggleMusic() {
-            const musicIcon = document.getElementById('musicIcon');
-            const musicControl = document.getElementById('musicControl');
-            
-            if (!backgroundMusic) {
-                initializeMusic();
-                return;
-            }
-            
-            if (musicPlaying) {
-                backgroundMusic.pause();
-                musicIcon.textContent = '🎵';
-                musicControl.classList.remove('playing');
-                musicPlaying = false;
-                showToast('🔇 Music paused', 'info');
-            } else {
-                backgroundMusic.play().then(() => {
-                    musicIcon.textContent = '🎶';
-                    musicControl.classList.add('playing');
-                    musicPlaying = true;
-                    showToast('🎵 Mysterious ambience playing...', 'success');
-                }).catch(error => {
-                    console.log('Music play failed:', error);
-                    showToast('🎵 Click to enable music', 'info');
-                });
-            }
-        }
-
-        function createMysteriousAmbience() {
-            // Create Web Audio API context for mysterious sounds
-            try {
-                const audioContext = new (window.AudioContext || window.webkitAudioContext)();
-                
-                // Create mysterious ambient drone
-                function createAmbienceTone() {
-                    const oscillator = audioContext.createOscillator();
-                    const gainNode = audioContext.createGain();
-                    const filter = audioContext.createBiquadFilter();
-                    
-                    oscillator.connect(filter);
-                    filter.connect(gainNode);
-                    gainNode.connect(audioContext.destination);
-                    
-                    // Deep, mysterious frequency
-                    oscillator.frequency.setValueAtTime(60, audioContext.currentTime);
-                    oscillator.frequency.exponentialRampToValueAtTime(80, audioContext.currentTime + 20);
-                    
-                    // Low-pass filter for ethereal effect
-                    filter.type = 'lowpass';
-                    filter.frequency.setValueAtTime(200, audioContext.currentTime);
-                    filter.Q.setValueAtTime(10, audioContext.currentTime);
-                    
-                    // Very quiet, atmospheric volume
-                    gainNode.gain.setValueAtTime(0, audioContext.currentTime);
-                    gainNode.gain.linearRampToValueAtTime(0.03, audioContext.currentTime + 2);
-                    gainNode.gain.linearRampToValueAtTime(0.01, audioContext.currentTime + 15);
-                    gainNode.gain.linearRampToValueAtTime(0.03, audioContext.currentTime + 30);
-                    
-                    oscillator.type = 'sine';
-                    oscillator.start(audioContext.currentTime);
-                    oscillator.stop(audioContext.currentTime + 30);
-                    
-                    // Create another layer
-                    setTimeout(() => createAmbienceTone(), 25000);
-                }
-                
-                // Start mysterious ambience on user interaction
-                document.addEventListener('click', function startAmbience() {
-                    if (audioContext.state === 'suspended') {
-                        audioContext.resume().then(() => {
-                            createAmbienceTone();
-                        });
-                    }
-                    document.removeEventListener('click', startAmbience);
-                }, { once: true });
-                
-            } catch (error) {
-                console.log('Web Audio API not supported');
-            }
         }
 
         // FIXED: Update player display with proper formatting
@@ -3446,9 +3290,6 @@
             if (liveChallengeUpdateInterval) {
                 clearInterval(liveChallengeUpdateInterval);
             }
-            if (backgroundMusic && !backgroundMusic.paused) {
-                backgroundMusic.pause();
-            }
         });
 
         console.log('✅ JomBro Mobile App Initialized');
@@ -3463,8 +3304,6 @@
         console.log('🔴 Live challengers with round avatars active');
         console.log('📱 Horizontal slide view for live users');
         console.log('⚡ Real-time status updates every 8 seconds');
-        console.log('🌟 3-size blinking stars with passing planets');
-        console.log('🎵 Mysterious background ambience system ready');
 
     </script>
 </body>
