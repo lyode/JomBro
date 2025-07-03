@@ -23,15 +23,6 @@
             --text-secondary: rgba(255, 255, 255, 0.7);
         }
 
-        // ===== HELPER FUNCTIONS =====
-        function showHelp() {
-            showToast('❓ Help guide coming soon!');
-        }
-
-        function showNotifications() {
-            showToast('🔔 No new notifications');
-        }
-
         * {
             margin: 0;
             padding: 0;
@@ -607,7 +598,44 @@
             to { opacity: 1; transform: scale(1); }
         }
 
-        /* ===== GROUP FEATURES ===== */
+        /* ===== SOCIAL HUB FEATURES ===== */
+        .social-tab {
+            transition: all 0.2s ease;
+        }
+
+        .social-tab:hover {
+            background: rgba(255, 255, 255, 0.1) !important;
+            border-color: rgba(255, 255, 255, 0.3) !important;
+        }
+
+        .social-tab.active {
+            background: rgba(0, 255, 150, 0.2) !important;
+            border-color: var(--primary-green) !important;
+            color: var(--primary-green) !important;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .friend-card {
+            transition: all 0.2s ease;
+            cursor: pointer;
+        }
+
+        .friend-card:hover {
+            background: rgba(255, 255, 255, 0.02);
+            border-color: rgba(255, 255, 255, 0.2);
+        }
+
+        .online-indicator {
+            animation: pulse 2s infinite;
+        }
+
         .icon-selector {
             transition: all 0.2s ease;
         }
@@ -776,7 +804,7 @@
             </div>
             <div class="nav-item" onclick="navTo(this, 'groups')">
                 <div class="nav-icon">👥</div>
-                <div class="nav-label">Groups</div>
+                <div class="nav-label">Social</div>
             </div>
             <div class="nav-item" onclick="navTo(this, 'shop')">
                 <div class="nav-icon">🛍️</div>
@@ -877,28 +905,28 @@
             <div class="modal-title">👥 Social Hub</div>
             
             <!-- Social Tabs -->
-            <div style="display: flex; gap: 4px; margin-bottom: 20px; background: rgba(255, 255, 255, 0.05); border-radius: 12px; padding: 4px;">
-                <div class="social-tab active" onclick="switchSocialTab(this, 'groups')" data-tab="groups">
-                    <span>👥 Groups</span>
-                </div>
-                <div class="social-tab" onclick="switchSocialTab(this, 'friends')" data-tab="friends">
-                    <span>👫 Friends</span>
-                </div>
-                <div class="social-tab" onclick="switchSocialTab(this, 'discover')" data-tab="discover">
-                    <span>🌟 Discover</span>
-                </div>
+            <div style="display: flex; gap: 4px; margin-bottom: 20px; border-bottom: 1px solid var(--border-color); padding-bottom: 12px;">
+                <button class="social-tab active" onclick="switchSocialTab(this, 'groups')" data-tab="groups" style="flex: 1; background: rgba(0, 255, 150, 0.2); border: 1px solid var(--primary-green); color: var(--primary-green); padding: 8px 12px; border-radius: 8px; font-size: 11px; font-weight: 600; cursor: pointer; transition: all 0.2s ease;">
+                    🏆 Groups
+                </button>
+                <button class="social-tab" onclick="switchSocialTab(this, 'friends')" data-tab="friends" style="flex: 1; background: rgba(255, 255, 255, 0.05); border: 1px solid var(--border-color); color: var(--text-secondary); padding: 8px 12px; border-radius: 8px; font-size: 11px; font-weight: 600; cursor: pointer; transition: all 0.2s ease;">
+                    👫 Friends
+                </button>
+                <button class="social-tab" onclick="switchSocialTab(this, 'discover')" data-tab="discover" style="flex: 1; background: rgba(255, 255, 255, 0.05); border: 1px solid var(--border-color); color: var(--text-secondary); padding: 8px 12px; border-radius: 8px; font-size: 11px; font-weight: 600; cursor: pointer; transition: all 0.2s ease;">
+                    🌟 Discover
+                </button>
             </div>
-
+            
             <!-- Groups Tab Content -->
-            <div id="groupsTab" class="social-tab-content">
+            <div id="groupsTabContent" class="tab-content active">
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
-                    <div style="font-size: 14px; color: var(--text-secondary);">My Groups</div>
+                    <div style="font-size: 14px; color: var(--text-secondary);">My Groups (2)</div>
                     <button class="btn-primary" onclick="showModal('createGroup')" style="padding: 6px 12px; font-size: 12px;">+ Create Group</button>
                 </div>
                 
                 <div id="myGroupsList">
                     <div style="border: 1px solid var(--primary-green); border-radius: 12px; padding: 16px; margin-bottom: 12px; background: rgba(0, 255, 150, 0.05);">
-                        <div style="display: flex; justify-content: between; align-items: start; margin-bottom: 8px;">
+                        <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 8px;">
                             <div>
                                 <div style="font-weight: 600; color: var(--primary-green); margin-bottom: 4px;">🎯 Fitness Warriors</div>
                                 <div style="font-size: 12px; color: var(--text-secondary); margin-bottom: 8px;">Owner • 23 members • 5 active challenges</div>
@@ -912,7 +940,7 @@
                     </div>
                     
                     <div style="border: 1px solid var(--border-color); border-radius: 12px; padding: 16px;">
-                        <div style="display: flex; justify-content: between; align-items: start; margin-bottom: 8px;">
+                        <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 8px;">
                             <div>
                                 <div style="font-weight: 600; margin-bottom: 4px;">🏢 Office Champions</div>
                                 <div style="font-size: 12px; color: var(--text-secondary); margin-bottom: 8px;">Member • 248 members • 15 active challenges</div>
@@ -926,149 +954,162 @@
                     </div>
                 </div>
             </div>
-
+            
             <!-- Friends Tab Content -->
-            <div id="friendsTab" class="social-tab-content" style="display: none;">
+            <div id="friendsTabContent" class="tab-content" style="display: none;">
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
-                    <div style="font-size: 14px; color: var(--text-secondary);">My Friends (12)</div>
-                    <button class="btn-primary" onclick="showAddFriend()" style="padding: 6px 12px; font-size: 12px;">+ Add Friend</button>
+                    <div style="font-size: 14px; color: var(--text-secondary);">Friends (12) • <span style="color: var(--primary-green);">5 Online</span></div>
+                    <button class="btn-primary" onclick="showAddFriend()" style="padding: 6px 12px; font-size: 12px; background: var(--primary-green); color: #000;">+ Add Friend</button>
                 </div>
-
-                <!-- Friend Search -->
-                <div style="margin-bottom: 16px;">
-                    <input type="text" class="form-input" placeholder="🔍 Search friends..." style="padding: 8px 12px; font-size: 14px;">
-                </div>
-
-                <!-- Active Friends -->
-                <div style="margin-bottom: 20px;">
-                    <div style="font-size: 12px; color: var(--text-secondary); margin-bottom: 8px;">ONLINE NOW (4)</div>
-                    <div style="display: flex; gap: 8px; overflow-x: auto; padding-bottom: 8px;">
-                        <div style="min-width: 60px; text-align: center; cursor: pointer;" onclick="viewFriendProfile('alex')">
-                            <div style="width: 48px; height: 48px; border-radius: 24px; background: linear-gradient(45deg, var(--primary-green), #00d4ff); margin: 0 auto 4px; display: flex; align-items: center; justify-content: center; font-size: 20px; position: relative;">
-                                👨
-                                <div style="position: absolute; bottom: 2px; right: 2px; width: 12px; height: 12px; background: var(--primary-green); border: 2px solid var(--dark-bg); border-radius: 50%;"></div>
-                            </div>
-                            <div style="font-size: 10px; color: var(--text-secondary);">Alex</div>
+                
+                <!-- Friend Requests -->
+                <div id="friendRequestsSection" style="background: rgba(255, 179, 217, 0.1); border: 1px solid #ffb3d9; border-radius: 12px; padding: 12px; margin-bottom: 16px;">
+                    <div style="font-size: 12px; color: #ffb3d9; font-weight: 600; margin-bottom: 8px;">📬 Friend Requests (2)</div>
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                        <div style="display: flex; align-items: center; gap: 8px;">
+                            <div style="width: 24px; height: 24px; border-radius: 12px; background: linear-gradient(45deg, #ffa502, #ff6b6b); display: flex; align-items: center; justify-content: center; font-size: 12px;">🏃‍♂️</div>
+                            <div style="font-size: 12px;"><strong>alex_runner</strong> wants to be friends</div>
                         </div>
-                        <div style="min-width: 60px; text-align: center; cursor: pointer;" onclick="viewFriendProfile('maria')">
-                            <div style="width: 48px; height: 48px; border-radius: 24px; background: linear-gradient(45deg, #ff6b9d, #c44569); margin: 0 auto 4px; display: flex; align-items: center; justify-content: center; font-size: 20px; position: relative;">
-                                👩
-                                <div style="position: absolute; bottom: 2px; right: 2px; width: 12px; height: 12px; background: var(--primary-green); border: 2px solid var(--dark-bg); border-radius: 50%;"></div>
-                            </div>
-                            <div style="font-size: 10px; color: var(--text-secondary);">Maria</div>
+                        <div style="display: flex; gap: 4px;">
+                            <button style="background: var(--primary-green); color: #000; padding: 4px 8px; border-radius: 6px; font-size: 10px; border: none; cursor: pointer; font-weight: 600;" onclick="acceptFriend('alex_runner')">Accept</button>
+                            <button style="background: rgba(255, 107, 107, 0.3); color: #ff6b6b; padding: 4px 8px; border-radius: 6px; font-size: 10px; border: none; cursor: pointer;" onclick="declineFriend('alex_runner')">Decline</button>
                         </div>
-                        <div style="min-width: 60px; text-align: center; cursor: pointer;" onclick="viewFriendProfile('john')">
-                            <div style="width: 48px; height: 48px; border-radius: 24px; background: linear-gradient(45deg, #4834d4, #686de0); margin: 0 auto 4px; display: flex; align-items: center; justify-content: center; font-size: 20px; position: relative;">
-                                👨‍💼
-                                <div style="position: absolute; bottom: 2px; right: 2px; width: 12px; height: 12px; background: var(--primary-green); border: 2px solid var(--dark-bg); border-radius: 50%;"></div>
-                            </div>
-                            <div style="font-size: 10px; color: var(--text-secondary);">John</div>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <div style="display: flex; align-items: center; gap: 8px;">
+                            <div style="width: 24px; height: 24px; border-radius: 12px; background: linear-gradient(45deg, #5352ed, #70a1ff); display: flex; align-items: center; justify-content: center; font-size: 12px;">🌟</div>
+                            <div style="font-size: 12px;"><strong>sarah_explorer</strong> wants to be friends</div>
                         </div>
-                        <div style="min-width: 60px; text-align: center; cursor: pointer;" onclick="viewFriendProfile('lisa')">
-                            <div style="width: 48px; height: 48px; border-radius: 24px; background: linear-gradient(45deg, #f8b500, #fbc531); margin: 0 auto 4px; display: flex; align-items: center; justify-content: center; font-size: 20px; position: relative;">
-                                👩‍🎨
-                                <div style="position: absolute; bottom: 2px; right: 2px; width: 12px; height: 12px; background: var(--primary-green); border: 2px solid var(--dark-bg); border-radius: 50%;"></div>
-                            </div>
-                            <div style="font-size: 10px; color: var(--text-secondary);">Lisa</div>
+                        <div style="display: flex; gap: 4px;">
+                            <button style="background: var(--primary-green); color: #000; padding: 4px 8px; border-radius: 6px; font-size: 10px; border: none; cursor: pointer; font-weight: 600;" onclick="acceptFriend('sarah_explorer')">Accept</button>
+                            <button style="background: rgba(255, 107, 107, 0.3); color: #ff6b6b; padding: 4px 8px; border-radius: 6px; font-size: 10px; border: none; cursor: pointer;" onclick="declineFriend('sarah_explorer')">Decline</button>
                         </div>
                     </div>
                 </div>
-
-                <!-- Friend Activity Feed -->
-                <div style="margin-bottom: 20px;">
-                    <div style="font-size: 12px; color: var(--text-secondary); margin-bottom: 12px;">RECENT ACTIVITY</div>
+                
+                <!-- Friends List -->
+                <div id="friendsList">
+                    <!-- Best Friend -->
+                    <div class="friend-card" style="border: 2px solid var(--primary-green); border-radius: 12px; padding: 12px; margin-bottom: 8px; background: rgba(0, 255, 150, 0.05); position: relative;">
+                        <div style="position: absolute; top: 8px; right: 8px; background: #ffd700; color: #000; padding: 2px 6px; border-radius: 6px; font-size: 9px; font-weight: 600;">BEST FRIEND</div>
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <div style="display: flex; align-items: center; gap: 12px;">
+                                <div style="position: relative;">
+                                    <div style="width: 36px; height: 36px; border-radius: 18px; background: linear-gradient(45deg, var(--primary-green), #00d4ff); display: flex; align-items: center; justify-content: center; font-size: 18px;">👨‍💼</div>
+                                    <div class="online-indicator" style="position: absolute; bottom: -2px; right: -2px; width: 12px; height: 12px; background: var(--primary-green); border: 2px solid var(--dark-bg); border-radius: 50%;"></div>
+                                </div>
+                                <div>
+                                    <div style="font-weight: 600; font-size: 14px; color: var(--primary-green);">mike_challenger</div>
+                                    <div style="font-size: 11px; color: var(--text-secondary);">🏆 Level 15 • Streak: 7 days • Online now</div>
+                                    <div style="font-size: 10px; color: var(--primary-green); margin-top: 2px;">💪 Completed "Coffee Shop Poetry" 2h ago</div>
+                                </div>
+                            </div>
+                            <div style="display: flex; flex-direction: column; gap: 4px;">
+                                <button style="background: #ffb3d9; color: #000; padding: 4px 12px; border-radius: 6px; font-size: 10px; border: none; cursor: pointer; font-weight: 600;" onclick="challengeFriend('mike_challenger')">Challenge</button>
+                                <button style="background: rgba(255, 255, 255, 0.1); color: var(--text-secondary); padding: 4px 12px; border-radius: 6px; font-size: 10px; border: none; cursor: pointer;">Message</button>
+                            </div>
+                        </div>
+                    </div>
                     
-                    <div style="border: 1px solid var(--border-color); border-radius: 12px; padding: 12px; margin-bottom: 8px;">
-                        <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 6px;">
-                            <div style="width: 32px; height: 32px; border-radius: 16px; background: linear-gradient(45deg, var(--primary-green), #00d4ff); display: flex; align-items: center; justify-content: center; font-size: 14px;">👨</div>
-                            <div>
-                                <div style="font-size: 13px; font-weight: 500;">Alex completed "Coffee Shop Poetry"</div>
-                                <div style="font-size: 11px; color: var(--text-secondary);">+500 tokens • 2 hours ago</div>
+                    <!-- Active Friends -->
+                    <div class="friend-card" style="border: 1px solid var(--border-color); border-radius: 12px; padding: 12px; margin-bottom: 8px;">
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <div style="display: flex; align-items: center; gap: 12px;">
+                                <div style="position: relative;">
+                                    <div style="width: 32px; height: 32px; border-radius: 16px; background: linear-gradient(45deg, #ff6b6b, #ffa502); display: flex; align-items: center; justify-content: center; font-size: 16px;">👩‍🎨</div>
+                                    <div class="online-indicator" style="position: absolute; bottom: -2px; right: -2px; width: 10px; height: 10px; background: var(--primary-green); border: 2px solid var(--dark-bg); border-radius: 50%;"></div>
+                                </div>
+                                <div>
+                                    <div style="font-weight: 600; font-size: 14px;">emma_creative</div>
+                                    <div style="font-size: 11px; color: var(--text-secondary);">🎨 Level 22 • In Coffee Shop Challenge</div>
+                                    <div style="font-size: 10px; color: var(--primary-green); margin-top: 2px;">🔥 5 day challenge streak!</div>
+                                </div>
                             </div>
-                        </div>
-                        <div style="display: flex; gap: 6px;">
-                            <button style="background: rgba(0, 255, 150, 0.2); border: 1px solid var(--primary-green); color: var(--primary-green); padding: 4px 8px; border-radius: 6px; font-size: 10px; cursor: pointer;">👍 Like</button>
-                            <button style="background: rgba(255, 179, 217, 0.2); border: 1px solid #ffb3d9; color: #ffb3d9; padding: 4px 8px; border-radius: 6px; font-size: 10px; cursor: pointer;">🚀 Try This</button>
+                            <div style="display: flex; gap: 6px;">
+                                <button style="background: #ffb3d9; color: #000; padding: 4px 8px; border-radius: 6px; font-size: 10px; border: none; cursor: pointer; font-weight: 600;" onclick="challengeFriend('emma_creative')">Challenge</button>
+                                <button style="background: rgba(255, 255, 255, 0.1); color: var(--text-secondary); padding: 4px 8px; border-radius: 6px; font-size: 10px; border: none; cursor: pointer;">View</button>
+                            </div>
                         </div>
                     </div>
-
-                    <div style="border: 1px solid var(--border-color); border-radius: 12px; padding: 12px; margin-bottom: 8px;">
-                        <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 6px;">
-                            <div style="width: 32px; height: 32px; border-radius: 16px; background: linear-gradient(45deg, #ff6b9d, #c44569); display: flex; align-items: center; justify-content: center; font-size: 14px;">👩</div>
-                            <div>
-                                <div style="font-size: 13px; font-weight: 500;">Maria created "City Art Hunt"</div>
-                                <div style="font-size: 11px; color: var(--text-secondary);">1,200 tokens • 5 hours ago</div>
+                    
+                    <div class="friend-card" style="border: 1px solid var(--border-color); border-radius: 12px; padding: 12px; margin-bottom: 8px;">
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <div style="display: flex; align-items: center; gap: 12px;">
+                                <div style="position: relative;">
+                                    <div style="width: 32px; height: 32px; border-radius: 16px; background: linear-gradient(45deg, #2ed573, #1e90ff); display: flex; align-items: center; justify-content: center; font-size: 16px;">🏃‍♀️</div>
+                                    <div class="online-indicator" style="position: absolute; bottom: -2px; right: -2px; width: 10px; height: 10px; background: var(--primary-green); border: 2px solid var(--dark-bg); border-radius: 50%;"></div>
+                                </div>
+                                <div>
+                                    <div style="font-weight: 600; font-size: 14px;">lisa_runner</div>
+                                    <div style="font-size: 11px; color: var(--text-secondary);">💪 Level 19 • Creating challenge...</div>
+                                    <div style="font-size: 10px; color: #ffa502; margin-top: 2px;">⭐ Just earned "Marathon Master" badge</div>
+                                </div>
                             </div>
-                        </div>
-                        <div style="display: flex; gap: 6px;">
-                            <button style="background: rgba(255, 179, 217, 0.2); border: 1px solid #ffb3d9; color: #ffb3d9; padding: 4px 8px; border-radius: 6px; font-size: 10px; cursor: pointer;">🚀 Accept</button>
-                            <button style="background: rgba(255, 255, 255, 0.1); border: 1px solid var(--border-color); color: var(--text-secondary); padding: 4px 8px; border-radius: 6px; font-size: 10px; cursor: pointer;">📤 Share</button>
+                            <div style="display: flex; gap: 6px;">
+                                <button style="background: #ffb3d9; color: #000; padding: 4px 8px; border-radius: 6px; font-size: 10px; border: none; cursor: pointer; font-weight: 600;" onclick="challengeFriend('lisa_runner')">Challenge</button>
+                                <button style="background: rgba(255, 255, 255, 0.1); color: var(--text-secondary); padding: 4px 8px; border-radius: 6px; font-size: 10px; border: none; cursor: pointer;">View</button>
+                            </div>
                         </div>
                     </div>
-
-                    <div style="border: 1px solid var(--border-color); border-radius: 12px; padding: 12px;">
-                        <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 6px;">
-                            <div style="width: 32px; height: 32px; border-radius: 16px; background: linear-gradient(45deg, #4834d4, #686de0); display: flex; align-items: center; justify-content: center; font-size: 14px;">👨‍💼</div>
-                            <div>
-                                <div style="font-size: 13px; font-weight: 500;">John earned "Fitness Master" badge</div>
-                                <div style="font-size: 11px; color: var(--text-secondary);">1 day ago</div>
+                    
+                    <!-- Offline Friends -->
+                    <div class="friend-card" style="border: 1px solid var(--border-color); border-radius: 12px; padding: 12px; margin-bottom: 8px; opacity: 0.7;">
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <div style="display: flex; align-items: center; gap: 12px;">
+                                <div style="position: relative;">
+                                    <div style="width: 32px; height: 32px; border-radius: 16px; background: linear-gradient(45deg, #5352ed, #70a1ff); display: flex; align-items: center; justify-content: center; font-size: 16px;">👨‍🚀</div>
+                                    <div style="position: absolute; bottom: -2px; right: -2px; width: 10px; height: 10px; background: rgba(255, 255, 255, 0.3); border: 2px solid var(--dark-bg); border-radius: 50%;"></div>
+                                </div>
+                                <div>
+                                    <div style="font-weight: 600; font-size: 14px;">david_explorer</div>
+                                    <div style="font-size: 11px; color: var(--text-secondary);">🌍 Level 18 • Last seen 2 hours ago</div>
+                                    <div style="font-size: 10px; color: var(--text-secondary); margin-top: 2px;">Last challenge: "Random Menu Adventure"</div>
+                                </div>
                             </div>
-                        </div>
-                        <div style="display: flex; gap: 6px;">
-                            <button style="background: rgba(0, 255, 150, 0.2); border: 1px solid var(--primary-green); color: var(--primary-green); padding: 4px 8px; border-radius: 6px; font-size: 10px; cursor: pointer;">🎉 Congrats</button>
+                            <div style="display: flex; gap: 6px;">
+                                <button style="background: rgba(255, 179, 217, 0.3); color: #ffb3d9; padding: 4px 8px; border-radius: 6px; font-size: 10px; border: none; cursor: pointer; opacity: 0.7;" onclick="challengeFriend('david_explorer')">Challenge</button>
+                                <button style="background: rgba(255, 255, 255, 0.1); color: var(--text-secondary); padding: 4px 8px; border-radius: 6px; font-size: 10px; border: none; cursor: pointer;">View</button>
+                            </div>
                         </div>
                     </div>
                 </div>
-
-                <!-- Friend Challenges -->
-                <div style="background: rgba(255, 179, 217, 0.05); border: 1px solid rgba(255, 179, 217, 0.2); border-radius: 12px; padding: 12px;">
-                    <div style="color: #ffb3d9; font-weight: 600; margin-bottom: 8px;">🎯 Challenge Friends</div>
-                    <div style="color: var(--text-secondary); font-size: 12px; margin-bottom: 8px;">Send the current challenge to your friends!</div>
-                    <button style="background: #ffb3d9; color: #000; padding: 6px 12px; border-radius: 6px; font-size: 11px; font-weight: 600; border: none; cursor: pointer;" onclick="challengeFriends()">📤 Send to Friends</button>
+                
+                <!-- Quick Actions -->
+                <div style="background: rgba(0, 255, 150, 0.05); border: 1px solid var(--primary-green); border-radius: 12px; padding: 12px; margin-top: 16px;">
+                    <div style="font-size: 12px; color: var(--primary-green); font-weight: 600; margin-bottom: 8px;">⚡ Quick Actions</div>
+                    <div style="display: flex; gap: 8px;">
+                        <button style="background: rgba(255, 179, 217, 0.2); border: 1px solid #ffb3d9; color: #ffb3d9; padding: 6px 12px; border-radius: 8px; font-size: 11px; cursor: pointer; font-weight: 600;" onclick="challengeAllFriends()">Challenge All Online</button>
+                        <button style="background: rgba(255, 255, 255, 0.1); border: 1px solid var(--border-color); color: var(--text-secondary); padding: 6px 12px; border-radius: 8px; font-size: 11px; cursor: pointer;" onclick="inviteFriends()">Invite More Friends</button>
+                    </div>
                 </div>
             </div>
-
+            
             <!-- Discover Tab Content -->
-            <div id="discoverTab" class="social-tab-content" style="display: none;">
-                <div style="font-size: 14px; color: var(--text-secondary); margin-bottom: 16px;">Find New Connections</div>
+            <div id="discoverTabContent" class="tab-content" style="display: none;">
+                <div style="font-size: 14px; color: var(--text-secondary); margin-bottom: 16px;">Discover New Groups & Friends</div>
                 
                 <!-- Suggested Friends -->
                 <div style="margin-bottom: 20px;">
-                    <div style="font-size: 12px; color: var(--text-secondary); margin-bottom: 12px;">SUGGESTED FRIENDS</div>
-                    
+                    <div style="font-size: 13px; font-weight: 600; margin-bottom: 12px; color: var(--text-primary);">👫 Suggested Friends</div>
                     <div style="border: 1px solid var(--border-color); border-radius: 12px; padding: 12px; margin-bottom: 8px;">
                         <div style="display: flex; justify-content: space-between; align-items: center;">
-                            <div style="display: flex; align-items: center; gap: 10px;">
-                                <div style="width: 40px; height: 40px; border-radius: 20px; background: linear-gradient(45deg, #ff9ff3, #f368e0); display: flex; align-items: center; justify-content: center; font-size: 18px;">👩‍💻</div>
+                            <div style="display: flex; align-items: center; gap: 12px;">
+                                <div style="width: 32px; height: 32px; border-radius: 16px; background: linear-gradient(45deg, #ffa502, #ff6b6b); display: flex; align-items: center; justify-content: center; font-size: 16px;">👩‍💻</div>
                                 <div>
-                                    <div style="font-weight: 500; margin-bottom: 2px;">Sarah Chen</div>
-                                    <div style="font-size: 11px; color: var(--text-secondary);">Mutual: Alex, Maria • 847 tokens</div>
+                                    <div style="font-weight: 600; font-size: 14px;">lisa_coder</div>
+                                    <div style="font-size: 11px; color: var(--text-secondary);">💻 Level 19 • 5 mutual friends</div>
                                 </div>
                             </div>
-                            <button style="background: var(--primary-green); color: #000; padding: 6px 12px; border-radius: 6px; font-size: 11px; font-weight: 600; border: none; cursor: pointer;" onclick="addFriend('sarah')">+ Add</button>
-                        </div>
-                    </div>
-
-                    <div style="border: 1px solid var(--border-color); border-radius: 12px; padding: 12px;">
-                        <div style="display: flex; justify-content: space-between; align-items: center;">
-                            <div style="display: flex; align-items: center; gap: 10px;">
-                                <div style="width: 40px; height: 40px; border-radius: 20px; background: linear-gradient(45deg, #55a3ff, #3742fa); display: flex; align-items: center; justify-content: center; font-size: 18px;">👨‍🚀</div>
-                                <div>
-                                    <div style="font-weight: 500; margin-bottom: 2px;">Mike Rodriguez</div>
-                                    <div style="font-size: 11px; color: var(--text-secondary);">From: Fitness Warriors • 1,203 tokens</div>
-                                </div>
-                            </div>
-                            <button style="background: var(--primary-green); color: #000; padding: 6px 12px; border-radius: 6px; font-size: 11px; font-weight: 600; border: none; cursor: pointer;" onclick="addFriend('mike')">+ Add</button>
+                            <button style="background: var(--primary-green); color: #000; padding: 4px 12px; border-radius: 6px; font-size: 11px; border: none; cursor: pointer; font-weight: 600;" onclick="sendFriendRequest('lisa_coder')">Add Friend</button>
                         </div>
                     </div>
                 </div>
-
+                
                 <!-- Discover Groups -->
                 <div>
-                    <div style="font-size: 12px; color: var(--text-secondary); margin-bottom: 12px;">DISCOVER GROUPS</div>
-                    
+                    <div style="font-size: 13px; font-weight: 600; margin-bottom: 12px; color: var(--text-primary);">🌟 Trending Groups</div>
                     <div style="border: 1px solid var(--border-color); border-radius: 12px; padding: 16px; margin-bottom: 12px;">
-                        <div style="display: flex; justify-content: between; align-items: start; margin-bottom: 8px;">
+                        <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 8px;">
                             <div>
                                 <div style="font-weight: 600; margin-bottom: 4px;">🎨 Creative Minds</div>
                                 <div style="font-size: 12px; color: var(--text-secondary); margin-bottom: 8px;">89 members • 8 active challenges</div>
@@ -1079,7 +1120,7 @@
                     </div>
                     
                     <div style="border: 1px solid var(--border-color); border-radius: 12px; padding: 16px;">
-                        <div style="display: flex; justify-content: between; align-items: start; margin-bottom: 8px;">
+                        <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 8px;">
                             <div>
                                 <div style="font-weight: 600; margin-bottom: 4px;">🌍 World Explorers</div>
                                 <div style="font-size: 12px; color: var(--text-secondary); margin-bottom: 8px;">342 members • 12 active challenges</div>
@@ -1091,7 +1132,7 @@
                 </div>
             </div>
             
-            <button class="btn-secondary" onclick="hideModal('groups')" style="margin-top: 16px;">Close</button>
+            <button class="btn-secondary" onclick="hideModal('groups')" style="margin-top: 20px;">Close</button>
         </div>
     </div>
 
@@ -1280,6 +1321,43 @@
             { name: 'Emma', avatar: '👩‍🔬', status: 'online' }
         ];
 
+        // ===== ENHANCED SOCIAL HUB SYSTEM =====
+        let friendsData = {
+            friends: [
+                { id: 'mike_challenger', name: 'mike_challenger', level: 15, status: 'online', avatar: '👨‍💼', isBestFriend: true, streak: 7, lastChallenge: 'Coffee Shop Poetry', lastSeen: 'now' },
+                { id: 'emma_creative', name: 'emma_creative', level: 22, status: 'online', avatar: '👩‍🎨', streak: 5, lastChallenge: 'In Coffee Shop Challenge', lastSeen: 'now' },
+                { id: 'lisa_runner', name: 'lisa_runner', level: 19, status: 'online', avatar: '🏃‍♀️', badge: 'Marathon Master', lastChallenge: 'Creating challenge...', lastSeen: 'now' },
+                { id: 'david_explorer', name: 'david_explorer', level: 18, status: 'offline', avatar: '👨‍🚀', lastChallenge: 'Random Menu Adventure', lastSeen: '2 hours ago' }
+            ],
+            requests: [
+                { id: 'alex_runner', name: 'alex_runner', avatar: '🏃‍♂️' },
+                { id: 'sarah_explorer', name: 'sarah_explorer', avatar: '🌟' }
+            ]
+        };
+
+        // Group management data
+        let selectedGroupIcon = '🎯';
+        let userGroups = [
+            {
+                id: 'fitness_warriors',
+                name: 'Fitness Warriors',
+                icon: '🎯',
+                members: 23,
+                challenges: 5,
+                role: 'admin',
+                description: 'Daily fitness challenges for warriors'
+            },
+            {
+                id: 'office_champions',
+                name: 'Office Champions',
+                icon: '🏢',
+                members: 248,
+                challenges: 15,
+                role: 'member',
+                description: 'Workplace challenges and team building'
+            }
+        ];
+
         // ===== UTILITY FUNCTIONS =====
         function showToast(message, isError = false) {
             const toast = document.getElementById('toast');
@@ -1298,6 +1376,15 @@
 
         function hideModal(id) {
             document.getElementById(id + 'Modal').classList.remove('show');
+        }
+
+        // ===== HELPER FUNCTIONS =====
+        function showHelp() {
+            showToast('❓ Help guide coming soon!');
+        }
+
+        function showNotifications() {
+            showToast('🔔 No new notifications');
         }
 
         // ===== LIVE PLAYERS DISPLAY =====
@@ -1486,110 +1573,119 @@
             document.getElementById('newDesc').value = '';
         }
 
-        // ===== NAVIGATION =====
-        function navTo(element, section) {
-            document.querySelectorAll('.nav-item').forEach(item => 
-                item.classList.remove('active')
-            );
+        // ===== SOCIAL TAB SWITCHING =====
+        function switchSocialTab(element, tab) {
+            // Update tab buttons
+            document.querySelectorAll('.social-tab').forEach(btn => {
+                btn.classList.remove('active');
+                btn.style.background = 'rgba(255, 255, 255, 0.05)';
+                btn.style.borderColor = 'var(--border-color)';
+                btn.style.color = 'var(--text-secondary)';
+            });
+            
             element.classList.add('active');
+            element.style.background = 'rgba(0, 255, 150, 0.2)';
+            element.style.borderColor = 'var(--primary-green)';
+            element.style.color = 'var(--primary-green)';
             
-            switch(section) {
-                case 'home':
-                    showToast('🏠 Home');
-                    break;
-                case 'ranks':
-                    showToast('🏆 Leaderboard coming soon!');
-                    break;
-                case 'challenges':
-                    showModal('create');
-                    break;
-                case 'create':
-                    showModal('create');
-                    break;
-                case 'groups':
-                    showModal('groups');
-                    break;
-                case 'shop':
-                    showToast('🛍️ Token shop coming soon!');
-                    break;
-                case 'profile':
-                    showToast('👤 Profile page coming soon!');
-                    break;
-                default:
-                    showToast(`📱 ${section}`);
-            }
-        }
-
-        // ===== SETTINGS =====
-        function saveSettings() {
-            const name = document.getElementById('displayName').value;
-            const username = document.getElementById('username').value;
+            // Show/hide content
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.style.display = 'none';
+            });
             
-            if (name.trim()) player.name = name.trim();
-            if (username.trim()) player.username = username.trim();
+            document.getElementById(tab + 'TabContent').style.display = 'block';
+        }
+
+        // ===== FRIEND REQUEST MANAGEMENT =====
+        function acceptFriend(username) {
+            showToast(`🎉 ${username} is now your friend!`);
             
-            updatePlayerSlogan(); // Update slogan with new name
-            hideModal('settings');
-            showToast('⚙️ Settings saved!');
+            // Remove from requests and add to friends
+            friendsData.requests = friendsData.requests.filter(req => req.id !== username);
+            
+            // Add to friends list
+            const newFriend = {
+                id: username,
+                name: username,
+                level: Math.floor(Math.random() * 20) + 10,
+                status: 'online',
+                avatar: username.includes('alex') ? '🏃‍♂️' : '🌟',
+                lastSeen: 'now'
+            };
+            
+            friendsData.friends.push(newFriend);
+            updateFriendRequestsDisplay();
         }
 
-        // ===== PLAYER DISPLAY =====
-        function updatePlayerDisplay() {
-            document.getElementById('playerTokens').textContent = player.tokens.toLocaleString();
-            updatePlayerSlogan();
+        function declineFriend(username) {
+            showToast(`👋 Friend request from ${username} declined`);
+            friendsData.requests = friendsData.requests.filter(req => req.id !== username);
+            updateFriendRequestsDisplay();
         }
 
-        function updatePlayerSlogan() {
-            const sloganElement = document.getElementById('logoSlogan');
-            if (sloganElement) {
-                sloganElement.textContent = `Let's Go! ${player.name}`;
+        function updateFriendRequestsDisplay() {
+            const requestsSection = document.getElementById('friendRequestsSection');
+            if (friendsData.requests.length === 0) {
+                requestsSection.style.display = 'none';
+            } else {
+                const countElement = requestsSection.querySelector('div[style*="color: #ffb3d9"]');
+                if (countElement) {
+                    countElement.textContent = `📬 Friend Requests (${friendsData.requests.length})`;
+                }
             }
         }
 
-        // ===== ONBOARDING =====
-        function checkFirstTime() {
-            const hasVisited = localStorage.getItem('jombro_visited');
-            if (!hasVisited) {
-                setTimeout(() => showModal('welcome'), 1000);
+        // ===== FRIEND INTERACTIONS =====
+        function challengeFriend(username) {
+            const friend = friendsData.friends.find(f => f.id === username);
+            if (friend) {
+                if (friend.status === 'online') {
+                    showToast(`🏆 Challenge sent to ${username}!`);
+                    
+                    // Simulate friend accepting challenge
+                    setTimeout(() => {
+                        showToast(`💪 ${username} accepted your challenge!`);
+                    }, 2000);
+                } else {
+                    showToast(`📱 Challenge will be sent when ${username} comes online`);
+                }
             }
         }
 
-        function startJourney() {
-            localStorage.setItem('jombro_visited', 'true');
-            player.tokens += 1000;
-            updatePlayerDisplay();
-            hideModal('welcome');
-            showToast('🎉 Welcome bonus: +1,000 tokens!');
+        function challengeAllFriends() {
+            const onlineFriends = friendsData.friends.filter(f => f.status === 'online');
+            showToast(`🚀 Challenge sent to ${onlineFriends.length} online friends!`);
+            
+            setTimeout(() => {
+                showToast(`💪 ${Math.floor(onlineFriends.length * 0.7)} friends accepted your challenge!`);
+            }, 3000);
         }
 
-        function skipWelcome() {
-            localStorage.setItem('jombro_visited', 'true');
-            hideModal('welcome');
-        }
-
-        // ===== ENHANCED GROUP MANAGEMENT =====
-        let selectedGroupIcon = '🎯';
-        let userGroups = [
-            {
-                id: 'fitness_warriors',
-                name: 'Fitness Warriors',
-                icon: '🎯',
-                members: 23,
-                challenges: 5,
-                role: 'admin',
-                description: 'Daily fitness challenges for warriors'
-            },
-            {
-                id: 'office_champions',
-                name: 'Office Champions',
-                icon: '🏢',
-                members: 248,
-                challenges: 15,
-                role: 'member',
-                description: 'Workplace challenges and team building'
+        function inviteFriends() {
+            if (navigator.share) {
+                navigator.share({
+                    title: 'Join me on JomBro!',
+                    text: 'Complete real-world challenges and earn tokens with me on JomBro! 🚀',
+                    url: window.location.href
+                }).then(() => showToast('📤 Invite sent!'))
+                .catch(() => showToast('📤 Invite link copied!'));
+            } else {
+                showToast('📤 Invite link copied to clipboard!');
             }
-        ];
+        }
 
+        function showAddFriend() {
+            const username = prompt('Enter username to add as friend:');
+            if (username && username.trim()) {
+                showToast(`📨 Friend request sent to ${username.trim()}!`);
+            }
+        }
+
+        function sendFriendRequest(username) {
+            showToast(`📨 Friend request sent to ${username}!`);
+        }
+
+        // ===== GROUP MANAGEMENT =====
         function selectGroupIcon(icon) {
             selectedGroupIcon = icon;
             document.getElementById('selectedGroupIcon').value = icon;
@@ -1686,6 +1782,87 @@
 
         function viewGroupChallenges(groupId) {
             showToast('📋 Group challenges coming soon!');
+        }
+
+        // ===== NAVIGATION =====
+        function navTo(element, section) {
+            document.querySelectorAll('.nav-item').forEach(item => 
+                item.classList.remove('active')
+            );
+            element.classList.add('active');
+            
+            switch(section) {
+                case 'home':
+                    showToast('🏠 Home');
+                    break;
+                case 'ranks':
+                    showToast('🏆 Leaderboard coming soon!');
+                    break;
+                case 'challenges':
+                    showModal('create');
+                    break;
+                case 'create':
+                    showModal('create');
+                    break;
+                case 'groups':
+                    showModal('groups');
+                    break;
+                case 'shop':
+                    showToast('🛍️ Token shop coming soon!');
+                    break;
+                case 'profile':
+                    showToast('👤 Profile page coming soon!');
+                    break;
+                default:
+                    showToast(`📱 ${section}`);
+            }
+        }
+
+        // ===== SETTINGS =====
+        function saveSettings() {
+            const name = document.getElementById('displayName').value;
+            const username = document.getElementById('username').value;
+            
+            if (name.trim()) player.name = name.trim();
+            if (username.trim()) player.username = username.trim();
+            
+            updatePlayerSlogan(); // Update slogan with new name
+            hideModal('settings');
+            showToast('⚙️ Settings saved!');
+        }
+
+        // ===== PLAYER DISPLAY =====
+        function updatePlayerDisplay() {
+            document.getElementById('playerTokens').textContent = player.tokens.toLocaleString();
+            updatePlayerSlogan();
+        }
+
+        function updatePlayerSlogan() {
+            const sloganElement = document.getElementById('logoSlogan');
+            if (sloganElement) {
+                sloganElement.textContent = `Let's Go! ${player.name}`;
+            }
+        }
+
+        // ===== ONBOARDING =====
+        function checkFirstTime() {
+            const hasVisited = localStorage.getItem('jombro_visited');
+            if (!hasVisited) {
+                setTimeout(() => showModal('welcome'), 1000);
+            }
+        }
+
+        function startJourney() {
+            localStorage.setItem('jombro_visited', 'true');
+            player.tokens += 1000;
+            updatePlayerDisplay();
+            hideModal('welcome');
+            showToast('🎉 Welcome bonus: +1,000 tokens!');
+        }
+
+        function skipWelcome() {
+            localStorage.setItem('jombro_visited', 'true');
+            hideModal('welcome');
         }
 
         // ===== TOUCH GESTURES =====
