@@ -1927,13 +1927,18 @@
                 <div>JomBro</div>
                 <div class="dark-slogan">Let's Go! Let's Go!</div>
             </div>
-            <div class="dark-header-icons">
-                <div class="round-btn" onclick="showHowToPlay()" title="How to Play">❓</div>
-                <div class="round-btn" onclick="showLiveActivity()" title="Live Activity">⚡</div>
-                <div class="round-btn" onclick="showModal('create')" title="Create Challenge">➕</div>
-                <div class="round-btn" onclick="showModal('groups')" title="Groups">👥</div>
-                <div class="round-btn" onclick="showNotifications()" title="Notifications">🔔</div>
-                <div class="round-btn" onclick="showModal('settings')" title="Settings">⚙️</div>
+            <div style="display: flex; align-items: center; gap: 12px;">
+                <div id="challengeCounter" style="background: rgba(0, 255, 150, 0.2); border: 1px solid rgba(0, 255, 150, 0.5); color: #00FF96; padding: 6px 12px; border-radius: 12px; font-size: 12px; font-weight: 600;">
+                    1/5
+                </div>
+                <div class="dark-header-icons">
+                    <div class="round-btn" onclick="showHowToPlay()" title="How to Play">❓</div>
+                    <div class="round-btn" onclick="showLiveActivity()" title="Live Activity">⚡</div>
+                    <div class="round-btn" onclick="showModal('create')" title="Create Challenge">➕</div>
+                    <div class="round-btn" onclick="showModal('groups')" title="Groups">👥</div>
+                    <div class="round-btn" onclick="showNotifications()" title="Notifications">🔔</div>
+                    <div class="round-btn" onclick="showModal('settings')" title="Settings">⚙️</div>
+                </div>
             </div>
         </div>
 
@@ -2317,7 +2322,7 @@
             cloudinaryApiSecret: ''
         };
 
-        // Enhanced load settings from localStorage
+        // Enhanced load settings with proper validation
         function loadSettings() {
             try {
                 const saved = localStorage.getItem('jombro_settings');
@@ -2326,77 +2331,138 @@
                     appSettings = { ...appSettings, ...savedSettings };
                 }
                 
-                // Apply saved settings to UI
-                document.getElementById('userDisplayName').value = appSettings.displayName;
-                document.getElementById('userUsername').value = appSettings.username;
-                document.getElementById('avatarStyle').value = appSettings.avatarStyle;
+                // Apply saved settings to UI elements (with validation)
+                const settingsMapping = {
+                    'userDisplayName': appSettings.displayName,
+                    'userUsername': appSettings.username,
+                    'avatarStyle': appSettings.avatarStyle,
+                    'backgroundTheme': appSettings.backgroundTheme,
+                    'animationSpeed': appSettings.animationSpeed,
+                    'difficultyFilter': appSettings.difficultyFilter,
+                    'profileVisibility': appSettings.profileVisibility,
+                    'openaiApiKey': appSettings.openaiApiKey
+                };
                 
-                document.getElementById('notifyNewChallenges').checked = appSettings.notifyNewChallenges;
-                document.getElementById('notifyReminders').checked = appSettings.notifyReminders;
-                document.getElementById('notifyAchievements').checked = appSettings.notifyAchievements;
-                document.getElementById('notifyFriends').checked = appSettings.notifyFriends;
+                Object.entries(settingsMapping).forEach(([elementId, value]) => {
+                    const element = document.getElementById(elementId);
+                    if (element) {
+                        element.value = value;
+                    }
+                });
                 
-                document.getElementById('profileVisibility').value = appSettings.profileVisibility;
-                document.getElementById('showRealName').checked = appSettings.showRealName;
-                document.getElementById('locationTracking').checked = appSettings.locationTracking;
+                // Handle checkboxes separately
+                const checkboxMapping = {
+                    'notifyNewChallenges': appSettings.notifyNewChallenges,
+                    'notifyReminders': appSettings.notifyReminders,
+                    'notifyAchievements': appSettings.notifyAchievements,
+                    'notifyFriends': appSettings.notifyFriends,
+                    'showRealName': appSettings.showRealName,
+                    'locationTracking': appSettings.locationTracking
+                };
                 
-                document.getElementById('backgroundTheme').value = appSettings.backgroundTheme;
-                document.getElementById('animationSpeed').value = appSettings.animationSpeed;
-                document.getElementById('difficultyFilter').value = appSettings.difficultyFilter;
-                
-                if (appSettings.openaiApiKey) {
-                    document.getElementById('openaiApiKey').value = appSettings.openaiApiKey;
-                }
+                Object.entries(checkboxMapping).forEach(([elementId, value]) => {
+                    const element = document.getElementById(elementId);
+                    if (element) {
+                        element.checked = value;
+                    }
+                });
                 
                 // Apply visual settings
                 applyBackgroundTheme(appSettings.backgroundTheme);
                 applyAnimationSpeed(appSettings.animationSpeed);
                 updatePlayerName();
                 
+                console.log('Settings loaded successfully');
+                
             } catch (error) {
                 console.error('Error loading settings:', error);
+                showToast('⚠️ Settings loading failed, using defaults', true);
             }
         }
 
-        // Enhanced save settings to localStorage
+        // Enhanced save settings with validation
         function saveSettings() {
-            // Update settings object
-            appSettings.displayName = document.getElementById('userDisplayName').value;
-            appSettings.username = document.getElementById('userUsername').value;
-            appSettings.avatarStyle = document.getElementById('avatarStyle').value;
-            
-            appSettings.notifyNewChallenges = document.getElementById('notifyNewChallenges').checked;
-            appSettings.notifyReminders = document.getElementById('notifyReminders').checked;
-            appSettings.notifyAchievements = document.getElementById('notifyAchievements').checked;
-            appSettings.notifyFriends = document.getElementById('notifyFriends').checked;
-            
-            appSettings.profileVisibility = document.getElementById('profileVisibility').value;
-            appSettings.showRealName = document.getElementById('showRealName').checked;
-            appSettings.locationTracking = document.getElementById('locationTracking').checked;
-            
-            appSettings.backgroundTheme = document.getElementById('backgroundTheme').value;
-            appSettings.animationSpeed = document.getElementById('animationSpeed').value;
-            appSettings.difficultyFilter = document.getElementById('difficultyFilter').value;
-            
-            appSettings.openaiApiKey = document.getElementById('openaiApiKey').value;
-            appSettings.cloudinaryCloudName = document.getElementById('cloudinaryCloudName').value;
-            appSettings.cloudinaryApiKey = document.getElementById('cloudinaryApiKey').value;
-            appSettings.cloudinaryApiSecret = document.getElementById('cloudinaryApiSecret').value;
-            
-            // Save to localStorage (mock for demo)
             try {
-                localStorage.setItem('jombro_settings', JSON.stringify(appSettings));
+                // Validate all form elements exist before saving
+                const requiredElements = [
+                    'userDisplayName', 'userUsername', 'avatarStyle',
+                    'backgroundTheme', 'animationSpeed', 'difficultyFilter'
+                ];
+                
+                let missingElements = [];
+                requiredElements.forEach(id => {
+                    if (!document.getElementById(id)) {
+                        missingElements.push(id);
+                    }
+                });
+                
+                if (missingElements.length > 0) {
+                    console.warn('Missing form elements:', missingElements);
+                    showToast('⚠️ Some settings could not be saved', true);
+                    return;
+                }
+                
+                // Update settings object safely
+                const displayNameEl = document.getElementById('userDisplayName');
+                const usernameEl = document.getElementById('userUsername');
+                
+                if (displayNameEl && displayNameEl.value.trim()) {
+                    appSettings.displayName = displayNameEl.value.trim();
+                }
+                
+                if (usernameEl && usernameEl.value.trim()) {
+                    appSettings.username = usernameEl.value.trim();
+                }
+                
+                // Continue with other settings...
+                const settingsToUpdate = [
+                    'avatarStyle', 'backgroundTheme', 'animationSpeed', 
+                    'difficultyFilter', 'profileVisibility', 
+                    'openaiApiKey', 'cloudinaryCloudName', 
+                    'cloudinaryApiKey', 'cloudinaryApiSecret'
+                ];
+                
+                settingsToUpdate.forEach(setting => {
+                    const element = document.getElementById(setting);
+                    if (element) {
+                        appSettings[setting] = element.value;
+                    }
+                });
+                
+                // Handle checkboxes
+                const checkboxSettings = [
+                    'notifyNewChallenges', 'notifyReminders', 'notifyAchievements',
+                    'notifyFriends', 'showRealName', 'locationTracking'
+                ];
+                
+                checkboxSettings.forEach(setting => {
+                    const element = document.getElementById(setting);
+                    if (element) {
+                        appSettings[setting] = element.checked;
+                    }
+                });
+                
+                // Save to localStorage (with error handling)
+                try {
+                    localStorage.setItem('jombro_settings', JSON.stringify(appSettings));
+                    console.log('Settings saved to localStorage');
+                } catch (storageError) {
+                    console.log('localStorage not available:', storageError);
+                }
+                
+                // Apply changes
+                applyBackgroundTheme(appSettings.backgroundTheme);
+                applyAnimationSpeed(appSettings.animationSpeed);
+                updatePlayerName();
+                updateChallengeDisplay(); // Refresh challenges with new difficulty filter
+                
+                hideModal('settings');
+                showToast('⚙️ All settings saved successfully!');
+                
             } catch (error) {
-                console.log('localStorage not available in demo environment');
+                console.error('Error saving settings:', error);
+                showToast('❌ Settings save failed!', true);
             }
-            
-            // Apply changes
-            applyBackgroundTheme(appSettings.backgroundTheme);
-            applyAnimationSpeed(appSettings.animationSpeed);
-            updatePlayerName();
-            
-            hideModal('settings');
-            showToast('⚙️ All settings saved successfully!');
         }
 
         // Reset settings to defaults
@@ -2476,23 +2542,197 @@
         let onboardingStep = 0;
         let isFirstLaunch = true;
 
-        // Enhanced initialization for beta launch
-        document.addEventListener('DOMContentLoaded', function() {
-            console.log('🚀 JomBro Beta Launch App Starting...');
+        // ===== INTERFACE VALIDATION & ERROR PREVENTION =====
+        
+        // Safe element update function
+        function safeUpdateElement(elementId, content, isHTML = false) {
+            const element = document.getElementById(elementId);
+            if (element) {
+                if (isHTML) {
+                    element.innerHTML = content;
+                } else {
+                    element.textContent = content;
+                }
+                return true;
+            } else {
+                console.warn(`Element ${elementId} not found`);
+                return false;
+            }
+        }
+
+        // Enhanced player display update with validation
+        function updatePlayerDisplay() {
+            safeUpdateElement('playerRank', playerData.rank);
+            safeUpdateElement('playerTokens', `🪙 ${playerData.tokens.toLocaleString()}`);
             
-            loadSettings();
-            generateSampleChallenges();
-            updatePlayerDisplay();
+            // Update profile elements if they exist
+            safeUpdateElement('profileDisplayName', appSettings.displayName);
+            safeUpdateElement('profileUsername', `@${appSettings.username}`);
+            safeUpdateElement('profileRankDisplay', playerData.rank);
+            safeUpdateElement('profileLevelBadge', playerData.level.toString());
+            safeUpdateElement('profileTokenCount', playerData.tokens.toLocaleString());
+            safeUpdateElement('profileChallengeCount', playerData.completedChallenges.toString());
+            safeUpdateElement('profileStreakCount', playerData.currentStreak.toString());
+        }
+
+        // Validation for challenge creation form
+        function validateChallengeForm() {
+            const title = document.getElementById('challengeTitle');
+            const description = document.getElementById('challengeDesc');
+            const points = document.getElementById('challengePoints');
+            
+            if (!title || !description || !points) {
+                console.error('Challenge form elements missing');
+                return false;
+            }
+            
+            if (!title.value.trim()) {
+                showToast('❌ Please enter a challenge title!', true);
+                return false;
+            }
+            
+            if (!description.value.trim()) {
+                showToast('❌ Please enter a challenge description!', true);
+                return false;
+            }
+            
+            return true;
+        }
+
+        // Enhanced create challenge with validation
+        function createChallenge() {
+            if (!validateChallengeForm()) return;
+            
+            const title = document.getElementById('challengeTitle').value;
+            const description = document.getElementById('challengeDesc').value;
+            const tokens = parseInt(document.getElementById('challengePoints').value);
+
+            const newChallenge = {
+                id: 'user_' + Date.now(),
+                title: title,
+                description: description,
+                hashtags: ["#UserChallenge", "#JomBro", "#Community"],
+                difficulty: tokens >= 5000 ? "epic" : tokens >= 2500 ? "hard" : "medium",
+                tokens: tokens,
+                type: "daily",
+                creator: appSettings.displayName || playerData.displayName,
+                avatar: playerData.avatar,
+                requirements: [
+                    "Complete the challenge as described",
+                    "Document your experience with photos/videos",
+                    "Share your results with the community",
+                    "Rate your overall experience"
+                ],
+                duration: "Variable"
+            };
+
+            challengeData.unshift(newChallenge);
+            currentPage = 0; // Reset to show new challenge first
             updateChallengeDisplay();
             
-            // Check if first launch
-            checkFirstLaunch();
+            hideModal('create');
+            showToast('✨ Challenge created successfully!');
             
-            // Add launch ready indicator
-            addLaunchReadyBadge();
+            // Clear form
+            safeUpdateElement('challengeTitle', '', false);
+            safeUpdateElement('challengeDesc', '', false);
+            document.getElementById('challengeTitle').value = '';
+            document.getElementById('challengeDesc').value = '';
+        }
+
+        // Validation for submission form
+        function validateSubmissionForm() {
+            const description = document.getElementById('challengeCompletionDesc');
+            const mediaFile = document.getElementById('challengeMedia');
             
-            console.log('✅ JomBro Beta Ready for Real Users!');
-        });
+            if (!description || !mediaFile) {
+                console.error('Submission form elements missing');
+                return false;
+            }
+            
+            if (!description.value.trim()) {
+                showToast('❌ Please describe what you did!', true);
+                return false;
+            }
+            
+            if (selectedRating === 0) {
+                showToast('❌ Please rate your experience!', true);
+                return false;
+            }
+            
+            return true;
+        }
+
+        // Fix modal show/hide with validation
+        function showModal(modalId) {
+            const modal = document.getElementById(modalId + 'Modal');
+            if (modal) {
+                modal.classList.add('show');
+                console.log(`Modal ${modalId} shown`);
+            } else {
+                console.error(`Modal ${modalId}Modal not found`);
+            }
+        }
+
+        function hideModal(modalId) {
+            const modal = document.getElementById(modalId + 'Modal');
+            if (modal) {
+                modal.classList.remove('show');
+                console.log(`Modal ${modalId} hidden`);
+            } else {
+                console.error(`Modal ${modalId}Modal not found`);
+            }
+        }
+
+        // Enhanced initialization with better error handling
+        function initializeApp() {
+            try {
+                console.log('🚀 JomBro Beta Launch App Starting...');
+                
+                loadSettings();
+                generateSampleChallenges();
+                updatePlayerDisplay();
+                updateChallengeDisplay();
+                
+                // Validate essential elements exist
+                const essentialElements = [
+                    'feedPages',
+                    'challengeContainer', 
+                    'playerRank',
+                    'playerTokens',
+                    'toast',
+                    'toastText'
+                ];
+                
+                let missingElements = [];
+                essentialElements.forEach(id => {
+                    if (!document.getElementById(id)) {
+                        missingElements.push(id);
+                    }
+                });
+                
+                if (missingElements.length > 0) {
+                    console.warn('Missing elements:', missingElements);
+                } else {
+                    console.log('✅ All essential elements found');
+                }
+                
+                // Check if first launch
+                checkFirstLaunch();
+                
+                // Add launch ready indicator
+                addLaunchReadyBadge();
+                
+                console.log('✅ JomBro Beta Ready for Real Users!');
+                
+            } catch (error) {
+                console.error('Initialization error:', error);
+                showToast('⚠️ App initialization error. Please refresh the page.', true);
+            }
+        }
+
+        // Replace the DOMContentLoaded listener
+        document.addEventListener('DOMContentLoaded', initializeApp);
 
         // Check if this is the user's first launch
         function checkFirstLaunch() {
@@ -2777,20 +3017,20 @@
             document.getElementById('challengePage').classList.add('show');
         }
 
-        // Enhanced submission for real launch
+        // Enhanced submission with comprehensive validation
         async function submitChallengeCompletion() {
+            // Validate form before proceeding
+            if (!validateSubmissionForm()) {
+                return;
+            }
+            
+            if (!currentChallenge) {
+                showToast('❌ No active challenge found!', true);
+                return;
+            }
+            
             const description = document.getElementById('challengeCompletionDesc').value;
             const mediaFile = document.getElementById('challengeMedia').files[0];
-
-            if (!description.trim()) {
-                showToast('❌ Please describe what you did!', true);
-                return;
-            }
-
-            if (selectedRating === 0) {
-                showToast('❌ Please rate your experience!', true);
-                return;
-            }
 
             // Launch analytics
             console.log('Challenge Submission:', {
@@ -2813,6 +3053,14 @@
                 } else {
                     // Enhanced mock review for beta
                     reviewResult = generateMockReview(description);
+                }
+                
+                // Ensure player data is properly updated
+                if (typeof playerData.tokens !== 'number') {
+                    playerData.tokens = 15247; // Reset to default if corrupted
+                }
+                if (typeof playerData.completedChallenges !== 'number') {
+                    playerData.completedChallenges = 143; // Reset to default if corrupted
                 }
                 
                 // Award tokens
@@ -2877,7 +3125,139 @@
 
         // Generate sample challenges with complete descriptions
         function generateSampleChallenges() {
-            challengeData = [
+            challengeData = generateAllChallenges();
+            console.log(`Generated ${challengeData.length} challenges`);
+        }
+
+        // Update player display
+        function updatePlayerDisplay() {
+            document.getElementById('playerRank').textContent = playerData.rank;
+            document.getElementById('playerTokens').textContent = `🪙 ${playerData.tokens.toLocaleString()}`;
+        }
+
+        // ===== INTERFACE VALIDATION & NUMBERING FIXES =====
+        
+        // Fix challenge numbering and display
+        function updateCurrentChallenge() {
+            const cards = document.querySelectorAll('.challenge-card');
+            const totalChallenges = challengeData.length;
+            
+            // Ensure currentPage is within bounds
+            if (currentPage >= totalChallenges) {
+                currentPage = 0;
+            } else if (currentPage < 0) {
+                currentPage = totalChallenges - 1;
+            }
+            
+            cards.forEach((card, index) => {
+                card.className = 'challenge-card';
+                if (index === currentPage) {
+                    card.classList.add('current');
+                } else if (index === (currentPage + 1) % totalChallenges) {
+                    card.classList.add('next');
+                } else {
+                    card.classList.add('prev');
+                }
+            });
+
+            // Update points display with proper formatting
+            if (challengeData[currentPage]) {
+                const pointsDisplay = document.getElementById('currentChallengePoints');
+                if (pointsDisplay) {
+                    const tokens = challengeData[currentPage].tokens;
+                    if (tokens >= 1000) {
+                        pointsDisplay.textContent = (tokens / 1000).toFixed(1) + 'K';
+                    } else {
+                        pointsDisplay.textContent = tokens.toString();
+                    }
+                }
+            }
+            
+            // Update challenge counter in header (if exists)
+            updateChallengeCounter();
+        }
+
+        // Add challenge counter display
+        function updateChallengeCounter() {
+            const existingCounter = document.getElementById('challengeCounter');
+            if (existingCounter) {
+                existingCounter.textContent = `${currentPage + 1}/${challengeData.length}`;
+            }
+        }
+
+        // Fix navigation with proper index handling
+        function nextChallenge() {
+            const totalChallenges = challengeData.length;
+            if (totalChallenges === 0) return;
+            
+            currentPage = (currentPage + 1) % totalChallenges;
+            updateCurrentChallenge();
+            showToast(`⏭️ Challenge ${currentPage + 1}/${totalChallenges}`);
+        }
+
+        // Fix previous challenge navigation
+        function previousChallenge() {
+            const totalChallenges = challengeData.length;
+            if (totalChallenges === 0) return;
+            
+            currentPage = currentPage === 0 ? totalChallenges - 1 : currentPage - 1;
+            updateCurrentChallenge();
+            showToast(`⏮️ Challenge ${currentPage + 1}/${totalChallenges}`);
+        }
+
+        // Fix challenge display with proper numbering
+        function updateChallengeDisplay() {
+            const feedPages = document.getElementById('feedPages');
+            if (!feedPages) return;
+            
+            feedPages.innerHTML = '';
+
+            // Filter challenges based on difficulty setting
+            let filteredChallenges = challengeData;
+            const difficultyFilter = appSettings.difficultyFilter;
+            
+            if (difficultyFilter !== 'all') {
+                const difficultyLevels = {
+                    'easy': ['easy'],
+                    'medium': ['easy', 'medium'],
+                    'hard': ['medium', 'hard'],
+                    'epic': ['hard', 'epic', 'legendary']
+                };
+                
+                const allowedDifficulties = difficultyLevels[difficultyFilter] || ['easy', 'medium', 'hard', 'epic', 'legendary'];
+                filteredChallenges = challengeData.filter(challenge => 
+                    allowedDifficulties.includes(challenge.difficulty)
+                );
+            }
+
+            // Reset currentPage if it's out of bounds after filtering
+            if (currentPage >= filteredChallenges.length) {
+                currentPage = 0;
+            }
+
+            // Create challenge cards with proper indexing
+            filteredChallenges.forEach((challenge, index) => {
+                const card = createChallengeCard(challenge, index);
+                feedPages.appendChild(card);
+            });
+
+            // Update challenge data reference for filtered view
+            challengeData = filteredChallenges;
+
+            if (filteredChallenges.length > 0) {
+                updateCurrentChallenge();
+            } else {
+                showToast('🎯 No challenges match your difficulty filter. Try adjusting settings!', true);
+                // Reset to show all challenges if filter results in empty list
+                challengeData = generateAllChallenges();
+                currentPage = 0;
+                updateChallengeDisplay();
+            }
+        }
+
+        // Get all challenges without filtering
+        function generateAllChallenges() {
+            return [
                 {
                     id: 'daily_001',
                     title: "Coffee Shop Poetry Challenge",
@@ -2983,44 +3363,174 @@
             ];
         }
 
-        // Update player display
-        function updatePlayerDisplay() {
-            document.getElementById('playerRank').textContent = playerData.rank;
-            document.getElementById('playerTokens').textContent = `🪙 ${playerData.tokens.toLocaleString()}`;
+        // Fix profile stats with proper number formatting
+        function updateProfileDisplay() {
+            // Ensure all elements exist before updating
+            const elements = {
+                'profileDisplayName': appSettings.displayName,
+                'profileUsername': `@${appSettings.username}`,
+                'profileRankDisplay': playerData.rank,
+                'profileLevelBadge': playerData.level.toString(),
+                'profileTokenCount': playerData.tokens.toLocaleString(),
+                'profileChallengeCount': playerData.completedChallenges.toString(),
+                'profileStreakCount': playerData.currentStreak.toString(),
+                'profileFollowerCount': '2.5K' // Mock data
+            };
+            
+            Object.entries(elements).forEach(([id, value]) => {
+                const element = document.getElementById(id);
+                if (element) {
+                    element.textContent = value;
+                }
+            });
         }
 
-        // Update challenge display with filtering
-        function updateChallengeDisplay() {
-            const feedPages = document.getElementById('feedPages');
-            feedPages.innerHTML = '';
-
-            // Filter challenges based on difficulty setting
-            let filteredChallenges = challengeData;
-            const difficultyFilter = appSettings.difficultyFilter;
+        // Fix achievement numbering
+        function populateAchievements() {
+            const achievements = [
+                { icon: '🚀', title: 'First Launch', desc: 'Completed first challenge', number: 1 },
+                { icon: '🔥', title: 'Hot Streak', desc: '10 day challenge streak', number: 2 },
+                { icon: '⭐', title: 'Rising Star', desc: '100+ total points', number: 3 },
+                { icon: '👑', title: 'Elite Status', desc: 'Reached Elite Gladiator', number: 4 },
+                { icon: '🎯', title: 'Marksman', desc: '50 challenges completed', number: 5 },
+                { icon: '💎', title: 'Diamond Tier', desc: '10,000+ tokens earned', number: 6 }
+            ];
             
-            if (difficultyFilter !== 'all') {
-                const difficultyLevels = {
-                    'easy': ['easy'],
-                    'medium': ['easy', 'medium'],
-                    'hard': ['medium', 'hard'],
-                    'epic': ['hard', 'epic', 'legendary']
-                };
-                
-                const allowedDifficulties = difficultyLevels[difficultyFilter] || ['easy', 'medium', 'hard', 'epic', 'legendary'];
-                filteredChallenges = challengeData.filter(challenge => 
-                    allowedDifficulties.includes(challenge.difficulty)
-                );
+            const carousel = document.getElementById('achievementCarousel');
+            if (carousel) {
+                carousel.innerHTML = achievements.map((achievement, index) => `
+                    <div class="achievement-card" onclick="showAchievementDetail('${achievement.title}')">
+                        <div class="achievement-icon">${achievement.icon}</div>
+                        <div class="achievement-title">${achievement.title}</div>
+                        <div class="achievement-desc">${achievement.desc}</div>
+                        <div style="font-size: 10px; color: rgba(255,255,255,0.5); margin-top: 4px;">#${achievement.number}</div>
+                    </div>
+                `).join('');
+            }
+        }
+
+        // Fix swipe gesture handling with proper bounds checking
+        document.addEventListener('touchend', (e) => {
+            if (!startY || !startX) return;
+
+            const endY = e.changedTouches[0].clientY;
+            const endX = e.changedTouches[0].clientX;
+            const deltaY = startY - endY;
+            const deltaX = startX - endX;
+
+            // Only handle vertical swipes on the feed
+            if (Math.abs(deltaY) > Math.abs(deltaX) && Math.abs(deltaY) > 50) {
+                if (e.target.closest('.dark-feed')) {
+                    if (deltaY > 0) {
+                        nextChallenge(); // Swipe up for next
+                    } else {
+                        previousChallenge(); // Swipe down for previous
+                    }
+                }
             }
 
-            filteredChallenges.forEach((challenge, index) => {
-                const card = createChallengeCard(challenge, index);
-                feedPages.appendChild(card);
-            });
+            startY = 0;
+            startX = 0;
+        });
 
-            if (filteredChallenges.length > 0) {
-                updateCurrentChallenge();
-            } else {
-                showToast('🎯 No challenges match your difficulty filter. Try adjusting settings!', true);
+        // Fix modal numbering and indexing
+        function showOnboardingStep() {
+            const steps = [
+                {
+                    icon: '🎯',
+                    title: 'Welcome to Challenges!',
+                    description: 'JomBro brings real-world challenges to life. Complete activities, earn tokens, and level up your social experience!',
+                    number: 1
+                },
+                {
+                    icon: '📱',
+                    title: 'How to Play',
+                    description: 'Swipe up/down to browse challenges. Tap "Accept Challenge" to start. Complete the activity and submit proof!',
+                    number: 2
+                },
+                {
+                    icon: '📸',
+                    title: 'Submit Your Proof',
+                    description: 'Take photos or videos of your completed challenges. Our AI reviews submissions and awards tokens based on quality!',
+                    number: 3
+                },
+                {
+                    icon: '🏆',
+                    title: 'Earn & Level Up',
+                    description: 'Collect tokens, unlock achievements, and climb the ranks. Share your progress with friends!',
+                    number: 4
+                },
+                {
+                    icon: '🚀',
+                    title: 'Ready to Start?',
+                    description: 'You\'re all set! Remember: Be creative, be authentic, and most importantly - have fun! Let\'s Go! Let\'s Go!',
+                    number: 5
+                }
+            ];
+
+            // Ensure onboardingStep is within bounds
+            if (onboardingStep >= steps.length) {
+                onboardingStep = steps.length - 1;
+            } else if (onboardingStep < 0) {
+                onboardingStep = 0;
+            }
+
+            const step = steps[onboardingStep];
+            const isLastStep = onboardingStep === steps.length - 1;
+            const isFirstStep = onboardingStep === 0;
+            
+            const contentElement = document.getElementById('onboardingContent');
+            if (contentElement) {
+                contentElement.innerHTML = `
+                    <div class="onboarding-step">
+                        <div class="onboarding-icon">${step.icon}</div>
+                        <div class="onboarding-title">${step.title}</div>
+                        <div class="onboarding-description">${step.description}</div>
+                        
+                        <div class="onboarding-progress">
+                            ${steps.map((_, index) => `
+                                <div class="progress-dot ${index === onboardingStep ? 'active' : ''}"></div>
+                            `).join('')}
+                        </div>
+                        
+                        <div style="text-align: center; margin: 15px 0; color: rgba(255,255,255,0.6); font-size: 14px;">
+                            Step ${step.number} of ${steps.length}
+                        </div>
+                    </div>
+                    
+                    <div style="display: flex; gap: 15px; margin-top: 20px;">
+                        ${!isFirstStep ? `
+                            <button class="btn-secondary" onclick="previousOnboardingStep()" style="flex: 1;">
+                                ← Previous
+                            </button>
+                        ` : ''}
+                        <button class="btn-primary" onclick="${isLastStep ? 'completeOnboarding()' : 'nextOnboardingStep()'}" style="flex: 2;">
+                            ${isLastStep ? '🎯 Start Challenging!' : 'Next →'}
+                        </button>
+                    </div>
+                    
+                    ${!isLastStep ? `
+                        <button class="btn-secondary" onclick="completeOnboarding()" style="margin-top: 10px; width: 100%;">
+                            Skip Tutorial
+                        </button>
+                    ` : ''}
+                `;
+            }
+        }
+
+        // Fix onboarding navigation with bounds checking
+        function nextOnboardingStep() {
+            const maxSteps = 5; // Total number of onboarding steps
+            if (onboardingStep < maxSteps - 1) {
+                onboardingStep++;
+                showOnboardingStep();
+            }
+        }
+
+        function previousOnboardingStep() {
+            if (onboardingStep > 0) {
+                onboardingStep--;
+                showOnboardingStep();
             }
         }
 
