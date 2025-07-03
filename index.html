@@ -26,6 +26,9 @@
             --safe-area-left: env(safe-area-inset-left, 0px);
             --safe-area-right: env(safe-area-inset-right, 0px);
             
+            /* Animation System */
+            --animation-duration: 0.4s;
+            
             /* Design System Colors */
             --primary-50: #E6FFF5;
             --primary-500: #00FF96;
@@ -80,7 +83,7 @@
             line-height: 1.5;
         }
 
-        /* ===== STARFIELD BACKGROUND (CONTROLLED OPACITY) ===== */
+        /* ===== ENHANCED ANIMATED STARFIELD BACKGROUND ===== */
         .starfield {
             position: fixed;
             top: 0;
@@ -96,7 +99,73 @@
             background-repeat: repeat;
             background-size: 200px 100px;
             z-index: 0;
-            opacity: 0.4; /* CONTROLLED OPACITY */
+            opacity: 0.4;
+            animation: starfieldMove 120s linear infinite;
+        }
+
+        .starfield::before {
+            content: '';
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background: 
+                radial-gradient(3px 3px at 50px 20px, rgba(255, 255, 255, 0.9), transparent),
+                radial-gradient(2px 2px at 150px 80px, rgba(255, 255, 255, 0.7), transparent),
+                radial-gradient(4px 4px at 250px 50px, rgba(255, 255, 255, 0.6), transparent),
+                radial-gradient(1px 1px at 300px 120px, rgba(255, 255, 255, 0.8), transparent);
+            background-size: 400px 200px;
+            animation: blinkingStars 4s ease-in-out infinite alternate;
+        }
+
+        .starfield::after {
+            content: '';
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background: 
+                radial-gradient(circle, rgba(64, 93, 230, 0.3) 0%, transparent 70%),
+                radial-gradient(circle, rgba(0, 255, 150, 0.2) 0%, transparent 60%),
+                radial-gradient(circle, rgba(255, 107, 71, 0.25) 0%, transparent 80%);
+            background-size: 800px 600px, 600px 400px, 900px 700px;
+            background-position: -200px -100px, 400px 200px, -300px 300px;
+            animation: planetsMove 180s linear infinite;
+        }
+
+        @keyframes starfieldMove {
+            0% { transform: translateX(0) translateY(0); }
+            25% { transform: translateX(-10px) translateY(-5px); }
+            50% { transform: translateX(-5px) translateY(-10px); }
+            75% { transform: translateX(5px) translateY(-5px); }
+            100% { transform: translateX(0) translateY(0); }
+        }
+
+        @keyframes blinkingStars {
+            0% { opacity: 0.3; }
+            50% { opacity: 0.8; }
+            100% { opacity: 0.3; }
+        }
+
+        @keyframes planetsMove {
+            0% { 
+                background-position: -200px -100px, 400px 200px, -300px 300px;
+                opacity: 0.1;
+            }
+            25% { 
+                background-position: 200px 100px, 600px 400px, 100px 500px;
+                opacity: 0.2;
+            }
+            50% { 
+                background-position: 600px 300px, 800px 600px, 500px 700px;
+                opacity: 0.15;
+            }
+            75% { 
+                background-position: 1000px 500px, 1200px 800px, 900px 900px;
+                opacity: 0.1;
+            }
+            100% { 
+                background-position: 1400px 700px, 1600px 1000px, 1300px 1100px;
+                opacity: 0.05;
+            }
         }
 
         /* ===== MAIN CONTAINER ===== */
@@ -190,7 +259,7 @@
                 0 0 25px rgba(255, 255, 255, 0.3);
             position: relative;
             touch-action: manipulation;
-            transition: all 0.3s ease;
+            transition: all var(--animation-duration) ease;
         }
 
         .round-btn:hover {
@@ -274,7 +343,7 @@
                 inset 0 1px 0 rgba(255, 255, 255, 0.1);
             transform-style: preserve-3d;
             transform-origin: bottom center;
-            transition: all 0.5s ease;
+            transition: all var(--animation-duration) ease;
         }
 
         .challenge-card.current {
@@ -1323,46 +1392,158 @@
         </div>
     </div>
 
-    <!-- Settings Modal -->
+    <!-- Enhanced User Settings Modal -->
     <div id="settingsModal" class="modal">
-        <div class="modal-content">
-            <div class="modal-title">⚙️ Settings</div>
+        <div class="modal-content" style="max-width: 500px;">
+            <div class="modal-title">⚙️ User Settings</div>
             
-            <div class="form-group">
-                <label class="form-label">🤖 AI Review API Key</label>
-                <input type="password" class="form-control" id="openaiApiKey" 
-                    placeholder="sk-... (OpenAI API Key for AI reviews)">
-                <small style="color: rgba(255,255,255,0.6); margin-top: 5px; display: block;">
-                    Get your API key from: <a href="https://platform.openai.com/api-keys" target="_blank" style="color: #00FF96;">https://platform.openai.com/api-keys</a>
-                </small>
+            <!-- User Profile Section -->
+            <div style="background: rgba(0, 255, 150, 0.1); border: 1px solid rgba(0, 255, 150, 0.3); border-radius: 16px; padding: 20px; margin-bottom: 25px;">
+                <h3 style="color: #00FF96; margin-bottom: 15px; font-size: 18px;">👤 Profile Settings</h3>
+                
+                <div class="form-group">
+                    <label class="form-label">Display Name</label>
+                    <input type="text" class="form-control" id="userDisplayName" 
+                        placeholder="Your display name" value="Alexandra Stone">
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Username</label>
+                    <input type="text" class="form-control" id="userUsername" 
+                        placeholder="@username" value="alexandra_stone">
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Avatar Style</label>
+                    <select class="form-control" id="avatarStyle">
+                        <option value="initials">📝 Initials (AS)</option>
+                        <option value="emoji">😎 Emoji Avatar</option>
+                        <option value="geometric">🔷 Geometric Pattern</option>
+                        <option value="gradient">🌈 Gradient Design</option>
+                    </select>
+                </div>
             </div>
             
-            <div class="form-group">
-                <label class="form-label">☁️ Cloudinary Settings</label>
-                <input type="text" class="form-control" id="cloudinaryCloudName" 
-                    placeholder="Cloud Name" style="margin-bottom: 10px;">
-                <input type="text" class="form-control" id="cloudinaryApiKey" 
-                    placeholder="API Key" style="margin-bottom: 10px;">
-                <input type="password" class="form-control" id="cloudinaryApiSecret" 
-                    placeholder="API Secret">
-                <small style="color: rgba(255,255,255,0.6); margin-top: 5px; display: block;">
-                    Get free account at: <a href="https://cloudinary.com/" target="_blank" style="color: #00FF96;">https://cloudinary.com/</a>
-                </small>
+            <!-- Notification Settings -->
+            <div style="background: rgba(255, 215, 0, 0.1); border: 1px solid rgba(255, 215, 0, 0.3); border-radius: 16px; padding: 20px; margin-bottom: 25px;">
+                <h3 style="color: #FFD700; margin-bottom: 15px; font-size: 18px;">🔔 Notifications</h3>
+                
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                    <label style="color: rgba(255, 255, 255, 0.9);">New Challenges</label>
+                    <input type="checkbox" id="notifyNewChallenges" checked style="width: 20px; height: 20px;">
+                </div>
+                
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                    <label style="color: rgba(255, 255, 255, 0.9);">Challenge Reminders</label>
+                    <input type="checkbox" id="notifyReminders" checked style="width: 20px; height: 20px;">
+                </div>
+                
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                    <label style="color: rgba(255, 255, 255, 0.9);">Achievement Unlocked</label>
+                    <input type="checkbox" id="notifyAchievements" checked style="width: 20px; height: 20px;">
+                </div>
+                
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <label style="color: rgba(255, 255, 255, 0.9);">Friend Activity</label>
+                    <input type="checkbox" id="notifyFriends" style="width: 20px; height: 20px;">
+                </div>
             </div>
             
-            <div class="form-group">
-                <label class="form-label">🎨 Background Theme</label>
-                <select class="form-control" id="backgroundTheme">
-                    <option value="space">🌌 Outer Space</option>
-                    <option value="underwater">🌊 Underwater</option>
-                    <option value="forest">🌲 Forest</option>
-                    <option value="cyberpunk">🔮 Cyberpunk</option>
-                    <option value="sunset">🌅 Sunset</option>
-                </select>
+            <!-- Privacy Settings -->
+            <div style="background: rgba(138, 43, 226, 0.1); border: 1px solid rgba(138, 43, 226, 0.3); border-radius: 16px; padding: 20px; margin-bottom: 25px;">
+                <h3 style="color: #8A2BE2; margin-bottom: 15px; font-size: 18px;">🔒 Privacy</h3>
+                
+                <div class="form-group">
+                    <label class="form-label">Profile Visibility</label>
+                    <select class="form-control" id="profileVisibility">
+                        <option value="public">🌍 Public - Everyone can see</option>
+                        <option value="friends">👥 Friends Only</option>
+                        <option value="private">🔒 Private</option>
+                    </select>
+                </div>
+                
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                    <label style="color: rgba(255, 255, 255, 0.9);">Show Real Name</label>
+                    <input type="checkbox" id="showRealName" style="width: 20px; height: 20px;">
+                </div>
+                
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <label style="color: rgba(255, 255, 255, 0.9);">Location Tracking</label>
+                    <input type="checkbox" id="locationTracking" checked style="width: 20px; height: 20px;">
+                </div>
             </div>
             
-            <button class="btn-primary" onclick="saveSettings()">💾 Save Settings</button>
-            <button class="btn-secondary" onclick="hideModal('settings')">Cancel</button>
+            <!-- App Preferences -->
+            <div style="background: rgba(79, 195, 247, 0.1); border: 1px solid rgba(79, 195, 247, 0.3); border-radius: 16px; padding: 20px; margin-bottom: 25px;">
+                <h3 style="color: #4FC3F7; margin-bottom: 15px; font-size: 18px;">🎨 App Preferences</h3>
+                
+                <div class="form-group">
+                    <label class="form-label">Background Theme</label>
+                    <select class="form-control" id="backgroundTheme">
+                        <option value="space">🌌 Outer Space (Default)</option>
+                        <option value="underwater">🌊 Underwater</option>
+                        <option value="forest">🌲 Forest</option>
+                        <option value="cyberpunk">🔮 Cyberpunk</option>
+                        <option value="sunset">🌅 Sunset</option>
+                        <option value="minimal">⚫ Minimal Dark</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Animation Speed</label>
+                    <select class="form-control" id="animationSpeed">
+                        <option value="fast">⚡ Fast</option>
+                        <option value="normal" selected>🔄 Normal</option>
+                        <option value="slow">🐌 Slow</option>
+                        <option value="off">❌ Disabled</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Challenge Difficulty Filter</label>
+                    <select class="form-control" id="difficultyFilter">
+                        <option value="all">🎯 All Difficulties</option>
+                        <option value="easy">🟢 Easy Only</option>
+                        <option value="medium">🟡 Easy + Medium</option>
+                        <option value="hard">🟠 Medium + Hard</option>
+                        <option value="epic">🔴 Hard + Epic Only</option>
+                    </select>
+                </div>
+            </div>
+            
+            <!-- Technical Settings -->
+            <div style="background: rgba(255, 107, 107, 0.1); border: 1px solid rgba(255, 107, 107, 0.3); border-radius: 16px; padding: 20px; margin-bottom: 25px;">
+                <h3 style="color: #FF6B6B; margin-bottom: 15px; font-size: 18px;">🤖 Technical Settings</h3>
+                
+                <div class="form-group">
+                    <label class="form-label">AI Review API Key</label>
+                    <input type="password" class="form-control" id="openaiApiKey" 
+                        placeholder="sk-... (OpenAI API Key for AI reviews)">
+                    <small style="color: rgba(255,255,255,0.6); margin-top: 5px; display: block;">
+                        Get your API key from: <a href="https://platform.openai.com/api-keys" target="_blank" style="color: #00FF96;">https://platform.openai.com/api-keys</a>
+                    </small>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">☁️ Cloudinary Settings</label>
+                    <input type="text" class="form-control" id="cloudinaryCloudName" 
+                        placeholder="Cloud Name" style="margin-bottom: 10px;">
+                    <input type="text" class="form-control" id="cloudinaryApiKey" 
+                        placeholder="API Key" style="margin-bottom: 10px;">
+                    <input type="password" class="form-control" id="cloudinaryApiSecret" 
+                        placeholder="API Secret">
+                    <small style="color: rgba(255,255,255,0.6); margin-top: 5px; display: block;">
+                        Get free account at: <a href="https://cloudinary.com/" target="_blank" style="color: #00FF96;">https://cloudinary.com/</a>
+                    </small>
+                </div>
+            </div>
+            
+            <!-- Action Buttons -->
+            <div style="display: flex; gap: 15px; margin-top: 30px;">
+                <button class="btn-primary" onclick="saveSettings()" style="flex: 2;">💾 Save All Settings</button>
+                <button class="btn-secondary" onclick="resetSettings()" style="flex: 1;">🔄 Reset</button>
+            </div>
+            <button class="btn-secondary" onclick="hideModal('settings')" style="margin-top: 10px;">Cancel</button>
         </div>
     </div>
 
@@ -1391,32 +1572,177 @@
         let currentPage = 0;
         let currentChallenge = null;
         let selectedRating = 0;
+        // Enhanced settings with user preferences
         let appSettings = {
+            // User Profile
+            displayName: 'Alexandra Stone',
+            username: 'alexandra_stone',
+            avatarStyle: 'initials',
+            
+            // Notifications
+            notifyNewChallenges: true,
+            notifyReminders: true,
+            notifyAchievements: true,
+            notifyFriends: false,
+            
+            // Privacy
+            profileVisibility: 'public',
+            showRealName: false,
+            locationTracking: true,
+            
+            // App Preferences
+            backgroundTheme: 'space',
+            animationSpeed: 'normal',
+            difficultyFilter: 'all',
+            
+            // Technical
             openaiApiKey: '',
             cloudinaryCloudName: '',
             cloudinaryApiKey: '',
-            cloudinaryApiSecret: '',
-            backgroundTheme: 'space'
+            cloudinaryApiSecret: ''
         };
 
-        // Load settings from localStorage (mock for demo)
+        // Enhanced load settings from localStorage
         function loadSettings() {
-            console.log('Loading settings...');
+            try {
+                const saved = localStorage.getItem('jombro_settings');
+                if (saved) {
+                    const savedSettings = JSON.parse(saved);
+                    appSettings = { ...appSettings, ...savedSettings };
+                }
+                
+                // Apply saved settings to UI
+                document.getElementById('userDisplayName').value = appSettings.displayName;
+                document.getElementById('userUsername').value = appSettings.username;
+                document.getElementById('avatarStyle').value = appSettings.avatarStyle;
+                
+                document.getElementById('notifyNewChallenges').checked = appSettings.notifyNewChallenges;
+                document.getElementById('notifyReminders').checked = appSettings.notifyReminders;
+                document.getElementById('notifyAchievements').checked = appSettings.notifyAchievements;
+                document.getElementById('notifyFriends').checked = appSettings.notifyFriends;
+                
+                document.getElementById('profileVisibility').value = appSettings.profileVisibility;
+                document.getElementById('showRealName').checked = appSettings.showRealName;
+                document.getElementById('locationTracking').checked = appSettings.locationTracking;
+                
+                document.getElementById('backgroundTheme').value = appSettings.backgroundTheme;
+                document.getElementById('animationSpeed').value = appSettings.animationSpeed;
+                document.getElementById('difficultyFilter').value = appSettings.difficultyFilter;
+                
+                if (appSettings.openaiApiKey) {
+                    document.getElementById('openaiApiKey').value = appSettings.openaiApiKey;
+                }
+                
+                // Apply visual settings
+                applyBackgroundTheme(appSettings.backgroundTheme);
+                applyAnimationSpeed(appSettings.animationSpeed);
+                updatePlayerName();
+                
+            } catch (error) {
+                console.error('Error loading settings:', error);
+            }
         }
 
-        // Save settings to localStorage (mock for demo)
+        // Enhanced save settings to localStorage
         function saveSettings() {
+            // Update settings object
+            appSettings.displayName = document.getElementById('userDisplayName').value;
+            appSettings.username = document.getElementById('userUsername').value;
+            appSettings.avatarStyle = document.getElementById('avatarStyle').value;
+            
+            appSettings.notifyNewChallenges = document.getElementById('notifyNewChallenges').checked;
+            appSettings.notifyReminders = document.getElementById('notifyReminders').checked;
+            appSettings.notifyAchievements = document.getElementById('notifyAchievements').checked;
+            appSettings.notifyFriends = document.getElementById('notifyFriends').checked;
+            
+            appSettings.profileVisibility = document.getElementById('profileVisibility').value;
+            appSettings.showRealName = document.getElementById('showRealName').checked;
+            appSettings.locationTracking = document.getElementById('locationTracking').checked;
+            
+            appSettings.backgroundTheme = document.getElementById('backgroundTheme').value;
+            appSettings.animationSpeed = document.getElementById('animationSpeed').value;
+            appSettings.difficultyFilter = document.getElementById('difficultyFilter').value;
+            
             appSettings.openaiApiKey = document.getElementById('openaiApiKey').value;
             appSettings.cloudinaryCloudName = document.getElementById('cloudinaryCloudName').value;
             appSettings.cloudinaryApiKey = document.getElementById('cloudinaryApiKey').value;
             appSettings.cloudinaryApiSecret = document.getElementById('cloudinaryApiSecret').value;
-            appSettings.backgroundTheme = document.getElementById('backgroundTheme').value;
             
-            console.log('Settings saved:', appSettings);
+            // Save to localStorage (mock for demo)
+            try {
+                localStorage.setItem('jombro_settings', JSON.stringify(appSettings));
+            } catch (error) {
+                console.log('localStorage not available in demo environment');
+            }
+            
+            // Apply changes
             applyBackgroundTheme(appSettings.backgroundTheme);
+            applyAnimationSpeed(appSettings.animationSpeed);
+            updatePlayerName();
             
             hideModal('settings');
-            showToast('⚙️ Settings saved successfully!');
+            showToast('⚙️ All settings saved successfully!');
+        }
+
+        // Reset settings to defaults
+        function resetSettings() {
+            if (confirm('Are you sure you want to reset all settings to default values?')) {
+                // Reset to defaults
+                document.getElementById('userDisplayName').value = 'Alexandra Stone';
+                document.getElementById('userUsername').value = 'alexandra_stone';
+                document.getElementById('avatarStyle').value = 'initials';
+                
+                document.getElementById('notifyNewChallenges').checked = true;
+                document.getElementById('notifyReminders').checked = true;
+                document.getElementById('notifyAchievements').checked = true;
+                document.getElementById('notifyFriends').checked = false;
+                
+                document.getElementById('profileVisibility').value = 'public';
+                document.getElementById('showRealName').checked = false;
+                document.getElementById('locationTracking').checked = true;
+                
+                document.getElementById('backgroundTheme').value = 'space';
+                document.getElementById('animationSpeed').value = 'normal';
+                document.getElementById('difficultyFilter').value = 'all';
+                
+                document.getElementById('openaiApiKey').value = '';
+                document.getElementById('cloudinaryCloudName').value = '';
+                document.getElementById('cloudinaryApiKey').value = '';
+                document.getElementById('cloudinaryApiSecret').value = '';
+                
+                showToast('🔄 Settings reset to defaults!');
+            }
+        }
+
+        // Update player name in UI
+        function updatePlayerName() {
+            playerData.displayName = appSettings.displayName;
+            // Update any displayed names in the UI
+            const usernameElements = document.querySelectorAll('.challenge-username');
+            usernameElements.forEach(el => {
+                if (el.textContent.includes(playerData.displayName)) {
+                    el.textContent = appSettings.displayName;
+                }
+            });
+        }
+
+        // Apply animation speed settings
+        function applyAnimationSpeed(speed) {
+            const root = document.documentElement;
+            
+            switch(speed) {
+                case 'fast':
+                    root.style.setProperty('--animation-duration', '0.2s');
+                    break;
+                case 'slow':
+                    root.style.setProperty('--animation-duration', '0.8s');
+                    break;
+                case 'off':
+                    root.style.setProperty('--animation-duration', '0s');
+                    break;
+                default: // normal
+                    root.style.setProperty('--animation-duration', '0.4s');
+            }
         }
 
         // Apply background theme
@@ -1559,18 +1885,38 @@
             document.getElementById('playerTokens').textContent = `🪙 ${playerData.tokens.toLocaleString()}`;
         }
 
-        // Update challenge display
+        // Update challenge display with filtering
         function updateChallengeDisplay() {
             const feedPages = document.getElementById('feedPages');
             feedPages.innerHTML = '';
 
-            challengeData.forEach((challenge, index) => {
+            // Filter challenges based on difficulty setting
+            let filteredChallenges = challengeData;
+            const difficultyFilter = appSettings.difficultyFilter;
+            
+            if (difficultyFilter !== 'all') {
+                const difficultyLevels = {
+                    'easy': ['easy'],
+                    'medium': ['easy', 'medium'],
+                    'hard': ['medium', 'hard'],
+                    'epic': ['hard', 'epic', 'legendary']
+                };
+                
+                const allowedDifficulties = difficultyLevels[difficultyFilter] || ['easy', 'medium', 'hard', 'epic', 'legendary'];
+                filteredChallenges = challengeData.filter(challenge => 
+                    allowedDifficulties.includes(challenge.difficulty)
+                );
+            }
+
+            filteredChallenges.forEach((challenge, index) => {
                 const card = createChallengeCard(challenge, index);
                 feedPages.appendChild(card);
             });
 
-            if (challengeData.length > 0) {
+            if (filteredChallenges.length > 0) {
                 updateCurrentChallenge();
+            } else {
+                showToast('🎯 No challenges match your difficulty filter. Try adjusting settings!', true);
             }
         }
 
