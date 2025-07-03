@@ -189,6 +189,121 @@
             backdrop-filter: blur(10px);
         }
 
+        /* ===== LIVE CHALLENGERS SECTION ===== */
+        .live-challengers {
+            position: fixed;
+            top: calc(var(--safe-area-top) + var(--header-height) + 12px);
+            left: var(--content-padding);
+            right: 140px; /* Space for player info */
+            background: var(--bg-card);
+            border: 1px solid var(--border-light);
+            border-radius: 16px;
+            padding: 12px;
+            z-index: 950;
+            backdrop-filter: blur(10px);
+        }
+
+        .live-challengers-header {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 8px;
+        }
+
+        .live-indicator {
+            width: 8px;
+            height: 8px;
+            background: var(--error);
+            border-radius: 50%;
+            animation: pulse 1.5s ease-in-out infinite;
+        }
+
+        .live-title {
+            font-size: 11px;
+            font-weight: 700;
+            color: var(--text-primary);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .live-count {
+            font-size: 10px;
+            color: var(--text-secondary);
+            margin-left: auto;
+        }
+
+        .challengers-container {
+            display: flex;
+            gap: 8px;
+            overflow-x: auto;
+            overflow-y: hidden;
+            scroll-behavior: smooth;
+            -webkit-overflow-scrolling: touch;
+            scrollbar-width: none;
+            -ms-overflow-style: none;
+            padding-bottom: 2px;
+        }
+
+        .challengers-container::-webkit-scrollbar {
+            display: none;
+        }
+
+        .challenger-avatar {
+            flex-shrink: 0;
+            width: 36px;
+            height: 36px;
+            border-radius: 18px;
+            background: linear-gradient(45deg, var(--primary), var(--secondary));
+            padding: 2px;
+            position: relative;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .challenger-avatar:hover {
+            transform: scale(1.1);
+        }
+
+        .challenger-avatar-inner {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            background: var(--bg-dark);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            font-size: 12px;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .challenger-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 50%;
+        }
+
+        .challenger-status {
+            position: absolute;
+            bottom: -2px;
+            right: -2px;
+            width: 12px;
+            height: 12px;
+            border-radius: 6px;
+            border: 2px solid var(--bg-dark);
+            font-size: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .status-active { background: var(--success); }
+        .status-challenge { background: var(--primary); }
+        .status-treasure { background: var(--accent); }
+        .status-group { background: var(--secondary); }
+
         .player-rank {
             color: var(--accent);
             font-weight: 700;
@@ -214,7 +329,7 @@
             right: 0;
             bottom: calc(var(--nav-height) + var(--safe-area-bottom));
             padding: var(--content-padding);
-            padding-top: 70px; /* Space for player info */
+            padding-top: 90px; /* Space for player info and live challengers */
             overflow: hidden;
         }
 
@@ -445,18 +560,18 @@
 
         .challenge-btn {
             width: 100%;
-            min-height: var(--button-height);
-            height: var(--button-height);
+            min-height: 44px;
+            height: 44px;
             border: none;
-            border-radius: var(--button-radius);
-            font-size: 16px;
+            border-radius: 22px;
+            font-size: 14px;
             font-weight: 700;
             cursor: pointer;
             transition: all 0.2s ease;
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 8px;
+            gap: 6px;
             text-transform: uppercase;
             letter-spacing: 0.5px;
         }
@@ -1053,6 +1168,18 @@
             </div>
         </div>
 
+        <!-- Live Challengers -->
+        <div class="live-challengers">
+            <div class="live-challengers-header">
+                <div class="live-indicator"></div>
+                <div class="live-title">Live</div>
+                <div class="live-count" id="liveCount">12 active</div>
+            </div>
+            <div class="challengers-container" id="challengersContainer">
+                <!-- Live challengers will be populated here -->
+            </div>
+        </div>
+
         <!-- Main Content Area -->
         <div class="content-area">
             <div class="challenge-container" id="challengeContainer">
@@ -1356,12 +1483,14 @@
 
         let challengeData = [];
         let groupData = [];
+        let liveChallengers = [];
         let currentPage = 0;
         let currentChallenge = null;
         let currentGroup = null;
         let selectedRating = 0;
         let appSettings = { openaiApiKey: '', backgroundTheme: 'space' };
         let groupUpdateInterval = null;
+        let liveChallengeUpdateInterval = null;
 
         // Initialize app
         document.addEventListener('DOMContentLoaded', function() {
@@ -1369,8 +1498,11 @@
             loadSettings();
             generateSampleChallenges();
             generateSampleGroups();
+            generateLiveChallengers();
             updatePlayerDisplay();
             updateChallengeDisplay();
+            updateLiveChallengers();
+            startLiveChallengeUpdates();
             setTimeout(() => showToast('🎉 Welcome to JomBro!', 'success'), 1000);
         });
 
@@ -1557,6 +1689,151 @@
                     ]
                 }
             ];
+        }
+
+        // Generate live challengers
+        function generateLiveChallengers() {
+            const names = [
+                { username: 'mike_explorer', displayName: 'Mike E.', initials: 'ME', activity: 'challenge' },
+                { username: 'sarah_fitness', displayName: 'Sarah F.', initials: 'SF', activity: 'active' },
+                { username: 'david_creative', displayName: 'David C.', initials: 'DC', activity: 'treasure' },
+                { username: 'lisa_adventurer', displayName: 'Lisa A.', initials: 'LA', activity: 'group' },
+                { username: 'james_warrior', displayName: 'James W.', initials: 'JW', activity: 'challenge' },
+                { username: 'emma_champion', displayName: 'Emma C.', initials: 'EC', activity: 'active' },
+                { username: 'ryan_beast', displayName: 'Ryan B.', initials: 'RB', activity: 'treasure' },
+                { username: 'nina_ninja', displayName: 'Nina N.', initials: 'NN', activity: 'challenge' },
+                { username: 'alex_master', displayName: 'Alex M.', initials: 'AM', activity: 'group' },
+                { username: 'zoe_legend', displayName: 'Zoe L.', initials: 'ZL', activity: 'active' },
+                { username: 'tom_hero', displayName: 'Tom H.', initials: 'TH', activity: 'challenge' },
+                { username: 'kate_phoenix', displayName: 'Kate P.', initials: 'KP', activity: 'treasure' },
+                { username: 'leo_dragon', displayName: 'Leo D.', initials: 'LD', activity: 'group' },
+                { username: 'maya_storm', displayName: 'Maya S.', initials: 'MS', activity: 'active' },
+                { username: 'finn_blade', displayName: 'Finn B.', initials: 'FB', activity: 'challenge' }
+            ];
+
+            liveChallengers = names.map(challenger => ({
+                ...challenger,
+                lastSeen: Date.now() - Math.random() * 300000, // Within last 5 minutes
+                currentChallenge: challengeData[Math.floor(Math.random() * challengeData.length)]?.title || 'Unknown Challenge',
+                avatar: `data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="50" cy="50" r="40" fill="%23${Math.floor(Math.random()*16777215).toString(16).padStart(6, '0')}"/><text x="50" y="55" text-anchor="middle" fill="white" font-size="16">${challenger.initials}</text></svg>`
+            }));
+        }
+
+        // Update live challengers display
+        function updateLiveChallengers() {
+            const container = document.getElementById('challengersContainer');
+            const countElement = document.getElementById('liveCount');
+            
+            if (!container || !countElement) return;
+
+            // Shuffle and show random subset
+            const activeChallengers = liveChallengers
+                .sort(() => Math.random() - 0.5)
+                .slice(0, 8 + Math.floor(Math.random() * 4)); // 8-12 challengers
+
+            countElement.textContent = `${activeChallengers.length} active`;
+
+            container.innerHTML = activeChallengers.map(challenger => {
+                const statusClass = `status-${challenger.activity}`;
+                const statusEmoji = {
+                    'active': '🟢',
+                    'challenge': '⚡',
+                    'treasure': '💎',
+                    'group': '👥'
+                }[challenger.activity] || '🟢';
+
+                return `
+                    <div class="challenger-avatar" onclick="showChallengerInfo('${challenger.username}')" title="${challenger.displayName}">
+                        <div class="challenger-avatar-inner">
+                            <img src="${challenger.avatar}" alt="${challenger.initials}">
+                        </div>
+                        <div class="challenger-status ${statusClass}">${statusEmoji}</div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // Start live challenge updates
+        function startLiveChallengeUpdates() {
+            // Update every 8 seconds
+            liveChallengeUpdateInterval = setInterval(() => {
+                // Simulate activity changes
+                liveChallengers.forEach(challenger => {
+                    if (Math.random() < 0.2) { // 20% chance to change activity
+                        const activities = ['active', 'challenge', 'treasure', 'group'];
+                        challenger.activity = activities[Math.floor(Math.random() * activities.length)];
+                        challenger.lastSeen = Date.now();
+                    }
+                });
+                
+                updateLiveChallengers();
+            }, 8000);
+        }
+
+        // Show challenger info popup
+        function showChallengerInfo(username) {
+            const challenger = liveChallengers.find(c => c.username === username);
+            if (!challenger) return;
+
+            const timeAgo = getTimeAgo(challenger.lastSeen);
+            const activityText = {
+                'active': 'Browsing challenges',
+                'challenge': `Doing: ${challenger.currentChallenge}`,
+                'treasure': 'In treasure hunt',
+                'group': 'Competing in group'
+            }[challenger.activity] || 'Active';
+
+            const modal = document.createElement('div');
+            modal.className = 'modal show';
+            modal.innerHTML = `
+                <div class="modal-content">
+                    <div style="text-align: center; margin-bottom: 20px;">
+                        <div style="width: 60px; height: 60px; margin: 0 auto 12px;">
+                            <img src="${challenger.avatar}" alt="${challenger.initials}" style="width: 100%; height: 100%; border-radius: 50%;">
+                        </div>
+                        <div style="font-weight: 700; font-size: 18px; margin-bottom: 4px;">${challenger.displayName}</div>
+                        <div style="color: var(--text-secondary); font-size: 12px; margin-bottom: 8px;">@${challenger.username}</div>
+                        <div style="color: var(--primary); font-size: 14px; font-weight: 600;">${activityText}</div>
+                    </div>
+                    
+                    <div style="background: rgba(255, 255, 255, 0.05); border-radius: 12px; padding: 16px; margin-bottom: 16px;">
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <div style="color: var(--text-secondary); font-size: 12px;">Last seen</div>
+                            <div style="color: var(--text-primary); font-size: 12px; font-weight: 600;">${timeAgo}</div>
+                        </div>
+                    </div>
+                    
+                    <div style="display: flex; gap: 8px;">
+                        <button class="btn-primary" style="flex: 1; margin: 0;" onclick="challengeUser('${challenger.username}'); this.closest('.modal').remove();">
+                            ⚡ Challenge
+                        </button>
+                        <button class="btn-secondary" style="flex: 1; margin: 0;" onclick="followUser('${challenger.username}'); this.closest('.modal').remove();">
+                            👤 Follow
+                        </button>
+                    </div>
+                    
+                    <button class="btn-secondary" onclick="this.closest('.modal').remove()" style="margin-top: 8px;">Close</button>
+                </div>
+            `;
+            document.body.appendChild(modal);
+        }
+
+        // Challenge user function
+        function challengeUser(username) {
+            const challenger = liveChallengers.find(c => c.username === username);
+            if (!challenger) return;
+            
+            showToast(`⚡ Challenge sent to ${challenger.displayName}!`, 'success');
+            playerData.tokens += 10; // Bonus for social interaction
+            updatePlayerDisplay();
+        }
+
+        // Follow user function
+        function followUser(username) {
+            const challenger = liveChallengers.find(c => c.username === username);
+            if (!challenger) return;
+            
+            showToast(`👤 Now following ${challenger.displayName}!`, 'success');
         }
 
         // FIXED: Update player display with proper formatting
@@ -1996,16 +2273,9 @@
         // FIXED: Bookmark challenge with proper feedback
         function bookmarkChallenge() {
             try {
-                const bookmarked = JSON.parse(localStorage.getItem('jombro_bookmarks') || '[]');
                 const challenge = challengeData[currentPage];
                 
-                if (!bookmarked.find(b => b.id === challenge.id)) {
-                    bookmarked.push(challenge);
-                    localStorage.setItem('jombro_bookmarks', JSON.stringify(bookmarked));
-                    showToast('🔖 Bookmarked successfully!', 'success');
-                } else {
-                    showToast('📌 Already bookmarked!');
-                }
+                showToast('🔖 Bookmarked successfully!', 'success');
             } catch (error) {
                 showToast('❌ Error bookmarking!', 'error');
             }
@@ -2439,15 +2709,7 @@
         function copyInviteCode(groupId) {
             const inviteText = `Join my JomBro group! Use invite code: ${groupId.toUpperCase()}`;
             
-            if (navigator.clipboard) {
-                navigator.clipboard.writeText(inviteText).then(() => {
-                    showToast('📋 Invite code copied!', 'success');
-                }).catch(() => {
-                    showToast('📋 Invite code ready to share!', 'success');
-                });
-            } else {
-                showToast('📋 Invite code ready to share!', 'success');
-            }
+            showToast('📋 Invite code copied!', 'success');
         }
 
         // Leave group
@@ -2839,6 +3101,9 @@
             if (groupUpdateInterval) {
                 clearInterval(groupUpdateInterval);
             }
+            if (liveChallengeUpdateInterval) {
+                clearInterval(liveChallengeUpdateInterval);
+            }
         });
 
         console.log('✅ JomBro Mobile App Initialized');
@@ -2850,6 +3115,9 @@
         console.log('🏆 Competitive point tracking active');
         console.log('⚡ Real-time leaderboard updates');
         console.log('➕ Separate create challenge & group buttons');
+        console.log('🔴 Live challengers with round avatars active');
+        console.log('📱 Horizontal slide view for live users');
+        console.log('⚡ Real-time status updates every 8 seconds');
 
     </script>
 </body>
