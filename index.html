@@ -30,17 +30,18 @@
             --button-radius: 26px;
             --touch-target: 44px;
             
-            /* Color System */
+            /* Color System - Ultra Transparent Glass */
             --primary: #00FF96;
             --secondary: #405DE6;
             --accent: #FFD700;
             --error: #FF6B6B;
             --success: #4CAF50;
             --bg-dark: #000000;
-            --bg-card: rgba(0, 0, 0, 0.85);
-            --border-light: rgba(255, 255, 255, 0.1);
+            --bg-card: rgba(0, 0, 0, 0.15);
+            --bg-modal: rgba(0, 0, 0, 0.25);
+            --border-light: rgba(255, 255, 255, 0.08);
             --text-primary: #FFFFFF;
-            --text-secondary: rgba(255, 255, 255, 0.7);
+            --text-secondary: rgba(255, 255, 255, 0.8);
         }
 
         * {
@@ -66,7 +67,7 @@
             color: var(--text-primary);
         }
 
-        /* ===== FIXED STARFIELD BACKGROUND ===== */
+        /* ===== ENHANCED STARFIELD BACKGROUND ===== */
         .starfield {
             position: fixed;
             top: 0;
@@ -80,8 +81,110 @@
                 radial-gradient(1px 1px at 130px 80px, rgba(255,255,255,0.6), transparent);
             background-repeat: repeat;
             background-size: 200px 100px;
-            opacity: 0.3;
+            opacity: 0.4;
             z-index: 0;
+        }
+
+        /* ===== ANIMATED BLINKING STARS ===== */
+        .animated-stars {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            pointer-events: none;
+            z-index: 1;
+            overflow: hidden;
+        }
+
+        .star-particle {
+            position: absolute;
+            background: #ffffff;
+            border-radius: 50%;
+            animation: starBlink 3s ease-in-out infinite, starMove 20s linear infinite;
+        }
+
+        .star-particle:nth-child(1) {
+            width: 2px; height: 2px;
+            top: 15%; left: 10%;
+            animation-delay: 0s, 0s;
+            animation-duration: 2.5s, 25s;
+        }
+
+        .star-particle:nth-child(2) {
+            width: 3px; height: 3px;
+            top: 25%; left: 80%;
+            animation-delay: 0.5s, 2s;
+            animation-duration: 3.2s, 30s;
+        }
+
+        .star-particle:nth-child(3) {
+            width: 1.5px; height: 1.5px;
+            top: 40%; left: 20%;
+            animation-delay: 1s, 4s;
+            animation-duration: 2.8s, 22s;
+        }
+
+        .star-particle:nth-child(4) {
+            width: 2.5px; height: 2.5px;
+            top: 60%; left: 90%;
+            animation-delay: 1.5s, 6s;
+            animation-duration: 3.5s, 28s;
+        }
+
+        .star-particle:nth-child(5) {
+            width: 2px; height: 2px;
+            top: 70%; left: 15%;
+            animation-delay: 2s, 8s;
+            animation-duration: 2.2s, 26s;
+        }
+
+        .star-particle:nth-child(6) {
+            width: 1px; height: 1px;
+            top: 35%; left: 60%;
+            animation-delay: 2.5s, 10s;
+            animation-duration: 4s, 24s;
+        }
+
+        .star-particle:nth-child(7) {
+            width: 3px; height: 3px;
+            top: 80%; left: 70%;
+            animation-delay: 0.2s, 12s;
+            animation-duration: 2.7s, 32s;
+        }
+
+        .star-particle:nth-child(8) {
+            width: 1.5px; height: 1.5px;
+            top: 20%; left: 45%;
+            animation-delay: 0.8s, 14s;
+            animation-duration: 3.8s, 20s;
+        }
+
+        .star-particle:nth-child(9) {
+            width: 2px; height: 2px;
+            top: 90%; left: 25%;
+            animation-delay: 1.2s, 16s;
+            animation-duration: 2.4s, 27s;
+        }
+
+        .star-particle:nth-child(10) {
+            width: 2.5px; height: 2.5px;
+            top: 50%; left: 85%;
+            animation-delay: 1.8s, 18s;
+            animation-duration: 3.1s, 29s;
+        }
+
+        @keyframes starBlink {
+            0%, 100% { opacity: 0.3; transform: scale(1); }
+            50% { opacity: 1; transform: scale(1.2); }
+        }
+
+        @keyframes starMove {
+            0% { transform: translateX(-10px) translateY(-10px); }
+            25% { transform: translateX(10px) translateY(10px); }
+            50% { transform: translateX(5px) translateY(-5px); }
+            75% { transform: translateX(-5px) translateY(5px); }
+            100% { transform: translateX(-10px) translateY(-10px); }
         }
 
         /* ===== FIXED MAIN CONTAINER ===== */
@@ -100,7 +203,7 @@
                 rgba(64, 93, 230, 0.05) 100%);
         }
 
-        /* ===== FIXED HEADER - PROPER ALIGNMENT ===== */
+        /* ===== ULTRA TRANSPARENT GLASS HEADER ===== */
         .header {
             position: fixed;
             top: var(--safe-area-top);
@@ -108,7 +211,8 @@
             right: 0;
             height: var(--header-height);
             background: var(--bg-card);
-            backdrop-filter: blur(20px);
+            backdrop-filter: blur(30px);
+            -webkit-backdrop-filter: blur(30px);
             border-bottom: 1px solid var(--border-light);
             display: flex;
             align-items: center;
@@ -145,13 +249,13 @@
             align-items: center;
         }
 
-        /* FIXED: Proper touch targets for buttons */
+        /* ULTRA TRANSPARENT GLASS: Proper touch targets for buttons */
         .header-btn {
             min-width: var(--touch-target);
             min-height: var(--touch-target);
             width: 40px;
             height: 40px;
-            background: rgba(0, 0, 0, 0.6);
+            background: rgba(0, 0, 0, 0.2);
             border: 1px solid var(--border-light);
             border-radius: 20px;
             display: flex;
@@ -162,20 +266,22 @@
             color: var(--text-primary);
             transition: all 0.2s ease;
             position: relative;
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
         }
 
         .header-btn:active {
             transform: scale(0.95);
-            background: var(--primary);
+            background: rgba(0, 255, 150, 0.3);
             color: var(--bg-dark);
         }
 
         .header-btn:hover {
-            background: rgba(0, 255, 150, 0.1);
+            background: rgba(0, 255, 150, 0.15);
             border-color: var(--primary);
         }
 
-        /* FIXED: Player info positioning and alignment */
+        /* ULTRA TRANSPARENT GLASS: Player info positioning and alignment */
         .player-info {
             position: fixed;
             top: calc(var(--safe-area-top) + var(--header-height) + 12px);
@@ -186,10 +292,11 @@
             padding: 12px 16px;
             font-size: 13px;
             z-index: 950;
-            backdrop-filter: blur(10px);
+            backdrop-filter: blur(25px);
+            -webkit-backdrop-filter: blur(25px);
         }
 
-        /* ===== LIVE CHALLENGERS SECTION ===== */
+        /* ===== ULTRA TRANSPARENT GLASS LIVE CHALLENGERS ===== */
         .live-challengers {
             position: fixed;
             top: calc(var(--safe-area-top) + var(--header-height) + 12px);
@@ -200,7 +307,8 @@
             border-radius: 16px;
             padding: 12px;
             z-index: 950;
-            backdrop-filter: blur(10px);
+            backdrop-filter: blur(25px);
+            -webkit-backdrop-filter: blur(25px);
         }
 
         .live-challengers-header {
@@ -340,6 +448,7 @@
             height: 100%;
         }
 
+        /* ===== ULTRA TRANSPARENT GLASS CHALLENGE CARDS ===== */
         .challenge-card {
             position: absolute;
             top: 0;
@@ -347,7 +456,8 @@
             right: 0;
             bottom: 0;
             background: var(--bg-card);
-            backdrop-filter: blur(20px);
+            backdrop-filter: blur(30px);
+            -webkit-backdrop-filter: blur(30px);
             border: 1px solid var(--border-light);
             border-radius: 24px;
             display: flex;
@@ -1139,6 +1249,20 @@
 <body>
     <!-- Starfield Background -->
     <div class="starfield"></div>
+
+    <!-- Animated Blinking Stars -->
+    <div class="animated-stars">
+        <div class="star-particle"></div>
+        <div class="star-particle"></div>
+        <div class="star-particle"></div>
+        <div class="star-particle"></div>
+        <div class="star-particle"></div>
+        <div class="star-particle"></div>
+        <div class="star-particle"></div>
+        <div class="star-particle"></div>
+        <div class="star-particle"></div>
+        <div class="star-particle"></div>
+    </div>
 
     <!-- Main App Container -->
     <div class="app-container">
