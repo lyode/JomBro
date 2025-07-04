@@ -125,7 +125,7 @@
         .glass-interface {
             width: 100%;
             max-width: 400px;
-            height: 95vh;
+            height: calc(100vh - 20px);
             background: var(--glass-bg);
             backdrop-filter: blur(20px) saturate(180%);
             -webkit-backdrop-filter: blur(20px) saturate(180%);
@@ -263,11 +263,15 @@
             box-shadow: 0 0 15px rgba(0, 255, 150, 0.4);
         }
 
-        /* ===== GLASS SECTIONS ===== */
+        /* ===== GLASS SECTIONS - OPTIMIZED SPACING ===== */
         .glass-section {
-            padding: 20px 25px;
+            padding: 15px 25px;
             border-bottom: 1px solid rgba(255, 255, 255, 0.06);
             background: linear-gradient(90deg, transparent 0%, rgba(255, 255, 255, 0.02) 50%, transparent 100%);
+        }
+
+        .glass-section.compact {
+            padding: 12px 25px;
         }
 
         .live-header {
@@ -412,8 +416,8 @@
         .active-challenges {
             display: flex;
             flex-direction: column;
-            gap: 8px;
-            max-height: 120px;
+            gap: 6px;
+            max-height: 80px;
             overflow-y: auto;
         }
 
@@ -421,13 +425,14 @@
             background: rgba(255, 255, 255, 0.05);
             border: 1px solid rgba(255, 255, 255, 0.1);
             border-radius: 10px;
-            padding: 10px;
+            padding: 8px 10px;
             display: flex;
             justify-content: space-between;
             align-items: center;
             backdrop-filter: blur(10px);
             transition: all 0.3s ease;
             cursor: pointer;
+            min-height: 32px;
         }
 
         .active-challenge-item:hover {
@@ -441,14 +446,14 @@
         }
 
         .challenge-name {
-            font-size: 12px;
+            font-size: 11px;
             font-weight: 600;
             color: var(--text-primary);
-            margin-bottom: 2px;
+            margin-bottom: 1px;
         }
 
         .challenge-progress {
-            font-size: 10px;
+            font-size: 9px;
             color: var(--text-secondary);
             display: flex;
             align-items: center;
@@ -457,9 +462,9 @@
 
         .progress-bar {
             flex: 1;
-            height: 3px;
+            height: 2px;
             background: rgba(255, 255, 255, 0.1);
-            border-radius: 2px;
+            border-radius: 1px;
             overflow: hidden;
         }
 
@@ -470,9 +475,9 @@
         }
 
         .challenge-status {
-            padding: 3px 8px;
-            border-radius: 8px;
-            font-size: 9px;
+            padding: 2px 6px;
+            border-radius: 6px;
+            font-size: 8px;
             font-weight: 600;
             text-transform: uppercase;
         }
@@ -495,12 +500,13 @@
             border: 1px solid rgba(139, 92, 246, 0.3);
         }
 
-        /* ===== MAIN CHALLENGE - GLASS CONTENT ===== */
+        /* ===== MAIN CHALLENGE - EXPANDED CONTENT ===== */
         .challenge-main {
             flex: 1;
-            padding: 25px;
+            padding: 20px 25px;
             overflow-y: auto;
             position: relative;
+            min-height: 280px;
         }
 
         .challenge-title {
@@ -574,9 +580,9 @@
             letter-spacing: 0.5px;
         }
 
-        /* ===== USER CONTROLS - GLASS STYLE ===== */
+        /* ===== USER CONTROLS - COMPACT STYLE ===== */
         .action-section {
-            padding: 25px;
+            padding: 18px 25px;
             background: linear-gradient(180deg, transparent 0%, rgba(255, 255, 255, 0.05) 100%);
             border-top: 1px solid rgba(255, 255, 255, 0.08);
             position: relative;
@@ -658,15 +664,16 @@
             box-shadow: 0 8px 25px rgba(255, 107, 157, 0.6);
         }
 
-        /* ===== GLASS BOTTOM NAVIGATION ===== */
+        /* ===== GLASS BOTTOM NAVIGATION - OPTIMIZED ===== */
         .glass-nav {
-            padding: 15px 25px calc(var(--safe-area-bottom) + 15px) 25px;
+            padding: 12px 25px calc(var(--safe-area-bottom) + 12px) 25px;
             background: linear-gradient(180deg, transparent 0%, rgba(255, 255, 255, 0.1) 100%);
             backdrop-filter: blur(20px);
             border-top: 1px solid rgba(255, 255, 255, 0.1);
             display: flex;
             justify-content: space-around;
             align-items: center;
+            min-height: 60px;
         }
 
         .nav-item {
@@ -835,9 +842,14 @@
 
         /* ===== MOBILE OPTIMIZATIONS ===== */
         @media (max-width: 400px) {
+            .phone-container {
+                padding: 5px;
+            }
+            
             .glass-interface {
-                max-width: 95%;
-                height: 97vh;
+                max-width: 100%;
+                height: calc(100vh - 10px);
+                border-radius: 20px;
             }
             
             .glass-header {
@@ -849,11 +861,20 @@
             }
             
             .challenge-main {
-                padding: 20px;
+                padding: 16px 20px;
+                min-height: 260px;
             }
             
             .challenge-title {
                 font-size: 20px;
+            }
+            
+            .glass-section, .glass-section.compact {
+                padding: 12px 20px;
+            }
+            
+            .action-section {
+                padding: 16px 20px;
             }
         }
 
@@ -896,7 +917,7 @@
             </div>
 
             <!-- Live Players Section -->
-            <div class="glass-section">
+            <div class="glass-section compact">
                 <div class="live-header">
                     <div class="live-indicator">
                         <div class="live-dot"></div>
@@ -914,7 +935,7 @@
             </div>
 
             <!-- Active Challenges Section -->
-            <div class="glass-section" id="activeChallengesSection">
+            <div class="glass-section compact" id="activeChallengesSection">
                 <div class="group-header">
                     <div class="group-title">
                         🎯 <span>My Active Challenges</span>
@@ -930,7 +951,7 @@
             </div>
 
             <!-- Group Creation Section -->
-            <div class="glass-section">
+            <div class="glass-section compact">
                 <div class="group-header">
                     <div class="group-title">
                         👥 <span>Create Friend Groups</span>
