@@ -47,7 +47,7 @@
             position: fixed;
             width: 100%;
             font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', sans-serif;
-            background: radial-gradient(circle at 30% 20%, #1a1a2e 0%, #16213e 25%, #0f0f23 50%, #000 100%);
+            background: #000000;
             color: var(--text-primary);
         }
 
@@ -204,15 +204,19 @@
             animation: pulse 3s infinite;
         }
 
-        /* ===== GLASS HEADER ===== */
+        /* ===== GLASS HEADER - FIXED TOP BAR ===== */
         .glass-header {
+            position: sticky;
+            top: 0;
+            z-index: 100;
             padding: calc(var(--safe-area-top) + 20px) 25px 20px 25px;
             display: flex;
             justify-content: space-between;
             align-items: center;
             border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-            background: linear-gradient(180deg, rgba(255, 255, 255, 0.1) 0%, transparent 100%);
-            position: relative;
+            background: rgba(15, 15, 15, 0.95);
+            backdrop-filter: blur(25px) saturate(180%);
+            -webkit-backdrop-filter: blur(25px) saturate(180%);
         }
 
         .logo-section {
@@ -664,11 +668,15 @@
             box-shadow: 0 8px 25px rgba(255, 107, 157, 0.6);
         }
 
-        /* ===== GLASS BOTTOM NAVIGATION - OPTIMIZED ===== */
+        /* ===== GLASS BOTTOM NAVIGATION - FIXED ===== */
         .glass-nav {
+            position: sticky;
+            bottom: 0;
+            z-index: 100;
             padding: 12px 25px calc(var(--safe-area-bottom) + 12px) 25px;
-            background: linear-gradient(180deg, transparent 0%, rgba(255, 255, 255, 0.1) 100%);
-            backdrop-filter: blur(20px);
+            background: rgba(15, 15, 15, 0.95);
+            backdrop-filter: blur(25px) saturate(180%);
+            -webkit-backdrop-filter: blur(25px) saturate(180%);
             border-top: 1px solid rgba(255, 255, 255, 0.1);
             display: flex;
             justify-content: space-around;
@@ -821,22 +829,22 @@
             to { opacity: 1; transform: scale(1); }
         }
 
-        /* ===== SCROLLBAR - GLASS STYLE ===== */
-        ::-webkit-scrollbar {
+        /* ===== CUSTOM SCROLLBAR FOR GLASS CONTENT ===== */
+        .glass-content::-webkit-scrollbar {
             width: 4px;
         }
 
-        ::-webkit-scrollbar-track {
-            background: rgba(255, 255, 255, 0.1);
+        .glass-content::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.05);
             border-radius: 2px;
         }
 
-        ::-webkit-scrollbar-thumb {
+        .glass-content::-webkit-scrollbar-thumb {
             background: rgba(0, 255, 150, 0.5);
             border-radius: 2px;
         }
 
-        ::-webkit-scrollbar-thumb:hover {
+        .glass-content::-webkit-scrollbar-thumb:hover {
             background: rgba(0, 255, 150, 0.7);
         }
 
@@ -862,7 +870,7 @@
             
             .challenge-main {
                 padding: 16px 20px;
-                min-height: 260px;
+                min-height: calc(100vh - 450px);
             }
             
             .challenge-title {
@@ -902,13 +910,14 @@
                 <span id="aiStatusText">AI Ready</span>
             </div>
 
-            <!-- Glass Header -->
+            <!-- Glass Header - Fixed Top Bar -->
             <div class="glass-header">
                 <div class="logo-section">
                     <div class="logo-text">JomBro</div>
                     <div class="logo-subtitle" id="logoSlogan">Let's Go! lyode</div>
                 </div>
                 <div class="header-actions">
+                    <div class="header-btn" onclick="scrollToChallenge()">🎯</div>
                     <div class="header-btn" onclick="showHelp()">❓</div>
                     <div class="header-btn" onclick="showNotifications()">🔔</div>
                     <div class="header-btn" onclick="showModal('create')">➕</div>
@@ -916,111 +925,189 @@
                 </div>
             </div>
 
-            <!-- Live Players Section -->
-            <div class="glass-section compact">
-                <div class="live-header">
-                    <div class="live-indicator">
-                        <div class="live-dot"></div>
-                        <span>LIVE</span>
-                        <span style="font-size: 10px; color: var(--text-secondary); margin-left: 8px;" id="liveStatus">+2 joining soon</span>
+            <!-- Scrollable Content Area -->
+            <div class="glass-content">
+                <!-- Live Players Section -->
+                <div class="glass-section compact">
+                    <div class="live-header">
+                        <div class="live-indicator">
+                            <div class="live-dot"></div>
+                            <span>LIVE</span>
+                            <span style="font-size: 10px; color: var(--text-secondary); margin-left: 8px;" id="liveStatus">+2 joining soon</span>
+                        </div>
+                        <div class="player-status">
+                            <span>Elite Gladiator</span>
+                            <span class="tokens-display" id="playerTokens">15,247</span>
+                        </div>
                     </div>
-                    <div class="player-status">
-                        <span>Elite Gladiator</span>
-                        <span class="tokens-display" id="playerTokens">15,247</span>
+                    <div class="live-players" id="livePlayersContainer">
+                        <!-- Dynamic player avatars -->
                     </div>
                 </div>
-                <div class="live-players" id="livePlayersContainer">
-                    <!-- Dynamic player avatars -->
+
+                <!-- Active Challenges Section -->
+                <div class="glass-section compact" id="activeChallengesSection">
+                    <div class="group-header">
+                        <div class="group-title">
+                            🎯 <span>My Active Challenges</span>
+                            <span class="challenge-count" id="challengeCount">2</span>
+                        </div>
+                        <button class="create-group-btn" onclick="showModal('myChallenges')">
+                            View All
+                        </button>
+                    </div>
+                    <div class="active-challenges" id="activeChallengesList">
+                        <!-- Dynamic active challenges -->
+                    </div>
+                </div>
+
+                <!-- Group Creation Section -->
+                <div class="glass-section compact">
+                    <div class="group-header">
+                        <div class="group-title">
+                            👥 <span>Create Friend Groups</span>
+                        </div>
+                        <button class="create-group-btn" onclick="showModal('createGroup')">
+                            Create Group
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Main Challenge Display - Full Screen Piece -->
+                <div class="challenge-main">
+                    <div class="challenge-title" id="challengeTitle">Coffee Shop Poetry Challenge</div>
+                    
+                    <div class="challenge-description" id="challengeDescription">
+                        Visit any coffee shop and ask the barista to write a short poem on your cup or napkin! This is a wonderful way to connect with people and brighten someone's day.
+                    </div>
+
+                    <div class="challenge-hashtags" id="challengeHashtags">
+                        <span class="hashtag">#CoffeePoetry</span>
+                        <span class="hashtag">#Connection</span>
+                        <span class="hashtag">#JomBro</span>
+                    </div>
+
+                    <div class="challenge-meta">
+                        <div class="meta-item">
+                            <div class="meta-value" id="challengeTokens">500</div>
+                            <div class="meta-label">Tokens</div>
+                        </div>
+                        <div class="meta-item">
+                            <div class="meta-value" id="challengeDifficulty">Easy</div>
+                            <div class="meta-label">Level</div>
+                        </div>
+                        <div class="meta-item">
+                            <div class="meta-value" id="challengeDuration">30m</div>
+                            <div class="meta-label">Duration</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- User Control Section -->
+                <div class="action-section">
+                    <!-- User Controls -->
+                    <div class="user-controls">
+                        <button class="control-btn primary" onclick="acceptChallenge()">
+                            ✅ Accept
+                        </button>
+                        <button class="control-btn" onclick="skipChallenge()">
+                            ⏭️ Skip
+                        </button>
+                        <button class="control-btn" onclick="createCustom()">
+                            ✏️ Customize
+                        </button>
+                        <button class="control-btn" onclick="askAI()">
+                            🤖 Ask AI
+                        </button>
+                    </div>
+
+                    <!-- AI Suggestion -->
+                    <div class="ai-suggestion" id="aiSuggestion">
+                        💡 AI suggests: This matches your social preferences
+                    </div>
+                    
+                    <button class="btn-primary" onclick="startChallenge()">
+                        🚀 START CHALLENGE
+                    </button>
+                </div>
+
+                <!-- Additional Features Section (Visible when scrolling) -->
+                <div class="glass-section">
+                    <div class="group-header">
+                        <div class="group-title">
+                            🏆 <span>Achievements</span>
+                        </div>
+                        <button class="create-group-btn" onclick="showModal('achievements')">
+                            View All
+                        </button>
+                    </div>
+                    <div style="display: flex; gap: 8px; overflow-x: auto;">
+                        <div style="min-width: 60px; padding: 8px; background: rgba(255,255,255,0.05); border-radius: 8px; text-align: center;">
+                            <div style="font-size: 20px;">🔥</div>
+                            <div style="font-size: 10px; color: var(--text-secondary);">Streak</div>
+                        </div>
+                        <div style="min-width: 60px; padding: 8px; background: rgba(255,255,255,0.05); border-radius: 8px; text-align: center;">
+                            <div style="font-size: 20px;">⭐</div>
+                            <div style="font-size: 10px; color: var(--text-secondary);">Star</div>
+                        </div>
+                        <div style="min-width: 60px; padding: 8px; background: rgba(255,255,255,0.05); border-radius: 8px; text-align: center;">
+                            <div style="font-size: 20px;">👑</div>
+                            <div style="font-size: 10px; color: var(--text-secondary);">Crown</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Stats Section -->
+                <div class="glass-section">
+                    <div class="group-header">
+                        <div class="group-title">
+                            📊 <span>Your Stats</span>
+                        </div>
+                    </div>
+                    <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px;">
+                        <div style="padding: 12px; background: rgba(255,255,255,0.05); border-radius: 10px; text-align: center;">
+                            <div style="font-size: 16px; font-weight: 700; color: var(--primary-green);">143</div>
+                            <div style="font-size: 10px; color: var(--text-secondary);">Completed</div>
+                        </div>
+                        <div style="padding: 12px; background: rgba(255,255,255,0.05); border-radius: 10px; text-align: center;">
+                            <div style="font-size: 16px; font-weight: 700; color: var(--primary-green);">12</div>
+                            <div style="font-size: 10px; color: var(--text-secondary);">Day Streak</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Friends Activity -->
+                <div class="glass-section">
+                    <div class="group-header">
+                        <div class="group-title">
+                            👨‍👩‍👧‍👦 <span>Friends Activity</span>
+                        </div>
+                    </div>
+                    <div style="display: flex; flex-direction: column; gap: 8px;">
+                        <div style="display: flex; align-items: center; gap: 12px; padding: 8px; background: rgba(255,255,255,0.05); border-radius: 8px;">
+                            <div style="width: 30px; height: 30px; background: linear-gradient(45deg, var(--primary-green), #00d4ff); border-radius: 50%; display: flex; align-items: center; justify-content: center;">👩</div>
+                            <div style="flex: 1;">
+                                <div style="font-size: 12px; font-weight: 600;">Maria completed Coffee Challenge</div>
+                                <div style="font-size: 10px; color: var(--text-secondary);">2 minutes ago</div>
+                            </div>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 12px; padding: 8px; background: rgba(255,255,255,0.05); border-radius: 8px;">
+                            <div style="width: 30px; height: 30px; background: linear-gradient(45deg, var(--primary-green), #00d4ff); border-radius: 50%; display: flex; align-items: center; justify-content: center;">👨</div>
+                            <div style="flex: 1;">
+                                <div style="font-size: 12px; font-weight: 600;">Alex started Business Support Quest</div>
+                                <div style="font-size: 10px; color: var(--text-secondary);">5 minutes ago</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Scroll indicator -->
+                <div style="padding: 20px; text-align: center; color: var(--text-secondary); font-size: 12px;">
+                    ✨ Scroll up to see more features ✨
                 </div>
             </div>
 
-            <!-- Active Challenges Section -->
-            <div class="glass-section compact" id="activeChallengesSection">
-                <div class="group-header">
-                    <div class="group-title">
-                        🎯 <span>My Active Challenges</span>
-                        <span class="challenge-count" id="challengeCount">2</span>
-                    </div>
-                    <button class="create-group-btn" onclick="showModal('myChallenges')">
-                        View All
-                    </button>
-                </div>
-                <div class="active-challenges" id="activeChallengesList">
-                    <!-- Dynamic active challenges -->
-                </div>
-            </div>
-
-            <!-- Group Creation Section -->
-            <div class="glass-section compact">
-                <div class="group-header">
-                    <div class="group-title">
-                        👥 <span>Create Friend Groups</span>
-                    </div>
-                    <button class="create-group-btn" onclick="showModal('createGroup')">
-                        Create Group
-                    </button>
-                </div>
-            </div>
-
-            <!-- Main Challenge Display -->
-            <div class="challenge-main">
-                <div class="challenge-title" id="challengeTitle">Coffee Shop Poetry Challenge</div>
-                
-                <div class="challenge-description" id="challengeDescription">
-                    Visit any coffee shop and ask the barista to write a short poem on your cup or napkin! This is a wonderful way to connect with people and brighten someone's day.
-                </div>
-
-                <div class="challenge-hashtags" id="challengeHashtags">
-                    <span class="hashtag">#CoffeePoetry</span>
-                    <span class="hashtag">#Connection</span>
-                    <span class="hashtag">#JomBro</span>
-                </div>
-
-                <div class="challenge-meta">
-                    <div class="meta-item">
-                        <div class="meta-value" id="challengeTokens">500</div>
-                        <div class="meta-label">Tokens</div>
-                    </div>
-                    <div class="meta-item">
-                        <div class="meta-value" id="challengeDifficulty">Easy</div>
-                        <div class="meta-label">Level</div>
-                    </div>
-                    <div class="meta-item">
-                        <div class="meta-value" id="challengeDuration">30m</div>
-                        <div class="meta-label">Duration</div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- User Control Section -->
-            <div class="action-section">
-                <!-- User Controls -->
-                <div class="user-controls">
-                    <button class="control-btn primary" onclick="acceptChallenge()">
-                        ✅ Accept
-                    </button>
-                    <button class="control-btn" onclick="skipChallenge()">
-                        ⏭️ Skip
-                    </button>
-                    <button class="control-btn" onclick="createCustom()">
-                        ✏️ Customize
-                    </button>
-                    <button class="control-btn" onclick="askAI()">
-                        🤖 Ask AI
-                    </button>
-                </div>
-
-                <!-- AI Suggestion -->
-                <div class="ai-suggestion" id="aiSuggestion">
-                    💡 AI suggests: This matches your social preferences
-                </div>
-                
-                <button class="btn-primary" onclick="startChallenge()">
-                    🚀 START CHALLENGE
-                </button>
-            </div>
-
-            <!-- Glass Bottom Navigation -->
+            <!-- Fixed Bottom Navigation -->
             <div class="glass-nav">
                 <div class="nav-item active" onclick="navTo(this, 'home')">
                     <div class="nav-icon">🏠</div>
@@ -1514,7 +1601,7 @@
             showToast(`👋 Checking out ${name}'s profile`);
         }
 
-        // ===== NAVIGATION =====
+        // ===== NAVIGATION WITH SCROLL =====
         function navTo(element, section) {
             document.querySelectorAll('.nav-item').forEach(item => 
                 item.classList.remove('active')
@@ -1523,6 +1610,8 @@
             
             switch(section) {
                 case 'home':
+                    // Scroll to top
+                    document.querySelector('.glass-content').scrollTo({ top: 0, behavior: 'smooth' });
                     showToast('🏠 Home - Your personalized challenge hub');
                     break;
                 case 'ranks':
@@ -1599,6 +1688,9 @@
             renderActiveChallenges();
             displayCurrentChallenge();
             
+            // Initialize scroll behavior
+            initScrollBehavior();
+            
             // Gentle AI status updates (every 20 seconds)
             setInterval(updateAIStatus, 20000);
             
@@ -1608,6 +1700,37 @@
             }, 1200);
             
             console.log('🌟 Floating Glass JomBro Interface Loaded');
+        }
+
+        // ===== SCROLL BEHAVIOR ENHANCEMENTS =====
+        function initScrollBehavior() {
+            const glassContent = document.querySelector('.glass-content');
+            const header = document.querySelector('.glass-header');
+            
+            if (glassContent && header) {
+                glassContent.addEventListener('scroll', () => {
+                    const scrollTop = glassContent.scrollTop;
+                    
+                    // Add header shadow when scrolling
+                    if (scrollTop > 10) {
+                        header.style.boxShadow = '0 4px 20px rgba(0, 0, 0, 0.3)';
+                    } else {
+                        header.style.boxShadow = 'none';
+                    }
+                });
+            }
+        }
+
+        // ===== SCROLL TO CHALLENGE FUNCTION =====
+        function scrollToChallenge() {
+            const challengeMain = document.querySelector('.challenge-main');
+            if (challengeMain) {
+                challengeMain.scrollIntoView({ 
+                    behavior: 'smooth', 
+                    block: 'start' 
+                });
+                showToast('🎯 Scrolled to main challenge!');
+            }
         }
 
         // Start the app
