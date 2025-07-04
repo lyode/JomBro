@@ -398,9 +398,101 @@
             box-shadow: 0 4px 15px rgba(0, 255, 150, 0.3);
         }
 
-        .create-group-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(0, 255, 150, 0.5);
+        .challenge-count {
+            background: linear-gradient(145deg, #ff6b9d, #c44569);
+            color: #fff;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: 10px;
+            font-weight: 700;
+            margin-left: 8px;
+            box-shadow: 0 2px 8px rgba(255, 107, 157, 0.4);
+        }
+
+        .active-challenges {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            max-height: 120px;
+            overflow-y: auto;
+        }
+
+        .active-challenge-item {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            padding: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .active-challenge-item:hover {
+            background: rgba(255, 255, 255, 0.08);
+            border-color: var(--primary-green);
+            transform: translateX(3px);
+        }
+
+        .challenge-info {
+            flex: 1;
+        }
+
+        .challenge-name {
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 2px;
+        }
+
+        .challenge-progress {
+            font-size: 10px;
+            color: var(--text-secondary);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .progress-bar {
+            flex: 1;
+            height: 3px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 2px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary-green), #00d4ff);
+            transition: width 0.3s ease;
+        }
+
+        .challenge-status {
+            padding: 3px 8px;
+            border-radius: 8px;
+            font-size: 9px;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .status-active {
+            background: rgba(0, 255, 150, 0.2);
+            color: var(--primary-green);
+            border: 1px solid rgba(0, 255, 150, 0.3);
+        }
+
+        .status-pending {
+            background: rgba(255, 165, 0, 0.2);
+            color: #ffa500;
+            border: 1px solid rgba(255, 165, 0, 0.3);
+        }
+
+        .status-completed {
+            background: rgba(139, 92, 246, 0.2);
+            color: var(--ai-purple);
+            border: 1px solid rgba(139, 92, 246, 0.3);
         }
 
         /* ===== MAIN CHALLENGE - GLASS CONTENT ===== */
@@ -619,6 +711,24 @@
             color: var(--primary-green);
         }
 
+        .nav-notification {
+            position: absolute;
+            top: -4px;
+            right: -4px;
+            width: 16px;
+            height: 16px;
+            background: linear-gradient(145deg, #ff6b9d, #c44569);
+            border-radius: 50%;
+            font-size: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 700;
+            box-shadow: 0 2px 8px rgba(255, 107, 157, 0.5);
+            animation: pulse 2s infinite;
+        }
+
         /* ===== MODALS - GLASS STYLE ===== */
         .modal {
             position: fixed;
@@ -803,6 +913,22 @@
                 </div>
             </div>
 
+            <!-- Active Challenges Section -->
+            <div class="glass-section" id="activeChallengesSection">
+                <div class="group-header">
+                    <div class="group-title">
+                        🎯 <span>My Active Challenges</span>
+                        <span class="challenge-count" id="challengeCount">2</span>
+                    </div>
+                    <button class="create-group-btn" onclick="showModal('myChallenges')">
+                        View All
+                    </button>
+                </div>
+                <div class="active-challenges" id="activeChallengesList">
+                    <!-- Dynamic active challenges -->
+                </div>
+            </div>
+
             <!-- Group Creation Section -->
             <div class="glass-section">
                 <div class="group-header">
@@ -878,6 +1004,7 @@
                 <div class="nav-item active" onclick="navTo(this, 'home')">
                     <div class="nav-icon">🏠</div>
                     <div class="nav-label">Home</div>
+                    <div class="nav-notification" id="homeNotification">2</div>
                 </div>
                 <div class="nav-item" onclick="navTo(this, 'ranks')">
                     <div class="nav-icon">🏆</div>
@@ -896,6 +1023,79 @@
                     <div class="nav-label">Profile</div>
                 </div>
             </div>
+        </div>
+    </div>
+
+    <!-- My Challenges Modal -->
+    <div id="myChallengesModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-title">
+                🎯 My Active Challenges
+            </div>
+            
+            <div style="display: flex; flex-direction: column; gap: 12px; max-height: 400px; overflow-y: auto;">
+                <div class="active-challenge-item" style="flex-direction: column; align-items: flex-start; padding: 15px;">
+                    <div style="display: flex; justify-content: space-between; width: 100%; margin-bottom: 8px;">
+                        <div class="challenge-name" style="font-size: 14px;">Coffee Shop Poetry Challenge</div>
+                        <div class="challenge-status status-active">Active</div>
+                    </div>
+                    <div style="font-size: 12px; color: var(--text-secondary); margin-bottom: 8px;">
+                        Visit a coffee shop and ask for a poem on your cup
+                    </div>
+                    <div class="challenge-progress" style="width: 100%;">
+                        <span>Progress: 2/3 steps</span>
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: 66%;"></div>
+                        </div>
+                    </div>
+                    <div style="display: flex; gap: 8px; margin-top: 10px;">
+                        <button class="control-btn" style="font-size: 10px; padding: 6px 12px;" onclick="updateProgress(1)">📷 Add Photo</button>
+                        <button class="control-btn" style="font-size: 10px; padding: 6px 12px;" onclick="completeChallenge(1)">✅ Complete</button>
+                    </div>
+                </div>
+
+                <div class="active-challenge-item" style="flex-direction: column; align-items: flex-start; padding: 15px;">
+                    <div style="display: flex; justify-content: space-between; width: 100%; margin-bottom: 8px;">
+                        <div class="challenge-name" style="font-size: 14px;">Local Business Support</div>
+                        <div class="challenge-status status-pending">Pending</div>
+                    </div>
+                    <div style="font-size: 12px; color: var(--text-secondary); margin-bottom: 8px;">
+                        Visit 3 local businesses and leave positive reviews
+                    </div>
+                    <div class="challenge-progress" style="width: 100%;">
+                        <span>Progress: 0/3 steps</span>
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: 0%;"></div>
+                        </div>
+                    </div>
+                    <div style="display: flex; gap: 8px; margin-top: 10px;">
+                        <button class="control-btn primary" style="font-size: 10px; padding: 6px 12px;" onclick="startChallenge(2)">🚀 Start</button>
+                        <button class="control-btn" style="font-size: 10px; padding: 6px 12px;" onclick="skipChallenge(2)">⏭️ Skip</button>
+                    </div>
+                </div>
+
+                <div class="active-challenge-item" style="flex-direction: column; align-items: flex-start; padding: 15px; opacity: 0.7;">
+                    <div style="display: flex; justify-content: space-between; width: 100%; margin-bottom: 8px;">
+                        <div class="challenge-name" style="font-size: 14px;">Random Acts of Kindness</div>
+                        <div class="challenge-status status-completed">Completed</div>
+                    </div>
+                    <div style="font-size: 12px; color: var(--text-secondary); margin-bottom: 8px;">
+                        Performed 5 random acts of kindness ✨
+                    </div>
+                    <div class="challenge-progress" style="width: 100%;">
+                        <span>Progress: 5/5 steps</span>
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: 100%;"></div>
+                        </div>
+                    </div>
+                    <div style="display: flex; gap: 8px; margin-top: 10px;">
+                        <button class="control-btn" style="font-size: 10px; padding: 6px 12px;" onclick="viewRewards(3)">🏆 View Rewards</button>
+                        <button class="control-btn" style="font-size: 10px; padding: 6px 12px;" onclick="shareSuccess(3)">📤 Share</button>
+                    </div>
+                </div>
+            </div>
+            
+            <button class="btn-primary" onclick="hideModal('myChallenges')" style="margin-top: 20px;">Close</button>
         </div>
     </div>
 
@@ -1034,6 +1234,27 @@
             }
         ];
 
+        let activeChallenges = [
+            {
+                id: 1,
+                title: 'Coffee Shop Poetry Challenge',
+                description: 'Visit a coffee shop and ask for a poem',
+                progress: 66,
+                status: 'active',
+                steps: '2/3',
+                timeLeft: '2h 30m'
+            },
+            {
+                id: 2,
+                title: 'Local Business Support',
+                description: 'Visit 3 local businesses',
+                progress: 0,
+                status: 'pending',
+                steps: '0/3',
+                timeLeft: '5h 15m'
+            }
+        ];
+
         let currentChallengeIndex = 0;
 
         let livePlayers = [
@@ -1117,14 +1338,124 @@
             ).join('');
         }
 
-        function acceptChallenge() {
-            showToast('✅ Challenge accepted! Good luck on your adventure!');
+        // ===== ACTIVE CHALLENGES MANAGEMENT =====
+        function renderActiveChallenges() {
+            const container = document.getElementById('activeChallengesList');
+            const countElement = document.getElementById('challengeCount');
+            const notificationElement = document.getElementById('homeNotification');
+            
+            // Update challenge count
+            const activeCount = activeChallenges.filter(c => c.status === 'active' || c.status === 'pending').length;
+            countElement.textContent = activeCount;
+            
+            // Update notification badge
+            if (notificationElement) {
+                notificationElement.textContent = activeCount;
+                notificationElement.style.display = activeCount > 0 ? 'flex' : 'none';
+            }
+            
+            // Render mini challenge list (show max 2)
+            const displayChallenges = activeChallenges.slice(0, 2);
+            
+            container.innerHTML = displayChallenges.map(challenge => `
+                <div class="active-challenge-item" onclick="showChallengeDetail(${challenge.id})">
+                    <div class="challenge-info">
+                        <div class="challenge-name">${challenge.title}</div>
+                        <div class="challenge-progress">
+                            <span>${challenge.steps} • ${challenge.timeLeft}</span>
+                            <div class="progress-bar">
+                                <div class="progress-fill" style="width: ${challenge.progress}%;"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="challenge-status status-${challenge.status}">
+                        ${challenge.status === 'active' ? 'Active' : 'Pending'}
+                    </div>
+                </div>
+            `).join('');
         }
 
-        function skipChallenge() {
-            currentChallengeIndex = (currentChallengeIndex + 1) % challenges.length;
-            displayCurrentChallenge();
-            showToast('⏭️ New challenge loaded');
+        function showChallengeDetail(challengeId) {
+            showToast(`📋 Opening challenge #${challengeId} details...`);
+            showModal('myChallenges');
+        }
+
+        function updateProgress(challengeId) {
+            const challenge = activeChallenges.find(c => c.id === challengeId);
+            if (challenge) {
+                challenge.progress = Math.min(challenge.progress + 33, 100);
+                const currentStep = Math.floor(challenge.progress / 33);
+                challenge.steps = `${currentStep}/3`;
+                renderActiveChallenges();
+                showToast('📸 Progress updated! Photo added to challenge.');
+            }
+        }
+
+        function completeChallenge(challengeId) {
+            const challenge = activeChallenges.find(c => c.id === challengeId);
+            if (challenge) {
+                challenge.status = 'completed';
+                challenge.progress = 100;
+                challenge.steps = '3/3';
+                renderActiveChallenges();
+                showToast('🎉 Challenge completed! Rewards earned!');
+                hideModal('myChallenges');
+                
+                // Add tokens to player
+                player.tokens += 500;
+                document.getElementById('playerTokens').textContent = player.tokens.toLocaleString();
+            }
+        }
+
+        function startChallenge(challengeId) {
+            const challenge = activeChallenges.find(c => c.id === challengeId);
+            if (challenge) {
+                challenge.status = 'active';
+                renderActiveChallenges();
+                showToast('🚀 Challenge started! Go make it happen!');
+            }
+        }
+
+        function viewRewards(challengeId) {
+            showToast('🏆 Rewards: +500 tokens, +1 streak, Achievement unlocked!');
+        }
+
+        function shareSuccess(challengeId) {
+            showToast('📤 Success shared with your friends!');
+        }
+
+        function acceptChallenge() {
+            const currentChallenge = challenges[currentChallengeIndex];
+            
+            // Add to active challenges
+            const newActiveChallenge = {
+                id: Date.now(),
+                title: currentChallenge.title,
+                description: currentChallenge.description,
+                progress: 0,
+                status: 'pending',
+                steps: '0/3',
+                timeLeft: '6h 00m'
+            };
+            
+            activeChallenges.unshift(newActiveChallenge);
+            renderActiveChallenges();
+            
+            showToast('✅ Challenge accepted! Check "My Challenges" to track progress.');
+        }
+
+        function skipChallenge(challengeId = null) {
+            if (challengeId) {
+                // Skip a specific challenge from active list
+                activeChallenges = activeChallenges.filter(c => c.id !== challengeId);
+                renderActiveChallenges();
+                showToast('⏭️ Challenge removed from your list');
+            } else {
+                // Skip current challenge (original functionality)
+                currentChallengeIndex = (currentChallengeIndex + 1) % challenges.length;
+                displayCurrentChallenge();
+                showToast('⏭️ New challenge loaded');
+            }
         }
 
         function createCustom() {
@@ -1244,6 +1575,7 @@
             }
             
             renderLivePlayers();
+            renderActiveChallenges();
             displayCurrentChallenge();
             
             // Gentle AI status updates (every 20 seconds)
