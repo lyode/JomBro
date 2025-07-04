@@ -10,19 +10,14 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="JomBro">
     <meta name="theme-color" content="#00ff96">
-    <meta name="msapplication-TileColor" content="#00ff96">
     
     <!-- Manifest Link -->
     <link rel="manifest" href="/manifest.json">
     
-    <!-- Icons -->
-    <link rel="icon" type="image/png" sizes="32x32" href="/icons/icon-32x32.png">
-    <link rel="icon" type="image/png" sizes="16x16" href="/icons/icon-16x16.png">
-    <link rel="apple-touch-icon" href="/icons/icon-192x192.png">
-    
     <title>JomBro - AI-Powered Social Challenge Platform</title>
+
     <style>
-        /* ===== ENHANCED JOMBRO WITH AI AUTOMATION ===== */
+        /* ===== ENHANCED MOBILE-FIRST JOMBRO WITH STARS ===== */
         :root {
             --safe-area-top: env(safe-area-inset-top, 20px);
             --safe-area-bottom: env(safe-area-inset-bottom, 20px);
@@ -55,6 +50,48 @@
             color: var(--text-primary);
         }
 
+        /* ===== BLINKING STARS BACKGROUND ===== */
+        .stars-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+            overflow: hidden;
+        }
+
+        .star {
+            position: absolute;
+            width: 2px;
+            height: 2px;
+            background: #ffffff;
+            border-radius: 50%;
+            animation: twinkle 3s infinite;
+        }
+
+        .star.medium {
+            width: 3px;
+            height: 3px;
+            background: var(--primary-green);
+            animation: twinkle 4s infinite;
+        }
+
+        .star.large {
+            width: 4px;
+            height: 4px;
+            background: var(--ai-purple);
+            animation: twinkle 5s infinite;
+        }
+
+        @keyframes twinkle {
+            0%, 100% { opacity: 0.3; transform: scale(1); }
+            25% { opacity: 1; transform: scale(1.2); }
+            50% { opacity: 0.8; transform: scale(1.1); }
+            75% { opacity: 1; transform: scale(1.3); }
+        }
+
         /* ===== MAIN CONTAINER ===== */
         .app-container {
             position: fixed;
@@ -65,35 +102,37 @@
             display: flex;
             flex-direction: column;
             background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 100%);
+            z-index: 1;
         }
 
-        /* ===== AI STATUS INDICATOR ===== */
+        /* ===== AI STATUS - LESS INTRUSIVE ===== */
         .ai-status {
             position: fixed;
             top: calc(var(--safe-area-top) + 10px);
             right: 20px;
-            background: linear-gradient(45deg, var(--ai-purple), var(--ai-blue));
-            padding: 6px 12px;
-            border-radius: 20px;
-            font-size: 11px;
-            font-weight: 600;
-            color: white;
+            background: rgba(139, 92, 246, 0.3);
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 10px;
+            font-weight: 500;
+            color: var(--ai-purple);
             z-index: 1000;
             display: flex;
             align-items: center;
-            gap: 6px;
-            box-shadow: 0 4px 20px rgba(139, 92, 246, 0.3);
+            gap: 4px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(139, 92, 246, 0.2);
         }
 
         .ai-pulse {
-            width: 8px;
-            height: 8px;
-            background: #fff;
+            width: 6px;
+            height: 6px;
+            background: var(--ai-purple);
             border-radius: 50%;
-            animation: pulse 2s infinite;
+            animation: pulse 3s infinite;
         }
 
-        /* ===== HEADER WITH AI INSIGHTS ===== */
+        /* ===== HEADER ===== */
         .app-header {
             padding: calc(var(--safe-area-top) + 15px) 20px 15px 20px;
             display: flex;
@@ -102,6 +141,8 @@
             border-bottom: 1px solid var(--border-color);
             background: rgba(10, 10, 10, 0.95);
             backdrop-filter: blur(20px);
+            position: relative;
+            z-index: 10;
         }
 
         .logo-section {
@@ -120,13 +161,6 @@
             font-size: 12px;
             color: var(--text-secondary);
             margin-top: -2px;
-        }
-
-        .ai-insight {
-            font-size: 10px;
-            color: var(--ai-purple);
-            margin-top: 2px;
-            opacity: 0.8;
         }
 
         .header-actions {
@@ -150,36 +184,19 @@
             position: relative;
         }
 
-        .header-btn.ai-enhanced {
-            background: linear-gradient(45deg, var(--ai-purple), var(--ai-blue));
-            box-shadow: 0 0 15px rgba(139, 92, 246, 0.3);
-        }
-
         .header-btn:hover {
             background: rgba(0, 255, 150, 0.2);
             border-color: var(--primary-green);
+            transform: scale(1.05);
         }
 
-        .ai-badge {
-            position: absolute;
-            top: -4px;
-            right: -4px;
-            width: 12px;
-            height: 12px;
-            background: var(--ai-purple);
-            border-radius: 50%;
-            font-size: 8px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-        }
-
-        /* ===== LIVE PLAYERS WITH AI ANALYTICS ===== */
+        /* ===== LIVE PLAYERS SECTION ===== */
         .live-section {
             padding: 15px 20px;
             border-bottom: 1px solid var(--border-color);
             background: var(--card-bg);
+            position: relative;
+            z-index: 10;
         }
 
         .live-header {
@@ -204,17 +221,6 @@
             background: #ff4757;
             border-radius: 50%;
             animation: pulse 2s infinite;
-        }
-
-        .active-count {
-            font-size: 12px;
-            color: var(--text-secondary);
-        }
-
-        .ai-prediction {
-            font-size: 10px;
-            color: var(--ai-purple);
-            margin-left: 8px;
         }
 
         .player-status {
@@ -257,11 +263,6 @@
             transition: transform 0.2s ease;
         }
 
-        .avatar-ring.ai-recommended {
-            background: linear-gradient(45deg, var(--ai-purple), var(--ai-blue));
-            box-shadow: 0 0 15px rgba(139, 92, 246, 0.4);
-        }
-
         .avatar-ring:hover {
             transform: scale(1.05);
         }
@@ -289,93 +290,57 @@
             border-radius: 50%;
         }
 
-        /* ===== AI CHALLENGE CREATOR SECTION ===== */
-        .creator-section {
+        /* ===== GROUP CREATION - PROMINENT ===== */
+        .group-section {
             padding: 15px 20px;
             border-bottom: 1px solid var(--border-color);
-            background: var(--card-bg);
+            background: rgba(0, 255, 150, 0.05);
+            position: relative;
+            z-index: 10;
         }
 
-        .creator-info {
+        .group-header {
             display: flex;
+            justify-content: space-between;
             align-items: center;
-            gap: 12px;
+            margin-bottom: 12px;
         }
 
-        .creator-avatar {
-            width: 40px;
-            height: 40px;
-            border-radius: 20px;
-            background: linear-gradient(45deg, var(--ai-purple), var(--ai-blue));
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 20px;
-            box-shadow: 0 0 20px rgba(139, 92, 246, 0.3);
-        }
-
-        .creator-details {
-            flex: 1;
-        }
-
-        .creator-name {
-            font-size: 16px;
+        .group-title {
+            font-size: 14px;
             font-weight: 600;
-            color: var(--text-primary);
-            margin-bottom: 2px;
-        }
-
-        .creator-badge {
-            background: linear-gradient(45deg, var(--ai-purple), var(--ai-blue));
-            color: #fff;
-            padding: 2px 8px;
-            border-radius: 8px;
-            font-size: 10px;
-            font-weight: 700;
-            text-transform: uppercase;
-            box-shadow: 0 0 15px rgba(139, 92, 246, 0.3);
-        }
-
-        .ai-stats {
+            color: var(--primary-green);
             display: flex;
-            gap: 12px;
-            font-size: 10px;
-            color: var(--ai-purple);
-            margin-top: 4px;
+            align-items: center;
+            gap: 8px;
         }
 
-        /* ===== MAIN CHALLENGE DISPLAY WITH AI ENHANCEMENT ===== */
+        .create-group-btn {
+            background: var(--primary-green);
+            color: #000;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .create-group-btn:hover {
+            background: #00e085;
+            transform: translateY(-1px);
+        }
+
+        /* ===== MAIN CHALLENGE DISPLAY ===== */
         .challenge-main {
             flex: 1;
             padding: 20px;
             overflow-y: auto;
             position: relative;
-        }
-
-        .ai-confidence {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            margin-bottom: 16px;
-            padding: 8px 12px;
-            background: rgba(139, 92, 246, 0.1);
-            border: 1px solid var(--ai-purple);
-            border-radius: 8px;
-            font-size: 12px;
-        }
-
-        .confidence-bar {
-            flex: 1;
-            height: 4px;
-            background: rgba(139, 92, 246, 0.2);
-            border-radius: 2px;
-            overflow: hidden;
-        }
-
-        .confidence-fill {
-            height: 100%;
-            background: var(--ai-purple);
-            transition: width 0.3s ease;
+            z-index: 10;
         }
 
         .challenge-title {
@@ -391,27 +356,6 @@
             line-height: 1.6;
             color: var(--text-primary);
             margin-bottom: 20px;
-        }
-
-        .ai-enhancement {
-            background: rgba(139, 92, 246, 0.1);
-            border-left: 3px solid var(--ai-purple);
-            padding: 12px;
-            margin-bottom: 20px;
-            border-radius: 0 8px 8px 0;
-        }
-
-        .ai-enhancement-title {
-            font-size: 12px;
-            font-weight: 600;
-            color: var(--ai-purple);
-            margin-bottom: 6px;
-        }
-
-        .ai-enhancement-text {
-            font-size: 14px;
-            color: var(--text-secondary);
-            line-height: 1.4;
         }
 
         .challenge-hashtags {
@@ -431,12 +375,6 @@
             font-weight: 500;
         }
 
-        .hashtag.ai-generated {
-            background: rgba(139, 92, 246, 0.15);
-            border-color: var(--ai-purple);
-            color: var(--ai-purple);
-        }
-
         .challenge-meta {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
@@ -450,12 +388,6 @@
             border-radius: 12px;
             padding: 12px;
             text-align: center;
-            position: relative;
-        }
-
-        .meta-item.ai-optimized {
-            border-color: var(--ai-purple);
-            box-shadow: 0 0 10px rgba(139, 92, 246, 0.2);
         }
 
         .meta-value {
@@ -472,87 +404,59 @@
             letter-spacing: 0.5px;
         }
 
-        .ai-optimization {
-            position: absolute;
-            top: -6px;
-            right: -6px;
-            width: 16px;
-            height: 16px;
-            background: var(--ai-purple);
-            border-radius: 50%;
-            font-size: 8px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-        }
-
-        /* ===== SIDE ACTIONS WITH AI ===== */
-        .side-actions {
-            position: fixed;
-            right: 20px;
-            top: 50%;
-            transform: translateY(-50%);
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-            z-index: 100;
-        }
-
-        .side-btn {
-            width: 48px;
-            height: 48px;
-            border-radius: 24px;
-            background: var(--card-bg);
-            border: 1px solid var(--border-color);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            font-size: 20px;
-            color: var(--text-primary);
-            transition: all 0.2s ease;
-            backdrop-filter: blur(20px);
-        }
-
-        .side-btn:hover {
-            background: rgba(0, 255, 150, 0.2);
-            border-color: var(--primary-green);
-            transform: scale(1.05);
-        }
-
-        .like-btn {
-            height: 60px;
-            flex-direction: column;
-            padding: 8px;
-            background: rgba(0, 255, 150, 0.1);
-            border-color: var(--primary-green);
-        }
-
-        .like-count {
-            font-size: 12px;
-            font-weight: 700;
-            color: var(--primary-green);
-            margin-bottom: 2px;
-        }
-
-        .ai-btn {
-            background: linear-gradient(45deg, var(--ai-purple), var(--ai-blue));
-            border-color: var(--ai-purple);
-            box-shadow: 0 0 15px rgba(139, 92, 246, 0.3);
-        }
-
-        /* ===== ACTION BUTTONS WITH AI ===== */
+        /* ===== USER CONTROL BUTTONS - MORE PROMINENT ===== */
         .action-section {
             padding: 20px;
             background: var(--card-bg);
             border-top: 1px solid var(--border-color);
+            position: relative;
+            z-index: 10;
         }
 
-        .action-buttons {
-            display: flex;
-            flex-direction: column;
+        .user-controls {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
             gap: 12px;
+            margin-bottom: 16px;
+        }
+
+        .control-btn {
+            background: rgba(255, 255, 255, 0.1);
+            color: var(--text-primary);
+            border: 1px solid var(--border-color);
+            padding: 12px 16px;
+            border-radius: 12px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            text-align: center;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+        }
+
+        .control-btn:hover {
+            background: rgba(255, 255, 255, 0.15);
+            border-color: var(--primary-green);
+        }
+
+        .control-btn.primary {
+            background: var(--primary-green);
+            color: #000;
+            border-color: var(--primary-green);
+        }
+
+        .ai-suggestion {
+            background: rgba(139, 92, 246, 0.1);
+            border: 1px solid var(--ai-purple);
+            color: var(--ai-purple);
+            padding: 10px;
+            border-radius: 8px;
+            font-size: 11px;
+            text-align: center;
+            margin-bottom: 12px;
         }
 
         .btn-primary {
@@ -571,49 +475,12 @@
             transition: all 0.2s ease;
             text-transform: uppercase;
             letter-spacing: 0.5px;
-            box-shadow: 0 0 20px rgba(255, 179, 217, 0.02);
-        }
-
-        .btn-primary.ai-enhanced {
-            background: linear-gradient(45deg, #ffb3d9, var(--ai-purple));
-            box-shadow: 0 4px 20px rgba(139, 92, 246, 0.3);
+            width: 100%;
         }
 
         .btn-primary:hover {
             background: #ff99d1;
             transform: translateY(-2px);
-            box-shadow: 0 8px 25px rgba(255, 179, 217, 0.3), 0 0 30px rgba(255, 179, 217, 0.02);
-        }
-
-        .btn-secondary {
-            background: rgba(255, 255, 255, 0.1);
-            color: var(--text-primary);
-            border: 1px solid var(--border-color);
-            padding: 14px 24px;
-            border-radius: 12px;
-            font-size: 14px;
-            font-weight: 600;
-            cursor: pointer;
-            text-align: center;
-            transition: all 0.2s ease;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-
-        .btn-secondary:hover {
-            background: rgba(255, 255, 255, 0.15);
-            border-color: rgba(255, 255, 255, 0.3);
-        }
-
-        .ai-recommendation {
-            background: rgba(139, 92, 246, 0.1);
-            border: 1px solid var(--ai-purple);
-            color: var(--ai-purple);
-            margin-bottom: 12px;
-            padding: 12px;
-            border-radius: 8px;
-            font-size: 12px;
-            text-align: center;
         }
 
         /* ===== BOTTOM NAVIGATION ===== */
@@ -625,6 +492,8 @@
             display: flex;
             justify-content: space-around;
             align-items: center;
+            position: relative;
+            z-index: 10;
         }
 
         .nav-item {
@@ -666,18 +535,7 @@
             color: var(--primary-green);
         }
 
-        .ai-notification {
-            position: absolute;
-            top: -2px;
-            right: 8px;
-            width: 8px;
-            height: 8px;
-            background: var(--ai-purple);
-            border-radius: 50%;
-            animation: pulse 2s infinite;
-        }
-
-        /* ===== AI DASHBOARD MODAL ===== */
+        /* ===== MODALS ===== */
         .modal {
             position: fixed;
             top: 0;
@@ -707,7 +565,9 @@
             max-height: 80%;
             overflow-y: auto;
             width: 100%;
-            max-width: 500px;
+            max-width: 400px;
+            position: relative;
+            z-index: 10;
         }
 
         .modal-title {
@@ -722,58 +582,7 @@
             gap: 8px;
         }
 
-        .ai-dashboard {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 16px;
-            margin-bottom: 24px;
-        }
-
-        .ai-metric {
-            background: rgba(139, 92, 246, 0.1);
-            border: 1px solid var(--ai-purple);
-            border-radius: 12px;
-            padding: 16px;
-            text-align: center;
-        }
-
-        .ai-metric-value {
-            font-size: 24px;
-            font-weight: 700;
-            color: var(--ai-purple);
-            margin-bottom: 4px;
-        }
-
-        .ai-metric-label {
-            font-size: 12px;
-            color: var(--text-secondary);
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-
-        .ai-log {
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid var(--border-color);
-            border-radius: 8px;
-            padding: 16px;
-            max-height: 200px;
-            overflow-y: auto;
-        }
-
-        .ai-log-entry {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            margin-bottom: 8px;
-            font-size: 12px;
-            color: var(--text-secondary);
-        }
-
-        .ai-log-time {
-            color: var(--ai-purple);
-            font-weight: 600;
-        }
-
+        /* ===== TOAST NOTIFICATIONS ===== */
         .toast {
             position: fixed;
             top: calc(var(--safe-area-top) + 60px);
@@ -799,16 +608,6 @@
             opacity: 1;
         }
 
-        .toast.ai {
-            border-color: var(--ai-purple);
-            background: rgba(139, 92, 246, 0.1);
-        }
-
-        .toast.error {
-            border-color: #ff4757;
-            background: rgba(255, 71, 87, 0.1);
-        }
-
         /* ===== ANIMATIONS ===== */
         @keyframes pulse {
             0%, 100% { opacity: 1; }
@@ -820,16 +619,7 @@
             to { opacity: 1; transform: scale(1); }
         }
 
-        @keyframes aiGlow {
-            0%, 100% { box-shadow: 0 0 15px rgba(139, 92, 246, 0.3); }
-            50% { box-shadow: 0 0 25px rgba(139, 92, 246, 0.6); }
-        }
-
-        .ai-glow {
-            animation: aiGlow 3s infinite;
-        }
-
-        /* ===== RESPONSIVE ===== */
+        /* ===== MOBILE OPTIMIZATIONS ===== */
         @media (max-width: 400px) {
             .app-header {
                 padding: calc(var(--safe-area-top) + 10px) 16px 10px 16px;
@@ -846,10 +636,6 @@
             .challenge-title {
                 font-size: 24px;
             }
-            
-            .side-actions {
-                right: 16px;
-            }
         }
 
         /* ===== PERFORMANCE ===== */
@@ -864,10 +650,13 @@
     </style>
 </head>
 <body>
-    <!-- AI Status Indicator -->
+    <!-- Blinking Stars Background -->
+    <div class="stars-container" id="starsContainer"></div>
+
+    <!-- AI Status - Less Intrusive -->
     <div class="ai-status" id="aiStatus">
         <div class="ai-pulse"></div>
-        <span id="aiStatusText">AI Active</span>
+        <span id="aiStatusText">AI Ready</span>
     </div>
 
     <div class="app-container">
@@ -876,19 +665,11 @@
             <div class="logo-section">
                 <div class="logo-text">JomBro</div>
                 <div class="logo-subtitle" id="logoSlogan">Let's Go! lyode</div>
-                <div class="ai-insight" id="aiInsight">AI generated 3 new challenges for you</div>
             </div>
             <div class="header-actions">
                 <div class="header-btn" onclick="showHelp()">❓</div>
-                <div class="header-btn" onclick="showNotifications()">
-                    🔔
-                    <div class="ai-badge">3</div>
-                </div>
+                <div class="header-btn" onclick="showNotifications()">🔔</div>
                 <div class="header-btn" onclick="showModal('create')">➕</div>
-                <div class="header-btn ai-enhanced" onclick="showModal('aiDashboard')">
-                    🤖
-                    <div class="ai-badge">AI</div>
-                </div>
                 <div class="header-btn" onclick="showModal('settings')">⚙️</div>
             </div>
         </div>
@@ -899,113 +680,86 @@
                 <div class="live-indicator">
                     <div class="live-dot"></div>
                     <span>LIVE</span>
-                    <div class="ai-prediction" id="aiPrediction">+2 joining soon</div>
+                    <span style="font-size: 11px; color: var(--text-secondary); margin-left: 8px;" id="liveStatus">+2 joining soon</span>
                 </div>
-                <div class="active-count" id="activeCount">8 active</div>
                 <div class="player-status">
                     <span>Elite Gladiator</span>
                     <span class="tokens-display" id="playerTokens">15,247</span>
                 </div>
             </div>
             <div class="live-players" id="livePlayersContainer">
-                <!-- Dynamic player avatars with AI recommendations -->
+                <!-- Dynamic player avatars -->
             </div>
         </div>
 
-        <!-- AI Challenge Creator -->
-        <div class="creator-section">
-            <div class="creator-info">
-                <div class="creator-avatar" id="creatorAvatar">🤖</div>
-                <div class="creator-details">
-                    <div class="creator-name" id="creatorName">JomBro AI Engine</div>
-                    <div class="creator-badge" id="challengeType">AI POWERED</div>
-                    <div class="ai-stats">
-                        <span>95% Success Rate</span>
-                        <span>•</span>
-                        <span>2.3s Response Time</span>
-                        <span>•</span>
-                        <span>Live Learning</span>
-                    </div>
+        <!-- Group Creation Section - Prominent -->
+        <div class="group-section">
+            <div class="group-header">
+                <div class="group-title">
+                    👥 <span>Create Friend Groups</span>
                 </div>
+                <button class="create-group-btn" onclick="showModal('createGroup')">
+                    Create Group
+                </button>
             </div>
         </div>
 
         <!-- Main Challenge Display -->
         <div class="challenge-main">
-            <!-- AI Confidence Indicator -->
-            <div class="ai-confidence">
-                <span>🎯 AI Match Score:</span>
-                <div class="confidence-bar">
-                    <div class="confidence-fill" id="confidenceFill" style="width: 87%"></div>
-                </div>
-                <span id="confidenceScore">87%</span>
-            </div>
-
             <div class="challenge-title" id="challengeTitle">Coffee Shop Poetry Challenge</div>
             
             <div class="challenge-description" id="challengeDescription">
-                Visit any coffee shop and ask the barista to write a short poem on your cup or napkin! This is a wonderful way to connect with people and brighten someone's day. Take a photo and share your experience.
-            </div>
-
-            <!-- AI Enhancement -->
-            <div class="ai-enhancement">
-                <div class="ai-enhancement-title">🤖 AI Enhancement</div>
-                <div class="ai-enhancement-text" id="aiEnhancement">
-                    Based on your social preferences, this challenge has been optimized for indoor settings and includes creative interaction elements that match your 89% success rate with social challenges.
-                </div>
+                Visit any coffee shop and ask the barista to write a short poem on your cup or napkin! This is a wonderful way to connect with people and brighten someone's day.
             </div>
 
             <div class="challenge-hashtags" id="challengeHashtags">
                 <span class="hashtag">#CoffeePoetry</span>
                 <span class="hashtag">#Connection</span>
                 <span class="hashtag">#JomBro</span>
-                <span class="hashtag ai-generated">#AIOptimized</span>
             </div>
 
             <div class="challenge-meta">
-                <div class="meta-item ai-optimized">
+                <div class="meta-item">
                     <div class="meta-value" id="challengeTokens">500</div>
                     <div class="meta-label">Tokens</div>
-                    <div class="ai-optimization">AI</div>
                 </div>
                 <div class="meta-item">
                     <div class="meta-value" id="challengeDifficulty">Easy</div>
                     <div class="meta-label">Level</div>
                 </div>
-                <div class="meta-item ai-optimized">
+                <div class="meta-item">
                     <div class="meta-value" id="challengeDuration">30m</div>
                     <div class="meta-label">Duration</div>
-                    <div class="ai-optimization">AI</div>
                 </div>
             </div>
         </div>
 
-        <!-- Side Actions -->
-        <div class="side-actions">
-            <div class="side-btn like-btn" onclick="likeChallenge()">
-                <div class="like-count" id="likeCount">2.5K</div>
-                <div>❤️</div>
-            </div>
-            <div class="side-btn" onclick="shareChallenge()">💬</div>
-            <div class="side-btn" onclick="bookmarkChallenge()">🔖</div>
-            <div class="side-btn ai-btn ai-glow" onclick="aiOptimizeChallenge()">
-                🧠
-            </div>
-        </div>
-
-        <!-- Action Buttons -->
+        <!-- User Control Section -->
         <div class="action-section">
-            <div class="ai-recommendation" id="aiRecommendation">
-                🤖 AI suggests: Accept this challenge - 94% chance you'll enjoy it based on your profile
-            </div>
-            <div class="action-buttons">
-                <button class="btn-primary ai-enhanced" onclick="acceptChallenge()">
-                    🚀 AI-ENHANCED ACCEPT
+            <!-- User Controls - More Prominent -->
+            <div class="user-controls">
+                <button class="control-btn primary" onclick="acceptChallenge()">
+                    ✅ Accept
                 </button>
-                <button class="btn-secondary" onclick="aiSkipChallenge()">
-                    AI SKIP & SUGGEST BETTER
+                <button class="control-btn" onclick="skipChallenge()">
+                    ⏭️ Skip
+                </button>
+                <button class="control-btn" onclick="createCustom()">
+                    ✏️ Customize
+                </button>
+                <button class="control-btn" onclick="askAI()">
+                    🤖 Ask AI
                 </button>
             </div>
+
+            <!-- AI Suggestion - Smaller -->
+            <div class="ai-suggestion" id="aiSuggestion">
+                💡 AI suggests: This matches your social preferences
+            </div>
+            
+            <button class="btn-primary" onclick="startChallenge()">
+                🚀 START CHALLENGE
+            </button>
         </div>
 
         <!-- Bottom Navigation -->
@@ -1018,19 +772,13 @@
                 <div class="nav-icon">🏆</div>
                 <div class="nav-label">Ranks</div>
             </div>
-            <div class="nav-item" onclick="navTo(this, 'challenges')">
-                <div class="nav-icon">➕</div>
-                <div class="nav-label">Create</div>
-                <div class="ai-notification"></div>
-            </div>
             <div class="nav-item" onclick="navTo(this, 'groups')">
                 <div class="nav-icon">👥</div>
-                <div class="nav-label">Social</div>
+                <div class="nav-label">Groups</div>
             </div>
-            <div class="nav-item" onclick="navTo(this, 'ai')">
-                <div class="nav-icon">🤖</div>
-                <div class="nav-label">AI Hub</div>
-                <div class="ai-notification"></div>
+            <div class="nav-item" onclick="navTo(this, 'create')">
+                <div class="nav-icon">➕</div>
+                <div class="nav-label">Create</div>
             </div>
             <div class="nav-item" onclick="navTo(this, 'profile')">
                 <div class="nav-icon">👤</div>
@@ -1038,782 +786,201 @@
             </div>
         </div>
     </div>
-<!-- Settings Modal -->
-<div id="settingsModal" class="modal">
-    <div class="modal-content">
-        <div class="modal-title">
-            ⚙️ Settings
-        </div>
-        
-        <div style="display: flex; flex-direction: column; gap: 20px;">
-            <div>
-                <div style="font-size: 14px; font-weight: 600; margin-bottom: 12px; color: var(--text-primary);">🤖 AI Preferences</div>
-                <div style="display: flex; flex-direction: column; gap: 8px;">
-                    <label style="display: flex; align-items: center; gap: 8px; font-size: 14px; color: var(--text-secondary);">
-                        <input type="checkbox" checked style="accent-color: var(--primary-green);"> Enable AI Personalization
-                    </label>
-                    <label style="display: flex; align-items: center; gap: 8px; font-size: 14px; color: var(--text-secondary);">
-                        <input type="checkbox" checked style="accent-color: var(--primary-green);"> AI Challenge Recommendations
-                    </label>
-                    <label style="display: flex; align-items: center; gap: 8px; font-size: 14px; color: var(--text-secondary);">
-                        <input type="checkbox" checked style="accent-color: var(--primary-green);"> Auto-Submit Review
-                    </label>
-                </div>
-            </div>
-            
-            <div>
-                <div style="font-size: 14px; font-weight: 600; margin-bottom: 12px; color: var(--text-primary);">🔔 Notifications</div>
-                <div style="display: flex; flex-direction: column; gap: 8px;">
-                    <label style="display: flex; align-items: center; gap: 8px; font-size: 14px; color: var(--text-secondary);">
-                        <input type="checkbox" checked style="accent-color: var(--primary-green);"> New Challenge Alerts
-                    </label>
-                    <label style="display: flex; align-items: center; gap: 8px; font-size: 14px; color: var(--text-secondary);">
-                        <input type="checkbox" checked style="accent-color: var(--primary-green);"> Friend Activity
-                    </label>
-                    <label style="display: flex; align-items: center; gap: 8px; font-size: 14px; color: var(--text-secondary);">
-                        <input type="checkbox" style="accent-color: var(--primary-green);"> Daily Reminders
-                    </label>
-                </div>
-            </div>
-            
-            <div>
-                <div style="font-size: 14px; font-weight: 600; margin-bottom: 12px; color: var(--text-primary);">📱 App Preferences</div>
-                <div style="display: flex; flex-direction: column; gap: 8px;">
-                    <label style="display: flex; align-items: center; gap: 8px; font-size: 14px; color: var(--text-secondary);">
-                        <input type="checkbox" checked style="accent-color: var(--primary-green);"> Dark Mode
-                    </label>
-                    <label style="display: flex; align-items: center; gap: 8px; font-size: 14px; color: var(--text-secondary);">
-                        <input type="checkbox" checked style="accent-color: var(--primary-green);"> Haptic Feedback
-                    </label>
-                </div>
-            </div>
-            
-            <div style="padding-top: 16px; border-top: 1px solid var(--border-color);">
-                <div style="display: flex; flex-direction: column; gap: 12px;">
-                    <button class="btn-secondary" onclick="showToast('🔄 Syncing with cloud...', false, true)">Sync Data</button>
-                    <button class="btn-secondary" onclick="showToast('📤 Backup created!', false, true)">Backup & Restore</button>
-                    <button class="btn-secondary" onclick="showToast('❓ Help center opening...', false, true)">Help & Support</button>
-                </div>
-            </div>
-        </div>
-        
-        <button class="btn-primary" onclick="hideModal('settings')" style="margin-top: 20px;">Save Settings</button>
-    </div>
-</div>
 
-<!-- Create Challenge Modal -->
-<div id="createModal" class="modal">
-    <div class="modal-content">
-        <div class="modal-title">
-            ➕ Create Challenge
-        </div>
-        
-        <div style="display: flex; flex-direction: column; gap: 16px;">
-            <div>
-                <label style="display: block; font-size: 12px; font-weight: 600; margin-bottom: 8px; color: var(--text-primary);">Challenge Title</label>
-                <input type="text" placeholder="Enter challenge title..." style="width: 100%; padding: 12px; border: 1px solid var(--border-color); border-radius: 8px; background: rgba(255,255,255,0.1); color: var(--text-primary); font-size: 14px;">
-            </div>
-            
-            <div>
-                <label style="display: block; font-size: 12px; font-weight: 600; margin-bottom: 8px; color: var(--text-primary);">Description</label>
-                <textarea placeholder="Describe your challenge..." style="width: 100%; height: 80px; padding: 12px; border: 1px solid var(--border-color); border-radius: 8px; background: rgba(255,255,255,0.1); color: var(--text-primary); font-size: 14px; resize: vertical;"></textarea>
-            </div>
-            
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
-                <div>
-                    <label style="display: block; font-size: 12px; font-weight: 600; margin-bottom: 8px; color: var(--text-primary);">Difficulty</label>
-                    <select style="width: 100%; padding: 12px; border: 1px solid var(--border-color); border-radius: 8px; background: rgba(255,255,255,0.1); color: var(--text-primary); font-size: 14px;">
-                        <option>Easy</option>
-                        <option>Medium</option>
-                        <option>Hard</option>
-                    </select>
-                </div>
-                <div>
-                    <label style="display: block; font-size: 12px; font-weight: 600; margin-bottom: 8px; color: var(--text-primary);">Tokens</label>
-                    <input type="number" value="500" min="100" max="2000" step="50" style="width: 100%; padding: 12px; border: 1px solid var(--border-color); border-radius: 8px; background: rgba(255,255,255,0.1); color: var(--text-primary); font-size: 14px;">
-                </div>
-            </div>
-            
-            <div>
-                <label style="display: block; font-size: 12px; font-weight: 600; margin-bottom: 8px; color: var(--text-primary);">Category</label>
-                <div style="display: flex; gap: 8px; flex-wrap: wrap;">
-                    <span onclick="toggleCategory(this)" style="padding: 6px 12px; background: rgba(0,255,150,0.2); border: 1px solid var(--primary-green); color: var(--primary-green); border-radius: 12px; font-size: 12px; cursor: pointer;">#Social</span>
-                    <span onclick="toggleCategory(this)" style="padding: 6px 12px; background: rgba(255,255,255,0.1); border: 1px solid var(--border-color); color: var(--text-secondary); border-radius: 12px; font-size: 12px; cursor: pointer;">#Creative</span>
-                    <span onclick="toggleCategory(this)" style="padding: 6px 12px; background: rgba(255,255,255,0.1); border: 1px solid var(--border-color); color: var(--text-secondary); border-radius: 12px; font-size: 12px; cursor: pointer;">#Food</span>
-                    <span onclick="toggleCategory(this)" style="padding: 6px 12px; background: rgba(255,255,255,0.1); border: 1px solid var(--border-color); color: var(--text-secondary); border-radius: 12px; font-size: 12px; cursor: pointer;">#Fitness</span>
-                </div>
-            </div>
-            
-            <div style="padding: 12px; background: rgba(139,92,246,0.1); border: 1px solid var(--ai-purple); border-radius: 8px;">
-                <div style="font-size: 12px; font-weight: 600; color: var(--ai-purple); margin-bottom: 6px;">🤖 AI Suggestions</div>
-                <div style="font-size: 11px; color: var(--text-secondary);">AI will help optimize your challenge for maximum engagement and appropriate difficulty.</div>
-            </div>
-        </div>
-        
-        <div style="display: flex; gap: 12px; margin-top: 20px;">
-            <button class="btn-secondary" onclick="hideModal('create')" style="flex: 1;">Cancel</button>
-            <button class="btn-primary" onclick="createChallenge()" style="flex: 1;">🚀 Create with AI</button>
-        </div>
-    </div>
-</div>
-
-<!-- Profile Modal -->
-<div id="profileModal" class="modal">
-    <div class="modal-content">
-        <div class="modal-title">
-            👤 Your Profile
-        </div>
-        
-        <div style="text-align: center; margin-bottom: 24px;">
-            <div style="width: 80px; height: 80px; border-radius: 40px; background: linear-gradient(45deg, var(--primary-green), #00d4ff); margin: 0 auto 12px; display: flex; align-items: center; justify-content: center; font-size: 32px;">🎯</div>
-            <div style="font-size: 20px; font-weight: 700; color: var(--text-primary); margin-bottom: 4px;">lyode</div>
-            <div style="font-size: 14px; color: var(--primary-green); font-weight: 600;">Elite Gladiator</div>
-        </div>
-        
-        <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 24px;">
-            <div style="text-align: center; padding: 16px; background: rgba(255,255,255,0.05); border-radius: 12px;">
-                <div style="font-size: 24px; font-weight: 700; color: var(--primary-green);">15,247</div>
-                <div style="font-size: 11px; color: var(--text-secondary); text-transform: uppercase;">Tokens</div>
-            </div>
-            <div style="text-align: center; padding: 16px; background: rgba(255,255,255,0.05); border-radius: 12px;">
-                <div style="font-size: 24px; font-weight: 700; color: var(--primary-green);">143</div>
-                <div style="font-size: 11px; color: var(--text-secondary); text-transform: uppercase;">Completed</div>
-            </div>
-            <div style="text-align: center; padding: 16px; background: rgba(255,255,255,0.05); border-radius: 12px;">
-                <div style="font-size: 24px; font-weight: 700; color: var(--primary-green);">12</div>
-                <div style="font-size: 11px; color: var(--text-secondary); text-transform: uppercase;">Day Streak</div>
-            </div>
-        </div>
-        
-        <div style="margin-bottom: 20px;">
-            <div style="font-size: 14px; font-weight: 600; margin-bottom: 12px; color: var(--text-primary);">🏆 Recent Achievements</div>
-            <div style="display: flex; flex-direction: column; gap: 8px;">
-                <div style="display: flex; align-items: center; gap: 12px; padding: 8px; background: rgba(255,255,255,0.05); border-radius: 8px;">
-                    <span style="font-size: 20px;">🔥</span>
-                    <div>
-                        <div style="font-size: 13px; font-weight: 600; color: var(--text-primary);">Streak Master</div>
-                        <div style="font-size: 11px; color: var(--text-secondary);">Complete 10 challenges in a row</div>
-                    </div>
-                </div>
-                <div style="display: flex; align-items: center; gap: 12px; padding: 8px; background: rgba(255,255,255,0.05); border-radius: 8px;">
-                    <span style="font-size: 20px;">🤖</span>
-                    <div>
-                        <div style="font-size: 13px; font-weight: 600; color: var(--text-primary);">AI Explorer</div>
-                        <div style="font-size: 11px; color: var(--text-secondary);">Use AI features 50 times</div>
-                    </div>
-                </div>
-                <div style="display: flex; align-items: center; gap: 12px; padding: 8px; background: rgba(255,255,255,0.05); border-radius: 8px;">
-                    <span style="font-size: 20px;">👥</span>
-                    <div>
-                        <div style="font-size: 13px; font-weight: 600; color: var(--text-primary);">Social Butterfly</div>
-                        <div style="font-size: 11px; color: var(--text-secondary);">Complete 25 social challenges</div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        
-        <div style="display: flex; gap: 12px;">
-            <button class="btn-secondary" onclick="hideModal('profile')" style="flex: 1;">Close</button>
-            <button class="btn-primary" onclick="showToast('✏️ Edit profile coming soon!', false, true)" style="flex: 1;">Edit Profile</button>
-        </div>
-    </div>
-</div>
-    <!-- AI Dashboard Modal -->
-    <div id="aiDashboardModal" class="modal">
+    <!-- Create Group Modal -->
+    <div id="createGroupModal" class="modal">
         <div class="modal-content">
             <div class="modal-title">
-                🤖 AI Control Center
+                👥 Create Friend Group
             </div>
             
-            <div class="ai-dashboard">
-                <div class="ai-metric">
-                    <div class="ai-metric-value" id="aiChallengesGenerated">247</div>
-                    <div class="ai-metric-label">Challenges Generated</div>
+            <div style="display: flex; flex-direction: column; gap: 16px;">
+                <div>
+                    <label style="display: block; font-size: 12px; font-weight: 600; margin-bottom: 8px; color: var(--text-primary);">Group Name</label>
+                    <input type="text" placeholder="My Adventure Squad..." style="width: 100%; padding: 12px; border: 1px solid var(--border-color); border-radius: 8px; background: rgba(255,255,255,0.1); color: var(--text-primary); font-size: 14px;">
                 </div>
-                <div class="ai-metric">
-                    <div class="ai-metric-value" id="aiAccuracy">94%</div>
-                    <div class="ai-metric-label">AI Accuracy</div>
+                
+                <div>
+                    <label style="display: block; font-size: 12px; font-weight: 600; margin-bottom: 8px; color: var(--text-primary);">Invite Friends</label>
+                    <input type="text" placeholder="Enter friend usernames..." style="width: 100%; padding: 12px; border: 1px solid var(--border-color); border-radius: 8px; background: rgba(255,255,255,0.1); color: var(--text-primary); font-size: 14px;">
                 </div>
-                <div class="ai-metric">
-                    <div class="ai-metric-value" id="aiSubmissionsReviewed">1,234</div>
-                    <div class="ai-metric-label">Auto-Reviewed</div>
-                </div>
-                <div class="ai-metric">
-                    <div class="ai-metric-value" id="aiResponseTime">2.3s</div>
-                    <div class="ai-metric-label">Response Time</div>
-                </div>
-            </div>
-            
-            <div style="margin-bottom: 16px;">
-                <div style="font-size: 14px; font-weight: 600; margin-bottom: 8px; color: var(--ai-purple);">🔍 AI Activity Log</div>
-                <div class="ai-log" id="aiLog">
-                    <div class="ai-log-entry">
-                        <span class="ai-log-time">14:32</span>
-                        <span>🎯 Generated personalized challenge based on user preferences</span>
-                    </div>
-                    <div class="ai-log-entry">
-                        <span class="ai-log-time">14:31</span>
-                        <span>⚡ Auto-approved submission with 96% confidence</span>
-                    </div>
-                    <div class="ai-log-entry">
-                        <span class="ai-log-time">14:30</span>
-                        <span>🔧 Optimized token reward based on difficulty analysis</span>
-                    </div>
-                    <div class="ai-log-entry">
-                        <span class="ai-log-time">14:29</span>
-                        <span>👥 Detected trending challenge pattern, creating variations</span>
-                    </div>
-                    <div class="ai-log-entry">
-                        <span class="ai-log-time">14:28</span>
-                        <span>📊 User engagement prediction: 87% completion probability</span>
-                    </div>
+                
+                <div>
+                    <label style="display: block; font-size: 12px; font-weight: 600; margin-bottom: 8px; color: var(--text-primary);">Group Privacy</label>
+                    <select style="width: 100%; padding: 12px; border: 1px solid var(--border-color); border-radius: 8px; background: rgba(255,255,255,0.1); color: var(--text-primary); font-size: 14px;">
+                        <option>Private - Invite Only</option>
+                        <option>Public - Anyone Can Join</option>
+                        <option>Friends Only</option>
+                    </select>
                 </div>
             </div>
             
-            <button class="btn-primary" onclick="hideModal('aiDashboard')">Close AI Dashboard</button>
+            <div style="display: flex; gap: 12px; margin-top: 20px;">
+                <button class="control-btn" onclick="hideModal('createGroup')" style="flex: 1;">Cancel</button>
+                <button class="btn-primary" onclick="createGroup()" style="flex: 1;">Create Group</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Settings Modal -->
+    <div id="settingsModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-title">⚙️ Settings</div>
+            
+            <div style="display: flex; flex-direction: column; gap: 20px;">
+                <div>
+                    <div style="font-size: 14px; font-weight: 600; margin-bottom: 12px; color: var(--text-primary);">👤 User Control</div>
+                    <div style="display: flex; flex-direction: column; gap: 8px;">
+                        <label style="display: flex; align-items: center; gap: 8px; font-size: 14px; color: var(--text-secondary);">
+                            <input type="checkbox" checked style="accent-color: var(--primary-green);"> Manual Challenge Selection
+                        </label>
+                        <label style="display: flex; align-items: center; gap: 8px; font-size: 14px; color: var(--text-secondary);">
+                            <input type="checkbox" style="accent-color: var(--primary-green);"> AI Recommendations Only
+                        </label>
+                        <label style="display: flex; align-items: center; gap: 8px; font-size: 14px; color: var(--text-secondary);">
+                            <input type="checkbox" checked style="accent-color: var(--primary-green);"> Friend Group Challenges
+                        </label>
+                    </div>
+                </div>
+                
+                <div>
+                    <div style="font-size: 14px; font-weight: 600; margin-bottom: 12px; color: var(--text-primary);">🔔 Notifications</div>
+                    <div style="display: flex; flex-direction: column; gap: 8px;">
+                        <label style="display: flex; align-items: center; gap: 8px; font-size: 14px; color: var(--text-secondary);">
+                            <input type="checkbox" checked style="accent-color: var(--primary-green);"> New Challenge Alerts
+                        </label>
+                        <label style="display: flex; align-items: center; gap: 8px; font-size: 14px; color: var(--text-secondary);">
+                            <input type="checkbox" checked style="accent-color: var(--primary-green);"> Friend Activity
+                        </label>
+                        <label style="display: flex; align-items: center; gap: 8px; font-size: 14px; color: var(--text-secondary);">
+                            <input type="checkbox" checked style="accent-color: var(--primary-green);"> Group Invites
+                        </label>
+                    </div>
+                </div>
+                
+                <div>
+                    <div style="font-size: 14px; font-weight: 600; margin-bottom: 12px; color: var(--text-primary);">📱 App Preferences</div>
+                    <div style="display: flex; flex-direction: column; gap: 8px;">
+                        <label style="display: flex; align-items: center; gap: 8px; font-size: 14px; color: var(--text-secondary);">
+                            <input type="checkbox" checked style="accent-color: var(--primary-green);"> Dark Mode
+                        </label>
+                        <label style="display: flex; align-items: center; gap: 8px; font-size: 14px; color: var(--text-secondary);">
+                            <input type="checkbox" checked style="accent-color: var(--primary-green);"> Blinking Stars Effect
+                        </label>
+                        <label style="display: flex; align-items: center; gap: 8px; font-size: 14px; color: var(--text-secondary);">
+                            <input type="checkbox" checked style="accent-color: var(--primary-green);"> Haptic Feedback
+                        </label>
+                    </div>
+                </div>
+            </div>
+            
+            <button class="btn-primary" onclick="hideModal('settings')" style="margin-top: 20px;">Save Settings</button>
         </div>
     </div>
 
     <!-- Toast Notification -->
     <div id="toast" class="toast">
-        <span id="toastText">AI system ready!</span>
+        <span id="toastText">Welcome to JomBro!</span>
     </div>
 
     <script>
-        // ===== ENHANCED JOMBRO WITH FULL AI AUTOMATION =====
+        // ===== ENHANCED MOBILE-FIRST JOMBRO WITH BALANCED AI =====
 
-        // Global AI state management
-        let aiSystem = {
-            isActive: true,
-            accuracy: 0.94,
-            responsiveTime: 2.3,
-            challengesGenerated: 247,
-            submissionsReviewed: 1234,
-            learningRate: 0.015,
-            confidenceScore: 87,
-            lastActivity: Date.now()
+        // Global state management - More user control
+        let userSettings = {
+            aiControl: false,  // Users control by default
+            manualSelection: true,
+            groupChallenges: true,
+            starsEnabled: true
         };
 
-        // Player state management
         let player = {
             name: 'lyode',
-            username: 'lyode',
             tokens: 15247,
             rank: 'Elite Gladiator',
             level: 27,
             completed: 143,
-            streak: 12,
-            preferences: {
-                categories: ['social', 'creative', 'food'],
-                difficulty: 'medium',
-                timeAvailable: 30,
-                socialLevel: 0.89
-            }
+            streak: 12
         };
 
-        // AI-Enhanced challenges database
         let challenges = [
             {
                 id: '1',
                 title: 'Coffee Shop Poetry Challenge',
-                description: 'Visit any coffee shop and ask the barista to write a short poem on your cup or napkin! This is a wonderful way to connect with people and brighten someone\'s day. Take a photo and share your experience.',
+                description: 'Visit any coffee shop and ask the barista to write a short poem on your cup or napkin! This is a wonderful way to connect with people and brighten someone\'s day.',
                 tokens: 500,
                 difficulty: 'Easy',
                 duration: '30m',
                 type: 'SOCIAL',
-                creator: 'JomBro AI',
-                avatar: '🤖',
-                hashtags: ['#CoffeePoetry', '#Connection', '#JomBro', '#AIOptimized'],
-                likes: 2547,
-                aiGenerated: true,
-                aiConfidence: 0.87,
-                successRate: 0.89,
-                aiEnhancement: 'Based on your social preferences, this challenge has been optimized for indoor settings and includes creative interaction elements that match your 89% success rate with social challenges.',
-                requirements: [
-                    'Visit any coffee shop',
-                    'Ask barista for a poem',
-                    'Take a photo',
-                    'Share the experience'
-                ]
+                hashtags: ['#CoffeePoetry', '#Connection', '#JomBro']
             },
             {
                 id: '2',
-                title: 'AI Street Art Discovery',
-                description: 'Use AI to identify and photograph 3 pieces of street art in your neighborhood. Research their artists and share the stories behind them.',
-                tokens: 1200,
+                title: 'Local Business Support Quest',
+                description: 'Visit 3 local businesses today and leave positive reviews to support your community entrepreneurs.',
+                tokens: 750,
                 difficulty: 'Medium',
                 duration: '45m',
-                type: 'AI-CREATIVE',
-                creator: 'JomBro AI',
-                avatar: '🤖',
-                hashtags: ['#StreetArt', '#AIDiscovery', '#Research', '#AIOptimized'],
-                likes: 1832,
-                aiGenerated: true,
-                aiConfidence: 0.92,
-                successRate: 0.76,
-                aiEnhancement: 'AI will help identify art styles and provide historical context. Challenge difficulty adjusted for your exploration preferences.',
-                requirements: [
-                    'Use AI image recognition',
-                    'Find 3 street art pieces',
-                    'Research each artist',
-                    'Share stories discovered'
-                ]
+                type: 'COMMUNITY',
+                hashtags: ['#SupportLocal', '#Community', '#Business']
             },
             {
                 id: '3',
-                title: 'Random Kindness Generator',
-                description: 'Let AI generate 5 random acts of kindness for you to complete today. Each act is personalized based on your location and preferences.',
-                tokens: 800,
+                title: 'Random Acts of Kindness',
+                description: 'Perform 5 random acts of kindness for strangers today and document how it made you feel.',
+                tokens: 1000,
                 difficulty: 'Easy',
                 duration: '60m',
-                type: 'AI-KINDNESS',
-                creator: 'JomBro AI',
-                avatar: '🤖',
-                hashtags: ['#Kindness', '#AI', '#Generosity', '#AIOptimized'],
-                likes: 3421,
-                aiGenerated: true,
-                aiConfidence: 0.95,
-                successRate: 0.94,
-                aiEnhancement: 'AI has generated location-specific kindness opportunities and adjusted timing based on your schedule.',
-                requirements: [
-                    'Use AI kindness generator',
-                    'Complete 5 random acts',
-                    'Document each act',
-                    'Share impact stories'
-                ]
+                type: 'KINDNESS',
+                hashtags: ['#Kindness', '#RandomActs', '#Positivity']
             }
         ];
 
-        let currentIndex = 0;
-        let selectedRating = 0;
+        let currentChallengeIndex = 0;
 
-        // Live players with AI recommendations
         let livePlayers = [
-            { name: 'Alex', avatar: '👨', status: 'online', aiRecommended: false },
-            { name: 'Maria', avatar: '👩', status: 'online', aiRecommended: true },
-            { name: 'John', avatar: '👨‍💼', status: 'online', aiRecommended: false },
-            { name: 'Lisa', avatar: '👩‍🎨', status: 'online', aiRecommended: true },
-            { name: 'Mike', avatar: '👨‍🚀', status: 'online', aiRecommended: false },
-            { name: 'Sarah', avatar: '👩‍💻', status: 'online', aiRecommended: false },
-            { name: 'David', avatar: '👨‍🎓', status: 'online', aiRecommended: true },
-            { name: 'Emma', avatar: '👩‍🔬', status: 'online', aiRecommended: false }
+            { name: 'Alex', avatar: '👨', status: 'online' },
+            { name: 'Maria', avatar: '👩', status: 'online' },
+            { name: 'John', avatar: '👨‍💼', status: 'online' },
+            { name: 'Lisa', avatar: '👩‍🎨', status: 'online' },
+            { name: 'Mike', avatar: '👨‍🚀', status: 'online' },
+            { name: 'Sarah', avatar: '👩‍💻', status: 'online' },
+            { name: 'David', avatar: '👨‍🎓', status: 'online' },
+            { name: 'Emma', avatar: '👩‍🔬', status: 'online' }
         ];
 
-        // ===== AI AUTOMATION FUNCTIONS =====
-
-        class JomBroAI {
-            constructor() {
-                this.isLearning = true;
-                this.confidence = 0.87;
-                this.responseTime = 2.3;
-                this.activityLog = [];
-                this.startLearning();
-            }
-
-            // AI Challenge Generation
-            async generatePersonalizedChallenge(userProfile) {
-                this.logActivity('🎯 Generating personalized challenge...');
+        // ===== BLINKING STARS SYSTEM =====
+        function createStars() {
+            const container = document.getElementById('starsContainer');
+            const starCount = 50; // Number of stars
+            
+            for (let i = 0; i < starCount; i++) {
+                const star = document.createElement('div');
+                star.className = 'star';
                 
-                await this.simulateProcessing(1500);
+                // Random star sizes
+                const size = Math.random();
+                if (size > 0.8) star.classList.add('large');
+                else if (size > 0.6) star.classList.add('medium');
                 
-                const templates = [
-                    {
-                        category: 'social',
-                        titles: ['Compliment Chain Challenge', 'Smile Spreading Mission', 'Random Connection Quest'],
-                        baseTokens: 600
-                    },
-                    {
-                        category: 'creative',
-                        titles: ['AI Art Collaboration', 'Tech-Enhanced Creativity', 'Digital Meets Analog'],
-                        baseTokens: 1000
-                    },
-                    {
-                        category: 'food',
-                        titles: ['AI Flavor Discovery', 'Culinary Code Challenge', 'Smart Taste Adventure'],
-                        baseTokens: 800
-                    }
-                ];
-
-                const preferredCategory = userProfile.preferences.categories[0];
-                const template = templates.find(t => t.category === preferredCategory) || templates[0];
+                // Random positions
+                star.style.left = Math.random() * 100 + '%';
+                star.style.top = Math.random() * 100 + '%';
                 
-                const newChallenge = {
-                    id: Date.now().toString(),
-                    title: template.titles[Math.floor(Math.random() * template.titles.length)],
-                    description: await this.generateDescription(preferredCategory),
-                    tokens: this.optimizeTokenReward(template.baseTokens, userProfile),
-                    difficulty: this.calculateOptimalDifficulty(userProfile),
-                    duration: this.optimizeDuration(userProfile),
-                    type: 'AI-GENERATED',
-                    creator: 'JomBro AI',
-                    avatar: '🤖',
-                    hashtags: this.generateHashtags(preferredCategory),
-                    likes: Math.floor(Math.random() * 1000) + 500,
-                    aiGenerated: true,
-                    aiConfidence: this.confidence,
-                    successRate: this.predictSuccessRate(userProfile),
-                    aiEnhancement: this.generateEnhancement(userProfile),
-                    requirements: await this.generateRequirements(preferredCategory)
-                };
-
-                this.logActivity('✅ Generated new personalized challenge');
-                aiSystem.challengesGenerated++;
-                return newChallenge;
-            }
-
-            // AI Submission Review
-            async reviewSubmission(submission) {
-                this.logActivity('⚡ Auto-reviewing submission...');
+                // Random animation delay
+                star.style.animationDelay = Math.random() * 5 + 's';
                 
-                await this.simulateProcessing(2000);
-                
-                // Simulate AI image analysis
-                const imageScore = this.analyzeImage(submission.image);
-                const textScore = this.analyzeDescription(submission.description);
-                const locationScore = this.verifyLocation(submission.location);
-                
-                const overallScore = (imageScore + textScore + locationScore) / 3;
-                const confidence = Math.min(overallScore + (Math.random() * 0.1), 0.99);
-                
-                const review = {
-                    autoApprove: confidence >= 0.8,
-                    confidence: confidence,
-                    tokenReward: this.calculateTokenReward(overallScore, submission.challenge),
-                    feedback: this.generateFeedback(overallScore),
-                    aiAnalysis: {
-                        imageScore: imageScore,
-                        textScore: textScore,
-                        locationScore: locationScore,
-                        authenticityScore: Math.random() * 0.3 + 0.7
-                    }
-                };
-
-                if (review.autoApprove) {
-                    this.logActivity(`✅ Auto-approved with ${Math.round(confidence * 100)}% confidence`);
-                    aiSystem.submissionsReviewed++;
-                } else {
-                    this.logActivity('📋 Queued for human review');
-                }
-
-                return review;
-            }
-
-            // AI Performance Optimization
-            async optimizeChallenge(challengeId, performanceData) {
-                this.logActivity('🔧 Optimizing challenge performance...');
-                
-                await this.simulateProcessing(1000);
-                
-                const optimizations = [];
-                
-                if (performanceData.completionRate < 0.4) {
-                    optimizations.push({
-                        type: 'difficulty',
-                        action: 'reduce',
-                        reason: 'Low completion rate detected'
-                    });
-                }
-                
-                if (performanceData.avgRating < 6) {
-                    optimizations.push({
-                        type: 'description',
-                        action: 'enhance',
-                        reason: 'User satisfaction below threshold'
-                    });
-                }
-                
-                if (performanceData.dropoutRate > 0.6) {
-                    optimizations.push({
-                        type: 'requirements',
-                        action: 'simplify',
-                        reason: 'High dropout rate'
-                    });
-                }
-
-                this.logActivity(`🔧 Applied ${optimizations.length} optimizations`);
-                return optimizations;
-            }
-
-            // AI Personalization Engine
-            getPersonalizedRecommendations(userId, count = 5) {
-                this.logActivity('📊 Generating personalized recommendations...');
-                
-                const userProfile = this.getUserProfile(userId);
-                const availableChallenges = challenges.filter(c => !c.completed);
-                
-                const scoredChallenges = availableChallenges.map(challenge => ({
-                    challenge,
-                    score: this.calculatePersonalizationScore(userProfile, challenge)
-                }));
-                
-                scoredChallenges.sort((a, b) => b.score - a.score);
-                
-                this.logActivity(`📊 Ranked ${scoredChallenges.length} challenges by fit`);
-                return scoredChallenges.slice(0, count).map(item => item.challenge);
-            }
-
-            // AI Trend Detection
-            async detectTrendingChallenges() {
-                this.logActivity('👥 Analyzing global challenge trends...');
-                
-                await this.simulateProcessing(3000);
-                
-                const trendingTopics = [
-                    { topic: 'sustainability', engagement: 0.85, platform: 'social' },
-                    { topic: 'local_business', engagement: 0.78, platform: 'community' },
-                    { topic: 'fitness_tech', engagement: 0.72, platform: 'health' }
-                ];
-                
-                const trendingChallenges = [];
-                
-                for (const trend of trendingTopics) {
-                    const challenge = await this.generateTrendingChallenge(trend);
-                    trendingChallenges.push(challenge);
-                }
-                
-                this.logActivity(`🌟 Generated ${trendingChallenges.length} trending challenges`);
-                return trendingChallenges;
-            }
-
-            // Helper Functions
-            analyzeImage(imageData) {
-                // Simulate computer vision analysis
-                return Math.random() * 0.3 + 0.7; // 70-100% score
-            }
-
-            analyzeDescription(description) {
-                if (!description || description.length < 10) return 0.3;
-                if (description.length > 50) return Math.random() * 0.2 + 0.8;
-                return Math.random() * 0.3 + 0.5;
-            }
-
-            verifyLocation(location) {
-                // Simulate location verification
-                return Math.random() * 0.2 + 0.8; // 80-100% confidence
-            }
-
-            calculateTokenReward(score, challenge) {
-                const baseTokens = challenge.tokens || 500;
-                const multiplier = Math.min(score * 1.2, 1.0);
-                return Math.floor(baseTokens * multiplier);
-            }
-
-            generateFeedback(score) {
-                if (score >= 0.9) return "Outstanding submission! Great execution and creativity.";
-                if (score >= 0.8) return "Excellent work! Your submission clearly shows challenge completion.";
-                if (score >= 0.7) return "Good effort! Nice job completing the challenge.";
-                if (score >= 0.6) return "Nice try! Consider adding more detail next time.";
-                return "Please review the challenge requirements and try again.";
-            }
-
-            optimizeTokenReward(baseTokens, userProfile) {
-                const difficultyMultiplier = userProfile.preferences.difficulty === 'hard' ? 1.5 : 
-                                           userProfile.preferences.difficulty === 'easy' ? 0.8 : 1.0;
-                return Math.floor(baseTokens * difficultyMultiplier);
-            }
-
-            calculateOptimalDifficulty(userProfile) {
-                const successRate = userProfile.preferences.socialLevel || 0.75;
-                if (successRate > 0.85) return 'Medium';
-                if (successRate > 0.65) return 'Easy';
-                return 'Beginner';
-            }
-
-            optimizeDuration(userProfile) {
-                const timeAvailable = userProfile.preferences.timeAvailable || 30;
-                if (timeAvailable > 60) return '90m';
-                if (timeAvailable > 30) return '45m';
-                return '30m';
-            }
-
-            generateHashtags(category) {
-                const hashtagMap = {
-                    social: ['#Social', '#Connection', '#Community', '#AIOptimized'],
-                    creative: ['#Creative', '#Art', '#Innovation', '#AIOptimized'],
-                    food: ['#Food', '#Culinary', '#Taste', '#AIOptimized'],
-                    fitness: ['#Fitness', '#Health', '#Active', '#AIOptimized']
-                };
-                return hashtagMap[category] || ['#JomBro', '#Challenge', '#AIOptimized'];
-            }
-
-            async generateDescription(category) {
-                const descriptions = {
-                    social: "Connect with someone new in your community through this AI-curated social interaction challenge.",
-                    creative: "Express your creativity using AI tools and traditional methods in this innovative challenge.",
-                    food: "Discover new flavors and culinary experiences with AI-guided food exploration.",
-                    fitness: "Achieve your fitness goals with this AI-optimized physical activity challenge."
-                };
-                return descriptions[category] || "Complete this AI-generated challenge tailored to your interests.";
-            }
-
-            generateEnhancement(userProfile) {
-                return `Based on your ${Math.round(userProfile.preferences.socialLevel * 100)}% success rate with ${userProfile.preferences.categories[0]} challenges, this has been optimized for your preferences and available time.`;
-            }
-
-            async generateRequirements(category) {
-                const requirementMap = {
-                    social: ['Interact with a new person', 'Take a photo of the interaction', 'Share your experience'],
-                    creative: ['Create something unique', 'Use AI assistance', 'Document the process'],
-                    food: ['Try a new food item', 'Rate the experience', 'Share with friends']
-                };
-                return requirementMap[category] || ['Complete the challenge', 'Document with photo', 'Share experience'];
-            }
-
-            calculatePersonalizationScore(userProfile, challenge) {
-                let score = 0;
-                
-                // Category preference
-                if (userProfile.preferences.categories.includes(challenge.type.toLowerCase())) {
-                    score += 0.4;
-                }
-                
-                // Difficulty match
-                const userDifficulty = userProfile.preferences.difficulty;
-                if (challenge.difficulty.toLowerCase() === userDifficulty) {
-                    score += 0.3;
-                }
-                
-                // Success rate prediction
-                score += challenge.successRate * 0.3;
-                
-                return Math.min(score, 1.0);
-            }
-
-            predictSuccessRate(userProfile) {
-                const baseRate = 0.75;
-                const categoryBonus = userProfile.preferences.categories.length * 0.05;
-                const experienceBonus = Math.min(userProfile.completed / 100, 0.2);
-                return Math.min(baseRate + categoryBonus + experienceBonus, 0.95);
-            }
-
-            getUserProfile(userId) {
-                return player; // In real app, fetch from database
-            }
-
-            async generateTrendingChallenge(trendData) {
-                const trendChallenges = {
-                    sustainability: {
-                        title: 'Zero Waste Day Challenge',
-                        description: 'Spend one full day creating zero waste. Document your sustainable choices and share tips.',
-                        tokens: 1500,
-                        hashtags: ['#ZeroWaste', '#Sustainability', '#Green', '#AIOptimized']
-                    },
-                    local_business: {
-                        title: 'Support Local Heroes',
-                        description: 'Visit 3 local businesses and share their stories on social media to support your community.',
-                        tokens: 1000,
-                        hashtags: ['#SupportLocal', '#Community', '#Business', '#AIOptimized']
-                    },
-                    fitness_tech: {
-                        title: 'Tech-Enhanced Workout',
-                        description: 'Use AI fitness apps to design and complete a personalized workout routine.',
-                        tokens: 1200,
-                        hashtags: ['#FitnessTech', '#AI', '#Workout', '#AIOptimized']
-                    }
-                };
-                return trendChallenges[trendData.topic] || trendChallenges.sustainability;
-            }
-
-            async simulateProcessing(ms) {
-                return new Promise(resolve => setTimeout(resolve, ms));
-            }
-
-            logActivity(message) {
-                const timestamp = new Date().toLocaleTimeString('en-US', { 
-                    hour12: false, 
-                    hour: '2-digit', 
-                    minute: '2-digit' 
-                });
-                
-                this.activityLog.unshift({
-                    time: timestamp,
-                    message: message,
-                    id: Date.now()
-                });
-                
-                // Keep only last 10 entries
-                if (this.activityLog.length > 10) {
-                    this.activityLog = this.activityLog.slice(0, 10);
-                }
-                
-                // Update UI if dashboard is open
-                this.updateActivityLog();
-            }
-
-            updateActivityLog() {
-                const logContainer = document.getElementById('aiLog');
-                if (logContainer) {
-                    logContainer.innerHTML = this.activityLog.map(entry => `
-                        <div class="ai-log-entry">
-                            <span class="ai-log-time">${entry.time}</span>
-                            <span>${entry.message}</span>
-                        </div>
-                    `).join('');
-                }
-            }
-
-            startLearning() {
-                // Simulate continuous learning
-                setInterval(() => {
-                    if (this.isLearning) {
-                        // Gradually improve accuracy
-                        this.confidence = Math.min(this.confidence + (Math.random() * 0.001), 0.99);
-                        aiSystem.accuracy = this.confidence;
-                        
-                        // Occasionally log learning activities
-                        if (Math.random() < 0.1) {
-                            this.logActivity('🧠 Model weights updated from user feedback');
-                        }
-                        
-                        // Update AI status
-                        this.updateAIStatus();
-                    }
-                }, 5000);
-            }
-
-            updateAIStatus() {
-                const statusElement = document.getElementById('aiStatusText');
-                const insights = [
-                    'AI Learning',
-                    'AI Active',
-                    'AI Optimizing',
-                    'AI Analyzing',
-                    'AI Generating'
-                ];
-                
-                if (statusElement) {
-                    statusElement.textContent = insights[Math.floor(Math.random() * insights.length)];
-                }
-                
-                // Update metrics in dashboard
-                this.updateDashboardMetrics();
-            }
-
-            updateDashboardMetrics() {
-                const elements = {
-                    'aiAccuracy': Math.round(this.confidence * 100) + '%',
-                    'aiChallengesGenerated': aiSystem.challengesGenerated,
-                    'aiSubmissionsReviewed': aiSystem.submissionsReviewed,
-                    'aiResponseTime': this.responseTime + 's'
-                };
-                
-                Object.entries(elements).forEach(([id, value]) => {
-                    const element = document.getElementById(id);
-                    if (element) element.textContent = value;
-                });
+                container.appendChild(star);
             }
         }
 
-        // Initialize AI System
-        const ai = new JomBroAI();
-
         // ===== UTILITY FUNCTIONS =====
-        function showToast(message, isError = false, isAI = false) {
+        function showToast(message, isError = false) {
             const toast = document.getElementById('toast');
             const text = document.getElementById('toastText');
             
             text.textContent = message;
-            toast.className = `toast ${isError ? 'error' : ''} ${isAI ? 'ai' : ''}`;
+            toast.className = `toast ${isError ? 'error' : ''}`;
             toast.classList.add('show');
             
             setTimeout(() => toast.classList.remove('show'), 3000);
@@ -1827,45 +994,62 @@
             document.getElementById(id + 'Modal').classList.remove('show');
         }
 
-        // ===== HELPER FUNCTIONS =====
-        function showHelp() {
-            showToast('❓ AI-powered help system coming soon!', false, true);
+        // ===== CHALLENGE FUNCTIONS - USER CONTROLLED =====
+        function displayCurrentChallenge() {
+            const challenge = challenges[currentChallengeIndex];
+            if (!challenge) return;
+
+            document.getElementById('challengeTitle').textContent = challenge.title;
+            document.getElementById('challengeDescription').textContent = challenge.description;
+            document.getElementById('challengeTokens').textContent = challenge.tokens.toLocaleString();
+            document.getElementById('challengeDifficulty').textContent = challenge.difficulty;
+            document.getElementById('challengeDuration').textContent = challenge.duration;
+
+            // Update hashtags
+            const hashtagsContainer = document.getElementById('challengeHashtags');
+            hashtagsContainer.innerHTML = challenge.hashtags.map(tag => 
+                `<span class="hashtag">${tag}</span>`
+            ).join('');
         }
 
-        function showNotifications() {
-            showToast('🔔 3 AI-generated challenge recommendations!', false, true);
+        function acceptChallenge() {
+            showToast('✅ Challenge accepted! Good luck!');
         }
-// ===== CREATE CHALLENGE FUNCTIONS =====
-function toggleCategory(element) {
-    const isSelected = element.style.backgroundColor.includes('rgba(0, 255, 150');
-    
-    if (isSelected) {
-        element.style.backgroundColor = 'rgba(255, 255, 255, 0.1)';
-        element.style.borderColor = 'var(--border-color)';
-        element.style.color = 'var(--text-secondary)';
-    } else {
-        element.style.backgroundColor = 'rgba(0, 255, 150, 0.2)';
-        element.style.borderColor = 'var(--primary-green)';
-        element.style.color = 'var(--primary-green)';
-    }
-}
 
-function createChallenge() {
-    showToast('🤖 AI is processing your challenge...', false, true);
-    
-    setTimeout(() => {
-        showToast('✅ Challenge created and published!', false, true);
-        hideModal('create');
-    }, 2000);
-    
-    ai.logActivity('✨ User created new challenge with AI assistance');
-}
+        function skipChallenge() {
+            currentChallengeIndex = (currentChallengeIndex + 1) % challenges.length;
+            displayCurrentChallenge();
+            showToast('⏭️ Showing next challenge');
+        }
+
+        function createCustom() {
+            showToast('✏️ Custom challenge creator opening...');
+        }
+
+        function askAI() {
+            if (userSettings.aiControl) {
+                showToast('🤖 AI is analyzing your preferences...');
+            } else {
+                showToast('🤖 AI suggestion: Try the coffee shop challenge!');
+            }
+        }
+
+        function startChallenge() {
+            showToast('🚀 Challenge started! Have fun!');
+        }
+
+        // ===== GROUP FUNCTIONS =====
+        function createGroup() {
+            showToast('👥 Friend group created successfully!');
+            hideModal('createGroup');
+        }
+
         // ===== LIVE PLAYERS DISPLAY =====
         function renderLivePlayers() {
             const container = document.getElementById('livePlayersContainer');
             container.innerHTML = livePlayers.map(player => `
                 <div class="player-avatar" onclick="showPlayerProfile('${player.name}')">
-                    <div class="avatar-ring ${player.aiRecommended ? 'ai-recommended' : ''}">
+                    <div class="avatar-ring">
                         <div class="avatar-inner">${player.avatar}</div>
                     </div>
                     <div class="avatar-status"></div>
@@ -1874,123 +1058,7 @@ function createChallenge() {
         }
 
         function showPlayerProfile(name) {
-            const player = livePlayers.find(p => p.name === name);
-            const isRecommended = player?.aiRecommended ? ' (AI Recommended Friend)' : '';
-            showToast(`👋 Viewing ${name}'s profile${isRecommended}`, false, player?.aiRecommended);
-        }
-
-        // ===== CHALLENGE DISPLAY =====
-        function displayCurrentChallenge() {
-            const challenge = challenges[currentIndex];
-            if (!challenge) return;
-
-            document.getElementById('challengeTitle').textContent = challenge.title;
-            document.getElementById('challengeDescription').textContent = challenge.description;
-            document.getElementById('challengeTokens').textContent = challenge.tokens.toLocaleString();
-            document.getElementById('challengeDifficulty').textContent = challenge.difficulty;
-            document.getElementById('challengeDuration').textContent = challenge.duration;
-            document.getElementById('challengeType').textContent = challenge.type;
-            document.getElementById('creatorName').textContent = challenge.creator;
-            document.getElementById('creatorAvatar').textContent = challenge.avatar;
-            document.getElementById('likeCount').textContent = formatNumber(challenge.likes);
-
-            // Update AI-specific elements
-            if (challenge.aiGenerated) {
-                document.getElementById('confidenceFill').style.width = `${Math.round(challenge.aiConfidence * 100)}%`;
-                document.getElementById('confidenceScore').textContent = `${Math.round(challenge.aiConfidence * 100)}%`;
-                document.getElementById('aiEnhancement').textContent = challenge.aiEnhancement;
-                document.getElementById('aiRecommendation').textContent = 
-                    `🤖 AI suggests: Accept this challenge - ${Math.round(challenge.successRate * 100)}% chance you'll enjoy it based on your profile`;
-            }
-
-            // Update hashtags
-            const hashtagsContainer = document.getElementById('challengeHashtags');
-            hashtagsContainer.innerHTML = challenge.hashtags.map(tag => 
-                `<span class="hashtag ${tag.includes('AI') ? 'ai-generated' : ''}">${tag}</span>`
-            ).join('');
-        }
-
-        function formatNumber(num) {
-            if (num >= 1000) {
-                return (num / 1000).toFixed(1) + 'K';
-            }
-            return num.toString();
-        }
-
-        // ===== AI-ENHANCED CHALLENGE ACTIONS =====
-        async function acceptChallenge() {
-            showToast('🚀 AI optimizing challenge for you...', false, true);
-            
-            // Simulate AI optimization
-            await new Promise(resolve => setTimeout(resolve, 1500));
-            
-            ai.logActivity('🎯 User accepted AI-optimized challenge');
-            showToast('✅ Challenge accepted! AI tracking your progress.', false, true);
-        }
-
-        async function aiSkipChallenge() {
-            showToast('🤖 AI finding better match...', false, true);
-            
-            // Generate new AI challenge
-            const newChallenge = await ai.generatePersonalizedChallenge(player);
-            challenges.unshift(newChallenge);
-            currentIndex = 0;
-            displayCurrentChallenge();
-            
-            showToast('✨ AI found a better challenge for you!', false, true);
-        }
-
-        async function aiOptimizeChallenge() {
-            showToast('🧠 AI optimizing current challenge...', false, true);
-            
-            const currentChallenge = challenges[currentIndex];
-            const performanceData = {
-                completionRate: 0.75,
-                avgRating: 7.8,
-                dropoutRate: 0.25
-            };
-            
-            const optimizations = await ai.optimizeChallenge(currentChallenge.id, performanceData);
-            
-            if (optimizations.length > 0) {
-                // Apply optimizations
-                if (optimizations.find(o => o.type === 'difficulty')) {
-                    currentChallenge.difficulty = 'Easy';
-                    currentChallenge.tokens = Math.floor(currentChallenge.tokens * 0.8);
-                }
-                
-                displayCurrentChallenge();
-                showToast(`🔧 AI applied ${optimizations.length} optimizations!`, false, true);
-            } else {
-                showToast('✅ Challenge already optimally configured!', false, true);
-            }
-        }
-
-        function likeChallenge() {
-            challenges[currentIndex].likes += 1;
-            document.getElementById('likeCount').textContent = formatNumber(challenges[currentIndex].likes);
-            
-            ai.logActivity('👍 User engagement data recorded for learning');
-            showToast('❤️ Liked! AI learning from your preferences.', false, true);
-        }
-
-        function shareChallenge() {
-            const challenge = challenges[currentIndex];
-            if (navigator.share) {
-                navigator.share({
-                    title: `${challenge.title} - JomBro AI Challenge`,
-                    text: `${challenge.description} Join me on this AI-powered challenge!`,
-                    url: window.location.href
-                }).then(() => showToast('📤 Challenge shared!'))
-                .catch(() => showToast('📤 Share failed'));
-            } else {
-                showToast('📤 AI-optimized challenge link copied!', false, true);
-            }
-        }
-
-        function bookmarkChallenge() {
-            ai.logActivity('🔖 User bookmarked challenge for later');
-            showToast('🔖 Bookmarked! AI will remind you later.', false, true);
+            showToast(`👋 Viewing ${name}'s profile`);
         }
 
         // ===== NAVIGATION =====
@@ -2005,115 +1073,87 @@ function createChallenge() {
                     showToast('🏠 Home - AI recommendations updated');
                     break;
                 case 'ranks':
-                    showToast('🏆 AI-powered leaderboard coming soon!', false, true);
-                    break;
-                case 'challenges':
-                    showToast('➕ AI challenge creator opening...', false, true);
+                    showToast('🏆 Leaderboard loading...');
                     break;
                 case 'groups':
-                    showToast('👥 AI matching you with compatible groups...', false, true);
+                    showToast('👥 Friend groups - Create and manage');
                     break;
-                case 'ai':
-                    showModal('aiDashboard');
+                case 'create':
+                    showToast('➕ Challenge creator opening...');
                     break;
                 case 'profile':
-    showModal('profile');
-    break;
-                default:
-                    showToast(`📱 ${section} - AI-powered features`, false, true);
+                    showToast('👤 Your profile and achievements');
+                    break;
             }
         }
 
-        // ===== PLAYER DISPLAY =====
-        function updatePlayerDisplay() {
-            document.getElementById('playerTokens').textContent = player.tokens.toLocaleString();
-            updatePlayerSlogan();
+        // ===== HELPER FUNCTIONS =====
+        function showHelp() {
+            showToast('❓ Help center opening...');
         }
 
-        function updatePlayerSlogan() {
-            const sloganElement = document.getElementById('logoSlogan');
-            if (sloganElement) {
-                sloganElement.textContent = `Let's Go! ${player.name}`;
-            }
+        function showNotifications() {
+            showToast('🔔 You have 3 new challenge invites!');
         }
 
-        // ===== AI PREDICTIONS =====
-        function updateAIPredictions() {
-            const predictions = [
-                '+2 joining soon',
-                'Emma going offline',
-                '+5 new challenges',
-                'Peak activity time',
-                'Trending: coffee challenges'
-            ];
+        // ===== GENTLE AI UPDATES =====
+        function updateAIStatus() {
+            const statusElement = document.getElementById('aiStatusText');
+            const liveStatusElement = document.getElementById('liveStatus');
             
-            const predictionElement = document.getElementById('aiPrediction');
-            if (predictionElement) {
-                predictionElement.textContent = predictions[Math.floor(Math.random() * predictions.length)];
+            const aiStatuses = ['AI Ready', 'AI Standby', 'AI Learning'];
+            const liveStatuses = ['+2 joining soon', 'Emma going offline', 'Peak activity time'];
+            
+            if (statusElement) {
+                statusElement.textContent = aiStatuses[Math.floor(Math.random() * aiStatuses.length)];
             }
             
-            // Update AI insights
-            const insights = [
-                'AI generated 3 new challenges for you',
-                'AI detected your optimal challenge time',
-                'AI found 2 compatible friends nearby',
-                'AI optimized your success rate to 94%',
-                'AI learned from your last 5 challenges'
-            ];
-            
-            const insightElement = document.getElementById('aiInsight');
-            if (insightElement) {
-                insightElement.textContent = insights[Math.floor(Math.random() * insights.length)];
+            if (liveStatusElement) {
+                liveStatusElement.textContent = liveStatuses[Math.floor(Math.random() * liveStatuses.length)];
             }
         }
 
-        // ===== AUTO-GENERATE CONTENT =====
-        async function autoGenerateContent() {
-            // Generate new challenges periodically
-            if (Math.random() < 0.3) {
-                const newChallenge = await ai.generatePersonalizedChallenge(player);
-                challenges.push(newChallenge);
-                
-                if (challenges.length > 10) {
-                    challenges = challenges.slice(-10); // Keep only latest 10
+        // ===== PWA SERVICE WORKER REGISTRATION =====
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', async () => {
+                try {
+                    const registration = await navigator.serviceWorker.register('/service-worker.js');
+                    console.log('✅ Service Worker registered successfully:', registration.scope);
+                    
+                } catch (error) {
+                    console.error('❌ Service Worker registration failed:', error);
                 }
-                
-                showToast('✨ AI generated new personalized challenge!', false, true);
-            }
-            
-            // Update AI predictions
-            updateAIPredictions();
-            
-            // Simulate friend recommendations
-            if (Math.random() < 0.2) {
-                const randomPlayer = livePlayers[Math.floor(Math.random() * livePlayers.length)];
-                randomPlayer.aiRecommended = !randomPlayer.aiRecommended;
-                renderLivePlayers();
-            }
+            });
         }
+
+        // ===== ONLINE/OFFLINE DETECTION =====
+        window.addEventListener('online', () => {
+            showToast('🌐 Back online! All features available.');
+        });
+
+        window.addEventListener('offline', () => {
+            showToast('📡 Offline mode - App still works!');
+        });
 
         // ===== INITIALIZATION =====
         function init() {
+            // Create blinking stars
+            if (userSettings.starsEnabled) {
+                createStars();
+            }
+            
             renderLivePlayers();
             displayCurrentChallenge();
-            updatePlayerDisplay();
-            updatePlayerSlogan();
-            updateAIPredictions();
             
-            // Update active count
-            document.getElementById('activeCount').textContent = `${livePlayers.length} active`;
+            // Update AI status gently (every 15 seconds instead of 5)
+            setInterval(updateAIStatus, 15000);
             
-            // Start AI content generation
-            setInterval(autoGenerateContent, 10000); // Every 10 seconds
-            
-            // Show AI system ready
+            // Show welcome message
             setTimeout(() => {
-                showToast('🤖 AI Automation System Online!', false, true);
+                showToast('✨ Welcome to JomBro! You control your adventure.');
             }, 1000);
             
-            console.log('🚀 JomBro AI System Initialized');
-            console.log('📊 AI Metrics:', aiSystem);
-            console.log('🤖 AI Instance:', ai);
+            console.log('🚀 JomBro Mobile App Initialized');
         }
 
         // Start the app
@@ -2123,7 +1163,7 @@ function createChallenge() {
             init();
         }
 
-        // Prevent zoom on double tap
+        // Prevent zoom on double tap (mobile optimization)
         let lastTouch = 0;
         document.addEventListener('touchend', (e) => {
             const now = Date.now();
@@ -2133,67 +1173,7 @@ function createChallenge() {
             lastTouch = now;
         });
 
-        // ===== EXPOSE AI SYSTEM FOR TESTING =====
-        window.JomBroAI = ai;
-        window.aiSystem = aiSystem;
-        window.player = player;
-        
-        // Demo AI functions in console
-        console.log('🤖 Try these AI functions in console:');
-        console.log('- ai.generatePersonalizedChallenge(player)');
-        console.log('- ai.reviewSubmission({image: "test.jpg", description: "Completed!", challenge: challenges[0]})');
-        console.log('- ai.getPersonalizedRecommendations("user123")');
-        console.log('- ai.detectTrendingChallenges()');
-        // ===== PWA SERVICE WORKER REGISTRATION =====
-        if ('serviceWorker' in navigator) {
-            window.addEventListener('load', async () => {
-                try {
-                    const registration = await navigator.serviceWorker.register('/service-worker.js');
-                    console.log('✅ Service Worker registered successfully:', registration.scope);
-                    
-                    registration.addEventListener('updatefound', () => {
-                        const newWorker = registration.installing;
-                        newWorker.addEventListener('statechange', () => {
-                            if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
-                                showToast('🔄 App update available. Refresh to get latest features!', false, true);
-                            }
-                        });
-                    });
-                    
-                } catch (error) {
-                    console.error('❌ Service Worker registration failed:', error);
-                }
-            });
-        }
-
-        // ===== PWA INSTALL PROMPT =====
-        let deferredPrompt;
-        
-        window.addEventListener('beforeinstallprompt', (e) => {
-            console.log('💾 PWA Install prompt available');
-            e.preventDefault();
-            deferredPrompt = e;
-            
-            // Show install notification
-            showToast('📱 JomBro can be installed as an app! Check your browser menu.', false, true);
-        });
-
-        // ===== ONLINE/OFFLINE DETECTION =====
-        function updateOnlineStatus() {
-            const isOnline = navigator.onLine;
-            const statusElement = document.getElementById('aiStatus');
-            
-            if (isOnline) {
-                statusElement.style.background = 'linear-gradient(45deg, var(--ai-purple), var(--ai-blue))';
-                showToast('🌐 Back online! Syncing data...', false, true);
-            } else {
-                statusElement.style.background = 'linear-gradient(45deg, #ff6b6b, #ee5a24)';
-                showToast('📡 Offline mode - App still works!', false, true);
-            }
-        }
-
-        window.addEventListener('online', updateOnlineStatus);
-        window.addEventListener('offline', updateOnlineStatus);
+        console.log('🎯 Mobile-First JomBro with Balanced AI Ready!');
     </script>
 </body>
 </html>
