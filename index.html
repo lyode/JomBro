@@ -48,12 +48,12 @@
 
         html, body {
             height: 100vh;
-            overflow: hidden;
             width: 100%;
             font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', sans-serif;
             background: #000000;
             color: var(--text-primary);
             user-select: none;
+            overflow: hidden;
         }
 
         /* ===== ENHANCED FLOATING STARS BACKGROUND ===== */
@@ -564,9 +564,9 @@
         .challenge-main {
             flex: 1;
             padding: 20px 25px;
-            overflow-y: auto;
+            overflow-y: visible;
             position: relative;
-            min-height: 280px;
+            min-height: 300px;
         }
 
         .challenge-title {
@@ -1066,7 +1066,7 @@
             
             .challenge-main {
                 padding: 16px 20px;
-                min-height: calc(100vh - 450px);
+                min-height: 200px;
             }
             
             .challenge-title {
@@ -1080,16 +1080,46 @@
             .action-section {
                 padding: 16px 20px;
             }
+            
+            .glass-content {
+                -webkit-overflow-scrolling: touch;
+                touch-action: pan-y;
+                overflow-y: scroll !important;
+                height: 100%;
+                min-height: 0;
+                flex: 1;
+            }
+            
+            .challenge-main {
+                min-height: 200px;
+            }
+            
+            /* Force scrollable content on mobile */
+            .glass-content > * {
+                flex-shrink: 0;
+            }
         }
 
-        /* ===== PERFORMANCE ENHANCEMENTS ===== */
-        .challenge-main {
-            will-change: scroll-position;
-            contain: layout style paint;
+        /* ===== ENHANCED SCROLLING SUPPORT ===== */
+        .glass-content {
+            -webkit-overflow-scrolling: touch;
+            overflow-y: scroll !important;
+            overflow-x: hidden;
+            scroll-behavior: smooth;
+            height: 100%;
+            position: relative;
         }
 
-        .live-players {
-            will-change: scroll-position;
+        /* Ensure content height for scrolling */
+        .glass-content > div {
+            flex-shrink: 0;
+        }
+
+        /* Force minimum content height to enable scrolling */
+        .glass-content::after {
+            content: '';
+            height: 1px;
+            display: block;
         }
 
         /* ===== LOADING STATES ===== */
@@ -1209,16 +1239,16 @@
                     <div class="logo-subtitle" id="logoSlogan">Let's Go! lyode</div>
                 </div>
                 <div class="header-actions">
+                    <div class="header-btn" onclick="scrollToTop()" title="Scroll to Top">🔝</div>
                     <div class="header-btn" onclick="scrollToChallenge()" title="Go to Challenge">🎯</div>
-                    <div class="header-btn" onclick="showHelp()" title="Help">❓</div>
+                    <div class="header-btn" onclick="scrollToBottom()" title="Scroll to Bottom">⬇️</div>
                     <div class="header-btn" onclick="showNotifications()" title="Notifications">🔔</div>
-                    <div class="header-btn" onclick="showModal('create')" title="Create Challenge">➕</div>
                     <div class="header-btn" onclick="showModal('settings')" title="Settings">⚙️</div>
                 </div>
             </div>
 
             <!-- Scrollable Content Area -->
-            <div class="glass-content" id="glassContent">
+            <div class="glass-content" id="glassContent" style="flex: 1; overflow-y: auto; overflow-x: hidden; -webkit-overflow-scrolling: touch; scroll-behavior: smooth; min-height: 0;">
                 <!-- Live Players Section -->
                 <div class="glass-section compact">
                     <div class="live-header">
@@ -1323,6 +1353,16 @@
                     </button>
                 </div>
 
+                <!-- Scroll Down Indicator -->
+                <div style="padding: 15px 25px; text-align: center; color: var(--primary-green); font-size: 14px; border-top: 1px solid rgba(255, 255, 255, 0.1); background: linear-gradient(180deg, transparent 0%, rgba(0, 255, 150, 0.1) 100%); animation: pulse 2s infinite;">
+                    <div style="display: flex; align-items: center; justify-content: center; gap: 8px;">
+                        <span>⬇️ SCROLL DOWN FOR MORE ⬇️</span>
+                    </div>
+                    <div style="margin-top: 6px; font-size: 12px; opacity: 0.9; font-weight: 600;">
+                        🏆 Achievements • 📊 Stats • 👥 Friends • 🔥 Trending
+                    </div>
+                </div>
+
                 <!-- Achievements Section -->
                 <div class="glass-section">
                     <div class="group-header">
@@ -1350,7 +1390,7 @@
                 </div>
 
                 <!-- Stats Section -->
-                <div class="glass-section">
+                <div class="glass-section" id="stats">
                     <div class="group-header">
                         <div class="group-title">
                             📊 <span>Your Stats</span>
@@ -1410,8 +1450,19 @@
                 </div>
 
                 <!-- Scroll indicator -->
-                <div style="padding: 20px; text-align: center; color: var(--text-secondary); font-size: 12px;">
-                    ✨ Scroll up to see more features ✨
+                <div style="padding: 30px 20px; text-align: center; color: var(--text-secondary); font-size: 12px; border-top: 1px solid rgba(255, 255, 255, 0.1); margin-top: 20px; background: linear-gradient(180deg, rgba(0, 255, 150, 0.05) 0%, transparent 100%);">
+                    <div style="margin-bottom: 10px; font-size: 14px; color: var(--primary-green);">
+                        🎉 You've reached the end! 🎉
+                    </div>
+                    <div style="margin-bottom: 8px;">
+                        ✨ Scroll up to see more features ✨
+                    </div>
+                    <div style="font-size: 10px; opacity: 0.7;">
+                        Swipe up ↑ to explore all JomBro features
+                    </div>
+                    <div style="margin-top: 15px; padding: 10px; background: rgba(255, 255, 255, 0.05); border-radius: 10px; font-size: 11px;">
+                        💡 Tip: Use header buttons 🔝 🎯 ⬇️ for quick navigation
+                    </div>
                 </div>
             </div>
 
@@ -2272,15 +2323,41 @@
 
         // ===== ENHANCED CLICK HANDLERS =====
         function logoClick() {
-            showToast('🚀 JomBro - Where adventures begin! Version 2.0', 'info');
+            showQuickNav();
+        }
+
+        function showQuickNav() {
+            const quickNavItems = [
+                { name: 'Active Challenges', action: () => showModal('myChallenges') },
+                { name: 'Create Challenge', action: () => showModal('create') },
+                { name: 'Achievements', action: () => showModal('achievements') },
+                { name: 'Friends Activity', action: () => scrollToSection('friendsActivity') },
+                { name: 'Trending', action: () => scrollToSection('trendingChallenges') },
+                { name: 'Stats', action: () => scrollToSection('stats') }
+            ];
             
-            // Easter egg: Triple tap for secret mode
+            let message = '🚀 Quick Navigation:\n';
+            quickNavItems.forEach((item, index) => {
+                message += `${index + 1}. ${item.name}\n`;
+            });
+            
+            showToast('📱 Tap header buttons to navigate: 🔝 Top, 🎯 Challenge, ⬇️ Bottom', 'info');
+            
+            // Easter egg counter
             if (!window.logoClickCount) window.logoClickCount = 0;
             window.logoClickCount++;
             
             if (window.logoClickCount === 3) {
-                showToast('🎉 Secret mode unlocked! You\'ve found the hidden feature!', 'success');
+                showToast('🎉 Secret unlocked! You found the navigation master mode!', 'success');
                 window.logoClickCount = 0;
+            }
+        }
+
+        function scrollToSection(sectionId) {
+            const element = document.getElementById(sectionId);
+            if (element) {
+                element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                showToast(`📍 Scrolled to ${sectionId}`, 'info');
             }
         }
 
@@ -2498,13 +2575,54 @@
             if (glassContent && header) {
                 glassContent.addEventListener('scroll', () => {
                     const scrollTop = glassContent.scrollTop;
+                    const scrollHeight = glassContent.scrollHeight;
+                    const clientHeight = glassContent.clientHeight;
+                    const scrollPercentage = (scrollTop / (scrollHeight - clientHeight)) * 100;
                     
+                    // Add header shadow when scrolling
                     if (scrollTop > 10) {
                         header.style.boxShadow = '0 4px 20px rgba(0, 0, 0, 0.3)';
                     } else {
                         header.style.boxShadow = 'none';
                     }
+                    
+                    // Update scroll progress indicator
+                    updateScrollProgress(scrollPercentage);
                 });
+                
+                // Add scroll gesture hint
+                setTimeout(() => {
+                    if (glassContent.scrollTop === 0) {
+                        showToast('👆 Swipe up to explore more features!', 'info');
+                    }
+                }, 3000);
+            }
+        }
+
+        function updateScrollProgress(percentage) {
+            // Visual feedback for scroll progress
+            const aiStatus = document.getElementById('aiStatus');
+            if (aiStatus && percentage > 50) {
+                aiStatus.style.transform = 'scale(1.1)';
+                setTimeout(() => {
+                    aiStatus.style.transform = 'scale(1)';
+                }, 200);
+            }
+        }
+
+        function scrollToTop() {
+            const glassContent = document.querySelector('.glass-content');
+            if (glassContent) {
+                glassContent.scrollTo({ top: 0, behavior: 'smooth' });
+                showToast('🏠 Scrolled to top!', 'info');
+            }
+        }
+
+        function scrollToBottom() {
+            const glassContent = document.querySelector('.glass-content');
+            if (glassContent) {
+                glassContent.scrollTo({ top: glassContent.scrollHeight, behavior: 'smooth' });
+                showToast('📊 Scrolled to bottom - explore all features!', 'info');
             }
         }
 
@@ -2579,12 +2697,55 @@
                 showToast('📡 Offline mode - Core features still available!', 'warning');
             });
             
-            // Welcome message
+            // Welcome message with scroll demonstration
             setTimeout(() => {
-                showToast('✨ Welcome to JomBro! Your adventure starts now! 🚀', 'success');
+                showToast('✨ Welcome to JomBro! Swipe up to explore all features! 📱', 'success');
             }, 1000);
             
+            // Demonstrate scrolling capability
+            setTimeout(() => {
+                const glassContent = document.querySelector('.glass-content');
+                if (glassContent && glassContent.scrollTop === 0) {
+                    showToast('👆 Try scrolling down to see Achievements, Stats, Friends & more!', 'info');
+                    
+                    // Gentle scroll demo
+                    setTimeout(() => {
+                        glassContent.scrollTo({ top: 100, behavior: 'smooth' });
+                        setTimeout(() => {
+                            glassContent.scrollTo({ top: 0, behavior: 'smooth' });
+                        }, 2000);
+                    }, 2000);
+                }
+            }, 4000);
+            
+            // Test scrolling functionality
+            setTimeout(() => {
+                testScrolling();
+            }, 6000);
+            
             console.log('🌟 Enhanced JomBro Interface Fully Loaded! 🚀');
+        }
+
+        function testScrolling() {
+            const glassContent = document.querySelector('.glass-content');
+            if (glassContent) {
+                const contentHeight = glassContent.scrollHeight;
+                const containerHeight = glassContent.clientHeight;
+                const canScroll = contentHeight > containerHeight;
+                
+                console.log('📏 Scroll Test:', {
+                    contentHeight,
+                    containerHeight,
+                    canScroll,
+                    scrollTop: glassContent.scrollTop
+                });
+                
+                if (canScroll) {
+                    showToast('✅ Scrolling is working! Swipe up to explore more features!', 'success');
+                } else {
+                    showToast('⚠️ Content might not be tall enough to scroll. Check all sections!', 'warning');
+                }
+            }
         }
 
         // ===== PREVENT ZOOM ON MOBILE =====
