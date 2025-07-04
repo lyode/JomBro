@@ -3,13 +3,24 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    
+    <!-- PWA Meta Tags -->
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="theme-color" content="#000000">
+    <meta name="apple-mobile-web-app-title" content="JomBro">
+    <meta name="theme-color" content="#00ff96">
+    <meta name="msapplication-TileColor" content="#00ff96">
+    
+    <!-- Manifest Link -->
+    <link rel="manifest" href="/manifest.json">
+    
+    <!-- Icons -->
+    <link rel="icon" type="image/png" sizes="32x32" href="/icons/icon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/icons/icon-16x16.png">
+    <link rel="apple-touch-icon" href="/icons/icon-192x192.png">
     
     <title>JomBro - AI-Powered Social Challenge Platform</title>
-
     <style>
         /* ===== ENHANCED JOMBRO WITH AI AUTOMATION ===== */
         :root {
@@ -2133,6 +2144,56 @@ function createChallenge() {
         console.log('- ai.reviewSubmission({image: "test.jpg", description: "Completed!", challenge: challenges[0]})');
         console.log('- ai.getPersonalizedRecommendations("user123")');
         console.log('- ai.detectTrendingChallenges()');
+        // ===== PWA SERVICE WORKER REGISTRATION =====
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', async () => {
+                try {
+                    const registration = await navigator.serviceWorker.register('/service-worker.js');
+                    console.log('✅ Service Worker registered successfully:', registration.scope);
+                    
+                    registration.addEventListener('updatefound', () => {
+                        const newWorker = registration.installing;
+                        newWorker.addEventListener('statechange', () => {
+                            if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                                showToast('🔄 App update available. Refresh to get latest features!', false, true);
+                            }
+                        });
+                    });
+                    
+                } catch (error) {
+                    console.error('❌ Service Worker registration failed:', error);
+                }
+            });
+        }
+
+        // ===== PWA INSTALL PROMPT =====
+        let deferredPrompt;
+        
+        window.addEventListener('beforeinstallprompt', (e) => {
+            console.log('💾 PWA Install prompt available');
+            e.preventDefault();
+            deferredPrompt = e;
+            
+            // Show install notification
+            showToast('📱 JomBro can be installed as an app! Check your browser menu.', false, true);
+        });
+
+        // ===== ONLINE/OFFLINE DETECTION =====
+        function updateOnlineStatus() {
+            const isOnline = navigator.onLine;
+            const statusElement = document.getElementById('aiStatus');
+            
+            if (isOnline) {
+                statusElement.style.background = 'linear-gradient(45deg, var(--ai-purple), var(--ai-blue))';
+                showToast('🌐 Back online! Syncing data...', false, true);
+            } else {
+                statusElement.style.background = 'linear-gradient(45deg, #ff6b6b, #ee5a24)';
+                showToast('📡 Offline mode - App still works!', false, true);
+            }
+        }
+
+        window.addEventListener('online', updateOnlineStatus);
+        window.addEventListener('offline', updateOnlineStatus);
     </script>
 </body>
 </html>
