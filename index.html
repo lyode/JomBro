@@ -3436,9 +3436,15 @@ auth.getRedirectResult().then((result) => {
     console.error('Google redirect error:', error);
 });
         auth.onAuthStateChanged(async (user) => {
+console.log('Auth state changed:', user); 
             if (user) {
+console.log('User detected:', user.displayName);
                 currentUser = user;
-                await createUserProfile(user);
+                try {
+    await createUserProfile(user);
+} catch (error) {
+    console.error('Error in createUserProfile:', error);
+}
                 
                 document.getElementById('authScreen').style.display = 'none';
                 document.getElementById('mainApp').style.display = 'block';
@@ -3453,6 +3459,7 @@ auth.getRedirectResult().then((result) => {
                 
                 console.log('User signed in:', user);
             } else {
+console.log('User signed out');
                 document.getElementById('authScreen').style.display = 'flex';
                 document.getElementById('mainApp').style.display = 'none';
                 document.getElementById('chatToggle').style.display = 'none';
