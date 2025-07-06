@@ -1060,6 +1060,70 @@
             background: rgba(139, 92, 246, 0.25);
             transform: scale(1.05);
         }
+
+        /* Upload Area Styles */
+        .upload-area {
+            border: 2px dashed var(--glass-border);
+            border-radius: 12px;
+            padding: 30px 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: rgba(255, 255, 255, 0.02);
+        }
+
+        .upload-area:hover {
+            border-color: var(--primary-pink);
+            background: rgba(255, 107, 157, 0.05);
+            transform: translateY(-2px);
+        }
+
+        .upload-area.has-file {
+            border-color: var(--success-green);
+            background: rgba(16, 185, 129, 0.1);
+        }
+
+        .score-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 6px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .score-item:last-child {
+            border-bottom: none;
+        }
+
+        .gallery-item {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 15px;
+            margin-bottom: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .gallery-item:hover {
+            background: rgba(255, 255, 255, 0.1);
+            transform: translateY(-2px);
+        }
+
+        .challenge-progress-bar {
+            width: 100%;
+            height: 4px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 2px;
+            overflow: hidden;
+            margin: 8px 0;
+        }
+
+        .challenge-progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary-pink), var(--primary-purple));
+            transition: width 0.3s ease;
+        }
     </style>
 </head>
 <body>
@@ -1177,6 +1241,14 @@
 
                 <!-- Action Section -->
                 <div class="action-section">
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 15px;">
+                        <button class="btn-secondary" onclick="submitChallengeProof()" style="display: flex; align-items: center; justify-content: center; gap: 6px;">
+                            📸 Submit Proof
+                        </button>
+                        <button class="btn-secondary" onclick="showChallengeGallery()" style="display: flex; align-items: center; justify-content: center; gap: 6px;">
+                            🏆 My Gallery
+                        </button>
+                    </div>
                     <button class="btn-primary" onclick="startChallenge()">
                         🚀 START CHALLENGE & INVITE FRIENDS
                     </button>
@@ -1345,6 +1417,136 @@
             <input type="text" class="chat-input" id="chatInput" placeholder="Type a message..." 
                    onkeypress="handleChatKeyPress(event)">
             <button class="chat-send" onclick="sendMessage()">➤</button>
+        </div>
+    </div>
+
+    <!-- Challenge Submission Modal -->
+    <div id="challengeSubmissionModal" class="modal">
+        <div class="modal-content" style="max-width: 450px;">
+            <div class="modal-header">
+                <div class="modal-title">📸 Submit Challenge Proof</div>
+                <button class="modal-close" onclick="hideModal('challengeSubmission')">&times;</button>
+            </div>
+
+            <div id="submissionContent">
+                <div style="text-align: center; margin-bottom: 20px;">
+                    <div style="font-size: 18px; font-weight: 600; margin-bottom: 8px;" id="submissionChallengeTitle">Coffee Shop Poetry Challenge</div>
+                    <div style="font-size: 12px; color: var(--text-secondary);">Upload photo or video proof of your completed challenge</div>
+                </div>
+
+                <!-- Upload Area -->
+                <div class="upload-area" onclick="triggerFileUpload()" id="uploadArea">
+                    <div class="upload-content">
+                        <div style="font-size: 48px; margin-bottom: 15px; color: var(--primary-pink);">📷</div>
+                        <div style="font-size: 16px; font-weight: 600; margin-bottom: 8px;">Upload Media</div>
+                        <div style="font-size: 12px; color: var(--text-secondary); margin-bottom: 15px;">Photos, videos, or screenshots</div>
+                        <div style="background: var(--primary-pink); color: white; padding: 8px 16px; border-radius: 8px; font-size: 12px; font-weight: 600;">Choose File</div>
+                    </div>
+                </div>
+
+                <input type="file" id="mediaUpload" accept="image/*,video/*" style="display: none;" onchange="handleFileUpload(event)">
+
+                <!-- Preview Area -->
+                <div id="mediaPreview" style="display: none; margin: 20px 0;">
+                    <div style="font-size: 14px; font-weight: 600; margin-bottom: 10px;">Preview:</div>
+                    <div id="previewContent" style="border-radius: 12px; overflow: hidden; max-height: 200px; display: flex; justify-content: center;"></div>
+                </div>
+
+                <!-- Challenge Description -->
+                <div style="margin: 20px 0;">
+                    <label style="font-size: 12px; font-weight: 600; color: var(--text-primary); margin-bottom: 8px; display: block;">Tell us about your experience:</label>
+                    <textarea id="challengeStory" placeholder="Describe what happened, how you felt, what you learned..." 
+                              style="width: 100%; min-height: 80px; padding: 12px; background: rgba(255,255,255,0.1); border: 1px solid var(--glass-border); border-radius: 10px; color: var(--text-primary); font-size: 14px; resize: vertical; outline: none;"></textarea>
+                </div>
+
+                <!-- AI Analysis Results (Hidden initially) -->
+                <div id="aiAnalysis" style="display: none; margin: 20px 0;">
+                    <div style="background: linear-gradient(135deg, rgba(139, 92, 246, 0.2), rgba(255, 107, 157, 0.2)); border: 1px solid rgba(139, 92, 246, 0.3); border-radius: 12px; padding: 20px;">
+                        <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 15px;">
+                            <div style="font-size: 24px;">🤖</div>
+                            <div>
+                                <div style="font-size: 14px; font-weight: 600;">AI Verification Complete</div>
+                                <div style="font-size: 11px; color: var(--text-secondary);">Analyzing your submission...</div>
+                            </div>
+                        </div>
+                        
+                        <div id="aiScore" style="text-align: center; margin: 20px 0;">
+                            <div style="font-size: 48px; font-weight: 700; color: var(--success-green);" id="scoreValue">85</div>
+                            <div style="font-size: 12px; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 1px;">AI Score</div>
+                        </div>
+
+                        <div id="aiScoreBreakdown" style="margin: 15px 0;">
+                            <div style="font-size: 12px; font-weight: 600; margin-bottom: 10px;">Verification Details:</div>
+                            <div class="score-item">
+                                <span style="font-size: 11px;">✅ Challenge Completion</span>
+                                <span style="font-size: 11px; color: var(--success-green); font-weight: 600;">Verified</span>
+                            </div>
+                            <div class="score-item">
+                                <span style="font-size: 11px;">🎯 Effort & Creativity</span>
+                                <span style="font-size: 11px; color: var(--success-green); font-weight: 600;" id="effortScore">High</span>
+                            </div>
+                            <div class="score-item">
+                                <span style="font-size: 11px;">📝 Story Quality</span>
+                                <span style="font-size: 11px; color: var(--success-green); font-weight: 600;" id="storyScore">Excellent</span>
+                            </div>
+                        </div>
+
+                        <div id="aiFeedback" style="background: rgba(255, 255, 255, 0.1); padding: 12px; border-radius: 8px; margin: 15px 0;">
+                            <div style="font-size: 11px; font-weight: 600; margin-bottom: 6px;">🎉 AI Feedback:</div>
+                            <div style="font-size: 11px; line-height: 1.4;" id="feedbackText">
+                                Great job! Your coffee shop poetry challenge shows genuine creativity and social connection. The barista's poem is heartwarming and your story captures the experience beautifully!
+                            </div>
+                        </div>
+
+                        <div id="rewardsEarned" style="background: rgba(255, 107, 157, 0.2); padding: 12px; border-radius: 8px; text-align: center;">
+                            <div style="font-size: 12px; font-weight: 600; margin-bottom: 6px;">🏆 Rewards Earned</div>
+                            <div style="display: flex; justify-content: space-around; align-items: center;">
+                                <div>
+                                    <div style="font-size: 14px; font-weight: 700; color: var(--primary-pink);" id="tokensEarned">500</div>
+                                    <div style="font-size: 9px; color: var(--text-secondary);">Tokens</div>
+                                </div>
+                                <div>
+                                    <div style="font-size: 14px; font-weight: 700; color: var(--primary-pink);" id="xpEarned">+25</div>
+                                    <div style="font-size: 9px; color: var(--text-secondary);">Experience</div>
+                                </div>
+                                <div>
+                                    <div style="font-size: 14px; font-weight: 700; color: var(--primary-pink);" id="streakBonus">+1</div>
+                                    <div style="font-size: 9px; color: var(--text-secondary);">Streak</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Action Buttons -->
+                <div style="display: flex; gap: 10px; margin-top: 20px;">
+                    <button class="btn-secondary" onclick="hideModal('challengeSubmission')" style="flex: 1;">Cancel</button>
+                    <button class="btn-primary" onclick="submitChallenge()" id="submitBtn" style="flex: 2;">
+                        🤖 Submit for AI Verification
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Challenge Gallery Modal -->
+    <div id="challengeGalleryModal" class="modal">
+        <div class="modal-content" style="max-width: 500px;">
+            <div class="modal-header">
+                <div class="modal-title">🏆 My Challenge Gallery</div>
+                <button class="modal-close" onclick="hideModal('challengeGallery')">&times;</button>
+            </div>
+
+            <div style="margin-bottom: 15px;">
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <div style="font-size: 12px; color: var(--text-secondary);">Your completed challenges with AI scores</div>
+                    <div style="font-size: 11px; background: var(--primary-pink); color: white; padding: 4px 8px; border-radius: 6px;" id="avgScore">Avg: 87.5</div>
+                </div>
+            </div>
+
+            <div id="challengeGalleryContent" style="max-height: 400px; overflow-y: auto;">
+                <!-- Gallery items will be populated here -->
+            </div>
         </div>
     </div>
 
@@ -1726,8 +1928,75 @@
                 generateAIChallenge()
             ];
             
+            // Add sample completed challenges for demo
+            initializeSampleCompletedChallenges();
+            
             // Display first challenge
             displayCurrentChallenge();
+        }
+
+        function initializeSampleCompletedChallenges() {
+            const sampleCompleted = [
+                {
+                    id: 1,
+                    challenge: {
+                        title: 'Random Acts of Kindness',
+                        category: 'SOCIAL',
+                        tokens: 600
+                    },
+                    file: {
+                        name: 'kindness_photo.jpg',
+                        type: 'image/jpeg',
+                        url: 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 200"><rect width="300" height="200" fill="%23ff6b9d"/><text x="150" y="100" text-anchor="middle" font-size="40" fill="white">📷</text><text x="150" y="140" text-anchor="middle" font-size="16" fill="white">Kindness Photo</text></svg>'
+                    },
+                    story: 'I helped an elderly lady carry her groceries and paid for a stranger\'s coffee. Both experiences were heartwarming and reminded me how small acts can make a big difference!',
+                    score: 92,
+                    tokens: 552,
+                    xp: 23,
+                    completedAt: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000), // 2 days ago
+                    verified: true
+                },
+                {
+                    id: 2,
+                    challenge: {
+                        title: 'Street Art Photography',
+                        category: 'CREATIVE',
+                        tokens: 550
+                    },
+                    file: {
+                        name: 'street_art.jpg',
+                        type: 'image/jpeg',
+                        url: 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 200"><rect width="300" height="200" fill="%2300d4ff"/><text x="150" y="100" text-anchor="middle" font-size="40" fill="white">🎨</text><text x="150" y="140" text-anchor="middle" font-size="16" fill="white">Street Art</text></svg>'
+                    },
+                    story: 'Found amazing murals in the downtown area! The artists\' creativity is incredible and each piece tells a unique story about our community.',
+                    score: 88,
+                    tokens: 484,
+                    xp: 22,
+                    completedAt: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000), // 5 days ago
+                    verified: true
+                },
+                {
+                    id: 3,
+                    challenge: {
+                        title: 'Digital Detox Hour',
+                        category: 'MINDFULNESS',
+                        tokens: 800
+                    },
+                    file: {
+                        name: 'meditation_video.mp4',
+                        type: 'video/mp4',
+                        url: 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 200"><rect width="300" height="200" fill="%23a855f7"/><text x="150" y="100" text-anchor="middle" font-size="40" fill="white">🎥</text><text x="150" y="140" text-anchor="middle" font-size="16" fill="white">Meditation</text></svg>'
+                    },
+                    story: 'Spent an hour in the park without any devices. The peace and clarity I felt was amazing. I could hear birds, feel the breeze, and just be present.',
+                    score: 95,
+                    tokens: 760,
+                    xp: 24,
+                    completedAt: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000), // 1 week ago
+                    verified: true
+                }
+            ];
+            
+            completedChallenges = sampleCompleted;
         }
 
         function displayCurrentChallenge() {
@@ -1960,6 +2229,318 @@
             alert(`🔍 Searching for challenges with ${hashtag}... Feature coming soon!`);
         }
 
+        // Challenge Submission & AI Verification System
+        function submitChallengeProof() {
+            const currentChallenge = availableChallenges[currentChallengeIndex];
+            if (!currentChallenge) {
+                showToast('No active challenge to submit!', 'error');
+                return;
+            }
+            
+            document.getElementById('submissionChallengeTitle').textContent = currentChallenge.title;
+            showModal('challengeSubmission');
+            resetSubmissionForm();
+        }
+
+        function resetSubmissionForm() {
+            document.getElementById('uploadArea').classList.remove('has-file');
+            document.getElementById('mediaPreview').style.display = 'none';
+            document.getElementById('challengeStory').value = '';
+            document.getElementById('aiAnalysis').style.display = 'none';
+            document.getElementById('submitBtn').textContent = '🤖 Submit for AI Verification';
+            document.getElementById('submitBtn').onclick = submitChallenge;
+            currentUploadedFile = null;
+        }
+
+        function triggerFileUpload() {
+            document.getElementById('mediaUpload').click();
+        }
+
+        function handleFileUpload(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            
+            currentUploadedFile = file;
+            
+            // Update upload area
+            const uploadArea = document.getElementById('uploadArea');
+            uploadArea.classList.add('has-file');
+            uploadArea.querySelector('.upload-content').innerHTML = `
+                <div style="font-size: 32px; margin-bottom: 10px; color: var(--success-green);">✅</div>
+                <div style="font-size: 14px; font-weight: 600; margin-bottom: 5px;">File Selected</div>
+                <div style="font-size: 11px; color: var(--text-secondary);">${file.name}</div>
+            `;
+            
+            // Show preview
+            const previewContainer = document.getElementById('mediaPreview');
+            const previewContent = document.getElementById('previewContent');
+            
+            if (file.type.startsWith('image/')) {
+                const img = document.createElement('img');
+                img.src = URL.createObjectURL(file);
+                img.style.maxWidth = '100%';
+                img.style.maxHeight = '200px';
+                img.style.borderRadius = '8px';
+                previewContent.innerHTML = '';
+                previewContent.appendChild(img);
+                previewContainer.style.display = 'block';
+            } else if (file.type.startsWith('video/')) {
+                const video = document.createElement('video');
+                video.src = URL.createObjectURL(file);
+                video.controls = true;
+                video.style.maxWidth = '100%';
+                video.style.maxHeight = '200px';
+                video.style.borderRadius = '8px';
+                previewContent.innerHTML = '';
+                previewContent.appendChild(video);
+                previewContainer.style.display = 'block';
+            }
+            
+            showToast('📎 Media uploaded successfully!', 'success');
+        }
+
+        async function submitChallenge() {
+            const story = document.getElementById('challengeStory').value.trim();
+            const currentChallenge = availableChallenges[currentChallengeIndex];
+            
+            if (!currentUploadedFile) {
+                showToast('Please upload a photo or video first!', 'error');
+                return;
+            }
+            
+            if (!story) {
+                showToast('Please describe your experience!', 'error');
+                return;
+            }
+            
+            // Show loading state
+            document.getElementById('submitBtn').textContent = '🤖 AI Analyzing...';
+            document.getElementById('submitBtn').disabled = true;
+            
+            // Simulate AI verification delay
+            showToast('🤖 AI is analyzing your submission...', 'info');
+            
+            setTimeout(() => {
+                performAIVerification(currentChallenge, currentUploadedFile, story);
+            }, 3000);
+        }
+
+        function performAIVerification(challenge, file, story) {
+            // Simulate AI verification with realistic scoring
+            const baseScore = 60 + Math.random() * 35; // 60-95 range
+            const storyBonus = story.length > 50 ? 5 : 0;
+            const mediaBonus = file.type.startsWith('video/') ? 5 : 0;
+            
+            const finalScore = Math.min(95, Math.round(baseScore + storyBonus + mediaBonus));
+            
+            // Generate AI feedback based on challenge type and score
+            const feedback = generateAIFeedback(challenge, finalScore, story);
+            
+            // Calculate rewards
+            const baseTokens = challenge.tokens || 500;
+            const scoreMultiplier = finalScore / 100;
+            const tokensEarned = Math.round(baseTokens * scoreMultiplier);
+            const xpEarned = Math.round(finalScore / 4);
+            
+            // Display AI analysis
+            displayAIAnalysis(finalScore, feedback, tokensEarned, xpEarned);
+            
+            // Save completed challenge
+            saveCompletedChallenge(challenge, file, story, finalScore, tokensEarned, xpEarned);
+            
+            // Update user stats
+            updateUserStats(tokensEarned, xpEarned);
+        }
+
+        function generateAIFeedback(challenge, score, story) {
+            const feedbackTemplates = {
+                high: [ // 85-95
+                    "Outstanding work! Your creativity and effort really shine through. This is exactly what this challenge is about!",
+                    "Exceptional submission! You've gone above and beyond. Your story captures the essence perfectly!",
+                    "Brilliant execution! Your approach to this challenge is inspiring and shows great thoughtfulness!",
+                    "Amazing job! The quality of your submission and storytelling is truly impressive!"
+                ],
+                good: [ // 70-84
+                    "Great job! You've completed the challenge well and your story shows genuine engagement!",
+                    "Nice work! Your submission shows good effort and creativity. Well done!",
+                    "Solid completion! You've captured the spirit of the challenge effectively!",
+                    "Good execution! Your approach demonstrates understanding of the challenge goals!"
+                ],
+                average: [ // 60-69
+                    "Good effort! You've completed the challenge. Consider adding more detail to your story next time!",
+                    "Nice attempt! The challenge is complete, though there's room for more creativity!",
+                    "Well done on completing the challenge! Your future submissions could benefit from more detail!",
+                    "Good work! You've met the basic requirements. Try to be more creative next time!"
+                ]
+            };
+            
+            let category = 'average';
+            if (score >= 85) category = 'high';
+            else if (score >= 70) category = 'good';
+            
+            const templates = feedbackTemplates[category];
+            return templates[Math.floor(Math.random() * templates.length)];
+        }
+
+        function displayAIAnalysis(score, feedback, tokens, xp) {
+            // Update score display
+            document.getElementById('scoreValue').textContent = score;
+            document.getElementById('scoreValue').style.color = 
+                score >= 85 ? 'var(--success-green)' : 
+                score >= 70 ? 'var(--warning-orange)' : 
+                'var(--error-red)';
+            
+            // Update score breakdown
+            document.getElementById('effortScore').textContent = 
+                score >= 85 ? 'Excellent' : score >= 70 ? 'Good' : 'Average';
+            document.getElementById('storyScore').textContent = 
+                score >= 80 ? 'Detailed' : score >= 65 ? 'Good' : 'Basic';
+            
+            // Update feedback
+            document.getElementById('feedbackText').textContent = feedback;
+            
+            // Update rewards
+            document.getElementById('tokensEarned').textContent = tokens;
+            document.getElementById('xpEarned').textContent = `+${xp}`;
+            document.getElementById('streakBonus').textContent = '+1';
+            
+            // Show analysis
+            document.getElementById('aiAnalysis').style.display = 'block';
+            
+            // Update submit button
+            document.getElementById('submitBtn').textContent = '🎉 Challenge Completed!';
+            document.getElementById('submitBtn').disabled = false;
+            document.getElementById('submitBtn').onclick = () => {
+                hideModal('challengeSubmission');
+                nextChallenge();
+            };
+            
+            showToast(`🎉 Challenge verified! Score: ${score}/100`, 'success');
+        }
+
+        function saveCompletedChallenge(challenge, file, story, score, tokens, xp) {
+            const completedChallenge = {
+                id: Date.now(),
+                challenge: challenge,
+                file: {
+                    name: file.name,
+                    type: file.type,
+                    url: URL.createObjectURL(file) // In real app, this would be uploaded to storage
+                },
+                story: story,
+                score: score,
+                tokens: tokens,
+                xp: xp,
+                completedAt: new Date(),
+                verified: true
+            };
+            
+            completedChallenges.unshift(completedChallenge);
+            
+            // In real app, save to Firebase
+            if (currentUser) {
+                // db.collection('completed_challenges').add(completedChallenge);
+            }
+        }
+
+        function updateUserStats(tokens, xp) {
+            if (userProfile) {
+                userProfile.tokens = (userProfile.tokens || 0) + tokens;
+                userProfile.challenges = (userProfile.challenges || 0) + 1;
+                userProfile.streak = (userProfile.streak || 0) + 1;
+                
+                // Level up logic
+                const currentXP = userProfile.xp || 0;
+                const newXP = currentXP + xp;
+                const newLevel = Math.floor(newXP / 100) + 1;
+                
+                if (newLevel > userProfile.level) {
+                    userProfile.level = newLevel;
+                    showToast(`🎉 Level Up! You're now Level ${newLevel}!`, 'success');
+                }
+                
+                userProfile.xp = newXP;
+                updateProfileDisplay();
+                
+                // Update in Firebase
+                if (currentUser) {
+                    updateUserProfile({
+                        tokens: userProfile.tokens,
+                        challenges: userProfile.challenges,
+                        streak: userProfile.streak,
+                        level: userProfile.level,
+                        xp: userProfile.xp
+                    });
+                }
+            }
+        }
+
+        function showChallengeGallery() {
+            showModal('challengeGallery');
+            populateChallengeGallery();
+        }
+
+        function populateChallengeGallery() {
+            const container = document.getElementById('challengeGalleryContent');
+            const avgScoreElement = document.getElementById('avgScore');
+            
+            if (completedChallenges.length === 0) {
+                container.innerHTML = `
+                    <div style="text-align: center; padding: 40px 20px; color: var(--text-secondary);">
+                        <div style="font-size: 48px; margin-bottom: 15px;">📸</div>
+                        <div style="font-size: 16px; margin-bottom: 8px;">No completed challenges yet</div>
+                        <div style="font-size: 12px;">Complete challenges and submit proof to build your gallery!</div>
+                    </div>
+                `;
+                avgScoreElement.textContent = 'Avg: --';
+                return;
+            }
+            
+            // Calculate average score
+            const avgScore = completedChallenges.reduce((sum, c) => sum + c.score, 0) / completedChallenges.length;
+            avgScoreElement.textContent = `Avg: ${avgScore.toFixed(1)}`;
+            
+            container.innerHTML = completedChallenges.map(completed => `
+                <div class="gallery-item" onclick="viewCompletedChallenge(${completed.id})">
+                    <div style="display: flex; gap: 12px;">
+                        <div style="flex-shrink: 0;">
+                            ${completed.file.type.startsWith('image/') ? 
+                                `<img src="${completed.file.url}" style="width: 60px; height: 60px; object-fit: cover; border-radius: 8px;">` :
+                                `<div style="width: 60px; height: 60px; background: var(--primary-purple); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 20px;">🎥</div>`
+                            }
+                        </div>
+                        <div style="flex: 1; min-width: 0;">
+                            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 6px;">
+                                <div style="font-size: 14px; font-weight: 600; truncate;">${completed.challenge.title}</div>
+                                <div style="display: flex; align-items: center; gap: 8px; flex-shrink: 0;">
+                                    <div style="background: ${completed.score >= 85 ? 'var(--success-green)' : completed.score >= 70 ? 'var(--warning-orange)' : 'var(--error-red)'}; color: white; padding: 2px 8px; border-radius: 6px; font-size: 11px; font-weight: 600;">${completed.score}</div>
+                                </div>
+                            </div>
+                            <div style="font-size: 11px; color: var(--text-secondary); margin-bottom: 6px;">
+                                ${completed.story.substring(0, 80)}${completed.story.length > 80 ? '...' : ''}
+                            </div>
+                            <div style="display: flex; justify-content: space-between; align-items: center;">
+                                <div style="font-size: 10px; color: var(--text-secondary);">
+                                    ${new Date(completed.completedAt).toLocaleDateString()}
+                                </div>
+                                <div style="display: flex; gap: 8px; font-size: 10px;">
+                                    <span style="color: var(--primary-pink);">+${completed.tokens} tokens</span>
+                                    <span style="color: var(--primary-purple);">+${completed.xp} XP</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function viewCompletedChallenge(challengeId) {
+            const completed = completedChallenges.find(c => c.id === challengeId);
+            if (!completed) return;
+            
+            alert(`🏆 ${completed.challenge.title}\n\nScore: ${completed.score}/100\nTokens: +${completed.tokens}\nXP: +${completed.xp}\n\nYour Story:\n${completed.story}\n\nCompleted: ${new Date(completed.completedAt).toLocaleDateString()}`);
+        }
+
         function showToast(message, type = 'info') {
             const toast = document.createElement('div');
             toast.className = `toast ${type}`;
@@ -2083,7 +2664,7 @@
                 document.getElementById('profileName').textContent = userProfile.displayName;
                 document.getElementById('profileBio').textContent = userProfile.bio || 'No bio yet';
                 document.getElementById('profileLevel').textContent = `Level ${userProfile.level} Explorer`;
-                document.getElementById('profileChallenges').textContent = userProfile.challenges || 0;
+                document.getElementById('profileChallenges').textContent = userProfile.challenges || completedChallenges.length;
                 document.getElementById('profileFriends').textContent = userProfile.friends?.length || 0;
                 document.getElementById('profileStreak').textContent = userProfile.streak || 0;
                 document.getElementById('profileAvatar').textContent = getInitials(userProfile.displayName);
