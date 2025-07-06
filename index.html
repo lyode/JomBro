@@ -3494,58 +3494,75 @@ auth.getRedirectResult().then((result) => {
     }
 });
         // 🔧 FIX 1: Improved Auth State Observer
+// 📱 MOBILE-FIRST AUTH STATE OBSERVER
 auth.onAuthStateChanged(async (user) => {
-    console.log('Auth state changed:', user);
+    console.log('📱 Auth state changed:', user?.uid || 'No user');
     
     if (user) {
-        // Check if user is anonymous and came from mobile browser
-        const isMobile = /Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
         const isAnonymous = user.isAnonymous;
-        
-        // Force login screen for anonymous users on mobile unless they explicitly chose test mode
         const testModeClicked = sessionStorage.getItem('testModeClicked');
         
-        if (isAnonymous && isMobile && !testModeClicked) {
-            console.log('Anonymous user detected on mobile - showing login screen');
-            // Sign out anonymous user to force proper login
+        console.log('📱 User info:', { 
+            anonymous: isAnonymous, 
+            testMode: testModeClicked,
+            displayName: user.displayName 
+        });
+        
+        // 🚫 Block unwanted anonymous sessions (mobile-focused)
+        if (isAnonymous && !testModeClicked) {
+            console.log('📱 Unwanted anonymous session - forcing logout');
             await auth.signOut();
-            document.getElementById('authScreen').style.display = 'flex';
-            document.getElementById('mainApp').style.display = 'none';
+            showAuthScreen();
             return;
         }
         
+        // ✅ Valid user - proceed to app
         currentUser = user;
         
         try {
             await createUserProfile(user);
         } catch (error) {
-            console.error('Error in createUserProfile:', error);
+            console.error('❌ Profile creation error:', error);
         }
         
-        document.getElementById('authScreen').style.display = 'none';
-        document.getElementById('mainApp').style.display = 'block';
-        document.getElementById('chatToggle').style.display = 'block';
+        showMainApp(user);
         
-        document.getElementById('userDisplayName').textContent = user.displayName || (user.isAnonymous ? 'Test User' : 'Anonymous');
-        
-        initializeLiveUsers();
-        loadFriends();
-        loadGroups();
-        initializeChallenges();
-        
-        console.log('User signed in:', user);
     } else {
-        console.log('User signed out');
-        document.getElementById('authScreen').style.display = 'flex';
-        document.getElementById('mainApp').style.display = 'none';
-        document.getElementById('chatToggle').style.display = 'none';
-        
-        if (unsubscribeChat) {
-            unsubscribeChat();
-            unsubscribeChat = null;
-        }
+        console.log('📱 User signed out');
+        showAuthScreen();
     }
 });
+
+// 📱 Mobile-optimized screen management
+function showAuthScreen() {
+    document.getElementById('authScreen').style.display = 'flex';
+    document.getElementById('mainApp').style.display = 'none';
+    document.getElementById('chatToggle').style.display = 'none';
+    
+    if (unsubscribeChat) {
+        unsubscribeChat();
+        unsubscribeChat = null;
+    }
+}
+
+function showMainApp(user) {
+    document.getElementById('authScreen').style.display = 'none';
+    document.getElementById('mainApp').style.display = 'block';
+    document.getElementById('chatToggle').style.display = 'block';
+    
+    // Mobile-friendly display names
+    const displayName = user.displayName || 
+                       (user.isAnonymous ? 'Test User' : 'User');
+    document.getElementById('userDisplayName').textContent = displayName;
+    
+    // Initialize app features
+    initializeLiveUsers();
+    loadFriends();
+    loadGroups();
+    initializeChallenges();
+    
+    console.log('📱 App initialized for:', displayName);
+}  
         // Event Listeners
         window.addEventListener('beforeunload', () => {
             updateOnlineStatus(false);
