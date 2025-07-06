@@ -2,953 +2,689 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    
-    <!-- PWA Meta Tags -->
-    <meta name="mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="apple-mobile-web-app-title" content="JomBro">
-    <meta name="theme-color" content="#ff6b9d">
-    <meta name="description" content="AI-Powered Social Challenge Platform - Connect, Challenge, Conquer!">
-    
-    <!-- Firebase v9 SDK -->
-    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-storage-compat.js"></script>
-       
-    <title>JomBro - Enhanced Social Challenge Platform</title>
-
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JomBro - Fixed Authentication</title>
     <style>
-        :root {
-            --safe-area-top: env(safe-area-inset-top, 20px);
-            --safe-area-bottom: env(safe-area-inset-bottom, 20px);
-            --primary-pink: #ff6b9d;
-            --primary-purple: #8b5cf6;
-            --primary-blue: #00d4ff;
-            --accent-pink: #ff8cc8;
-            --accent-purple: #a855f7;
-            --accent-blue: #3b82f6;
-            --dark-bg: #0a0a0a;
-            --glass-bg: rgba(15, 15, 15, 0.85);
-            --glass-border: rgba(255, 255, 255, 0.1);
-            --glass-shadow: rgba(0, 0, 0, 0.5);
-            --text-primary: #ffffff;
-            --text-secondary: rgba(255, 255, 255, 0.7);
-            --success-green: #10b981;
-            --warning-orange: #f59e0b;
-            --error-red: #ef4444;
-        }
-
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            -webkit-tap-highlight-color: transparent;
-            -webkit-font-smoothing: antialiased;
-            touch-action: manipulation;
         }
-
-        html, body {
-            height: 100vh;
-            width: 100%;
-            font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', sans-serif;
-            background: #000000;
-            color: var(--text-primary);
-            user-select: none;
-            overflow: hidden;
-        }
-
-        /* 📱 MOBILE-OPTIMIZED AUTH SCREEN STYLES */
-        .auth-screen {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
             display: flex;
-            align-items: center;
             justify-content: center;
-            z-index: 5000;
-            padding: 20px;
+            align-items: center;
         }
-
+        
         .auth-container {
-            background: var(--glass-bg);
-            backdrop-filter: blur(25px);
-            border: 1px solid var(--glass-border);
-            border-radius: 25px;
-            padding: 40px 30px;
+            background: #2a2a3e;
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+            width: 100%;
+            max-width: 400px;
             text-align: center;
-            box-shadow: 0 25px 50px var(--glass-shadow);
-            max-width: 350px;
-            width: 100%;
         }
-
-        .auth-logo {
+        
+        .rocket {
             font-size: 48px;
+            margin-bottom: 20px;
+        }
+        
+        h1 {
+            color: white;
             margin-bottom: 10px;
-        }
-
-        .auth-title {
             font-size: 28px;
-            font-weight: 300;
-            color: var(--text-primary);
-            margin-bottom: 8px;
         }
-
-        .auth-subtitle {
-            font-size: 14px;
-            color: var(--text-secondary);
+        
+        .subtitle {
+            color: #a0a0a0;
             margin-bottom: 30px;
+            font-size: 14px;
         }
-
-        /* 📱 MOBILE-OPTIMIZED AUTH BUTTONS */
-        .auth-btn {
+        
+        .auth-button {
             width: 100%;
-            padding: 16px 20px;
+            padding: 15px;
+            margin: 10px 0;
             border: none;
             border-radius: 12px;
             font-size: 16px;
             font-weight: 600;
             cursor: pointer;
             transition: all 0.3s ease;
-            margin-bottom: 12px;
             display: flex;
             align-items: center;
             justify-content: center;
             gap: 10px;
-            min-height: 50px;
-            position: relative;
         }
-
-        .auth-btn:hover {
+        
+        .google-btn {
+            background: white;
+            color: #333;
+        }
+        
+        .google-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+        }
+        
+        .email-btn {
+            background: #4a5568;
+            color: white;
+        }
+        
+        .email-btn:hover {
+            background: #2d3748;
             transform: translateY(-2px);
         }
-
-        .auth-btn.google {
-            background: #fff;
-            color: #333;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-            border: 1px solid #dadce0;
-        }
-
-        .auth-btn.google:hover {
-            background: #f8f9fa;
-            box-shadow: 0 5px 20px rgba(0,0,0,0.15);
-        }
-
-        .auth-btn.email {
-            background: #34495e;
-            color: #fff;
-            box-shadow: 0 2px 10px rgba(52, 73, 94, 0.3);
-        }
-
-        .auth-btn.email:hover {
-            background: #2c3e50;
-            box-shadow: 0 5px 20px rgba(52, 73, 94, 0.4);
-        }
-
-        .auth-btn.facebook {
+        
+        .facebook-btn {
             background: #1877f2;
-            color: #fff;
-            box-shadow: 0 2px 10px rgba(24, 119, 242, 0.3);
-        }
-
-        .auth-btn.facebook:hover {
-            background: #166fe5;
-            box-shadow: 0 5px 20px rgba(24, 119, 242, 0.4);
-        }
-
-        .auth-btn.phone {
-            background: var(--primary-pink);
-            color: #fff;
-        }
-
-        .auth-btn.phone:hover {
-            background: #e55a8a;
-        }
-
-        .auth-btn.anonymous {
-            background: #666;
             color: white;
-            opacity: 0.8;
         }
-
-        .auth-btn.anonymous:hover {
-            background: #555;
-            opacity: 1;
+        
+        .facebook-btn:hover {
+            background: #166fe5;
+            transform: translateY(-2px);
         }
-
-        /* Mobile Loading State */
-        .auth-btn.loading {
-            opacity: 0.6;
-            cursor: not-allowed;
-            pointer-events: none;
+        
+        .phone-btn {
+            background: #e53e3e;
+            color: white;
         }
-
-        .auth-btn.loading::after {
-            content: '';
-            position: absolute;
-            width: 20px;
-            height: 20px;
-            border: 2px solid transparent;
-            border-top: 2px solid currentColor;
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-            right: 15px;
+        
+        .phone-btn:hover {
+            background: #c53030;
+            transform: translateY(-2px);
         }
-
-        @keyframes spin {
-            to { transform: rotate(360deg); }
+        
+        .test-btn {
+            background: #38a169;
+            color: white;
         }
-
-        /* Mobile-Specific Responsive */
-        @media (max-width: 480px) {
-            .auth-container {
-                padding: 30px 20px;
-                margin: 10px;
-                max-width: calc(100vw - 20px);
-            }
-            
-            .auth-btn {
-                padding: 18px 20px;
-                font-size: 16px;
-                margin-bottom: 10px;
-                min-height: 55px;
-            }
-            
-            .auth-btn span {
-                font-size: 18px;
-            }
-            
-            .auth-title {
-                font-size: 24px;
-            }
-            
-            .auth-subtitle {
-                font-size: 13px;
-                margin-bottom: 25px;
-            }
+        
+        .test-btn:hover {
+            background: #2f855a;
+            transform: translateY(-2px);
         }
-
-        /* Rest of your existing styles... */
-        .modal {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(0, 0, 0, 0.8);
-            backdrop-filter: blur(10px);
+        
+        .email-form {
             display: none;
-            align-items: center;
-            justify-content: center;
-            z-index: 3000;
-            padding: 20px;
+            margin-top: 20px;
         }
-
-        .modal.show {
-            display: flex;
+        
+        .phone-form {
+            display: none;
+            margin-top: 20px;
         }
-
-        .modal-content {
-            background: var(--glass-bg);
-            backdrop-filter: blur(25px);
-            border: 1px solid var(--glass-border);
-            border-radius: 20px;
-            padding: 25px;
-            max-width: 90%;
-            max-height: 80%;
-            overflow-y: auto;
+        
+        .form-input {
             width: 100%;
-            max-width: 400px;
-            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.5);
+            padding: 12px;
+            margin: 10px 0;
+            border: 1px solid #4a5568;
+            border-radius: 8px;
+            background: #1a1a2e;
+            color: white;
+            font-size: 16px;
         }
-
-        .modal-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
-            padding-bottom: 15px;
-            border-bottom: 1px solid var(--glass-border);
+        
+        .form-input::placeholder {
+            color: #a0a0a0;
         }
-
-        .modal-title {
-            font-size: 18px;
-            font-weight: 600;
-            color: var(--text-primary);
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .modal-close {
-            background: none;
+        
+        .back-btn {
+            background: #718096;
+            color: white;
+            padding: 10px 20px;
             border: none;
-            color: var(--text-secondary);
-            font-size: 20px;
+            border-radius: 8px;
             cursor: pointer;
-            padding: 5px;
+            margin-right: 10px;
         }
-
-        /* Main App Layout */
-        .phone-container {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
+        
+        .submit-btn {
+            background: #3182ce;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+        
+        .error-message {
+            background: #fed7d7;
+            color: #c53030;
             padding: 10px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            z-index: 1;
+            border-radius: 8px;
+            margin: 10px 0;
+            display: none;
         }
-
-        .glass-interface {
-            width: 100%;
-            max-width: 400px;
-            height: calc(100vh - 20px);
-            background: var(--glass-bg);
-            backdrop-filter: blur(20px) saturate(180%);
-            border: 1px solid var(--glass-border);
-            border-radius: 25px;
-            box-shadow: 0 25px 50px var(--glass-shadow);
-            display: flex;
-            flex-direction: column;
-            overflow: hidden;
-            position: relative;
+        
+        .success-message {
+            background: #c6f6d5;
+            color: #2f855a;
+            padding: 10px;
+            border-radius: 8px;
+            margin: 10px 0;
+            display: none;
         }
-
-        .glass-header {
-            position: sticky;
-            top: 0;
-            z-index: 100;
-            padding: calc(var(--safe-area-top) + 20px) 25px 20px 25px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-            background: rgba(15, 15, 15, 0.95);
-            backdrop-filter: blur(25px);
+        
+        .loading {
+            display: none;
+            color: #a0a0a0;
+            margin: 10px 0;
         }
-
-        .logo-section {
-            display: flex;
-            flex-direction: column;
-            cursor: pointer;
+        
+        #recaptcha-container {
+            margin: 10px 0;
         }
-
-        .logo-text {
-            font-size: 26px;
-            font-weight: 200;
-            color: var(--text-primary);
-            letter-spacing: -1px;
+        
+        .user-info {
+            display: none;
+            background: #1a1a2e;
+            padding: 20px;
+            border-radius: 12px;
+            margin-top: 20px;
+            color: white;
         }
-
-        .logo-slogan {
-            font-size: 10px;
-            color: var(--primary-pink);
-            margin-top: -2px;
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            opacity: 0.9;
-            animation: pulse 3s infinite;
-        }
-
-        .logo-subtitle {
-            font-size: 9px;
-            color: var(--text-secondary);
-            margin-top: 2px;
-            opacity: 0.8;
-        }
-
-        .header-actions {
-            display: flex;
-            gap: 8px;
-        }
-
-        .header-btn {
-            width: 30px;
-            height: 30px;
-            border-radius: 15px;
-            background: rgba(255, 255, 255, 0.08);
-            border: 1px solid rgba(255, 255, 255, 0.15);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            font-size: 14px;
-            color: var(--text-primary);
-            transition: all 0.3s ease;
-            position: relative;
-        }
-
-        .header-btn:hover {
-            background: rgba(255, 107, 157, 0.2);
-            border-color: var(--primary-pink);
-            transform: scale(1.1);
-        }
-
-        .glass-content {
-            flex: 1;
-            overflow-y: auto;
-            overflow-x: hidden;
-            -webkit-overflow-scrolling: touch;
-            scroll-behavior: smooth;
-        }
-
-        .glass-section {
-            padding: 15px 25px;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.06);
-        }
-
-        .challenge-main {
-            flex: 1;
-            padding: 20px 25px;
-            min-height: 300px;
-        }
-
-        .challenge-title {
-            font-size: 24px;
-            font-weight: 600;
-            color: var(--primary-pink);
-            margin-bottom: 20px;
-            line-height: 1.2;
-        }
-
-        .btn-primary {
-            background: linear-gradient(145deg, #ff6b9d, #c44569);
-            color: #fff;
+        
+        .logout-btn {
+            background: #e53e3e;
+            color: white;
+            padding: 10px 20px;
             border: none;
-            padding: 16px 24px;
-            border-radius: 15px;
-            font-size: 14px;
-            font-weight: 700;
+            border-radius: 8px;
             cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            transition: all 0.3s ease;
-            width: 100%;
-            box-shadow: 0 6px 20px rgba(255, 107, 157, 0.4);
+            margin-top: 15px;
         }
-
-        .btn-primary:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 8px 25px rgba(255, 107, 157, 0.6);
-        }
-
-        .chat-toggle {
-            position: fixed;
-            bottom: 80px;
-            right: 20px;
-            width: 60px;
-            height: 60px;
-            background: var(--primary-pink);
-            border: none;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 24px;
-            color: #fff;
-            cursor: pointer;
-            box-shadow: 0 4px 20px rgba(255, 107, 157, 0.4);
-            z-index: 1001;
-            transition: all 0.3s ease;
-        }
-
-        .hidden {
-            display: none !important;
+        
+        .terms {
+            color: #a0a0a0;
+            font-size: 12px;
+            margin-top: 20px;
         }
     </style>
 </head>
 <body>
-    <!-- 📱 MOBILE-OPTIMIZED AUTH SCREEN -->
-    <div id="authScreen" class="auth-screen">
-        <div class="auth-container">
-            <div class="auth-logo">🚀</div>
-            <div class="auth-title">Welcome to JomBro</div>
-            <div class="auth-subtitle">Connect with friends and tackle challenges together!</div>
-            
-            <!-- 📱 MOBILE-FIRST LOGIN BUTTONS -->
-            <button class="auth-btn google" onclick="signInWithGoogle()">
-                <span>🔍</span>
-                Continue with Google
+    <div class="auth-container">
+        <div class="rocket">🚀</div>
+        <h1>Welcome to JomBro</h1>
+        <p class="subtitle">Connect with friends and tackle challenges together!</p>
+        
+        <div id="errorMessage" class="error-message"></div>
+        <div id="successMessage" class="success-message"></div>
+        <div id="loading" class="loading">⏳ Loading...</div>
+        
+        <!-- Main Auth Screen -->
+        <div id="mainAuth">
+            <button class="auth-button google-btn" onclick="signInWithGoogle()">
+                🔍 Continue with Google
             </button>
             
-            <button class="auth-btn email" onclick="signInWithEmail()">
-                <span>📧</span>
-                Continue with Email
+            <button class="auth-button email-btn" onclick="showEmailForm()">
+                📧 Continue with Email
             </button>
             
-            <button class="auth-btn facebook" onclick="signInWithFacebook()">
-                <span>📘</span>
-                Continue with Facebook
+            <button class="auth-button facebook-btn" onclick="signInWithFacebook()">
+                📘 Continue with Facebook
             </button>
             
-            <button class="auth-btn phone" onclick="signInWithPhone()">
-                <span>📱</span>
-                Continue with Phone
+            <button class="auth-button phone-btn" onclick="showPhoneForm()">
+                📱 Continue with Phone
             </button>
             
-            <button class="auth-btn anonymous" onclick="signInAnonymously()">
-                <span>🧪</span>
-                Test Mode (Skip Login)
+            <button class="auth-button test-btn" onclick="signInAnonymously()">
+                ✅ Test Mode (Skip Login)
             </button>
-            
-            <div style="margin-top: 20px; font-size: 12px; color: var(--text-secondary);">
-                By continuing, you agree to our Terms & Privacy Policy
+        </div>
+        
+        <!-- Email Form -->
+        <div id="emailForm" class="email-form">
+            <input type="email" id="emailInput" class="form-input" placeholder="Enter your email" required>
+            <input type="password" id="passwordInput" class="form-input" placeholder="Enter your password" required>
+            <div>
+                <button class="back-btn" onclick="showMainAuth()">Back</button>
+                <button class="submit-btn" onclick="signInWithEmailPassword()">Sign In</button>
+                <button class="submit-btn" onclick="signUpWithEmailPassword()">Sign Up</button>
             </div>
         </div>
-    </div>
-
-    <!-- Main App -->
-    <div id="mainApp" class="phone-container" style="display: none;">
-        <div class="glass-interface">
-            <!-- Header -->
-            <div class="glass-header">
-                <div class="logo-section">
-                    <div class="logo-text">JomBro</div>
-                    <div class="logo-slogan">Let's go! Let's Go!</div>
-                    <div class="logo-subtitle" id="userDisplayName">Loading...</div>
-                </div>
-                <div class="header-actions">
-                    <div class="header-btn" onclick="alert('💬 Chat feature coming soon!')" title="Chat">💬</div>
-                    <div class="header-btn" onclick="alert('👥 Friends feature coming soon!')" title="Friends">👥</div>
-                    <div class="header-btn" onclick="alert('🏠 Groups feature coming soon!')" title="Groups">🏠</div>
-                    <div class="header-btn" onclick="alert('👤 Profile feature coming soon!')" title="Profile">👤</div>
-                    <div class="header-btn" onclick="signOut()" title="Sign Out">🚪</div>
-                </div>
-            </div>
-
-            <div class="glass-content">
-                <!-- Live Players Section -->
-                <div class="glass-section">
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
-                        <div style="display: flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 600; color: var(--text-primary);">
-                            <div style="width: 6px; height: 6px; background: #ff4757; border-radius: 50%; animation: pulse 2s infinite;"></div>
-                            <span>LIVE</span>
-                            <span style="background: rgba(0, 255, 150, 0.2); color: var(--success-green); padding: 2px 8px; border-radius: 10px; font-size: 10px;">1 online</span>
-                        </div>
-                        <div style="background: rgba(255, 107, 157, 0.15); border: 1px solid rgba(255, 107, 157, 0.3); color: var(--primary-pink); padding: 4px 10px; border-radius: 10px; font-size: 10px; font-weight: 600; cursor: pointer;">
-                            <span id="userLevel">Level 1</span>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Main Challenge -->
-                <div class="challenge-main">
-                    <div class="challenge-title">🎉 Welcome to JomBro!</div>
-                    <div style="font-size: 15px; line-height: 1.6; color: var(--text-primary); margin-bottom: 20px; opacity: 0.9;">
-                        Your mobile authentication is now working! You can sign in with Google, Email, Facebook, Phone, or use Test Mode. 
-                        Start connecting with friends and tackling amazing challenges together!
-                    </div>
-                    
-                    <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin: 20px 0;">
-                        <div style="text-align: center; background: rgba(255, 255, 255, 0.05); padding: 12px; border-radius: 10px;">
-                            <div style="font-size: 16px; font-weight: 700; color: var(--primary-pink);">✅</div>
-                            <div style="font-size: 10px; color: var(--text-secondary); text-transform: uppercase;">Google</div>
-                        </div>
-                        <div style="text-align: center; background: rgba(255, 255, 255, 0.05); padding: 12px; border-radius: 10px;">
-                            <div style="font-size: 16px; font-weight: 700; color: var(--primary-pink);">✅</div>
-                            <div style="font-size: 10px; color: var(--text-secondary); text-transform: uppercase;">Email</div>
-                        </div>
-                        <div style="text-align: center; background: rgba(255, 255, 255, 0.05); padding: 12px; border-radius: 10px;">
-                            <div style="font-size: 16px; font-weight: 700; color: var(--primary-pink);">✅</div>
-                            <div style="font-size: 10px; color: var(--text-secondary); text-transform: uppercase;">Mobile</div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Action Section -->
-                <div style="padding: 18px 25px; background: linear-gradient(180deg, transparent 0%, rgba(255, 255, 255, 0.05) 100%); border-top: 1px solid rgba(255, 255, 255, 0.08);">
-                    <button class="btn-primary" onclick="alert('🎉 Authentication working! Ready for challenges!')">
-                        🚀 START YOUR JOMBRO JOURNEY
-                    </button>
-                </div>
+        
+        <!-- Phone Form -->
+        <div id="phoneForm" class="phone-form">
+            <input type="tel" id="phoneInput" class="form-input" placeholder="+60123456789" required>
+            <div id="recaptcha-container"></div>
+            <input type="text" id="otpInput" class="form-input" placeholder="Enter OTP" style="display:none;">
+            <div>
+                <button class="back-btn" onclick="showMainAuth()">Back</button>
+                <button class="submit-btn" id="phoneSubmitBtn" onclick="signInWithPhone()">Send OTP</button>
             </div>
         </div>
+        
+        <!-- User Info (After Login) -->
+        <div id="userInfo" class="user-info">
+            <h3>Welcome!</h3>
+            <p id="userDetails"></p>
+            <button class="logout-btn" onclick="signOut()">Sign Out</button>
+        </div>
+        
+        <p class="terms">By continuing, you agree to our Terms & Privacy Policy</p>
     </div>
 
-    <!-- Chat Toggle -->
-    <button id="chatToggle" class="chat-toggle" onclick="alert('💬 Chat feature coming soon!')" style="display: none;">
-        💬
-    </button>
+    <!-- Firebase SDK -->
+    <script type="module">
+        // Firebase Configuration
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
+        import { 
+            getAuth, 
+            signInWithRedirect, 
+            getRedirectResult,
+            signInWithPopup,
+            signInWithEmailAndPassword,
+            createUserWithEmailAndPassword,
+            signInWithPhoneNumber,
+            signInAnonymously as firebaseSignInAnonymously,
+            signOut as firebaseSignOut,
+            onAuthStateChanged,
+            GoogleAuthProvider,
+            FacebookAuthProvider,
+            RecaptchaVerifier
+        } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
 
-    <script>
-        // 📱 FIREBASE CONFIGURATION
+        // Your Firebase config
         const firebaseConfig = {
-            apiKey: "AIzaSyC_orriRUuf1ynDiFaJAPrO6-Gu3GeURxQ",
+            apiKey: "AIzaSyDmd4FT5llDWJOcJNr02QY0nF6N5vFFzSM",
             authDomain: "jombro-9d129.firebaseapp.com",
             projectId: "jombro-9d129",
-            storageBucket: "jombro-9d129.firebasestorage.app",
+            storageBucket: "jombro-9d129.appspot.com",
             messagingSenderId: "390572076435",
-            appId: "1:390572076435:web:2a90027c66dc34d9834c66",
-            measurementId: "G-YPQ5R5GLP8"
+            appId: "1:390572076435:web:4c4b7b58c5653b0e52ba32"
         };
 
         // Initialize Firebase
-        firebase.initializeApp(firebaseConfig);
-        const auth = firebase.auth();
-        const db = firebase.firestore();
-        const storage = firebase.storage();
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
 
-        // Global state
-        let currentUser = null;
+        // Providers
+        const googleProvider = new GoogleAuthProvider();
+        const facebookProvider = new FacebookAuthProvider();
 
-        // 📱 MOBILE REDIRECT HANDLER - Handles authentication redirects
-        auth.getRedirectResult().then((result) => {
-            console.log('📱 Redirect result:', result);
-            
-            if (result.user) {
-                console.log('✅ Redirect login successful:', result.user.displayName);
-                
-                // Handle different providers
-                if (result.credential) {
-                    const provider = result.credential.providerId;
-                    console.log('📱 Provider:', provider);
-                    
-                    if (provider === 'google.com') {
-                        const credential = firebase.auth.GoogleAuthProvider.credentialFromResult(result);
-                        const accessToken = credential.accessToken;
-                        console.log('✅ Google access token:', accessToken);
-                    } else if (provider === 'facebook.com') {
-                        const credential = firebase.auth.FacebookAuthProvider.credentialFromResult(result);
-                        const accessToken = credential.accessToken;
-                        console.log('✅ Facebook access token:', accessToken);
-                    }
-                }
-            } else {
-                console.log('📱 No redirect result');
-            }
-        }).catch((error) => {
-            console.error('❌ Redirect error:', error);
-            
-            // Handle redirect errors
-            if (error.code === 'auth/account-exists-with-different-credential') {
-                alert('❌ Account exists with different login method!\n\nPlease use your original sign-in method.');
-            } else if (error.code === 'auth/credential-already-in-use') {
-                alert('❌ This account is already linked!\n\nPlease sign in normally.');
-            } else {
-                alert(`❌ Login failed: ${error.message}\n\nPlease try again.`);
-            }
-        });
+        // Global variables
+        let recaptchaVerifier = null;
+        let confirmationResult = null;
 
-        // 📱 MOBILE-FIRST AUTH STATE OBSERVER
-        auth.onAuthStateChanged(async (user) => {
-            console.log('📱 Auth state changed:', user?.uid || 'No user');
-            
-            if (user) {
-                const isAnonymous = user.isAnonymous;
-                const testModeClicked = sessionStorage.getItem('testModeClicked');
-                
-                console.log('📱 User info:', { 
-                    anonymous: isAnonymous, 
-                    testMode: testModeClicked,
-                    displayName: user.displayName 
-                });
-                
-                // 🚫 Block unwanted anonymous sessions (mobile-focused)
-                if (isAnonymous && !testModeClicked) {
-                    console.log('📱 Unwanted anonymous session - forcing logout');
-                    await auth.signOut();
-                    showAuthScreen();
-                    return;
-                }
-                
-                // ✅ Valid user - proceed to app
-                currentUser = user;
-                showMainApp(user);
-                
-            } else {
-                console.log('📱 User signed out');
-                showAuthScreen();
-            }
-        });
-
-        // 📱 Screen Management Functions
-        function showAuthScreen() {
-            document.getElementById('authScreen').style.display = 'flex';
-            document.getElementById('mainApp').style.display = 'none';
-            document.getElementById('chatToggle').style.display = 'none';
+        // Make functions global
+        window.auth = auth;
+        
+        // ===== UTILITY FUNCTIONS =====
+        
+        function showLoading(show = true) {
+            document.getElementById('loading').style.display = show ? 'block' : 'none';
         }
-
-        function showMainApp(user) {
-            document.getElementById('authScreen').style.display = 'none';
-            document.getElementById('mainApp').style.display = 'block';
-            document.getElementById('chatToggle').style.display = 'block';
-            
-            // Mobile-friendly display names
-            const displayName = user.displayName || 
-                               (user.isAnonymous ? 'Test User' : 'User');
-            document.getElementById('userDisplayName').textContent = displayName;
-            
-            console.log('📱 App initialized for:', displayName);
+        
+        function showError(message) {
+            const errorEl = document.getElementById('errorMessage');
+            errorEl.textContent = message;
+            errorEl.style.display = 'block';
+            setTimeout(() => {
+                errorEl.style.display = 'none';
+            }, 5000);
         }
-
-        // 📱 MOBILE-OPTIMIZED AUTHENTICATION FUNCTIONS
-
-        // 🔍 Google Sign-In
-        async function signInWithGoogle() {
-            console.log('📱 Starting Google sign-in...');
-            
+        
+        function showSuccess(message) {
+            const successEl = document.getElementById('successMessage');
+            successEl.textContent = message;
+            successEl.style.display = 'block';
+            setTimeout(() => {
+                successEl.style.display = 'none';
+            }, 3000);
+        }
+        
+        function hideAllForms() {
+            document.getElementById('mainAuth').style.display = 'none';
+            document.getElementById('emailForm').style.display = 'none';
+            document.getElementById('phoneForm').style.display = 'none';
+            document.getElementById('userInfo').style.display = 'none';
+        }
+        
+        // ===== NAVIGATION FUNCTIONS =====
+        
+        window.showMainAuth = function() {
+            hideAllForms();
+            document.getElementById('mainAuth').style.display = 'block';
+        }
+        
+        window.showEmailForm = function() {
+            hideAllForms();
+            document.getElementById('emailForm').style.display = 'block';
+        }
+        
+        window.showPhoneForm = function() {
+            hideAllForms();
+            document.getElementById('phoneForm').style.display = 'block';
+            setupRecaptcha();
+        }
+        
+        // ===== GOOGLE AUTHENTICATION =====
+        
+        window.signInWithGoogle = async function() {
             try {
-                const provider = new firebase.auth.GoogleAuthProvider();
-                provider.setCustomParameters({
-                    prompt: 'select_account'
-                });
+                showLoading(true);
+                console.log('Starting Google sign-in...');
                 
-                console.log('📱 Using redirect for mobile');
-                await auth.signInWithRedirect(provider);
-                
-            } catch (error) {
-                console.error('❌ Google sign-in error:', error);
-                
-                if (error.code === 'auth/operation-not-allowed') {
-                    alert('❌ Google login not enabled!\n\nPlease contact support.');
-                } else if (error.code === 'auth/network-request-failed') {
-                    alert('❌ Network error!\n\nCheck your internet connection.');
-                } else {
-                    alert(`❌ Google login failed!\n\n${error.message}`);
-                }
-            }
-        }
-
-        // 📧 Email/Password Sign-In
-        async function signInWithEmail() {
-            console.log('📧 Starting email sign-in...');
-            
-            try {
-                const email = prompt('📧 Enter your email address:');
-                if (!email) return;
-                
-                const password = prompt('🔒 Enter password (min 6 characters):');
-                if (!password) return;
-                
+                // Try popup first, fallback to redirect if blocked
                 try {
-                    const result = await auth.signInWithEmailAndPassword(email, password);
-                    console.log('✅ Email sign-in successful');
-                } catch (signInError) {
-                    if (signInError.code === 'auth/user-not-found') {
-                        const create = confirm('❓ No account found with this email.\n\nWould you like to create a new account?');
-                        if (create) {
-                            await auth.createUserWithEmailAndPassword(email, password);
-                            console.log('✅ Account created successfully');
-                        }
-                    } else {
-                        throw signInError;
-                    }
+                    const result = await signInWithPopup(auth, googleProvider);
+                    console.log('Google popup sign-in successful:', result.user);
+                    showSuccess('Google sign-in successful!');
+                } catch (popupError) {
+                    console.log('Popup blocked, trying redirect...', popupError);
+                    // If popup is blocked, use redirect
+                    await signInWithRedirect(auth, googleProvider);
                 }
             } catch (error) {
-                console.error('❌ Email sign-in error:', error);
-                
-                if (error.code === 'auth/weak-password') {
-                    alert('❌ Password too weak!\n\nPlease use at least 6 characters.');
-                } else if (error.code === 'auth/invalid-email') {
-                    alert('❌ Invalid email address!\n\nPlease enter a valid email.');
-                } else if (error.code === 'auth/wrong-password') {
-                    alert('❌ Incorrect password!\n\nPlease try again.');
-                } else {
-                    alert(`❌ Email login failed!\n\n${error.message}`);
-                }
+                console.error('Google sign-in error:', error);
+                showError('Google Sign-in Error: ' + error.message);
+            } finally {
+                showLoading(false);
             }
         }
-
-        // 📘 Facebook Sign-In
-        async function signInWithFacebook() {
-            console.log('📱 Starting Facebook sign-in...');
-            
+        
+        // ===== EMAIL/PASSWORD AUTHENTICATION =====
+        
+        window.signInWithEmailPassword = async function() {
             try {
-                const provider = new firebase.auth.FacebookAuthProvider();
-                // Don't add email scope for now (development mode issue)
-                provider.addScope('public_profile');
+                showLoading(true);
+                const email = document.getElementById('emailInput').value;
+                const password = document.getElementById('passwordInput').value;
                 
-                console.log('📱 Using redirect for mobile');
-                await auth.signInWithRedirect(provider);
-                
-            } catch (error) {
-                console.error('❌ Facebook sign-in error:', error);
-                
-                if (error.code === 'auth/operation-not-allowed') {
-                    alert('❌ Facebook login not enabled!\n\nWaiting for Facebook app approval.');
-                } else {
-                    alert(`❌ Facebook login failed!\n\n${error.message}`);
-                }
-            }
-        }
-
-        // 📱 Phone Sign-In
-        async function signInWithPhone() {
-            console.log('📱 Starting phone sign-in...');
-            
-            try {
-                const phoneNumber = prompt('📱 Enter phone number with country code:\n\nExamples:\n• +60123456789 (Malaysia)\n• +1234567890 (USA)\n• +447123456789 (UK)');
-                
-                if (!phoneNumber) {
-                    console.log('📱 Phone input cancelled');
+                if (!email || !password) {
+                    showError('Please enter both email and password');
                     return;
                 }
                 
-                console.log('📱 Phone number:', phoneNumber);
+                const result = await signInWithEmailAndPassword(auth, email, password);
+                console.log('Email sign-in successful:', result.user);
+                showSuccess('Email sign-in successful!');
+            } catch (error) {
+                console.error('Email sign-in error:', error);
+                showError('Email Sign-in Error: ' + error.message);
+            } finally {
+                showLoading(false);
+            }
+        }
+        
+        window.signUpWithEmailPassword = async function() {
+            try {
+                showLoading(true);
+                const email = document.getElementById('emailInput').value;
+                const password = document.getElementById('passwordInput').value;
                 
-                // Clear existing reCAPTCHA
-                if (window.recaptchaVerifier) {
-                    try {
-                        window.recaptchaVerifier.clear();
-                    } catch (e) {
-                        console.log('📱 reCAPTCHA clear error (expected):', e.message);
-                    }
-                    window.recaptchaVerifier = null;
+                if (!email || !password) {
+                    showError('Please enter both email and password');
+                    return;
                 }
                 
-                // Create mobile-optimized reCAPTCHA
-                console.log('📱 Creating reCAPTCHA...');
-                window.recaptchaVerifier = new firebase.auth.RecaptchaVerifier('authScreen', {
-                    'size': 'compact',
+                if (password.length < 6) {
+                    showError('Password must be at least 6 characters');
+                    return;
+                }
+                
+                const result = await createUserWithEmailAndPassword(auth, email, password);
+                console.log('Email sign-up successful:', result.user);
+                showSuccess('Account created successfully!');
+            } catch (error) {
+                console.error('Email sign-up error:', error);
+                showError('Sign-up Error: ' + error.message);
+            } finally {
+                showLoading(false);
+            }
+        }
+        
+        // ===== PHONE AUTHENTICATION =====
+        
+        function setupRecaptcha() {
+            try {
+                if (window.recaptchaVerifier) {
+                    window.recaptchaVerifier.clear();
+                }
+                
+                window.recaptchaVerifier = new RecaptchaVerifier(auth, 'recaptcha-container', {
+                    'size': 'normal',
                     'callback': (response) => {
-                        console.log('✅ reCAPTCHA solved');
+                        console.log('reCAPTCHA solved');
                     },
                     'expired-callback': () => {
-                        console.log('⏰ reCAPTCHA expired');
-                        alert('❌ Verification expired. Please try again.');
+                        console.log('reCAPTCHA expired');
+                        showError('reCAPTCHA expired. Please try again.');
                     }
                 });
                 
-                console.log('📱 Sending SMS...');
-                const confirmationResult = await auth.signInWithPhoneNumber(phoneNumber, window.recaptchaVerifier);
-                
-                console.log('📱 SMS sent, requesting verification code...');
-                const verificationCode = prompt('📱 Enter the 6-digit code sent to your phone:');
-                
-                if (verificationCode) {
-                    console.log('📱 Verifying code...');
-                    await confirmationResult.confirm(verificationCode);
-                    console.log('✅ Phone verification successful');
-                } else {
-                    console.log('📱 Verification cancelled');
-                }
-                
+                window.recaptchaVerifier.render().then(() => {
+                    console.log('reCAPTCHA rendered successfully');
+                }).catch(error => {
+                    console.error('reCAPTCHA render error:', error);
+                    showError('reCAPTCHA setup failed: ' + error.message);
+                });
             } catch (error) {
-                console.error('❌ Phone sign-in error:', error);
+                console.error('reCAPTCHA setup error:', error);
+                showError('reCAPTCHA setup failed: ' + error.message);
+            }
+        }
+        
+        window.signInWithPhone = async function() {
+            try {
+                const phoneNumber = document.getElementById('phoneInput').value;
+                const otpInput = document.getElementById('otpInput');
+                const submitBtn = document.getElementById('phoneSubmitBtn');
                 
-                // Clean up reCAPTCHA on error
+                if (!confirmationResult) {
+                    // Send OTP
+                    if (!phoneNumber) {
+                        showError('Please enter your phone number');
+                        return;
+                    }
+                    
+                    showLoading(true);
+                    console.log('Sending OTP to:', phoneNumber);
+                    
+                    confirmationResult = await signInWithPhoneNumber(auth, phoneNumber, window.recaptchaVerifier);
+                    
+                    showSuccess('OTP sent successfully!');
+                    otpInput.style.display = 'block';
+                    submitBtn.textContent = 'Verify OTP';
+                    submitBtn.onclick = verifyOTP;
+                } else {
+                    // This case is handled by verifyOTP function
+                    await verifyOTP();
+                }
+            } catch (error) {
+                console.error('Phone sign-in error:', error);
+                showError('Phone Sign-in Error: ' + error.message);
+                
+                // Reset reCAPTCHA on error
                 if (window.recaptchaVerifier) {
-                    try {
-                        window.recaptchaVerifier.clear();
-                    } catch (e) {}
-                    window.recaptchaVerifier = null;
-                }
-                
-                if (error.code === 'auth/invalid-phone-number') {
-                    alert('❌ Invalid phone number!\n\nPlease include country code:\n• +60123456789 (Malaysia)\n• +1234567890 (USA)');
-                } else if (error.code === 'auth/too-many-requests') {
-                    alert('❌ Too many SMS requests!\n\nPlease wait 15 minutes and try again.');
-                } else if (error.code === 'auth/captcha-check-failed') {
-                    alert('❌ reCAPTCHA failed!\n\nPlease refresh the page and try again.');
-                } else {
-                    alert(`❌ Phone verification failed!\n\n${error.message}\n\nTry refreshing the page.`);
-                }
-            }
-        }
-
-        // 🧪 Anonymous/Test Mode Sign-In
-        async function signInAnonymously() {
-            console.log('🧪 Starting test mode...');
-            
-            try {
-                // Mark that user explicitly chose test mode
-                sessionStorage.setItem('testModeClicked', 'true');
-                
-                const result = await auth.signInAnonymously();
-                console.log('✅ Test mode successful');
-            } catch (error) {
-                console.error('❌ Test mode error:', error);
-                alert('❌ Test mode failed. Please try refreshing the page.');
-            }
-        }
-
-        // 🚪 Sign Out
-        async function signOut() {
-            try {
-                console.log('🚪 Signing out...');
-                
-                // Clear session storage
-                sessionStorage.removeItem('testModeClicked');
-                
-                // Sign out from Firebase
-                await auth.signOut();
-                
-                console.log('✅ Signed out successfully');
-            } catch (error) {
-                console.error('❌ Sign out error:', error);
-            }
-        }
-
-        // 📱 Mobile Detection and Optimization
-        function isMobile() {
-            return /Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-        }
-
-        function isInAppBrowser() {
-            const userAgent = navigator.userAgent || navigator.vendor || window.opera;
-            
-            return (
-                userAgent.includes('FBAN') || // Facebook App
-                userAgent.includes('FBAV') || // Facebook App
-                userAgent.includes('Line') ||  // LINE App
-                userAgent.includes('Twitter') || // Twitter App
-                userAgent.includes('Instagram') || // Instagram App
-                userAgent.includes('WhatsApp') || // WhatsApp App
-                userAgent.includes('LinkedIn') // LinkedIn App
-            );
-        }
-
-        // 🔍 Debug Functions (for testing)
-        function debugAuthState() {
-            const info = {
-                userAgent: navigator.userAgent,
-                isMobile: isMobile(),
-                isInAppBrowser: isInAppBrowser(),
-                currentUser: auth.currentUser?.uid || 'None',
-                isAnonymous: auth.currentUser?.isAnonymous || false,
-                testModeClicked: sessionStorage.getItem('testModeClicked'),
-                authScreenVisible: document.getElementById('authScreen').style.display !== 'none',
-                mainAppVisible: document.getElementById('mainApp').style.display !== 'none'
-            };
-            
-            console.log('🔍 MOBILE AUTH DEBUG:', info);
-            alert('🔍 Debug Info (check console):\n\n' + JSON.stringify(info, null, 2));
-        }
-
-        // Event Listeners
-        window.addEventListener('beforeunload', () => {
-            // Clean up resources
-            if (window.recaptchaVerifier) {
-                try {
                     window.recaptchaVerifier.clear();
-                } catch (e) {}
+                    setupRecaptcha();
+                }
+            } finally {
+                showLoading(false);
             }
-        });
-
-        document.addEventListener('visibilitychange', () => {
-            if (document.visibilityState === 'hidden') {
-                console.log('📱 App hidden');
+        }
+        
+        async function verifyOTP() {
+            try {
+                const otpCode = document.getElementById('otpInput').value;
+                
+                if (!otpCode) {
+                    showError('Please enter the OTP code');
+                    return;
+                }
+                
+                showLoading(true);
+                console.log('Verifying OTP:', otpCode);
+                
+                const result = await confirmationResult.confirm(otpCode);
+                console.log('Phone verification successful:', result.user);
+                showSuccess('Phone verification successful!');
+                
+                // Reset form
+                confirmationResult = null;
+                document.getElementById('otpInput').style.display = 'none';
+                document.getElementById('phoneSubmitBtn').textContent = 'Send OTP';
+                document.getElementById('phoneSubmitBtn').onclick = window.signInWithPhone;
+            } catch (error) {
+                console.error('OTP verification error:', error);
+                showError('OTP Verification Error: ' + error.message);
+            } finally {
+                showLoading(false);
+            }
+        }
+        
+        // ===== FACEBOOK AUTHENTICATION =====
+        
+        window.signInWithFacebook = async function() {
+            try {
+                showLoading(true);
+                console.log('Starting Facebook sign-in...');
+                
+                // Try popup first, fallback to redirect if blocked
+                try {
+                    const result = await signInWithPopup(auth, facebookProvider);
+                    console.log('Facebook popup sign-in successful:', result.user);
+                    showSuccess('Facebook sign-in successful!');
+                } catch (popupError) {
+                    console.log('Popup blocked, trying redirect...', popupError);
+                    await signInWithRedirect(auth, facebookProvider);
+                }
+            } catch (error) {
+                console.error('Facebook sign-in error:', error);
+                showError('Facebook Sign-in Error: ' + error.message);
+            } finally {
+                showLoading(false);
+            }
+        }
+        
+        // ===== ANONYMOUS AUTHENTICATION =====
+        
+        window.signInAnonymously = async function() {
+            try {
+                showLoading(true);
+                console.log('Starting anonymous sign-in...');
+                
+                const result = await firebaseSignInAnonymously(auth);
+                console.log('Anonymous sign-in successful:', result.user);
+                showSuccess('Test mode activated!');
+            } catch (error) {
+                console.error('Anonymous sign-in error:', error);
+                showError('Test Mode Error: ' + error.message);
+            } finally {
+                showLoading(false);
+            }
+        }
+        
+        // ===== SIGN OUT =====
+        
+        window.signOut = async function() {
+            try {
+                showLoading(true);
+                await firebaseSignOut(auth);
+                console.log('Sign out successful');
+                showSuccess('Signed out successfully!');
+                
+                // Reset forms
+                document.getElementById('emailInput').value = '';
+                document.getElementById('passwordInput').value = '';
+                document.getElementById('phoneInput').value = '';
+                document.getElementById('otpInput').value = '';
+                confirmationResult = null;
+                
+                showMainAuth();
+            } catch (error) {
+                console.error('Sign out error:', error);
+                showError('Sign Out Error: ' + error.message);
+            } finally {
+                showLoading(false);
+            }
+        }
+        
+        // ===== AUTH STATE OBSERVER =====
+        
+        onAuthStateChanged(auth, (user) => {
+            console.log('Auth state changed:', user);
+            
+            if (user) {
+                // User is signed in
+                hideAllForms();
+                document.getElementById('userInfo').style.display = 'block';
+                
+                const userDetails = document.getElementById('userDetails');
+                let userInfo = '';
+                
+                if (user.displayName) {
+                    userInfo += `Name: ${user.displayName}<br>`;
+                }
+                if (user.email) {
+                    userInfo += `Email: ${user.email}<br>`;
+                }
+                if (user.phoneNumber) {
+                    userInfo += `Phone: ${user.phoneNumber}<br>`;
+                }
+                if (user.isAnonymous) {
+                    userInfo += `Mode: Test User<br>`;
+                }
+                
+                userInfo += `User ID: ${user.uid}`;
+                userDetails.innerHTML = userInfo;
+                
+                console.log('User successfully authenticated:', {
+                    uid: user.uid,
+                    email: user.email,
+                    displayName: user.displayName,
+                    phoneNumber: user.phoneNumber,
+                    isAnonymous: user.isAnonymous
+                });
             } else {
-                console.log('📱 App visible');
+                // User is signed out
+                showMainAuth();
             }
         });
-
-        console.log('🚀 JomBro Mobile-Optimized Platform Loaded!');
-        console.log('📱 Device:', isMobile() ? 'Mobile' : 'Desktop');
-        console.log('🌐 Browser:', isInAppBrowser() ? 'In-App Browser' : 'Regular Browser');
+        
+        // ===== CHECK REDIRECT RESULT ON PAGE LOAD =====
+        
+        window.addEventListener('load', async () => {
+            try {
+                console.log('Checking for redirect result...');
+                const result = await getRedirectResult(auth);
+                
+                if (result) {
+                    console.log('Redirect sign-in successful:', result.user);
+                    showSuccess('Sign-in successful!');
+                } else {
+                    console.log('No redirect result found');
+                }
+            } catch (error) {
+                console.error('Redirect result error:', error);
+                showError('Authentication Error: ' + error.message);
+            }
+        });
+        
+        // ===== ERROR TRACKING =====
+        
+        window.addEventListener('error', function(e) {
+            console.error('JavaScript Error:', e.message, 'at line', e.lineno);
+            showError('JavaScript Error: ' + e.message);
+        });
+        
+        console.log('🚀 JomBro Authentication System Loaded Successfully!');
+        console.log('🔧 All authentication methods are now properly configured');
+        console.log('📱 Mobile-optimized with proper error handling');
+        
     </script>
 </body>
 </html>
