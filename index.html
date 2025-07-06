@@ -21,6 +21,17 @@
     <title>JomBro - Enhanced Social Challenge Platform</title>
 
     <style>
+.auth-btn.facebook {
+    background: #1877f2;
+    color: #fff;
+    box-shadow: 0 2px 10px rgba(24, 119, 242, 0.3);
+}
+
+.auth-btn.facebook:hover {
+    background: #166fe5;
+    transform: translateY(-2px);
+    box-shadow: 0 5px 20px rgba(24, 119, 242, 0.4);
+}
         :root {
             --safe-area-top: env(safe-area-inset-top, 20px);
             --safe-area-bottom: env(safe-area-inset-bottom, 20px);
@@ -1224,7 +1235,10 @@
                 <span>🔍</span>
                 Continue with Google
             </button>
-            
+            <button class="auth-btn facebook" onclick="signInWithFacebook()">
+    <span>📘</span>
+    Continue with Facebook
+</button>
             <button class="auth-btn phone" onclick="signInWithPhone()">
                 <span>📱</span>
                 Continue with Phone
@@ -2802,6 +2816,40 @@ async function signInAnonymously() {
         alert('Test login failed. Please try again.');
     }
 }
+async function signInAnonymously() {
+    try {
+        const result = await auth.signInAnonymously();
+        console.log('Anonymous sign-in successful:', result.user);
+    } catch (error) {
+        console.error('Anonymous sign-in error:', error);
+        alert('Test login failed. Please try again.');
+    }
+}
+
+// 👈 ADD YOUR FACEBOOK FUNCTION HERE:
+async function signInWithFacebook() {
+    try {
+        const provider = new firebase.auth.FacebookAuthProvider();
+        provider.addScope('email');
+        provider.addScope('public_profile');
+        
+        const isMobile = /Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+        
+        if (isMobile) {
+            await auth.signInWithRedirect(provider);
+        } else {
+            const result = await auth.signInWithPopup(provider);
+            console.log('Facebook sign-in successful:', result.user);
+        }
+    } catch (error) {
+        console.error('Facebook sign-in error:', error);
+        if (error.code === 'auth/account-exists-with-different-credential') {
+            alert('An account already exists with the same email. Please sign in with your original method.');
+        } else {
+            alert('Facebook sign-in failed. Please try again.');
+        }
+    }
+}
         async function signOut() {
             try {
                 await updateOnlineStatus(false);
@@ -3427,13 +3475,23 @@ async function signInAnonymously() {
         }
 
         // Auth State Observer
-        // Handle redirect result for mobile Google sign-in
+// Handle redirect result for mobile sign-ins
 auth.getRedirectResult().then((result) => {
     if (result.user) {
-        console.log('Google redirect sign-in successful:', result.user);
+        console.log('Redirect sign-in successful:', result.user);
+        
+        if (result.credential && result.credential.providerId === 'facebook.com') {
+            const credential = firebase.auth.FacebookAuthProvider.credentialFromResult(result);
+            const accessToken = credential.accessToken;
+            console.log('Facebook access token:', accessToken);
+        }
     }
 }).catch((error) => {
-    console.error('Google redirect error:', error);
+    console.error('Redirect error:', error);
+    
+    if (error.code === 'auth/account-exists-with-different-credential') {
+        alert('An account already exists with this email. Please sign in with your original method.');
+    }
 });
         auth.onAuthStateChanged(async (user) => {
 console.log('Auth state changed:', user); 
