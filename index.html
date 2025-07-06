@@ -2587,15 +2587,26 @@
         }
 
         // Authentication Functions
-        async function signInWithGoogle() {
-            try {
-                const provider = new firebase.auth.GoogleAuthProvider();
-                const result = await auth.signInWithPopup(provider);
-                console.log('Google sign-in successful:', result.user);
-            } catch (error) {
-                console.error('Google sign-in error:', error);
-                alert('Sign-in failed. Please try again.');
-            }
+async function signInWithGoogle() {
+    try {
+        const provider = new firebase.auth.GoogleAuthProvider();
+        
+        // Check if mobile device
+        const isMobile = /Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+        
+        if (isMobile) {
+            // Use redirect for mobile
+            await auth.signInWithRedirect(provider);
+        } else {
+            // Use popup for desktop
+            const result = await auth.signInWithPopup(provider);
+            console.log('Google sign-in successful:', result.user);
+        }
+    } catch (error) {
+        console.error('Google sign-in error:', error);
+        alert('Sign-in failed. Please try again.');
+    }
+}            }
         }
 
         async function signInWithPhone() {
@@ -3249,6 +3260,14 @@ async function signInAnonymously() {
         }
 
         // Auth State Observer
+        // Handle redirect result for mobile Google sign-in
+auth.getRedirectResult().then((result) => {
+    if (result.user) {
+        console.log('Google redirect sign-in successful:', result.user);
+    }
+}).catch((error) => {
+    console.error('Google redirect error:', error);
+});
         auth.onAuthStateChanged(async (user) => {
             if (user) {
                 currentUser = user;
