@@ -3493,44 +3493,59 @@ auth.getRedirectResult().then((result) => {
         alert('An account already exists with this email. Please sign in with your original method.');
     }
 });
-        auth.onAuthStateChanged(async (user) => {
-console.log('Auth state changed:', user); 
-            if (user) {
-console.log('User detected:', user.displayName);
-                currentUser = user;
-                try {
-    await createUserProfile(user);
-} catch (error) {
-    console.error('Error in createUserProfile:', error);
-}
-                
-                document.getElementById('authScreen').style.display = 'none';
-                document.getElementById('mainApp').style.display = 'block';
-                document.getElementById('chatToggle').style.display = 'block';
-                
-                document.getElementById('userDisplayName').textContent = user.displayName || 'Anonymous';
-                
-                initializeLiveUsers();
-                loadFriends();
-                loadGroups();
-                initializeChallenges();
-                
-                console.log('User signed in:', user);
-            } else {
-console.log('User signed out');
-                document.getElementById('authScreen').style.display = 'flex';
-                document.getElementById('mainApp').style.display = 'none';
-                document.getElementById('chatToggle').style.display = 'none';
-                
-                if (unsubscribeChat) {
-                    unsubscribeChat();
-                    unsubscribeChat = null;
-                }
-                
-                console.log('User signed out');
-            }
-        });
-
+        // 🔧 FIX 1: Improved Auth State Observer
+auth.onAuthStateChanged(async (user) => {
+    console.log('Auth state changed:', user);
+    
+    if (user) {
+        // Check if user is anonymous and came from mobile browser
+        const isMobile = /Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+        const isAnonymous = user.isAnonymous;
+        
+        // Force login screen for anonymous users on mobile unless they explicitly chose test mode
+        const testModeClicked = sessionStorage.getItem('testModeClicked');
+        
+        if (isAnonymous && isMobile && !testModeClicked) {
+            console.log('Anonymous user detected on mobile - showing login screen');
+            // Sign out anonymous user to force proper login
+            await auth.signOut();
+            document.getElementById('authScreen').style.display = 'flex';
+            document.getElementById('mainApp').style.display = 'none';
+            return;
+        }
+        
+        currentUser = user;
+        
+        try {
+            await createUserProfile(user);
+        } catch (error) {
+            console.error('Error in createUserProfile:', error);
+        }
+        
+        document.getElementById('authScreen').style.display = 'none';
+        document.getElementById('mainApp').style.display = 'block';
+        document.getElementById('chatToggle').style.display = 'block';
+        
+        document.getElementById('userDisplayName').textContent = user.displayName || (user.isAnonymous ? 'Test User' : 'Anonymous');
+        
+        initializeLiveUsers();
+        loadFriends();
+        loadGroups();
+        initializeChallenges();
+        
+        console.log('User signed in:', user);
+    } else {
+        console.log('User signed out');
+        document.getElementById('authScreen').style.display = 'flex';
+        document.getElementById('mainApp').style.display = 'none';
+        document.getElementById('chatToggle').style.display = 'none';
+        
+        if (unsubscribeChat) {
+            unsubscribeChat();
+            unsubscribeChat = null;
+        }
+    }
+});
         // Event Listeners
         window.addEventListener('beforeunload', () => {
             updateOnlineStatus(false);
