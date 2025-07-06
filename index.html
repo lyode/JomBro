@@ -18,10 +18,9 @@
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-storage-compat.js"></script>
        
-    <title>JomBro - Real Social Challenge Platform</title>
+    <title>JomBro - Enhanced Social Challenge Platform</title>
 
     <style>
-        /* Your existing CSS stays the same - I'll just add new social features */
         :root {
             --safe-area-top: env(safe-area-inset-top, 20px);
             --safe-area-bottom: env(safe-area-inset-bottom, 20px);
@@ -138,13 +137,415 @@
             box-shadow: 0 5px 20px rgba(0,0,0,0.2);
         }
 
-        /* Chat Interface Styles */
+        /* Enhanced Modal System */
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(10px);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 3000;
+            padding: 20px;
+        }
+
+        .modal.show {
+            display: flex;
+        }
+
+        .modal-content {
+            background: var(--glass-bg);
+            backdrop-filter: blur(25px);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            padding: 25px;
+            max-width: 90%;
+            max-height: 80%;
+            overflow-y: auto;
+            width: 100%;
+            max-width: 400px;
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.5);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid var(--glass-border);
+        }
+
+        .modal-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            color: var(--text-secondary);
+            font-size: 20px;
+            cursor: pointer;
+            padding: 5px;
+        }
+
+        /* Enhanced User Profile Styles */
+        .profile-header {
+            text-align: center;
+            margin-bottom: 25px;
+        }
+
+        .profile-avatar-large {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: linear-gradient(45deg, var(--primary-pink), var(--primary-purple));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 32px;
+            margin: 0 auto 15px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .profile-avatar-large:hover {
+            transform: scale(1.05);
+        }
+
+        .profile-avatar-edit {
+            position: absolute;
+            bottom: 0;
+            right: 0;
+            width: 24px;
+            height: 24px;
+            background: var(--primary-pink);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            cursor: pointer;
+        }
+
+        .profile-name {
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        .profile-bio {
+            font-size: 14px;
+            color: var(--text-secondary);
+            margin-bottom: 5px;
+        }
+
+        .profile-level {
+            display: inline-block;
+            background: var(--primary-pink);
+            color: white;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .profile-stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            margin: 20px 0;
+        }
+
+        .profile-stat {
+            text-align: center;
+            background: rgba(255, 255, 255, 0.05);
+            padding: 15px 10px;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .profile-stat:hover {
+            background: rgba(255, 255, 255, 0.1);
+            transform: translateY(-2px);
+        }
+
+        .profile-stat-value {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--primary-pink);
+            margin-bottom: 4px;
+        }
+
+        .profile-stat-label {
+            font-size: 11px;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+        }
+
+        .profile-actions {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        /* Enhanced Friends System */
+        .friends-search {
+            position: relative;
+            margin-bottom: 20px;
+        }
+
+        .friends-search-input {
+            width: 100%;
+            padding: 12px 15px 12px 40px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid var(--glass-border);
+            border-radius: 12px;
+            color: var(--text-primary);
+            font-size: 14px;
+            outline: none;
+        }
+
+        .friends-search-icon {
+            position: absolute;
+            left: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-secondary);
+        }
+
+        .friends-tabs {
+            display: flex;
+            margin-bottom: 20px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            padding: 4px;
+        }
+
+        .friends-tab {
+            flex: 1;
+            padding: 8px 12px;
+            text-align: center;
+            font-size: 12px;
+            font-weight: 600;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            color: var(--text-secondary);
+        }
+
+        .friends-tab.active {
+            background: var(--primary-pink);
+            color: white;
+        }
+
+        .friend-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            margin-bottom: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .friend-item:hover {
+            background: rgba(255, 255, 255, 0.1);
+            transform: translateX(5px);
+        }
+
+        .friend-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(45deg, var(--primary-blue), var(--primary-purple));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            position: relative;
+        }
+
+        .friend-status {
+            position: absolute;
+            bottom: -2px;
+            right: -2px;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            border: 2px solid var(--dark-bg);
+        }
+
+        .friend-status.online {
+            background: var(--success-green);
+        }
+
+        .friend-status.offline {
+            background: var(--text-secondary);
+        }
+
+        .friend-info {
+            flex: 1;
+        }
+
+        .friend-name {
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 2px;
+        }
+
+        .friend-activity {
+            font-size: 11px;
+            color: var(--text-secondary);
+        }
+
+        .friend-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .friend-action-btn {
+            padding: 6px 12px;
+            border: none;
+            border-radius: 8px;
+            font-size: 11px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .friend-action-btn.primary {
+            background: var(--primary-pink);
+            color: white;
+        }
+
+        .friend-action-btn.secondary {
+            background: rgba(255, 255, 255, 0.1);
+            color: var(--text-primary);
+        }
+
+        /* Enhanced Group System */
+        .group-form {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .form-label {
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .form-input {
+            padding: 12px 15px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid var(--glass-border);
+            border-radius: 10px;
+            color: var(--text-primary);
+            font-size: 14px;
+            outline: none;
+            transition: all 0.3s ease;
+        }
+
+        .form-input:focus {
+            border-color: var(--primary-pink);
+            box-shadow: 0 0 0 2px rgba(255, 107, 157, 0.2);
+        }
+
+        .form-textarea {
+            min-height: 80px;
+            resize: vertical;
+        }
+
+        .form-select {
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%23ffffff' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='m6 8 4 4 4-4'/%3e%3c/svg%3e");
+            background-position: right 8px center;
+            background-repeat: no-repeat;
+            background-size: 16px;
+            padding-right: 32px;
+        }
+
+        .group-privacy-options {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-top: 8px;
+        }
+
+        .privacy-option {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .privacy-option:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .privacy-option input[type="radio"] {
+            margin: 0;
+        }
+
+        .members-selector {
+            max-height: 200px;
+            overflow-y: auto;
+            border: 1px solid var(--glass-border);
+            border-radius: 10px;
+            padding: 10px;
+        }
+
+        .member-option {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 8px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .member-option:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .member-checkbox {
+            margin: 0;
+        }
+
+        /* Enhanced Chat Interface */
         .chat-interface {
             position: fixed;
             bottom: 0;
             left: 0;
             right: 0;
-            height: 50%;
+            height: 60%;
             background: var(--glass-bg);
             backdrop-filter: blur(25px);
             border-top: 1px solid var(--glass-border);
@@ -174,6 +575,11 @@
             color: var(--text-primary);
         }
 
+        .chat-members {
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+
         .chat-close {
             background: none;
             border: none;
@@ -201,6 +607,19 @@
             flex-direction: row-reverse;
         }
 
+        .message.system {
+            justify-content: center;
+            margin: 10px 0;
+        }
+
+        .message.system .message-content {
+            background: rgba(255, 255, 255, 0.1);
+            color: var(--text-secondary);
+            font-size: 12px;
+            text-align: center;
+            max-width: 80%;
+        }
+
         .message-avatar {
             width: 32px;
             height: 32px;
@@ -209,7 +628,7 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 14px;
+            font-size: 12px;
             flex-shrink: 0;
         }
 
@@ -273,7 +692,7 @@
             font-size: 16px;
         }
 
-        /* Your existing styles continue here... */
+        /* Main App Layout */
         .phone-container {
             position: fixed;
             top: 0;
@@ -353,12 +772,29 @@
             font-size: 14px;
             color: var(--text-primary);
             transition: all 0.3s ease;
+            position: relative;
         }
 
         .header-btn:hover {
             background: rgba(255, 107, 157, 0.2);
             border-color: var(--primary-pink);
             transform: scale(1.1);
+        }
+
+        .notification-badge {
+            position: absolute;
+            top: -4px;
+            right: -4px;
+            width: 16px;
+            height: 16px;
+            background: var(--primary-pink);
+            border-radius: 50%;
+            font-size: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 700;
         }
 
         .glass-content {
@@ -515,6 +951,24 @@
             box-shadow: 0 8px 25px rgba(255, 107, 157, 0.6);
         }
 
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.1);
+            color: var(--text-primary);
+            border: 1px solid var(--glass-border);
+            padding: 12px 20px;
+            border-radius: 12px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.15);
+            transform: translateY(-2px);
+        }
+
         .chat-toggle {
             position: fixed;
             bottom: 80px;
@@ -539,7 +993,6 @@
             transform: scale(1.1);
         }
 
-        /* Online users list */
         .online-count {
             background: rgba(0, 255, 150, 0.2);
             color: var(--success-green);
@@ -549,7 +1002,7 @@
             margin-left: 8px;
         }
 
-        /* Loading state */
+        /* Utility Classes */
         .loading {
             position: fixed;
             top: 50%;
@@ -558,10 +1011,30 @@
             font-size: 18px;
             color: var(--text-primary);
         }
+
+        .hidden {
+            display: none !important;
+        }
+
+        .text-center {
+            text-align: center;
+        }
+
+        .mb-10 {
+            margin-bottom: 10px;
+        }
+
+        .mb-15 {
+            margin-bottom: 15px;
+        }
+
+        .mb-20 {
+            margin-bottom: 20px;
+        }
     </style>
 </head>
 <body>
-    <!-- Auth Screen (shows first) -->
+    <!-- Auth Screen -->
     <div id="authScreen" class="auth-screen">
         <div class="auth-container">
             <div class="auth-logo">🚀</div>
@@ -584,24 +1057,31 @@
         </div>
     </div>
 
-    <!-- Main App (shows after auth) -->
+    <!-- Main App -->
     <div id="mainApp" class="phone-container" style="display: none;">
         <div class="glass-interface">
-            <!-- Header with user info -->
+            <!-- Header -->
             <div class="glass-header">
                 <div class="logo-section" onclick="showProfile()">
                     <div class="logo-text">JomBro</div>
                     <div class="logo-subtitle" id="userDisplayName">Loading...</div>
                 </div>
                 <div class="header-actions">
-                    <div class="header-btn" onclick="toggleChat()" title="Group Chat">💬</div>
-                    <div class="header-btn" onclick="showFriends()" title="Friends">👥</div>
+                    <div class="header-btn" onclick="toggleChat()" title="Group Chat">
+                        💬
+                        <div class="notification-badge" id="chatNotifications" style="display: none;">3</div>
+                    </div>
+                    <div class="header-btn" onclick="showFriends()" title="Friends">
+                        👥
+                        <div class="notification-badge" id="friendsNotifications" style="display: none;">2</div>
+                    </div>
+                    <div class="header-btn" onclick="showGroups()" title="Groups">🏠</div>
                     <div class="header-btn" onclick="signOut()" title="Sign Out">🚪</div>
                 </div>
             </div>
 
             <div class="glass-content">
-                <!-- Live Players Section (Real Data) -->
+                <!-- Live Players Section -->
                 <div class="glass-section">
                     <div class="live-header">
                         <div class="live-indicator">
@@ -609,12 +1089,12 @@
                             <span>LIVE</span>
                             <span class="online-count" id="onlineCount">0 online</span>
                         </div>
-                        <div class="user-status" id="userStatus">
+                        <div class="user-status" id="userStatus" onclick="showProfile()">
                             <span id="userLevel">Level 1</span>
                         </div>
                     </div>
                     <div class="live-players" id="livePlayersContainer">
-                        <!-- Real users will appear here -->
+                        <!-- Real users appear here -->
                     </div>
                 </div>
 
@@ -637,19 +1117,184 @@
         </div>
     </div>
 
-    <!-- Chat Interface -->
+    <!-- Enhanced User Profile Modal -->
+    <div id="profileModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-title">👤 My Profile</div>
+                <button class="modal-close" onclick="hideModal('profile')">&times;</button>
+            </div>
+            
+            <div class="profile-header">
+                <div class="profile-avatar-large" id="profileAvatar" onclick="changeProfilePicture()">
+                    LY
+                    <div class="profile-avatar-edit">📷</div>
+                </div>
+                <div class="profile-name" id="profileName">Lyode</div>
+                <div class="profile-bio" id="profileBio">Challenge enthusiast • Coffee lover • Always up for adventures!</div>
+                <div class="profile-level" id="profileLevel">Level 5 Explorer</div>
+            </div>
+
+            <div class="profile-stats">
+                <div class="profile-stat" onclick="showAchievements()">
+                    <div class="profile-stat-value" id="profileChallenges">47</div>
+                    <div class="profile-stat-label">Challenges</div>
+                </div>
+                <div class="profile-stat" onclick="showFriends()">
+                    <div class="profile-stat-value" id="profileFriends">23</div>
+                    <div class="profile-stat-label">Friends</div>
+                </div>
+                <div class="profile-stat" onclick="showStats()">
+                    <div class="profile-stat-value" id="profileStreak">12</div>
+                    <div class="profile-stat-label">Day Streak</div>
+                </div>
+            </div>
+
+            <div class="profile-actions">
+                <button class="btn-secondary" onclick="editProfile()">Edit Profile</button>
+                <button class="btn-secondary" onclick="showSettings()">Settings</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Enhanced Friends Modal -->
+    <div id="friendsModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-title">👥 Friends</div>
+                <button class="modal-close" onclick="hideModal('friends')">&times;</button>
+            </div>
+
+            <div class="friends-search">
+                <div class="friends-search-icon">🔍</div>
+                <input type="text" class="friends-search-input" placeholder="Search friends..." 
+                       oninput="searchFriends(this.value)">
+            </div>
+
+            <div class="friends-tabs">
+                <div class="friends-tab active" onclick="switchFriendsTab('all')">All Friends</div>
+                <div class="friends-tab" onclick="switchFriendsTab('online')">Online</div>
+                <div class="friends-tab" onclick="switchFriendsTab('requests')">Requests</div>
+            </div>
+
+            <div id="friendsList">
+                <!-- Friends will be populated here -->
+            </div>
+
+            <div style="margin-top: 20px;">
+                <button class="btn-primary" onclick="findFriends()">🔍 Find New Friends</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Enhanced Create Group Modal -->
+    <div id="groupModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-title">🏠 Create Group</div>
+                <button class="modal-close" onclick="hideModal('group')">&times;</button>
+            </div>
+
+            <form class="group-form" onsubmit="createGroup(event)">
+                <div class="form-group">
+                    <label class="form-label">Group Name</label>
+                    <input type="text" class="form-input" id="groupName" placeholder="My Adventure Squad" required>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Description</label>
+                    <textarea class="form-input form-textarea" id="groupDescription" 
+                              placeholder="What's your group about? What challenges will you tackle together?"></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Group Icon</label>
+                    <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                        <div class="group-icon-option" onclick="selectGroupIcon('🏔️')">🏔️</div>
+                        <div class="group-icon-option" onclick="selectGroupIcon('🚀')">🚀</div>
+                        <div class="group-icon-option" onclick="selectGroupIcon('⚡')">⚡</div>
+                        <div class="group-icon-option" onclick="selectGroupIcon('🔥')">🔥</div>
+                        <div class="group-icon-option" onclick="selectGroupIcon('🌟')">🌟</div>
+                        <div class="group-icon-option" onclick="selectGroupIcon('💪')">💪</div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Privacy Settings</label>
+                    <div class="group-privacy-options">
+                        <label class="privacy-option">
+                            <input type="radio" name="privacy" value="public" checked>
+                            <div>
+                                <div style="font-weight: 600;">🌍 Public</div>
+                                <div style="font-size: 12px; color: var(--text-secondary);">Anyone can find and join</div>
+                            </div>
+                        </label>
+                        <label class="privacy-option">
+                            <input type="radio" name="privacy" value="private">
+                            <div>
+                                <div style="font-weight: 600;">🔒 Private</div>
+                                <div style="font-size: 12px; color: var(--text-secondary);">Invite only</div>
+                            </div>
+                        </label>
+                        <label class="privacy-option">
+                            <input type="radio" name="privacy" value="friends">
+                            <div>
+                                <div style="font-weight: 600;">👥 Friends Only</div>
+                                <div style="font-size: 12px; color: var(--text-secondary);">Only friends can join</div>
+                            </div>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Invite Friends</label>
+                    <div class="members-selector" id="membersSelector">
+                        <!-- Friends list for invitation -->
+                    </div>
+                </div>
+
+                <div style="display: flex; gap: 10px; margin-top: 20px;">
+                    <button type="button" class="btn-secondary" onclick="hideModal('group')" style="flex: 1;">Cancel</button>
+                    <button type="submit" class="btn-primary" style="flex: 1;">Create Group</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Enhanced Chat Interface -->
     <div id="chatInterface" class="chat-interface">
         <div class="chat-header">
-            <div class="chat-title">Challenge Group Chat</div>
+            <div>
+                <div class="chat-title" id="chatTitle">Challenge Group Chat</div>
+                <div class="chat-members" id="chatMembers">3 members online</div>
+            </div>
             <button class="chat-close" onclick="toggleChat()">✕</button>
         </div>
         <div class="chat-messages" id="chatMessages">
-            <!-- Real-time messages appear here -->
+            <!-- Messages appear here -->
         </div>
         <div class="chat-input-container">
             <input type="text" class="chat-input" id="chatInput" placeholder="Type a message..." 
                    onkeypress="handleChatKeyPress(event)">
             <button class="chat-send" onclick="sendMessage()">➤</button>
+        </div>
+    </div>
+
+    <!-- Groups Modal -->
+    <div id="groupsModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-title">🏠 My Groups</div>
+                <button class="modal-close" onclick="hideModal('groups')">&times;</button>
+            </div>
+
+            <div id="groupsList">
+                <!-- Groups will be populated here -->
+            </div>
+
+            <div style="margin-top: 20px;">
+                <button class="btn-primary" onclick="showCreateGroup()">➕ Create New Group</button>
+            </div>
         </div>
     </div>
 
@@ -659,7 +1304,7 @@
     </button>
 
     <script>
-        // Firebase Configuration - YOUR REAL CONFIG
+        // Firebase Configuration
         const firebaseConfig = {
             apiKey: "AIzaSyC_orriRUuf1ynDiFaJAPrO6-Gu3GeURxQ",
             authDomain: "jombro-9d129.firebaseapp.com",
@@ -680,6 +1325,10 @@
         let currentUser = null;
         let chatOpen = false;
         let unsubscribeChat = null;
+        let currentFriendsTab = 'all';
+        let userProfile = {};
+        let friendsList = [];
+        let groupsList = [];
 
         // Authentication Functions
         async function signInWithGoogle() {
@@ -713,6 +1362,7 @@
 
         async function signOut() {
             try {
+                await updateOnlineStatus(false);
                 await auth.signOut();
                 window.location.reload();
             } catch (error) {
@@ -720,30 +1370,52 @@
             }
         }
 
-        // User Management
+        // Enhanced User Management
         async function createUserProfile(user) {
             const userRef = db.collection('users').doc(user.uid);
             const userDoc = await userRef.get();
             
             if (!userDoc.exists) {
-                await userRef.set({
+                const newProfile = {
                     uid: user.uid,
                     displayName: user.displayName || 'Anonymous',
                     email: user.email,
                     photoURL: user.photoURL,
+                    bio: 'New to JomBro! Ready to tackle challenges! 🚀',
                     level: 1,
                     tokens: 0,
                     challenges: 0,
+                    streak: 0,
+                    friends: [],
+                    groups: [],
+                    achievements: [],
                     createdAt: firebase.firestore.FieldValue.serverTimestamp(),
                     lastActive: firebase.firestore.FieldValue.serverTimestamp(),
                     online: true
-                });
+                };
+                await userRef.set(newProfile);
+                userProfile = newProfile;
             } else {
-                // Update last active and online status
+                userProfile = userDoc.data();
                 await userRef.update({
                     lastActive: firebase.firestore.FieldValue.serverTimestamp(),
                     online: true
                 });
+            }
+            
+            updateProfileDisplay();
+        }
+
+        function updateProfileDisplay() {
+            if (userProfile) {
+                document.getElementById('profileName').textContent = userProfile.displayName;
+                document.getElementById('profileBio').textContent = userProfile.bio || 'No bio yet';
+                document.getElementById('profileLevel').textContent = `Level ${userProfile.level} Explorer`;
+                document.getElementById('profileChallenges').textContent = userProfile.challenges || 0;
+                document.getElementById('profileFriends').textContent = userProfile.friends?.length || 0;
+                document.getElementById('profileStreak').textContent = userProfile.streak || 0;
+                document.getElementById('profileAvatar').textContent = getInitials(userProfile.displayName);
+                document.getElementById('userLevel').textContent = `Level ${userProfile.level}`;
             }
         }
 
@@ -756,7 +1428,288 @@
             }
         }
 
-        // Real-time Chat Functions
+        // Enhanced Friends System
+        async function loadFriends() {
+            if (!currentUser) return;
+            
+            try {
+                const usersSnapshot = await db.collection('users').get();
+                const allUsers = [];
+                
+                usersSnapshot.forEach(doc => {
+                    const userData = doc.data();
+                    if (userData.uid !== currentUser.uid) {
+                        allUsers.push(userData);
+                    }
+                });
+                
+                friendsList = allUsers;
+                displayFriends();
+            } catch (error) {
+                console.error('Error loading friends:', error);
+            }
+        }
+
+        function displayFriends() {
+            const friendsList_elem = document.getElementById('friendsList');
+            if (!friendsList_elem) return;
+            
+            let filteredFriends = friendsList;
+            
+            if (currentFriendsTab === 'online') {
+                filteredFriends = friendsList.filter(friend => friend.online);
+            } else if (currentFriendsTab === 'requests') {
+                filteredFriends = []; // Placeholder for friend requests
+            }
+            
+            if (filteredFriends.length === 0) {
+                friendsList_elem.innerHTML = `
+                    <div class="text-center" style="padding: 40px 20px; color: var(--text-secondary);">
+                        <div style="font-size: 48px; margin-bottom: 15px;">👥</div>
+                        <div style="font-size: 16px; margin-bottom: 8px;">No ${currentFriendsTab === 'all' ? 'friends' : currentFriendsTab} yet</div>
+                        <div style="font-size: 12px;">Start connecting with other challengers!</div>
+                    </div>
+                `;
+                return;
+            }
+            
+            friendsList_elem.innerHTML = filteredFriends.map(friend => `
+                <div class="friend-item" onclick="showFriendProfile('${friend.uid}')">
+                    <div class="friend-avatar">
+                        ${getInitials(friend.displayName)}
+                        <div class="friend-status ${friend.online ? 'online' : 'offline'}"></div>
+                    </div>
+                    <div class="friend-info">
+                        <div class="friend-name">${friend.displayName}</div>
+                        <div class="friend-activity">
+                            ${friend.online ? 'Online now' : 'Last seen ' + formatTime(friend.lastActive)}
+                        </div>
+                    </div>
+                    <div class="friend-actions">
+                        <button class="friend-action-btn primary" onclick="event.stopPropagation(); sendDirectMessage('${friend.uid}')">
+                            💬
+                        </button>
+                        <button class="friend-action-btn secondary" onclick="event.stopPropagation(); inviteToChallenge('${friend.uid}')">
+                            🎯
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function switchFriendsTab(tab) {
+            currentFriendsTab = tab;
+            
+            // Update tab appearance
+            document.querySelectorAll('.friends-tab').forEach(tabEl => {
+                tabEl.classList.remove('active');
+            });
+            document.querySelector(`[onclick="switchFriendsTab('${tab}')"]`).classList.add('active');
+            
+            displayFriends();
+        }
+
+        function searchFriends(query) {
+            // Filter friends based on search query
+            const filtered = friendsList.filter(friend => 
+                friend.displayName.toLowerCase().includes(query.toLowerCase())
+            );
+            
+            // Temporarily update display
+            const friendsList_elem = document.getElementById('friendsList');
+            if (query.trim() === '') {
+                displayFriends();
+                return;
+            }
+            
+            friendsList_elem.innerHTML = filtered.map(friend => `
+                <div class="friend-item" onclick="showFriendProfile('${friend.uid}')">
+                    <div class="friend-avatar">
+                        ${getInitials(friend.displayName)}
+                        <div class="friend-status ${friend.online ? 'online' : 'offline'}"></div>
+                    </div>
+                    <div class="friend-info">
+                        <div class="friend-name">${friend.displayName}</div>
+                        <div class="friend-activity">
+                            ${friend.online ? 'Online now' : 'Last seen recently'}
+                        </div>
+                    </div>
+                    <div class="friend-actions">
+                        <button class="friend-action-btn primary" onclick="event.stopPropagation(); sendDirectMessage('${friend.uid}')">💬</button>
+                        <button class="friend-action-btn secondary" onclick="event.stopPropagation(); inviteToChallenge('${friend.uid}')">🎯</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        async function sendDirectMessage(friendId) {
+            const friend = friendsList.find(f => f.uid === friendId);
+            if (!friend) return;
+            
+            // Create or open direct message chat
+            const message = prompt(`Send a message to ${friend.displayName}:`);
+            if (!message) return;
+            
+            try {
+                await db.collection('direct_messages').add({
+                    participants: [currentUser.uid, friendId].sort(),
+                    senderId: currentUser.uid,
+                    message: message,
+                    timestamp: firebase.firestore.FieldValue.serverTimestamp()
+                });
+                
+                alert(`Message sent to ${friend.displayName}! 💬`);
+            } catch (error) {
+                console.error('Error sending message:', error);
+                alert('Failed to send message. Please try again.');
+            }
+        }
+
+        function inviteToChallenge(friendId) {
+            const friend = friendsList.find(f => f.uid === friendId);
+            if (!friend) return;
+            
+            alert(`🎯 Challenge invitation sent to ${friend.displayName}! They'll get a notification to join your Coffee Shop Poetry Challenge.`);
+        }
+
+        function showFriendProfile(friendId) {
+            const friend = friendsList.find(f => f.uid === friendId);
+            if (!friend) return;
+            
+            alert(`👤 ${friend.displayName}\nLevel: ${friend.level || 1}\nChallenges: ${friend.challenges || 0}\nStatus: ${friend.online ? 'Online' : 'Offline'}\n\n${friend.bio || 'No bio available'}`);
+        }
+
+        // Enhanced Group System
+        let selectedGroupIcon = '🚀';
+
+        function selectGroupIcon(icon) {
+            selectedGroupIcon = icon;
+            
+            // Update visual selection
+            document.querySelectorAll('.group-icon-option').forEach(el => {
+                el.style.background = 'rgba(255, 255, 255, 0.1)';
+                el.style.border = '2px solid transparent';
+            });
+            
+            event.target.style.background = 'rgba(255, 107, 157, 0.2)';
+            event.target.style.border = '2px solid var(--primary-pink)';
+        }
+
+        async function createGroup(event) {
+            event.preventDefault();
+            
+            const groupName = document.getElementById('groupName').value.trim();
+            const groupDescription = document.getElementById('groupDescription').value.trim();
+            const privacy = document.querySelector('input[name="privacy"]:checked').value;
+            
+            if (!groupName) {
+                alert('Please enter a group name');
+                return;
+            }
+            
+            try {
+                const groupData = {
+                    name: groupName,
+                    description: groupDescription,
+                    icon: selectedGroupIcon,
+                    privacy: privacy,
+                    createdBy: currentUser.uid,
+                    members: [currentUser.uid],
+                    admins: [currentUser.uid],
+                    challenges: [],
+                    createdAt: firebase.firestore.FieldValue.serverTimestamp()
+                };
+                
+                const groupRef = await db.collection('groups').add(groupData);
+                
+                // Update user's groups
+                await db.collection('users').doc(currentUser.uid).update({
+                    groups: firebase.firestore.FieldValue.arrayUnion(groupRef.id)
+                });
+                
+                alert(`🎉 Group "${groupName}" created successfully! Start inviting friends and planning challenges!`);
+                hideModal('group');
+                loadGroups();
+                
+                // Reset form
+                document.getElementById('groupName').value = '';
+                document.getElementById('groupDescription').value = '';
+                selectedGroupIcon = '🚀';
+                
+            } catch (error) {
+                console.error('Error creating group:', error);
+                alert('Failed to create group. Please try again.');
+            }
+        }
+
+        async function loadGroups() {
+            if (!currentUser) return;
+            
+            try {
+                const groupsSnapshot = await db.collection('groups')
+                    .where('members', 'array-contains', currentUser.uid)
+                    .get();
+                
+                groupsList = [];
+                groupsSnapshot.forEach(doc => {
+                    groupsList.push({ id: doc.id, ...doc.data() });
+                });
+                
+                displayGroups();
+            } catch (error) {
+                console.error('Error loading groups:', error);
+            }
+        }
+
+        function displayGroups() {
+            const groupsList_elem = document.getElementById('groupsList');
+            if (!groupsList_elem) return;
+            
+            if (groupsList.length === 0) {
+                groupsList_elem.innerHTML = `
+                    <div class="text-center" style="padding: 40px 20px; color: var(--text-secondary);">
+                        <div style="font-size: 48px; margin-bottom: 15px;">🏠</div>
+                        <div style="font-size: 16px; margin-bottom: 8px;">No groups yet</div>
+                        <div style="font-size: 12px;">Create your first group to start challenging with friends!</div>
+                    </div>
+                `;
+                return;
+            }
+            
+            groupsList_elem.innerHTML = groupsList.map(group => `
+                <div class="friend-item" onclick="openGroup('${group.id}')">
+                    <div class="friend-avatar">${group.icon}</div>
+                    <div class="friend-info">
+                        <div class="friend-name">${group.name}</div>
+                        <div class="friend-activity">${group.members.length} members • ${group.privacy}</div>
+                    </div>
+                    <div class="friend-actions">
+                        <button class="friend-action-btn primary" onclick="event.stopPropagation(); openGroupChat('${group.id}')">💬</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function openGroup(groupId) {
+            const group = groupsList.find(g => g.id === groupId);
+            if (!group) return;
+            
+            alert(`🏠 ${group.name}\n${group.description}\nMembers: ${group.members.length}\nPrivacy: ${group.privacy}\n\nGroup features coming soon!`);
+        }
+
+        function openGroupChat(groupId) {
+            const group = groupsList.find(g => g.id === groupId);
+            if (!group) return;
+            
+            document.getElementById('chatTitle').textContent = `${group.icon} ${group.name}`;
+            document.getElementById('chatMembers').textContent = `${group.members.length} members`;
+            
+            if (!chatOpen) {
+                toggleChat();
+            }
+        }
+
+        // Enhanced Chat Functions
         function initializeChat() {
             const chatRef = db.collection('messages').orderBy('timestamp', 'asc');
             
@@ -775,24 +1728,36 @@
             
             messages.forEach((message) => {
                 const messageDiv = document.createElement('div');
-                messageDiv.className = `message ${message.userId === currentUser.uid ? 'own' : ''}`;
+                
+                if (message.userId === 'system') {
+                    messageDiv.className = 'message system';
+                } else {
+                    messageDiv.className = `message ${message.userId === currentUser.uid ? 'own' : ''}`;
+                }
                 
                 const time = message.timestamp ? 
                     new Date(message.timestamp.toDate()).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) : 
                     'now';
                 
-                messageDiv.innerHTML = `
-                    <div class="message-avatar">${message.userAvatar || '👤'}</div>
-                    <div class="message-content">
-                        <div class="message-text">${message.text}</div>
-                        <div class="message-time">${time}</div>
-                    </div>
-                `;
+                if (message.userId === 'system') {
+                    messageDiv.innerHTML = `
+                        <div class="message-content">
+                            <div class="message-text">${message.text}</div>
+                        </div>
+                    `;
+                } else {
+                    messageDiv.innerHTML = `
+                        <div class="message-avatar">${message.userAvatar || '👤'}</div>
+                        <div class="message-content">
+                            <div class="message-text">${message.text}</div>
+                            <div class="message-time">${time}</div>
+                        </div>
+                    `;
+                }
                 
                 chatMessages.appendChild(messageDiv);
             });
             
-            // Scroll to bottom
             chatMessages.scrollTop = chatMessages.scrollHeight;
         }
 
@@ -865,7 +1830,7 @@
             users.forEach((user) => {
                 const playerDiv = document.createElement('div');
                 playerDiv.className = 'player-avatar';
-                playerDiv.onclick = () => showPlayerProfile(user.displayName);
+                playerDiv.onclick = () => showFriendProfile(user.uid);
                 
                 playerDiv.innerHTML = `
                     <div class="avatar-ring">
@@ -878,23 +1843,69 @@
             });
         }
 
-        // Utility Functions
-        function getInitials(name) {
-            return name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
-        }
-
-        function showPlayerProfile(name) {
-            alert(`👤 ${name} is online and challenging! Send them a friend request?`);
-        }
-
-        function showProfile() {
-            if (currentUser) {
-                alert(`👤 ${currentUser.displayName}\nLevel: 1\nChallenges: 0\nTokens: 0`);
+        // Modal Functions
+        function showModal(id) {
+            const modal = document.getElementById(id + 'Modal');
+            if (modal) {
+                modal.classList.add('show');
+                
+                // Load data based on modal type
+                if (id === 'friends') {
+                    loadFriends();
+                } else if (id === 'groups') {
+                    loadGroups();
+                } else if (id === 'profile') {
+                    updateProfileDisplay();
+                }
             }
         }
 
+        function hideModal(id) {
+            const modal = document.getElementById(id + 'Modal');
+            if (modal) {
+                modal.classList.remove('show');
+            }
+        }
+
+        // UI Functions
+        function showProfile() {
+            showModal('profile');
+        }
+
         function showFriends() {
-            alert('👥 Friends feature coming soon! For now, everyone in the chat is your challenge buddy!');
+            showModal('friends');
+        }
+
+        function showGroups() {
+            showModal('groups');
+        }
+
+        function showCreateGroup() {
+            hideModal('groups');
+            showModal('group');
+            
+            // Populate members selector with friends
+            populateMembersSelector();
+        }
+
+        function populateMembersSelector() {
+            const selector = document.getElementById('membersSelector');
+            if (!selector || !friendsList.length) return;
+            
+            selector.innerHTML = friendsList.map(friend => `
+                <label class="member-option">
+                    <input type="checkbox" class="member-checkbox" value="${friend.uid}">
+                    <div class="friend-avatar" style="width: 30px; height: 30px; font-size: 12px;">
+                        ${getInitials(friend.displayName)}
+                    </div>
+                    <div>
+                        <div style="font-weight: 600; font-size: 14px;">${friend.displayName}</div>
+                        <div style="font-size: 11px; color: var(--text-secondary);">
+                            ${friend.online ? 'Online' : 'Offline'}
+                        </div>
+                    </div>
+                </label>
+            `).join('');
         }
 
         function startChallenge() {
@@ -902,14 +1913,75 @@
                 toggleChat();
             }
             
-            // Send challenge start message
             db.collection('messages').add({
                 text: `🚀 ${currentUser.displayName} started the Coffee Shop Poetry Challenge! Who's joining?`,
                 userId: 'system',
-                userName: 'JomBro',
-                userAvatar: '🤖',
                 timestamp: firebase.firestore.FieldValue.serverTimestamp()
             });
+        }
+
+        function findFriends() {
+            alert('🔍 Friend discovery feature coming soon! For now, share your JomBro link with friends to connect!');
+        }
+
+        function editProfile() {
+            const newBio = prompt('Enter your new bio:', userProfile.bio || '');
+            if (newBio !== null) {
+                updateUserProfile({ bio: newBio });
+            }
+        }
+
+        function changeProfilePicture() {
+            alert('📷 Profile picture upload coming soon! For now, your initials look great!');
+        }
+
+        async function updateUserProfile(updates) {
+            if (!currentUser) return;
+            
+            try {
+                await db.collection('users').doc(currentUser.uid).update(updates);
+                Object.assign(userProfile, updates);
+                updateProfileDisplay();
+                alert('✅ Profile updated successfully!');
+            } catch (error) {
+                console.error('Error updating profile:', error);
+                alert('Failed to update profile. Please try again.');
+            }
+        }
+
+        function showSettings() {
+            alert('⚙️ Settings panel coming soon! For now, you can edit your bio and manage friends.');
+        }
+
+        function showAchievements() {
+            alert('🏆 Achievements system coming soon! Keep completing challenges to unlock rewards!');
+        }
+
+        function showStats() {
+            alert('📊 Detailed stats coming soon! Your current streak: ' + (userProfile.streak || 0) + ' days');
+        }
+
+        // Utility Functions
+        function getInitials(name) {
+            if (!name) return 'A';
+            return name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
+        }
+
+        function formatTime(timestamp) {
+            if (!timestamp) return 'recently';
+            
+            const now = new Date();
+            const time = timestamp.toDate ? timestamp.toDate() : new Date(timestamp);
+            const diff = now - time;
+            
+            const minutes = Math.floor(diff / (1000 * 60));
+            const hours = Math.floor(diff / (1000 * 60 * 60));
+            const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+            
+            if (minutes < 1) return 'just now';
+            if (minutes < 60) return `${minutes}m ago`;
+            if (hours < 24) return `${hours}h ago`;
+            return `${days}d ago`;
         }
 
         // Auth State Observer
@@ -918,25 +1990,22 @@
                 currentUser = user;
                 await createUserProfile(user);
                 
-                // Show main app
                 document.getElementById('authScreen').style.display = 'none';
                 document.getElementById('mainApp').style.display = 'block';
                 document.getElementById('chatToggle').style.display = 'block';
                 
-                // Update UI
                 document.getElementById('userDisplayName').textContent = user.displayName || 'Anonymous';
                 
-                // Initialize real-time features
                 initializeLiveUsers();
+                loadFriends();
+                loadGroups();
                 
                 console.log('User signed in:', user);
             } else {
-                // Show auth screen
                 document.getElementById('authScreen').style.display = 'flex';
                 document.getElementById('mainApp').style.display = 'none';
                 document.getElementById('chatToggle').style.display = 'none';
                 
-                // Clean up listeners
                 if (unsubscribeChat) {
                     unsubscribeChat();
                     unsubscribeChat = null;
@@ -946,12 +2015,11 @@
             }
         });
 
-        // Handle page unload - set user offline
+        // Event Listeners
         window.addEventListener('beforeunload', () => {
             updateOnlineStatus(false);
         });
 
-        // Handle visibility change - update online status
         document.addEventListener('visibilitychange', () => {
             if (document.visibilityState === 'visible') {
                 updateOnlineStatus(true);
@@ -960,7 +2028,32 @@
             }
         });
 
-        console.log('🚀 JomBro Social Features Loaded!');
+        // Style group icon options
+        document.addEventListener('DOMContentLoaded', () => {
+            const style = document.createElement('style');
+            style.textContent = `
+                .group-icon-option {
+                    width: 40px;
+                    height: 40px;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    background: rgba(255, 255, 255, 0.1);
+                    border: 2px solid transparent;
+                    border-radius: 10px;
+                    cursor: pointer;
+                    font-size: 18px;
+                    transition: all 0.3s ease;
+                }
+                .group-icon-option:hover {
+                    background: rgba(255, 255, 255, 0.15);
+                    transform: scale(1.1);
+                }
+            `;
+            document.head.appendChild(style);
+        });
+
+        console.log('🚀 JomBro Enhanced Social Platform Loaded!');
     </script>
 </body>
 </html>
