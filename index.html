@@ -3582,6 +3582,84 @@ function shareProfile() {
 function viewFullStats() {
     alert(`📊 Detailed Stats:\n\nTotal Challenges: ${userProfile?.challenges || 0}\nSuccess Rate: 94%\nAverage Score: 87.5\nFavorite Category: Social Connection\nTotal Distance Traveled: 45.2 km\nCoffee Shops Visited: 12\nNew Friends Made: 8\n\nFull analytics dashboard coming soon!`);
 }
+// Enhanced User Profile Functions
+function showEnhancedProfile() {
+    showModal('enhancedProfile');
+    updateEnhancedProfileDisplay();
+}
+
+function updateEnhancedProfileDisplay() {
+    // Update with real user data
+    if (userProfile) {
+        document.getElementById('enhancedProfileName').textContent = userProfile.displayName || 'User';
+        document.getElementById('enhancedProfileBio').textContent = userProfile.bio || 'Challenge enthusiast';
+        document.getElementById('profileTokensDisplay').textContent = userProfile.tokens || '0';
+        document.getElementById('profileLevelDisplay').textContent = `Level ${userProfile.level || 1}`;
+        document.getElementById('profileStreakDisplay').textContent = userProfile.streak || '0';
+        
+        // Update avatar
+        const initials = getInitials(userProfile.displayName || 'User');
+        document.getElementById('profileInitials').textContent = initials;
+    }
+}
+
+async function uploadProfilePicture() {
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = 'image/*';
+    
+    input.onchange = async (event) => {
+        const file = event.target.files[0];
+        if (!file) return;
+        
+        // Show loading
+        document.getElementById('profileInitials').innerHTML = '<div style="width: 20px; height: 20px; border: 2px solid rgba(255,255,255,0.3); border-radius: 50%; border-top-color: white; animation: spin 1s ease-in-out infinite; margin: 0 auto;"></div>';
+        
+        // Simulate upload delay
+        setTimeout(() => {
+            const imageUrl = URL.createObjectURL(file);
+            document.getElementById('profileImage').src = imageUrl;
+            document.getElementById('profileImage').style.display = 'block';
+            document.getElementById('profileInitials').style.display = 'none';
+            
+            showToast('📷 Profile picture updated!', 'success');
+        }, 2000);
+    };
+    
+    input.click();
+}
+
+function editEnhancedProfile() {
+    const newBio = prompt('Update your bio:', userProfile?.bio || '');
+    if (newBio !== null) {
+        if (userProfile) {
+            userProfile.bio = newBio;
+            updateUserProfile({ bio: newBio });
+            updateEnhancedProfileDisplay();
+        }
+        showToast('✅ Profile updated!', 'success');
+    }
+}
+
+function shareProfile() {
+    const profileUrl = `https://jom-bro.vercel.app/profile/${currentUser?.uid}`;
+    
+    if (navigator.share) {
+        navigator.share({
+            title: `Check out ${userProfile?.displayName}'s JomBro Profile!`,
+            text: `Level ${userProfile?.level} challenger with ${userProfile?.challenges} completed challenges!`,
+            url: profileUrl
+        });
+    } else {
+        // Fallback: copy to clipboard
+        navigator.clipboard.writeText(profileUrl);
+        showToast('🔗 Profile link copied!', 'success');
+    }
+}
+
+function viewFullStats() {
+    alert(`📊 Detailed Stats:\n\nTotal Challenges: ${userProfile?.challenges || 0}\nSuccess Rate: 94%\nAverage Score: 87.5\nFavorite Category: Social Connection\nTotal Distance Traveled: 45.2 km\nCoffee Shops Visited: 12\nNew Friends Made: 8\n\nFull analytics dashboard coming soon!`);
+}
     </script>
 </body>
 </html>
