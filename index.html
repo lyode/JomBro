@@ -747,10 +747,21 @@
             letter-spacing: -1px;
         }
 
-        .logo-subtitle {
-            font-size: 11px;
-            color: var(--text-secondary);
+        .logo-slogan {
+            font-size: 10px;
+            color: var(--primary-pink);
             margin-top: -2px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            opacity: 0.9;
+            animation: pulse 3s infinite;
+        }
+
+        .logo-subtitle {
+            font-size: 9px;
+            color: var(--text-secondary);
+            margin-top: 2px;
             opacity: 0.8;
         }
 
@@ -1031,6 +1042,24 @@
         .mb-20 {
             margin-bottom: 20px;
         }
+
+        .hashtag {
+            background: rgba(139, 92, 246, 0.15);
+            border: 1px solid rgba(139, 92, 246, 0.3);
+            color: var(--primary-purple);
+            padding: 5px 10px;
+            border-radius: 10px;
+            font-size: 12px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-block;
+        }
+
+        .hashtag:hover {
+            background: rgba(139, 92, 246, 0.25);
+            transform: scale(1.05);
+        }
     </style>
 </head>
 <body>
@@ -1064,6 +1093,7 @@
             <div class="glass-header">
                 <div class="logo-section" onclick="showProfile()">
                     <div class="logo-text">JomBro</div>
+                    <div class="logo-slogan">Let's go! Let's Go!</div>
                     <div class="logo-subtitle" id="userDisplayName">Loading...</div>
                 </div>
                 <div class="header-actions">
@@ -1100,10 +1130,48 @@
 
                 <!-- Main Challenge -->
                 <div class="challenge-main">
-                    <div class="challenge-title">Coffee Shop Poetry Challenge</div>
-                    <div class="challenge-description">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                        <div style="display: flex; align-items: center; gap: 10px;">
+                            <div id="challengeCategory" style="background: var(--primary-pink); color: white; padding: 4px 10px; border-radius: 12px; font-size: 11px; font-weight: 600;">Social Connection</div>
+                            <div style="background: rgba(255, 255, 255, 0.1); color: var(--text-secondary); padding: 4px 8px; border-radius: 8px; font-size: 10px;">AI Generated</div>
+                        </div>
+                        <div style="display: flex; gap: 8px;">
+                            <button onclick="nextChallenge()" style="background: rgba(255, 255, 255, 0.1); border: none; color: var(--text-primary); padding: 6px 8px; border-radius: 8px; cursor: pointer; font-size: 12px;" title="Next Challenge">🔄</button>
+                            <button onclick="refreshChallenges()" style="background: rgba(255, 255, 255, 0.1); border: none; color: var(--text-primary); padding: 6px 8px; border-radius: 8px; cursor: pointer; font-size: 12px;" title="Generate New">✨</button>
+                            <button onclick="showChallengeLibrary()" style="background: rgba(255, 255, 255, 0.1); border: none; color: var(--text-primary); padding: 6px 8px; border-radius: 8px; cursor: pointer; font-size: 12px;" title="Challenge Library">📚</button>
+                        </div>
+                    </div>
+                    
+                    <div class="challenge-title" id="challengeTitle">Coffee Shop Poetry Challenge</div>
+                    <div class="challenge-description" id="challengeDescription">
                         Visit any coffee shop and ask the barista to write a short poem on your cup or napkin! 
                         Share your experience with friends and see who gets the most creative poem!
+                    </div>
+                    
+                    <div id="challengeHashtags" style="display: flex; flex-wrap: wrap; gap: 8px; margin: 15px 0;">
+                        <span class="hashtag">#CoffeePoetry</span>
+                        <span class="hashtag">#Connection</span>
+                        <span class="hashtag">#JomBro</span>
+                    </div>
+                    
+                    <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin: 20px 0;">
+                        <div style="text-align: center; background: rgba(255, 255, 255, 0.05); padding: 12px; border-radius: 10px;">
+                            <div style="font-size: 16px; font-weight: 700; color: var(--primary-pink);" id="challengeTokens">500</div>
+                            <div style="font-size: 10px; color: var(--text-secondary); text-transform: uppercase;">Tokens</div>
+                        </div>
+                        <div style="text-align: center; background: rgba(255, 255, 255, 0.05); padding: 12px; border-radius: 10px;">
+                            <div style="font-size: 16px; font-weight: 700; color: var(--primary-pink);" id="challengeDifficulty">Easy</div>
+                            <div style="font-size: 10px; color: var(--text-secondary); text-transform: uppercase;">Level</div>
+                        </div>
+                        <div style="text-align: center; background: rgba(255, 255, 255, 0.05); padding: 12px; border-radius: 10px;">
+                            <div style="font-size: 16px; font-weight: 700; color: var(--primary-pink);" id="challengeDuration">30m</div>
+                            <div style="font-size: 10px; color: var(--text-secondary); text-transform: uppercase;">Duration</div>
+                        </div>
+                    </div>
+                    
+                    <div style="background: rgba(139, 92, 246, 0.1); border: 1px solid rgba(139, 92, 246, 0.3); color: var(--primary-purple); padding: 12px; border-radius: 12px; margin: 15px 0; text-align: center;">
+                        <div style="font-size: 12px; font-weight: 600; margin-bottom: 4px;">🤖 AI Recommendation</div>
+                        <div style="font-size: 11px;" id="aiReason">Perfect for building connections and boosting your social confidence!</div>
                     </div>
                 </div>
 
@@ -1280,6 +1348,27 @@
         </div>
     </div>
 
+    <!-- Challenge Library Modal -->
+    <div id="challengeLibraryModal" class="modal">
+        <div class="modal-content" style="max-width: 500px;">
+            <div class="modal-header">
+                <div class="modal-title">📚 Challenge Library</div>
+                <button class="modal-close" onclick="hideModal('challengeLibrary')">&times;</button>
+            </div>
+
+            <div style="margin-bottom: 20px;">
+                <div style="font-size: 12px; color: var(--text-secondary); margin-bottom: 10px;">Choose from AI-curated challenge categories:</div>
+                <div id="challengeCategories" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px;">
+                    <!-- Categories will be populated here -->
+                </div>
+            </div>
+
+            <div id="categorychallenges" style="max-height: 300px; overflow-y: auto;">
+                <!-- Challenges will be populated here -->
+            </div>
+        </div>
+    </div>
+
     <!-- Groups Modal -->
     <div id="groupsModal" class="modal">
         <div class="modal-content">
@@ -1329,6 +1418,589 @@
         let userProfile = {};
         let friendsList = [];
         let groupsList = [];
+        let currentChallengeIndex = 0;
+        let availableChallenges = [];
+
+        // AI Challenge Generation System
+        const challengeCategories = {
+            SOCIAL: {
+                name: 'Social Connection',
+                icon: '👥',
+                color: '#ff6b9d',
+                challenges: [
+                    {
+                        title: 'Coffee Shop Poetry Challenge',
+                        description: 'Visit any coffee shop and ask the barista to write a short poem on your cup or napkin! Share your experience with friends and see who gets the most creative poem!',
+                        difficulty: 'Easy',
+                        duration: '30m',
+                        tokens: 500,
+                        hashtags: ['#CoffeePoetry', '#Connection', '#JomBro']
+                    },
+                    {
+                        title: 'Compliment Stranger Challenge',
+                        description: 'Give genuine compliments to 5 strangers today. Notice their reactions and spread positivity wherever you go!',
+                        difficulty: 'Medium',
+                        duration: '45m',
+                        tokens: 750,
+                        hashtags: ['#Kindness', '#Positivity', '#Social']
+                    },
+                    {
+                        title: 'Random Acts of Kindness',
+                        description: 'Perform 3 random acts of kindness for strangers. Pay for someone\'s coffee, help carry groceries, or leave encouraging notes!',
+                        difficulty: 'Easy',
+                        duration: '60m',
+                        tokens: 600,
+                        hashtags: ['#Kindness', '#RandomActs', '#Helping']
+                    },
+                    {
+                        title: 'Start a Conversation Challenge',
+                        description: 'Start meaningful conversations with 3 people you don\'t know well. Ask about their passions, dreams, or interesting experiences!',
+                        difficulty: 'Hard',
+                        duration: '90m',
+                        tokens: 1000,
+                        hashtags: ['#Conversation', '#Connection', '#People']
+                    }
+                ]
+            },
+            ADVENTURE: {
+                name: 'Adventure & Exploration',
+                icon: '🗺️',
+                color: '#8b5cf6',
+                challenges: [
+                    {
+                        title: 'Hidden Gem Discovery',
+                        description: 'Find and explore a place in your city you\'ve never been to before. Take photos and share what makes it special!',
+                        difficulty: 'Easy',
+                        duration: '120m',
+                        tokens: 800,
+                        hashtags: ['#Exploration', '#Discovery', '#Hidden']
+                    },
+                    {
+                        title: 'Public Transport Adventure',
+                        description: 'Take public transport to a random stop and explore the area for 1 hour. Document your unexpected discoveries!',
+                        difficulty: 'Medium',
+                        duration: '90m',
+                        tokens: 700,
+                        hashtags: ['#Adventure', '#Random', '#Transport']
+                    },
+                    {
+                        title: 'Sunrise/Sunset Quest',
+                        description: 'Wake up early or stay up to watch a sunrise or sunset from somewhere you\'ve never watched it before!',
+                        difficulty: 'Medium',
+                        duration: '60m',
+                        tokens: 650,
+                        hashtags: ['#Nature', '#Sunrise', '#Peaceful']
+                    }
+                ]
+            },
+            CREATIVE: {
+                name: 'Creative Expression',
+                icon: '🎨',
+                color: '#00d4ff',
+                challenges: [
+                    {
+                        title: 'Street Art Photography',
+                        description: 'Find and photograph 10 pieces of street art, murals, or creative displays in your area. Create a mini photo story!',
+                        difficulty: 'Easy',
+                        duration: '75m',
+                        tokens: 550,
+                        hashtags: ['#StreetArt', '#Photography', '#Creative']
+                    },
+                    {
+                        title: 'One-Minute Video Story',
+                        description: 'Create a 1-minute video telling a story about your day, neighborhood, or something that inspires you!',
+                        difficulty: 'Medium',
+                        duration: '45m',
+                        tokens: 700,
+                        hashtags: ['#Video', '#Storytelling', '#Creative']
+                    },
+                    {
+                        title: 'Sidewalk Chalk Art',
+                        description: 'Create sidewalk chalk art that will brighten someone\'s day. Write positive messages or draw something beautiful!',
+                        difficulty: 'Easy',
+                        duration: '40m',
+                        tokens: 500,
+                        hashtags: ['#ChalkArt', '#Public', '#Positive']
+                    }
+                ]
+            },
+            FITNESS: {
+                name: 'Health & Fitness',
+                icon: '💪',
+                color: '#10b981',
+                challenges: [
+                    {
+                        title: 'Stairs Only Challenge',
+                        description: 'Avoid elevators and escalators for the entire day. Take the stairs everywhere and count your total steps climbed!',
+                        difficulty: 'Medium',
+                        duration: 'All Day',
+                        tokens: 800,
+                        hashtags: ['#Fitness', '#Stairs', '#Health']
+                    },
+                    {
+                        title: 'Walking Meeting Challenge',
+                        description: 'Turn your next meeting or phone call into a walking session. Combine productivity with movement!',
+                        difficulty: 'Easy',
+                        duration: '30m',
+                        tokens: 400,
+                        hashtags: ['#Walking', '#Productivity', '#Health']
+                    },
+                    {
+                        title: 'Exercise in Nature',
+                        description: 'Do a 30-minute workout outdoors - in a park, beach, or your backyard. Fresh air + fitness = amazing!',
+                        difficulty: 'Medium',
+                        duration: '30m',
+                        tokens: 600,
+                        hashtags: ['#Nature', '#Outdoor', '#Fitness']
+                    }
+                ]
+            },
+            LEARNING: {
+                name: 'Learning & Growth',
+                icon: '📚',
+                color: '#f59e0b',
+                challenges: [
+                    {
+                        title: 'Learn 10 New Words',
+                        description: 'Learn 10 new words in any language and use them in conversations today. Expand your vocabulary!',
+                        difficulty: 'Easy',
+                        duration: '40m',
+                        tokens: 450,
+                        hashtags: ['#Language', '#Learning', '#Words']
+                    },
+                    {
+                        title: 'Teach Someone Something',
+                        description: 'Teach someone a skill you know - cooking, music, tech, anything! Share knowledge and make connections.',
+                        difficulty: 'Medium',
+                        duration: '60m',
+                        tokens: 700,
+                        hashtags: ['#Teaching', '#Sharing', '#Skills']
+                    },
+                    {
+                        title: 'Local History Discovery',
+                        description: 'Research and learn 5 interesting facts about your city\'s history. Share what surprised you most!',
+                        difficulty: 'Easy',
+                        duration: '45m',
+                        tokens: 500,
+                        hashtags: ['#History', '#Local', '#Facts']
+                    }
+                ]
+            },
+            MINDFULNESS: {
+                name: 'Mindfulness & Wellness',
+                icon: '🧘',
+                color: '#a855f7',
+                challenges: [
+                    {
+                        title: 'Digital Detox Hour',
+                        description: 'Spend 1 hour completely offline. Read, meditate, walk, or just be present without any digital devices!',
+                        difficulty: 'Hard',
+                        duration: '60m',
+                        tokens: 800,
+                        hashtags: ['#DigitalDetox', '#Mindfulness', '#Present']
+                    },
+                    {
+                        title: 'Gratitude Photo Series',
+                        description: 'Take photos of 5 things you\'re grateful for today and write a short gratitude note for each one.',
+                        difficulty: 'Easy',
+                        duration: '30m',
+                        tokens: 400,
+                        hashtags: ['#Gratitude', '#Mindfulness', '#Positive']
+                    },
+                    {
+                        title: 'Meditation in Public',
+                        description: 'Find a peaceful public spot and meditate for 15 minutes. Practice mindfulness surrounded by city life.',
+                        difficulty: 'Medium',
+                        duration: '20m',
+                        tokens: 550,
+                        hashtags: ['#Meditation', '#Public', '#Peace']
+                    }
+                ]
+            }
+        };
+
+        // AI-Powered Challenge Recommendation System
+        function generateAIChallenge() {
+            const categories = Object.keys(challengeCategories);
+            const userPreferences = getUserPreferences();
+            
+            // Weight categories based on user history and preferences
+            let weightedCategories = categories.map(cat => ({
+                category: cat,
+                weight: calculateCategoryWeight(cat, userPreferences)
+            }));
+            
+            // Sort by weight and add some randomness
+            weightedCategories.sort((a, b) => b.weight - a.weight);
+            
+            // Select category (70% chance for top preference, 30% for variety)
+            const selectedCategory = Math.random() < 0.7 ? 
+                weightedCategories[0].category : 
+                categories[Math.floor(Math.random() * categories.length)];
+            
+            const challenges = challengeCategories[selectedCategory].challenges;
+            const selectedChallenge = challenges[Math.floor(Math.random() * challenges.length)];
+            
+            return {
+                ...selectedChallenge,
+                category: selectedCategory,
+                categoryInfo: challengeCategories[selectedCategory],
+                aiReason: generateAIReason(selectedCategory, selectedChallenge, userPreferences)
+            };
+        }
+
+        function getUserPreferences() {
+            // Analyze user's completed challenges, interests, and behavior
+            return {
+                preferredDifficulty: userProfile.preferredDifficulty || 'Medium',
+                completedCategories: userProfile.completedCategories || {},
+                timePreference: userProfile.timePreference || 'medium',
+                socialLevel: userProfile.socialLevel || 'medium',
+                currentStreak: userProfile.streak || 0,
+                level: userProfile.level || 1
+            };
+        }
+
+        function calculateCategoryWeight(category, preferences) {
+            let weight = 1;
+            
+            // Boost categories user hasn't tried much
+            const completed = preferences.completedCategories[category] || 0;
+            if (completed < 3) weight += 0.5;
+            
+            // Adjust based on user level
+            if (category === 'SOCIAL' && preferences.socialLevel === 'high') weight += 0.3;
+            if (category === 'ADVENTURE' && preferences.level > 3) weight += 0.2;
+            if (category === 'MINDFULNESS' && preferences.currentStreak > 5) weight += 0.2;
+            
+            // Add randomness for variety
+            weight += Math.random() * 0.3;
+            
+            return weight;
+        }
+
+        function generateAIReason(category, challenge, preferences) {
+            const reasons = {
+                SOCIAL: [
+                    "Perfect for building connections and boosting your social confidence!",
+                    "Great way to practice your people skills and spread positivity!",
+                    "This will help you step out of your comfort zone in a fun way!"
+                ],
+                ADVENTURE: [
+                    "Time for some exploration! This matches your adventurous spirit!",
+                    "Perfect for discovering something new in your area!",
+                    "Great way to break your routine and see the world differently!"
+                ],
+                CREATIVE: [
+                    "Let your creativity shine! This will unlock your artistic side!",
+                    "Perfect for expressing yourself and creating something beautiful!",
+                    "Great way to see the world through an artistic lens!"
+                ],
+                FITNESS: [
+                    "Excellent for staying active and energized!",
+                    "Perfect way to combine health with fun activities!",
+                    "Great for building healthy habits that stick!"
+                ],
+                LEARNING: [
+                    "Perfect for expanding your knowledge and growing as a person!",
+                    "Great way to challenge your brain and learn something new!",
+                    "Excellent for building skills you can use forever!"
+                ],
+                MINDFULNESS: [
+                    "Perfect for finding peace and balance in your day!",
+                    "Great way to practice being present and grateful!",
+                    "Excellent for mental wellness and inner growth!"
+                ]
+            };
+            
+            const categoryReasons = reasons[category] || reasons.SOCIAL;
+            return categoryReasons[Math.floor(Math.random() * categoryReasons.length)];
+        }
+
+        // Challenge Management Functions
+        function initializeChallenges() {
+            // Generate initial pool of challenges
+            availableChallenges = [
+                generateAIChallenge(),
+                generateAIChallenge(),
+                generateAIChallenge()
+            ];
+            
+            // Display first challenge
+            displayCurrentChallenge();
+        }
+
+        function displayCurrentChallenge() {
+            const challenge = availableChallenges[currentChallengeIndex];
+            if (!challenge) return;
+            
+            document.getElementById('challengeTitle').textContent = challenge.title;
+            document.getElementById('challengeDescription').textContent = challenge.description;
+            document.getElementById('challengeCategory').textContent = challenge.categoryInfo.name;
+            document.getElementById('challengeDifficulty').textContent = challenge.difficulty;
+            document.getElementById('challengeDuration').textContent = challenge.duration;
+            document.getElementById('challengeTokens').textContent = challenge.tokens;
+            document.getElementById('aiReason').textContent = challenge.aiReason;
+            
+            // Update category badge color
+            const categoryBadge = document.getElementById('challengeCategory');
+            if (categoryBadge) {
+                categoryBadge.style.background = challenge.categoryInfo.color;
+                categoryBadge.style.color = 'white';
+            }
+            
+            // Update hashtags
+            const hashtagsContainer = document.getElementById('challengeHashtags');
+            if (hashtagsContainer) {
+                hashtagsContainer.innerHTML = challenge.hashtags.map(tag => 
+                    `<span class="hashtag" style="border-color: ${challenge.categoryInfo.color};" onclick="searchHashtag('${tag}')">${tag}</span>`
+                ).join('');
+            }
+        }
+
+        function nextChallenge() {
+            currentChallengeIndex = (currentChallengeIndex + 1) % availableChallenges.length;
+            
+            // Generate new challenge if we've seen all
+            if (currentChallengeIndex === 0) {
+                availableChallenges.push(generateAIChallenge());
+            }
+            
+            displayCurrentChallenge();
+            
+            // Show notification
+            showToast('🎯 New AI-generated challenge loaded!', 'success');
+        }
+
+        function refreshChallenges() {
+            // Generate 3 new challenges
+            availableChallenges = [
+                generateAIChallenge(),
+                generateAIChallenge(),
+                generateAIChallenge()
+            ];
+            currentChallengeIndex = 0;
+            displayCurrentChallenge();
+            
+            showToast('✨ Fresh challenges generated by AI!', 'success');
+        }
+
+        function showChallengeLibrary() {
+            // Create modal content for challenge library
+            showChallengeLibraryModal();
+        }
+
+        function showChallengeLibraryModal() {
+            showModal('challengeLibrary');
+            populateChallengeLibrary();
+        }
+
+        function populateChallengeLibrary() {
+            const categoriesContainer = document.getElementById('challengeCategories');
+            const challengesContainer = document.getElementById('categorychallenges');
+            
+            // Populate categories
+            categoriesContainer.innerHTML = Object.keys(challengeCategories).map(categoryKey => {
+                const category = challengeCategories[categoryKey];
+                return `
+                    <div onclick="showCategoryChallenges('${categoryKey}')" style="
+                        background: linear-gradient(135deg, ${category.color}20, ${category.color}10);
+                        border: 1px solid ${category.color}40;
+                        color: var(--text-primary);
+                        padding: 15px;
+                        border-radius: 12px;
+                        cursor: pointer;
+                        transition: all 0.3s ease;
+                        text-align: center;
+                    " onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
+                        <div style="font-size: 24px; margin-bottom: 8px;">${category.icon}</div>
+                        <div style="font-size: 12px; font-weight: 600;">${category.name}</div>
+                        <div style="font-size: 10px; color: var(--text-secondary); margin-top: 4px;">
+                            ${category.challenges.length} challenges
+                        </div>
+                    </div>
+                `;
+            }).join('');
+            
+            // Show all challenges initially
+            showAllChallenges();
+        }
+
+        function showCategoryChallenges(categoryKey) {
+            const category = challengeCategories[categoryKey];
+            const challengesContainer = document.getElementById('categorychallenges');
+            
+            challengesContainer.innerHTML = `
+                <div style="margin-bottom: 15px; display: flex; align-items: center; gap: 10px;">
+                    <div style="font-size: 20px;">${category.icon}</div>
+                    <div>
+                        <div style="font-size: 14px; font-weight: 600;">${category.name}</div>
+                        <div style="font-size: 11px; color: var(--text-secondary);">${category.challenges.length} available challenges</div>
+                    </div>
+                </div>
+                ${category.challenges.map(challenge => `
+                    <div onclick="selectChallengeFromLibrary('${categoryKey}', '${challenge.title}')" style="
+                        background: rgba(255, 255, 255, 0.05);
+                        border: 1px solid rgba(255, 255, 255, 0.1);
+                        border-radius: 12px;
+                        padding: 15px;
+                        margin-bottom: 10px;
+                        cursor: pointer;
+                        transition: all 0.3s ease;
+                    " onmouseover="this.style.background='rgba(255, 255, 255, 0.1)'" onmouseout="this.style.background='rgba(255, 255, 255, 0.05)'">
+                        <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px;">
+                            <div style="font-size: 14px; font-weight: 600; flex: 1;">${challenge.title}</div>
+                            <div style="display: flex; gap: 8px; flex-shrink: 0;">
+                                <span style="background: ${category.color}; color: white; padding: 2px 8px; border-radius: 8px; font-size: 10px; font-weight: 600;">${challenge.difficulty}</span>
+                                <span style="background: rgba(255, 255, 255, 0.1); color: var(--text-secondary); padding: 2px 8px; border-radius: 8px; font-size: 10px;">${challenge.duration}</span>
+                            </div>
+                        </div>
+                        <div style="font-size: 12px; color: var(--text-secondary); line-height: 1.4; margin-bottom: 8px;">
+                            ${challenge.description}
+                        </div>
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <div style="display: flex; gap: 4px;">
+                                ${challenge.hashtags.slice(0, 2).map(tag => `
+                                    <span style="font-size: 9px; color: ${category.color}; background: ${category.color}20; padding: 2px 6px; border-radius: 6px;">${tag}</span>
+                                `).join('')}
+                            </div>
+                            <div style="font-size: 12px; font-weight: 600; color: var(--primary-pink);">
+                                ${challenge.tokens} tokens
+                            </div>
+                        </div>
+                    </div>
+                `).join('')}
+            `;
+        }
+
+        function showAllChallenges() {
+            const challengesContainer = document.getElementById('categorychallenges');
+            let allChallenges = [];
+            
+            Object.keys(challengeCategories).forEach(categoryKey => {
+                const category = challengeCategories[categoryKey];
+                category.challenges.forEach(challenge => {
+                    allChallenges.push({
+                        ...challenge,
+                        categoryKey,
+                        category
+                    });
+                });
+            });
+            
+            // Shuffle and show random selection
+            allChallenges.sort(() => Math.random() - 0.5);
+            const selectedChallenges = allChallenges.slice(0, 8);
+            
+            challengesContainer.innerHTML = `
+                <div style="margin-bottom: 15px;">
+                    <div style="font-size: 14px; font-weight: 600; margin-bottom: 4px;">✨ Featured Challenges</div>
+                    <div style="font-size: 11px; color: var(--text-secondary);">AI-curated selection for you</div>
+                </div>
+                ${selectedChallenges.map(challenge => `
+                    <div onclick="selectChallengeFromLibrary('${challenge.categoryKey}', '${challenge.title}')" style="
+                        background: rgba(255, 255, 255, 0.05);
+                        border: 1px solid rgba(255, 255, 255, 0.1);
+                        border-radius: 12px;
+                        padding: 15px;
+                        margin-bottom: 10px;
+                        cursor: pointer;
+                        transition: all 0.3s ease;
+                    " onmouseover="this.style.background='rgba(255, 255, 255, 0.1)'" onmouseout="this.style.background='rgba(255, 255, 255, 0.05)'">
+                        <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px;">
+                            <div style="display: flex; align-items: center; gap: 8px; flex: 1;">
+                                <span style="font-size: 16px;">${challenge.category.icon}</span>
+                                <div style="font-size: 14px; font-weight: 600;">${challenge.title}</div>
+                            </div>
+                            <div style="display: flex; gap: 8px; flex-shrink: 0;">
+                                <span style="background: ${challenge.category.color}; color: white; padding: 2px 8px; border-radius: 8px; font-size: 10px; font-weight: 600;">${challenge.difficulty}</span>
+                                <span style="background: rgba(255, 255, 255, 0.1); color: var(--text-secondary); padding: 2px 8px; border-radius: 8px; font-size: 10px;">${challenge.duration}</span>
+                            </div>
+                        </div>
+                        <div style="font-size: 12px; color: var(--text-secondary); line-height: 1.4; margin-bottom: 8px;">
+                            ${challenge.description.substring(0, 100)}...
+                        </div>
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <div style="font-size: 10px; color: ${challenge.category.color}; background: ${challenge.category.color}20; padding: 2px 8px; border-radius: 6px;">
+                                ${challenge.category.name}
+                            </div>
+                            <div style="font-size: 12px; font-weight: 600; color: var(--primary-pink);">
+                                ${challenge.tokens} tokens
+                            </div>
+                        </div>
+                    </div>
+                `).join('')}
+            `;
+        }
+
+        function selectChallengeFromLibrary(categoryKey, challengeTitle) {
+            const category = challengeCategories[categoryKey];
+            const challenge = category.challenges.find(c => c.title === challengeTitle);
+            
+            if (challenge) {
+                // Create enhanced challenge object
+                const enhancedChallenge = {
+                    ...challenge,
+                    category: categoryKey,
+                    categoryInfo: category,
+                    aiReason: generateAIReason(categoryKey, challenge, getUserPreferences())
+                };
+                
+                // Add to available challenges and set as current
+                availableChallenges.unshift(enhancedChallenge);
+                currentChallengeIndex = 0;
+                displayCurrentChallenge();
+                
+                hideModal('challengeLibrary');
+                showToast(`🎯 Selected: ${challenge.title}`, 'success');
+            }
+        }
+
+        function searchHashtag(hashtag) {
+            alert(`🔍 Searching for challenges with ${hashtag}... Feature coming soon!`);
+        }
+
+        function showToast(message, type = 'info') {
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+            toast.textContent = message;
+            
+            // Style the toast
+            Object.assign(toast.style, {
+                position: 'fixed',
+                top: '20px',
+                left: '50%',
+                transform: 'translateX(-50%)',
+                background: type === 'success' ? 'var(--success-green)' : 'var(--primary-pink)',
+                color: 'white',
+                padding: '12px 20px',
+                borderRadius: '10px',
+                zIndex: '4000',
+                fontSize: '14px',
+                fontWeight: '600',
+                opacity: '0',
+                transition: 'all 0.3s ease'
+            });
+            
+            document.body.appendChild(toast);
+            
+            // Animate in
+            setTimeout(() => {
+                toast.style.opacity = '1';
+                toast.style.transform = 'translateX(-50%) translateY(10px)';
+            }, 100);
+            
+            // Remove after 3 seconds
+            setTimeout(() => {
+                toast.style.opacity = '0';
+                toast.style.transform = 'translateX(-50%) translateY(-10px)';
+                setTimeout(() => {
+                    if (toast.parentNode) {
+                        toast.parentNode.removeChild(toast);
+                    }
+                }, 300);
+            }, 3000);
+        }
 
         // Authentication Functions
         async function signInWithGoogle() {
@@ -1999,6 +2671,7 @@
                 initializeLiveUsers();
                 loadFriends();
                 loadGroups();
+                initializeChallenges();
                 
                 console.log('User signed in:', user);
             } else {
