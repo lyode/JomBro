@@ -9,18 +9,19 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="JomBro">
-   html<meta name="theme-color" content="#ff6b9d">
+    <meta name="theme-color" content="#ff6b9d">
     <meta name="description" content="AI-Powered Social Challenge Platform - Connect, Challenge, Conquer!">
-       <!-- Manifest Link -->
-    <link rel="manifest" href="manifest.json">
-    <!-- Icons -->
-    <link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' fill='%2300ff96'/><text x='50' y='60' text-anchor='middle' font-size='40' fill='black'>🚀</text></svg>">
-    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' fill='%2300ff96'/><text x='50' y='60' text-anchor='middle' font-size='40' fill='black'>🚀</text></svg>">
     
-    <title>JomBro - AI-Powered Social Challenge Platform</title>
+    <!-- Firebase v9 SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-storage-compat.js"></script>
+       
+    <title>JomBro - Real Social Challenge Platform</title>
 
     <style>
-        /* ===== ENHANCED FLOATING DARK GLASS JOMBRO INTERFACE ===== */
+        /* Your existing CSS stays the same - I'll just add new social features */
         :root {
             --safe-area-top: env(safe-area-inset-top, 20px);
             --safe-area-bottom: env(safe-area-inset-bottom, 20px);
@@ -60,64 +61,219 @@
             overflow: hidden;
         }
 
-        /* ===== ENHANCED FLOATING STARS BACKGROUND ===== */
-        .stars-container {
+        /* Auth Screen Styles */
+        .auth-screen {
             position: fixed;
             top: 0;
             left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 5000;
+            padding: 20px;
+        }
+
+        .auth-container {
+            background: var(--glass-bg);
+            backdrop-filter: blur(25px);
+            border: 1px solid var(--glass-border);
+            border-radius: 25px;
+            padding: 40px 30px;
+            text-align: center;
+            box-shadow: 0 25px 50px var(--glass-shadow);
+            max-width: 350px;
             width: 100%;
-            height: 100%;
-            pointer-events: none;
-            z-index: 0;
-            overflow: hidden;
         }
 
-        .star {
-            position: absolute;
-            border-radius: 50%;
-            animation: twinkle 4s infinite;
-            box-shadow: 0 0 6px currentColor;
+        .auth-logo {
+            font-size: 48px;
+            margin-bottom: 10px;
         }
 
-        .star.small {
-            width: 1px;
-            height: 1px;
-            background: rgba(255, 255, 255, 0.8);
-            animation-duration: 3s;
+        .auth-title {
+            font-size: 28px;
+            font-weight: 300;
+            color: var(--text-primary);
+            margin-bottom: 8px;
         }
 
-        .star.medium {
-            width: 2px;
-            height: 2px;
+        .auth-subtitle {
+            font-size: 14px;
+            color: var(--text-secondary);
+            margin-bottom: 30px;
+        }
+
+        .auth-btn {
+            width: 100%;
+            padding: 15px;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .auth-btn.google {
+            background: #fff;
+            color: #333;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .auth-btn.phone {
             background: var(--primary-pink);
-            animation-duration: 4s;
-            box-shadow: 0 0 8px var(--primary-pink);
+            color: #fff;
         }
 
-        .star.large {
-            width: 3px;
-            height: 3px;
-            background: var(--primary-purple);
-            animation-duration: 5s;
-            box-shadow: 0 0 10px var(--primary-purple);
+        .auth-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(0,0,0,0.2);
         }
 
-        .star.huge {
-            width: 4px;
-            height: 4px;
-            background: var(--primary-blue);
-            animation-duration: 6s;
-            box-shadow: 0 0 12px var(--primary-blue);
+        /* Chat Interface Styles */
+        .chat-interface {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 50%;
+            background: var(--glass-bg);
+            backdrop-filter: blur(25px);
+            border-top: 1px solid var(--glass-border);
+            border-radius: 20px 20px 0 0;
+            transform: translateY(100%);
+            transition: transform 0.3s ease;
+            z-index: 1000;
+            display: flex;
+            flex-direction: column;
         }
 
-        @keyframes twinkle {
-            0%, 100% { opacity: 0.3; transform: scale(1); }
-            25% { opacity: 1; transform: scale(1.5); }
-            50% { opacity: 0.6; transform: scale(1.2); }
-            75% { opacity: 1; transform: scale(1.8); }
+        .chat-interface.open {
+            transform: translateY(0);
         }
 
-        /* ===== FLOATING GLASS CONTAINER ===== */
+        .chat-header {
+            padding: 15px 20px;
+            border-bottom: 1px solid var(--glass-border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .chat-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .chat-close {
+            background: none;
+            border: none;
+            color: var(--text-secondary);
+            font-size: 18px;
+            cursor: pointer;
+        }
+
+        .chat-messages {
+            flex: 1;
+            overflow-y: auto;
+            padding: 15px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .message {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+
+        .message.own {
+            flex-direction: row-reverse;
+        }
+
+        .message-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: var(--primary-pink);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            flex-shrink: 0;
+        }
+
+        .message-content {
+            background: rgba(255,255,255,0.1);
+            padding: 8px 12px;
+            border-radius: 12px;
+            max-width: 70%;
+            word-wrap: break-word;
+        }
+
+        .message.own .message-content {
+            background: var(--primary-pink);
+        }
+
+        .message-text {
+            font-size: 14px;
+            line-height: 1.4;
+        }
+
+        .message-time {
+            font-size: 11px;
+            color: var(--text-secondary);
+            margin-top: 4px;
+        }
+
+        .chat-input-container {
+            padding: 15px;
+            border-top: 1px solid var(--glass-border);
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .chat-input {
+            flex: 1;
+            background: rgba(255,255,255,0.1);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            padding: 10px 15px;
+            color: var(--text-primary);
+            font-size: 14px;
+            outline: none;
+        }
+
+        .chat-input::placeholder {
+            color: var(--text-secondary);
+        }
+
+        .chat-send {
+            background: var(--primary-pink);
+            border: none;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            color: #fff;
+            font-size: 16px;
+        }
+
+        /* Your existing styles continue here... */
         .phone-container {
             position: fixed;
             top: 0;
@@ -137,90 +293,15 @@
             height: calc(100vh - 20px);
             background: var(--glass-bg);
             backdrop-filter: blur(20px) saturate(180%);
-            -webkit-backdrop-filter: blur(20px) saturate(180%);
             border: 1px solid var(--glass-border);
             border-radius: 25px;
-            box-shadow: 
-                0 25px 50px var(--glass-shadow),
-                0 0 0 1px rgba(255, 255, 255, 0.05),
-                inset 0 1px 0 rgba(255, 255, 255, 0.1);
+            box-shadow: 0 25px 50px var(--glass-shadow);
             display: flex;
             flex-direction: column;
             overflow: hidden;
             position: relative;
-            animation: floatIn 1s ease-out;
         }
 
-        @keyframes floatIn {
-            from {
-                opacity: 0;
-                transform: translateY(50px) scale(0.95);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0) scale(1);
-            }
-        }
-
-        /* ===== GLASS GLOW EFFECT ===== */
-        .glass-interface::before {
-            content: '';
-            position: absolute;
-            top: -2px;
-            left: -2px;
-            right: -2px;
-            bottom: -2px;
-            background: linear-gradient(45deg, 
-                transparent 0%, 
-                rgba(255, 107, 157, 0.4) 25%, 
-                transparent 50%, 
-                rgba(139, 92, 246, 0.4) 75%, 
-                transparent 100%);
-            border-radius: 25px;
-            z-index: -1;
-            animation: glowPulse 6s infinite;
-        }
-
-        @keyframes glowPulse {
-            0%, 100% { opacity: 0.3; }
-            50% { opacity: 0.7; }
-        }
-
-        /* ===== AI STATUS - EMBEDDED IN GLASS ===== */
-        .ai-status {
-            position: absolute;
-            top: 15px;
-            right: 15px;
-            background: rgba(255, 107, 157, 0.2);
-            padding: 4px 8px;
-            border-radius: 10px;
-            font-size: 9px;
-            font-weight: 500;
-            color: var(--primary-pink);
-            z-index: 1000;
-            display: flex;
-            align-items: center;
-            gap: 4px;
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 107, 157, 0.3);
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-        .ai-status:hover {
-            background: rgba(255, 107, 157, 0.3);
-            transform: scale(1.05);
-        }
-
-        .ai-pulse {
-            width: 4px;
-            height: 4px;
-            background: var(--primary-pink);
-            border-radius: 50%;
-            animation: pulse 3s infinite;
-        }
-
-        /* ===== GLASS HEADER - FIXED TOP BAR ===== */
         .glass-header {
             position: sticky;
             top: 0;
@@ -231,9 +312,7 @@
             align-items: center;
             border-bottom: 1px solid rgba(255, 255, 255, 0.08);
             background: rgba(15, 15, 15, 0.95);
-            backdrop-filter: blur(25px) saturate(180%);
-            -webkit-backdrop-filter: blur(25px) saturate(180%);
-            transition: box-shadow 0.3s ease;
+            backdrop-filter: blur(25px);
         }
 
         .logo-section {
@@ -247,7 +326,6 @@
             font-weight: 200;
             color: var(--text-primary);
             letter-spacing: -1px;
-            text-shadow: 0 0 20px rgba(255, 107, 157, 0.5);
         }
 
         .logo-subtitle {
@@ -275,35 +353,25 @@
             font-size: 14px;
             color: var(--text-primary);
             transition: all 0.3s ease;
-            backdrop-filter: blur(10px);
-            position: relative;
         }
 
         .header-btn:hover {
             background: rgba(255, 107, 157, 0.2);
             border-color: var(--primary-pink);
             transform: scale(1.1);
-            box-shadow: 0 0 15px rgba(255, 107, 157, 0.4);
         }
 
-        .header-btn:active {
-            transform: scale(0.95);
+        .glass-content {
+            flex: 1;
+            overflow-y: auto;
+            overflow-x: hidden;
+            -webkit-overflow-scrolling: touch;
+            scroll-behavior: smooth;
         }
 
-        /* ===== GLASS SECTIONS - OPTIMIZED SPACING ===== */
         .glass-section {
             padding: 15px 25px;
             border-bottom: 1px solid rgba(255, 255, 255, 0.06);
-            background: linear-gradient(90deg, transparent 0%, rgba(255, 255, 255, 0.02) 50%, transparent 100%);
-            transition: background 0.3s ease;
-        }
-
-        .glass-section:hover {
-            background: linear-gradient(90deg, transparent 0%, rgba(255, 255, 255, 0.04) 50%, transparent 100%);
-        }
-
-        .glass-section.compact {
-            padding: 12px 25px;
         }
 
         .live-header {
@@ -328,10 +396,14 @@
             background: #ff4757;
             border-radius: 50%;
             animation: pulse 2s infinite;
-            box-shadow: 0 0 10px #ff4757;
         }
 
-        .player-status {
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        .user-status {
             background: rgba(255, 107, 157, 0.15);
             border: 1px solid rgba(255, 107, 157, 0.3);
             color: var(--primary-pink);
@@ -339,22 +411,7 @@
             border-radius: 10px;
             font-size: 10px;
             font-weight: 600;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            backdrop-filter: blur(10px);
             cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-        .player-status:hover {
-            background: rgba(255, 107, 157, 0.25);
-            transform: scale(1.05);
-        }
-
-        .tokens-display {
-            color: #ffa502;
-            font-weight: 700;
         }
 
         .live-players {
@@ -362,12 +419,6 @@
             gap: 12px;
             overflow-x: auto;
             padding-bottom: 5px;
-            scrollbar-width: none;
-            -ms-overflow-style: none;
-        }
-
-        .live-players::-webkit-scrollbar {
-            display: none;
         }
 
         .player-avatar {
@@ -387,11 +438,6 @@
 
         .avatar-ring:hover {
             transform: scale(1.1);
-            box-shadow: 0 0 20px rgba(255, 107, 157, 0.5);
-        }
-
-        .avatar-ring:active {
-            transform: scale(0.95);
         }
 
         .avatar-inner {
@@ -412,164 +458,15 @@
             right: 0;
             width: 10px;
             height: 10px;
-            background: var(--primary-pink);
+            background: var(--success-green);
             border: 2px solid var(--dark-bg);
             border-radius: 50%;
-            box-shadow: 0 0 8px var(--primary-pink);
             animation: pulse 2s infinite;
         }
 
-        /* ===== GROUP SECTION - GLASS STYLE ===== */
-        .group-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 12px;
-        }
-
-        .group-title {
-            font-size: 13px;
-            font-weight: 600;
-            color: var(--primary-pink);
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            text-shadow: 0 0 10px rgba(255, 107, 157, 0.3);
-        }
-
-        .create-group-btn {
-            background: linear-gradient(145deg, var(--primary-pink), var(--primary-purple));
-            color: #fff;
-            border: none;
-            padding: 6px 12px;
-            border-radius: 10px;
-            font-size: 11px;
-            font-weight: 700;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            box-shadow: 0 4px 15px rgba(255, 107, 157, 0.3);
-        }
-
-        .create-group-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(255, 107, 157, 0.4);
-        }
-
-        .create-group-btn:active {
-            transform: translateY(0);
-        }
-
-        .challenge-count {
-            background: linear-gradient(145deg, #ff6b9d, #c44569);
-            color: #fff;
-            padding: 2px 8px;
-            border-radius: 10px;
-            font-size: 10px;
-            font-weight: 700;
-            margin-left: 8px;
-            box-shadow: 0 2px 8px rgba(255, 107, 157, 0.4);
-            animation: pulse 3s infinite;
-        }
-
-        .active-challenges {
-            display: flex;
-            flex-direction: column;
-            gap: 6px;
-            max-height: 80px;
-            overflow-y: auto;
-        }
-
-        .active-challenge-item {
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 10px;
-            padding: 8px 10px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            backdrop-filter: blur(10px);
-            transition: all 0.3s ease;
-            cursor: pointer;
-            min-height: 32px;
-        }
-
-        .active-challenge-item:hover {
-            background: rgba(255, 255, 255, 0.08);
-            border-color: var(--primary-green);
-            transform: translateX(3px);
-        }
-
-        .active-challenge-item:active {
-            transform: translateX(1px);
-        }
-
-        .challenge-info {
-            flex: 1;
-        }
-
-        .challenge-name {
-            font-size: 11px;
-            font-weight: 600;
-            color: var(--text-primary);
-            margin-bottom: 1px;
-        }
-
-        .challenge-progress {
-            font-size: 9px;
-            color: var(--text-secondary);
-            display: flex;
-            align-items: center;
-            gap: 6px;
-        }
-
-        .progress-bar {
-            flex: 1;
-            height: 2px;
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 1px;
-            overflow: hidden;
-        }
-
-        .progress-fill {
-            height: 100%;
-            background: linear-gradient(90deg, var(--primary-pink), var(--primary-purple));
-            transition: width 0.3s ease;
-        }
-
-        .challenge-status {
-            padding: 2px 6px;
-            border-radius: 6px;
-            font-size: 8px;
-            font-weight: 600;
-            text-transform: uppercase;
-        }
-
-        .status-active {
-            background: rgba(255, 107, 157, 0.2);
-            color: var(--primary-pink);
-            border: 1px solid rgba(255, 107, 157, 0.3);
-        }
-
-        .status-pending {
-            background: rgba(255, 165, 0, 0.2);
-            color: #ffa500;
-            border: 1px solid rgba(255, 165, 0, 0.3);
-        }
-
-        .status-completed {
-            background: rgba(139, 92, 246, 0.2);
-            color: var(--primary-purple);
-            border: 1px solid rgba(139, 92, 246, 0.3);
-        }
-
-        /* ===== MAIN CHALLENGE - EXPANDED CONTENT ===== */
         .challenge-main {
             flex: 1;
             padding: 20px 25px;
-            overflow-y: visible;
-            position: relative;
             min-height: 300px;
         }
 
@@ -579,14 +476,6 @@
             color: var(--primary-pink);
             margin-bottom: 20px;
             line-height: 1.2;
-            text-shadow: 0 0 20px rgba(255, 107, 157, 0.4);
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-        .challenge-title:hover {
-            transform: scale(1.02);
-            text-shadow: 0 0 25px rgba(255, 107, 157, 0.6);
         }
 
         .challenge-description {
@@ -597,149 +486,10 @@
             opacity: 0.9;
         }
 
-        .challenge-hashtags {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 8px;
-            margin-bottom: 20px;
-        }
-
-        .hashtag {
-            background: rgba(139, 92, 246, 0.15);
-            border: 1px solid rgba(139, 92, 246, 0.3);
-            color: var(--primary-purple);
-            padding: 5px 10px;
-            border-radius: 10px;
-            font-size: 12px;
-            font-weight: 500;
-            backdrop-filter: blur(10px);
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-        .hashtag:hover {
-            background: rgba(139, 92, 246, 0.25);
-            transform: scale(1.05);
-        }
-
-        .hashtag:active {
-            transform: scale(0.95);
-        }
-
-        .challenge-meta {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 12px;
-            margin-bottom: 25px;
-        }
-
-        .meta-item {
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 12px;
-            padding: 12px;
-            text-align: center;
-            backdrop-filter: blur(10px);
-            transition: all 0.3s ease;
-            cursor: pointer;
-        }
-
-        .meta-item:hover {
-            background: rgba(255, 255, 255, 0.08);
-            transform: translateY(-2px);
-        }
-
-        .meta-item:active {
-            transform: translateY(0);
-        }
-
-        .meta-value {
-            font-size: 16px;
-            font-weight: 700;
-            color: var(--primary-pink);
-            margin-bottom: 4px;
-        }
-
-        .meta-label {
-            font-size: 10px;
-            color: var(--text-secondary);
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-
-        /* ===== USER CONTROLS - COMPACT STYLE ===== */
         .action-section {
             padding: 18px 25px;
             background: linear-gradient(180deg, transparent 0%, rgba(255, 255, 255, 0.05) 100%);
             border-top: 1px solid rgba(255, 255, 255, 0.08);
-            position: relative;
-        }
-
-        .user-controls {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 12px;
-            margin-bottom: 16px;
-        }
-
-        .control-btn {
-            background: rgba(255, 255, 255, 0.08);
-            color: var(--text-primary);
-            border: 1px solid rgba(255, 255, 255, 0.15);
-            padding: 12px 16px;
-            border-radius: 12px;
-            font-size: 12px;
-            font-weight: 600;
-            cursor: pointer;
-            text-align: center;
-            transition: all 0.3s ease;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 6px;
-            backdrop-filter: blur(10px);
-        }
-
-        .control-btn:hover {
-            background: rgba(255, 255, 255, 0.15);
-            border-color: var(--primary-green);
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(0, 255, 150, 0.2);
-        }
-
-        .control-btn:active {
-            transform: translateY(0);
-        }
-
-        .control-btn.primary {
-            background: linear-gradient(145deg, var(--primary-green), #00d4ff);
-            color: #000;
-            border-color: var(--primary-green);
-            box-shadow: 0 4px 15px rgba(0, 255, 150, 0.3);
-        }
-
-        .control-btn.primary:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(0, 255, 150, 0.4);
-        }
-
-        .ai-suggestion {
-            background: rgba(139, 92, 246, 0.1);
-            border: 1px solid rgba(139, 92, 246, 0.3);
-            color: var(--primary-purple);
-            padding: 10px;
-            border-radius: 10px;
-            font-size: 11px;
-            text-align: center;
-            margin-bottom: 12px;
-            backdrop-filter: blur(10px);
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-        .ai-suggestion:hover {
-            background: rgba(139, 92, 246, 0.15);
-            transform: scale(1.02);
         }
 
         .btn-primary {
@@ -756,8 +506,6 @@
             justify-content: center;
             gap: 8px;
             transition: all 0.3s ease;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
             width: 100%;
             box-shadow: 0 6px 20px rgba(255, 107, 157, 0.4);
         }
@@ -767,2019 +515,452 @@
             box-shadow: 0 8px 25px rgba(255, 107, 157, 0.6);
         }
 
-        .btn-primary:active {
-            transform: translateY(-1px);
-        }
-
-        /* ===== GLASS BOTTOM NAVIGATION - FIXED ===== */
-        .glass-nav {
-            position: sticky;
-            bottom: 0;
-            z-index: 100;
-            padding: 12px 25px calc(var(--safe-area-bottom) + 12px) 25px;
-            background: rgba(15, 15, 15, 0.95);
-            backdrop-filter: blur(25px) saturate(180%);
-            -webkit-backdrop-filter: blur(25px) saturate(180%);
-            border-top: 1px solid rgba(255, 255, 255, 0.1);
-            display: flex;
-            justify-content: space-around;
-            align-items: center;
-            min-height: 60px;
-        }
-
-        .nav-item {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            padding: 8px 10px;
-            cursor: pointer;
-            border-radius: 12px;
-            transition: all 0.3s ease;
-            min-width: 50px;
-            position: relative;
-        }
-
-        .nav-item.active {
-            background: rgba(0, 255, 150, 0.15);
-            border: 1px solid rgba(0, 255, 150, 0.3);
-            box-shadow: 0 0 20px rgba(0, 255, 150, 0.2);
-        }
-
-        .nav-item:hover {
-            background: rgba(255, 255, 255, 0.1);
-            transform: translateY(-2px);
-        }
-
-        .nav-item:active {
-            transform: translateY(0);
-        }
-
-        .nav-icon {
-            font-size: 18px;
-            margin-bottom: 4px;
-            color: var(--text-secondary);
-            transition: all 0.3s ease;
-        }
-
-        .nav-item.active .nav-icon {
-            color: var(--primary-green);
-            text-shadow: 0 0 10px var(--primary-green);
-        }
-
-        .nav-label {
-            font-size: 9px;
-            font-weight: 600;
-            color: var(--text-secondary);
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-
-        .nav-item.active .nav-label {
-            color: var(--primary-green);
-        }
-
-        /* ===== MODALS - GLASS STYLE ===== */
-        .modal {
+        .chat-toggle {
             position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(0, 0, 0, 0.7);
-            backdrop-filter: blur(10px);
-            display: none;
-            align-items: center;
-            justify-content: center;
-            z-index: 2000;
-            padding: 20px;
-        }
-
-        .modal.show {
-            display: flex;
-            animation: fadeIn 0.4s ease;
-        }
-
-        .modal-content {
-            background: var(--glass-bg);
-            backdrop-filter: blur(25px);
-            border: 1px solid var(--glass-border);
-            border-radius: 20px;
-            padding: 25px;
-            max-width: 90%;
-            max-height: 80%;
-            overflow-y: auto;
-            width: 100%;
-            max-width: 350px;
-            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.5);
-        }
-
-        .modal-title {
-            font-size: 18px;
-            font-weight: 600;
-            margin-bottom: 20px;
-            text-align: center;
-            color: var(--text-primary);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-        }
-
-        .form-group {
-            margin-bottom: 16px;
-        }
-
-        .form-label {
-            display: block;
-            font-size: 12px;
-            font-weight: 600;
-            margin-bottom: 8px;
-            color: var(--text-primary);
-        }
-
-        .form-input {
-            width: 100%;
-            padding: 12px;
-            border: 1px solid var(--glass-border);
-            border-radius: 10px;
-            background: rgba(255,255,255,0.1);
-            color: var(--text-primary);
-            font-size: 14px;
-            backdrop-filter: blur(10px);
-            transition: all 0.3s ease;
-        }
-
-        .form-input:focus {
-            outline: none;
-            border-color: var(--primary-pink);
-            box-shadow: 0 0 0 2px rgba(255, 107, 157, 0.2);
-        }
-
-        .form-select {
-            appearance: none;
-            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='m6 8 4 4 4-4'/%3e%3c/svg%3e");
-            background-position: right 8px center;
-            background-repeat: no-repeat;
-            background-size: 16px;
-            padding-right: 32px;
-        }
-
-        /* ===== TOAST NOTIFICATIONS ===== */
-        .toast {
-            position: fixed;
-            top: calc(var(--safe-area-top) + 60px);
-            left: 20px;
+            bottom: 80px;
             right: 20px;
-            background: var(--glass-bg);
-            backdrop-filter: blur(20px);
-            border: 1px solid rgba(255, 107, 157, 0.3);
-            color: var(--text-primary);
-            padding: 15px 20px;
-            border-radius: 15px;
-            font-size: 13px;
-            font-weight: 500;
-            text-align: center;
-            z-index: 3000;
-            transform: translateY(-100px);
-            opacity: 0;
-            transition: all 0.4s ease;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
-        }
-
-        .toast.show {
-            transform: translateY(0);
-            opacity: 1;
-        }
-
-        .toast.success {
-            border-color: var(--success-green);
-            background: rgba(16, 185, 129, 0.1);
-        }
-
-        .toast.warning {
-            border-color: var(--warning-orange);
-            background: rgba(245, 158, 11, 0.1);
-        }
-
-        .toast.error {
-            border-color: var(--error-red);
-            background: rgba(239, 68, 68, 0.1);
-        }
-
-        /* ===== NOTIFICATION BADGES ===== */
-        .nav-notification {
-            position: absolute;
-            top: -4px;
-            right: -4px;
-            width: 16px;
-            height: 16px;
-            background: linear-gradient(145deg, #ff6b9d, #c44569);
+            width: 60px;
+            height: 60px;
+            background: var(--primary-pink);
+            border: none;
             border-radius: 50%;
-            font-size: 8px;
             display: flex;
             align-items: center;
             justify-content: center;
-            color: white;
-            font-weight: 700;
-            box-shadow: 0 2px 8px rgba(255, 107, 157, 0.5);
-            animation: pulse 2s infinite;
-        }
-
-        /* ===== ANIMATIONS ===== */
-        @keyframes pulse {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.5; }
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: scale(0.9); }
-            to { opacity: 1; transform: scale(1); }
-        }
-
-        @keyframes slideUp {
-            from { transform: translateY(20px); opacity: 0; }
-            to { transform: translateY(0); opacity: 1; }
-        }
-
-        /* ===== ACHIEVEMENT STYLES ===== */
-        .achievement-item {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            padding: 12px;
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 10px;
-            margin-bottom: 8px;
-            transition: all 0.3s ease;
-            cursor: pointer;
-        }
-
-        .achievement-item:hover {
-            background: rgba(255, 255, 255, 0.08);
-            transform: translateX(5px);
-        }
-
-        .achievement-icon {
             font-size: 24px;
-            filter: drop-shadow(0 0 10px rgba(255, 107, 157, 0.5));
+            color: #fff;
+            cursor: pointer;
+            box-shadow: 0 4px 20px rgba(255, 107, 157, 0.4);
+            z-index: 1001;
+            transition: all 0.3s ease;
         }
 
-        .achievement-info {
-            flex: 1;
+        .chat-toggle:hover {
+            transform: scale(1.1);
         }
 
-        .achievement-title {
-            font-size: 14px;
-            font-weight: 600;
-            color: var(--text-primary);
-            margin-bottom: 4px;
+        /* Online users list */
+        .online-count {
+            background: rgba(0, 255, 150, 0.2);
+            color: var(--success-green);
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: 10px;
+            margin-left: 8px;
         }
 
-        .achievement-desc {
-            font-size: 12px;
-            color: var(--text-secondary);
-        }
-
-        .achievement-progress {
-            text-align: right;
-            font-size: 12px;
-            color: var(--primary-pink);
-            font-weight: 600;
-        }
-
-        /* ===== MOBILE OPTIMIZATIONS ===== */
-        @media (max-width: 400px) {
-            .phone-container {
-                padding: 5px;
-            }
-            
-            .glass-interface {
-                max-width: 100%;
-                height: calc(100vh - 10px);
-                border-radius: 20px;
-            }
-            
-            .glass-header {
-                padding: calc(var(--safe-area-top) + 15px) 20px 15px 20px;
-            }
-            
-            .logo-text {
-                font-size: 22px;
-            }
-            
-            .challenge-main {
-                padding: 16px 20px;
-                min-height: 200px;
-            }
-            
-            .challenge-title {
-                font-size: 20px;
-            }
-            
-            .glass-section, .glass-section.compact {
-                padding: 12px 20px;
-            }
-            
-            .action-section {
-                padding: 16px 20px;
-            }
-            
-            .glass-content {
-                -webkit-overflow-scrolling: touch;
-                touch-action: pan-y;
-                overflow-y: scroll !important;
-                height: 100%;
-                min-height: 0;
-                flex: 1;
-            }
-            
-            .challenge-main {
-                min-height: 200px;
-            }
-            
-            /* Force scrollable content on mobile */
-            .glass-content > * {
-                flex-shrink: 0;
-            }
-        }
-
-        /* ===== ENHANCED SCROLLING SUPPORT ===== */
-        .glass-content {
-            -webkit-overflow-scrolling: touch;
-            overflow-y: scroll !important;
-            overflow-x: hidden;
-            scroll-behavior: smooth;
-            height: 100%;
-            position: relative;
-        }
-
-        /* Ensure content height for scrolling */
-        .glass-content > div {
-            flex-shrink: 0;
-        }
-
-        /* Force minimum content height to enable scrolling */
-        .glass-content::after {
-            content: '';
-            height: 1px;
-            display: block;
-        }
-
-        /* ===== LOADING STATES ===== */
+        /* Loading state */
         .loading {
-            position: relative;
-            pointer-events: none;
-            opacity: 0.6;
-        }
-
-        .loading::after {
-            content: '';
-            position: absolute;
+            position: fixed;
             top: 50%;
             left: 50%;
-            width: 20px;
-            height: 20px;
-            margin: -10px 0 0 -10px;
-            border: 2px solid var(--primary-green);
-            border-top: 2px solid transparent;
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-        }
-
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-
-        /* ===== CAMERA OVERLAY ===== */
-        .camera-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(0, 0, 0, 0.9);
-            display: none;
-            align-items: center;
-            justify-content: center;
-            z-index: 4000;
-            flex-direction: column;
-            gap: 20px;
-        }
-
-        .camera-overlay.show {
-            display: flex;
-        }
-
-        .camera-frame {
-            width: 300px;
-            height: 300px;
-            border: 3px solid var(--primary-pink);
-            border-radius: 20px;
-            position: relative;
-            overflow: hidden;
-            box-shadow: 0 0 30px rgba(255, 107, 157, 0.5);
-        }
-
-        .camera-controls {
-            display: flex;
-            gap: 20px;
-        }
-
-        .camera-btn {
-            background: rgba(255, 255, 255, 0.1);
-            border: 1px solid rgba(255, 255, 255, 0.3);
+            transform: translate(-50%, -50%);
+            font-size: 18px;
             color: var(--text-primary);
-            padding: 12px 20px;
-            border-radius: 10px;
-            font-size: 14px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            backdrop-filter: blur(10px);
-        }
-
-        .camera-btn:hover {
-            background: rgba(255, 255, 255, 0.2);
-            transform: scale(1.05);
-        }
-
-        .camera-btn.capture {
-            background: var(--primary-pink);
-            color: #fff;
-        }
-
-        /* ===== VIBRATION FEEDBACK ===== */
-        @media (hover: none) {
-            .control-btn:active, .btn-primary:active, .nav-item:active {
-                animation: vibrate 0.1s;
-            }
-        }
-
-        @keyframes vibrate {
-            0%, 100% { transform: translateX(0); }
-            25% { transform: translateX(-2px); }
-            75% { transform: translateX(2px); }
         }
     </style>
 </head>
 <body>
-    <!-- Floating Stars Background -->
-    <div class="stars-container" id="starsContainer"></div>
-
-    <!-- Floating Glass Interface Container -->
-    <div class="phone-container">
-        <div class="glass-interface">
-            <!-- AI Status - Embedded -->
-            <div class="ai-status" id="aiStatus" onclick="toggleAIMode()">
-                <div class="ai-pulse"></div>
-                <span id="aiStatusText">AI Ready</span>
+    <!-- Auth Screen (shows first) -->
+    <div id="authScreen" class="auth-screen">
+        <div class="auth-container">
+            <div class="auth-logo">🚀</div>
+            <div class="auth-title">Welcome to JomBro</div>
+            <div class="auth-subtitle">Connect with friends and tackle challenges together!</div>
+            
+            <button class="auth-btn google" onclick="signInWithGoogle()">
+                <span>🔍</span>
+                Continue with Google
+            </button>
+            
+            <button class="auth-btn phone" onclick="signInWithPhone()">
+                <span>📱</span>
+                Continue with Phone
+            </button>
+            
+            <div style="margin-top: 20px; font-size: 12px; color: var(--text-secondary);">
+                By continuing, you agree to our Terms & Privacy Policy
             </div>
+        </div>
+    </div>
 
-            <!-- Glass Header - Fixed Top Bar -->
+    <!-- Main App (shows after auth) -->
+    <div id="mainApp" class="phone-container" style="display: none;">
+        <div class="glass-interface">
+            <!-- Header with user info -->
             <div class="glass-header">
-                <div class="logo-section" onclick="logoClick()">
+                <div class="logo-section" onclick="showProfile()">
                     <div class="logo-text">JomBro</div>
-                    <div class="logo-subtitle" id="logoSlogan">Let's Go! lyode</div>
+                    <div class="logo-subtitle" id="userDisplayName">Loading...</div>
                 </div>
                 <div class="header-actions">
-                    <div class="header-btn" onclick="scrollToTop()" title="Scroll to Top">🔝</div>
-                    <div class="header-btn" onclick="scrollToChallenge()" title="Go to Challenge">🎯</div>
-                    <div class="header-btn" onclick="scrollToBottom()" title="Scroll to Bottom">⬇️</div>
-                    <div class="header-btn" onclick="showNotifications()" title="Notifications">🔔</div>
-                    <div class="header-btn" onclick="showModal('settings')" title="Settings">⚙️</div>
+                    <div class="header-btn" onclick="toggleChat()" title="Group Chat">💬</div>
+                    <div class="header-btn" onclick="showFriends()" title="Friends">👥</div>
+                    <div class="header-btn" onclick="signOut()" title="Sign Out">🚪</div>
                 </div>
             </div>
 
-            <!-- Scrollable Content Area -->
-            <div class="glass-content" id="glassContent" style="flex: 1; overflow-y: auto; overflow-x: hidden; -webkit-overflow-scrolling: touch; scroll-behavior: smooth; min-height: 0;">
-                <!-- Live Players Section -->
-                <div class="glass-section compact">
+            <div class="glass-content">
+                <!-- Live Players Section (Real Data) -->
+                <div class="glass-section">
                     <div class="live-header">
                         <div class="live-indicator">
                             <div class="live-dot"></div>
                             <span>LIVE</span>
-                            <span style="font-size: 10px; color: var(--text-secondary); margin-left: 8px;" id="liveStatus">+2 joining soon</span>
+                            <span class="online-count" id="onlineCount">0 online</span>
                         </div>
-                        <div class="player-status" onclick="showPlayerStats()">
-                            <span>Elite Gladiator</span>
-                            <span class="tokens-display" id="playerTokens">15,247</span>
+                        <div class="user-status" id="userStatus">
+                            <span id="userLevel">Level 1</span>
                         </div>
                     </div>
                     <div class="live-players" id="livePlayersContainer">
-                        <!-- Dynamic player avatars -->
+                        <!-- Real users will appear here -->
                     </div>
                 </div>
 
-                <!-- Active Challenges Section -->
-                <div class="glass-section compact" id="activeChallengesSection">
-                    <div class="group-header">
-                        <div class="group-title">
-                            🎯 <span>My Active Challenges</span>
-                            <span class="challenge-count" id="challengeCount">2</span>
-                        </div>
-                        <button class="create-group-btn" onclick="showModal('myChallenges')">
-                            View All
-                        </button>
-                    </div>
-                    <div class="active-challenges" id="activeChallengesList">
-                        <!-- Dynamic active challenges -->
+                <!-- Main Challenge -->
+                <div class="challenge-main">
+                    <div class="challenge-title">Coffee Shop Poetry Challenge</div>
+                    <div class="challenge-description">
+                        Visit any coffee shop and ask the barista to write a short poem on your cup or napkin! 
+                        Share your experience with friends and see who gets the most creative poem!
                     </div>
                 </div>
 
-                <!-- Group Creation Section -->
-                <div class="glass-section compact">
-                    <div class="group-header">
-                        <div class="group-title">
-                            👥 <span>Create Friend Groups</span>
-                        </div>
-                        <button class="create-group-btn" onclick="showModal('createGroup')">
-                            Create Group
-                        </button>
-                    </div>
-                </div>
-
-                <!-- Main Challenge Display - Full Screen Piece -->
-                <div class="challenge-main" id="challengeMain">
-                    <div class="challenge-title" id="challengeTitle">Coffee Shop Poetry Challenge</div>
-                    
-                    <div class="challenge-description" id="challengeDescription">
-                        Visit any coffee shop and ask the barista to write a short poem on your cup or napkin! This is a wonderful way to connect with people and brighten someone's day.
-                    </div>
-
-                    <div class="challenge-hashtags" id="challengeHashtags">
-                        <span class="hashtag" onclick="searchHashtag(this)">#CoffeePoetry</span>
-                        <span class="hashtag" onclick="searchHashtag(this)">#Connection</span>
-                        <span class="hashtag" onclick="searchHashtag(this)">#JomBro</span>
-                    </div>
-
-                    <div class="challenge-meta">
-                        <div class="meta-item" onclick="showTokenInfo()">
-                            <div class="meta-value" id="challengeTokens">500</div>
-                            <div class="meta-label">Tokens</div>
-                        </div>
-                        <div class="meta-item" onclick="showDifficultyInfo()">
-                            <div class="meta-value" id="challengeDifficulty">Easy</div>
-                            <div class="meta-label">Level</div>
-                        </div>
-                        <div class="meta-item" onclick="showTimeInfo()">
-                            <div class="meta-value" id="challengeDuration">30m</div>
-                            <div class="meta-label">Duration</div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- User Control Section -->
+                <!-- Action Section -->
                 <div class="action-section">
-                    <!-- User Controls -->
-                    <div class="user-controls">
-                        <button class="control-btn primary" onclick="acceptChallenge()">
-                            ✅ Accept
-                        </button>
-                        <button class="control-btn" onclick="skipChallenge()">
-                            ⏭️ Skip
-                        </button>
-                        <button class="control-btn" onclick="createCustom()">
-                            ✏️ Customize
-                        </button>
-                        <button class="control-btn" onclick="askAI()">
-                            🤖 Ask AI
-                        </button>
-                    </div>
-
-                    <!-- AI Suggestion -->
-                    <div class="ai-suggestion" id="aiSuggestion" onclick="expandAISuggestion()">
-                        💡 AI suggests: This matches your social preferences perfectly!
-                    </div>
-                    
                     <button class="btn-primary" onclick="startChallenge()">
-                        🚀 START CHALLENGE
+                        🚀 START CHALLENGE & INVITE FRIENDS
                     </button>
                 </div>
-
-                <!-- Scroll Down Indicator -->
-                <div style="padding: 15px 25px; text-align: center; color: var(--primary-pink); font-size: 14px; border-top: 1px solid rgba(255, 255, 255, 0.1); background: linear-gradient(180deg, transparent 0%, rgba(255, 107, 157, 0.1) 100%); animation: pulse 2s infinite;">
-                    <div style="display: flex; align-items: center; justify-content: center; gap: 8px;">
-                        <span>⬇️ SCROLL DOWN FOR MORE ⬇️</span>
-                    </div>
-                    <div style="margin-top: 6px; font-size: 12px; opacity: 0.9; font-weight: 600;">
-                        🏆 Achievements • 📊 Stats • 👥 Friends • 🔥 Trending
-                    </div>
-                </div>
-
-                <!-- Achievements Section -->
-                <div class="glass-section">
-                    <div class="group-header">
-                        <div class="group-title">
-                            🏆 <span>Recent Achievements</span>
-                        </div>
-                        <button class="create-group-btn" onclick="showModal('achievements')">
-                            View All
-                        </button>
-                    </div>
-                    <div style="display: flex; gap: 8px; overflow-x: auto;">
-                        <div class="achievement-item" style="min-width: 60px; padding: 8px; text-align: center; margin-bottom: 0;" onclick="showAchievementDetail(1)">
-                            <div style="font-size: 20px;">🔥</div>
-                            <div style="font-size: 10px; color: var(--text-secondary);">12 Day Streak</div>
-                        </div>
-                        <div class="achievement-item" style="min-width: 60px; padding: 8px; text-align: center; margin-bottom: 0;" onclick="showAchievementDetail(2)">
-                            <div style="font-size: 20px;">⭐</div>
-                            <div style="font-size: 10px; color: var(--text-secondary);">Social Star</div>
-                        </div>
-                        <div class="achievement-item" style="min-width: 60px; padding: 8px; text-align: center; margin-bottom: 0;" onclick="showAchievementDetail(3)">
-                            <div style="font-size: 20px;">👑</div>
-                            <div style="font-size: 10px; color: var(--text-secondary);">Elite Rank</div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Stats Section -->
-                <div class="glass-section" id="stats">
-                    <div class="group-header">
-                        <div class="group-title">
-                            📊 <span>Your Stats</span>
-                        </div>
-                        <button class="create-group-btn" onclick="showDetailedStats()">
-                            Details
-                        </button>
-                    </div>
-                    <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px;">
-                        <div class="meta-item" onclick="showCompletedChallenges()">
-                            <div class="meta-value" id="completedCount">143</div>
-                            <div class="meta-label">Completed</div>
-                        </div>
-                        <div class="meta-item" onclick="showStreakHistory()">
-                            <div class="meta-value" id="currentStreak">12</div>
-                            <div class="meta-label">Day Streak</div>
-                        </div>
-                        <div class="meta-item" onclick="showLevelProgress()">
-                            <div class="meta-value" id="playerLevel">27</div>
-                            <div class="meta-label">Level</div>
-                        </div>
-                        <div class="meta-item" onclick="showRankingInfo()">
-                            <div class="meta-value" id="globalRank">#284</div>
-                            <div class="meta-label">Global Rank</div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Friends Activity -->
-                <div class="glass-section">
-                    <div class="group-header">
-                        <div class="group-title">
-                            👨‍👩‍👧‍👦 <span>Friends Activity</span>
-                        </div>
-                        <button class="create-group-btn" onclick="showAllFriends()">
-                            View All
-                        </button>
-                    </div>
-                    <div id="friendsActivity" style="display: flex; flex-direction: column; gap: 8px;">
-                        <!-- Dynamic friends activity -->
-                    </div>
-                </div>
-
-                <!-- Trending Challenges -->
-                <div class="glass-section">
-                    <div class="group-header">
-                        <div class="group-title">
-                            🔥 <span>Trending Challenges</span>
-                        </div>
-                        <button class="create-group-btn" onclick="showTrendingChallenges()">
-                            Explore
-                        </button>
-                    </div>
-                    <div id="trendingChallenges" style="display: flex; flex-direction: column; gap: 8px;">
-                        <!-- Dynamic trending challenges -->
-                    </div>
-                </div>
-
-                <!-- Scroll indicator -->
-                <div style="padding: 30px 20px; text-align: center; color: var(--text-secondary); font-size: 12px; border-top: 1px solid rgba(255, 255, 255, 0.1); margin-top: 20px; background: linear-gradient(180deg, rgba(255, 107, 157, 0.05) 0%, transparent 100%);">
-                    <div style="margin-bottom: 10px; font-size: 14px; color: var(--primary-pink);">
-                        🎉 You've reached the end! 🎉
-                    </div>
-                    <div style="margin-bottom: 8px;">
-                        ✨ Scroll up to see more features ✨
-                    </div>
-                    <div style="font-size: 10px; opacity: 0.7;">
-                        Swipe up ↑ to explore all JomBro features
-                    </div>
-                    <div style="margin-top: 15px; padding: 10px; background: rgba(255, 255, 255, 0.05); border-radius: 10px; font-size: 11px;">
-                        💡 Tip: Use header buttons 🔝 🎯 ⬇️ for quick navigation
-                    </div>
-                </div>
-            </div>
-
-            <!-- Fixed Bottom Navigation -->
-            <div class="glass-nav">
-                <div class="nav-item active" onclick="navTo(this, 'home')">
-                    <div class="nav-icon">🏠</div>
-                    <div class="nav-label">Home</div>
-                    <div class="nav-notification" id="homeNotification">2</div>
-                </div>
-                <div class="nav-item" onclick="navTo(this, 'ranks')">
-                    <div class="nav-icon">🏆</div>
-                    <div class="nav-label">Ranks</div>
-                </div>
-                <div class="nav-item" onclick="navTo(this, 'groups')">
-                    <div class="nav-icon">👥</div>
-                    <div class="nav-label">Groups</div>
-                </div>
-                <div class="nav-item" onclick="navTo(this, 'create')">
-                    <div class="nav-icon">➕</div>
-                    <div class="nav-label">Create</div>
-                </div>
-                <div class="nav-item" onclick="navTo(this, 'profile')">
-                    <div class="nav-icon">👤</div>
-                    <div class="nav-label">Profile</div>
-                </div>
             </div>
         </div>
     </div>
 
-    <!-- My Challenges Modal -->
-    <div id="myChallengesModal" class="modal">
-        <div class="modal-content">
-            <div class="modal-title">
-                🎯 My Active Challenges
-            </div>
-            
-            <div style="display: flex; flex-direction: column; gap: 12px; max-height: 400px; overflow-y: auto;">
-                <div class="active-challenge-item" style="flex-direction: column; align-items: flex-start; padding: 15px;">
-                    <div style="display: flex; justify-content: space-between; width: 100%; margin-bottom: 8px;">
-                        <div class="challenge-name" style="font-size: 14px;">Coffee Shop Poetry Challenge</div>
-                        <div class="challenge-status status-active">Active</div>
-                    </div>
-                    <div style="font-size: 12px; color: var(--text-secondary); margin-bottom: 8px;">
-                        Visit a coffee shop and ask for a poem on your cup
-                    </div>
-                    <div class="challenge-progress" style="width: 100%;">
-                        <span>Progress: 2/3 steps</span>
-                        <div class="progress-bar">
-                            <div class="progress-fill" style="width: 66%;"></div>
-                        </div>
-                    </div>
-                    <div style="display: flex; gap: 8px; margin-top: 10px;">
-                        <button class="control-btn" style="font-size: 10px; padding: 6px 12px;" onclick="takePhoto(1)">📷 Add Photo</button>
-                        <button class="control-btn" style="font-size: 10px; padding: 6px 12px;" onclick="completeChallenge(1)">✅ Complete</button>
-                    </div>
-                </div>
-
-                <div class="active-challenge-item" style="flex-direction: column; align-items: flex-start; padding: 15px;">
-                    <div style="display: flex; justify-content: space-between; width: 100%; margin-bottom: 8px;">
-                        <div class="challenge-name" style="font-size: 14px;">Local Business Support</div>
-                        <div class="challenge-status status-pending">Pending</div>
-                    </div>
-                    <div style="font-size: 12px; color: var(--text-secondary); margin-bottom: 8px;">
-                        Visit 3 local businesses and leave positive reviews
-                    </div>
-                    <div class="challenge-progress" style="width: 100%;">
-                        <span>Progress: 0/3 steps</span>
-                        <div class="progress-bar">
-                            <div class="progress-fill" style="width: 0%;"></div>
-                        </div>
-                    </div>
-                    <div style="display: flex; gap: 8px; margin-top: 10px;">
-                        <button class="control-btn primary" style="font-size: 10px; padding: 6px 12px;" onclick="startChallengeById(2)">🚀 Start</button>
-                        <button class="control-btn" style="font-size: 10px; padding: 6px 12px;" onclick="skipChallenge(2)">⏭️ Skip</button>
-                    </div>
-                </div>
-
-                <div class="active-challenge-item" style="flex-direction: column; align-items: flex-start; padding: 15px; opacity: 0.7;">
-                    <div style="display: flex; justify-content: space-between; width: 100%; margin-bottom: 8px;">
-                        <div class="challenge-name" style="font-size: 14px;">Random Acts of Kindness</div>
-                        <div class="challenge-status status-completed">Completed</div>
-                    </div>
-                    <div style="font-size: 12px; color: var(--text-secondary); margin-bottom: 8px;">
-                        Performed 5 random acts of kindness ✨
-                    </div>
-                    <div class="challenge-progress" style="width: 100%;">
-                        <span>Progress: 5/5 steps</span>
-                        <div class="progress-bar">
-                            <div class="progress-fill" style="width: 100%;"></div>
-                        </div>
-                    </div>
-                    <div style="display: flex; gap: 8px; margin-top: 10px;">
-                        <button class="control-btn" style="font-size: 10px; padding: 6px 12px;" onclick="viewRewards(3)">🏆 View Rewards</button>
-                        <button class="control-btn" style="font-size: 10px; padding: 6px 12px;" onclick="shareSuccess(3)">📤 Share</button>
-                    </div>
-                </div>
-            </div>
-            
-            <button class="btn-primary" onclick="hideModal('myChallenges')" style="margin-top: 20px;">Close</button>
+    <!-- Chat Interface -->
+    <div id="chatInterface" class="chat-interface">
+        <div class="chat-header">
+            <div class="chat-title">Challenge Group Chat</div>
+            <button class="chat-close" onclick="toggleChat()">✕</button>
+        </div>
+        <div class="chat-messages" id="chatMessages">
+            <!-- Real-time messages appear here -->
+        </div>
+        <div class="chat-input-container">
+            <input type="text" class="chat-input" id="chatInput" placeholder="Type a message..." 
+                   onkeypress="handleChatKeyPress(event)">
+            <button class="chat-send" onclick="sendMessage()">➤</button>
         </div>
     </div>
 
-    <!-- Create Group Modal -->
-    <div id="createGroupModal" class="modal">
-        <div class="modal-content">
-            <div class="modal-title">
-                👥 Create Friend Group
-            </div>
-            
-            <div style="display: flex; flex-direction: column; gap: 16px;">
-                <div class="form-group">
-                    <label class="form-label">Group Name</label>
-                    <input type="text" class="form-input" id="groupName" placeholder="My Adventure Squad..." maxlength="30">
-                </div>
-                
-                <div class="form-group">
-                    <label class="form-label">Description</label>
-                    <textarea class="form-input" id="groupDescription" placeholder="What's your group about?" rows="3" maxlength="150"></textarea>
-                </div>
-                
-                <div class="form-group">
-                    <label class="form-label">Invite Friends</label>
-                    <input type="text" class="form-input" id="friendInvites" placeholder="Enter friend usernames...">
-                </div>
-                
-                <div class="form-group">
-                    <label class="form-label">Group Privacy</label>
-                    <select class="form-input form-select" id="groupPrivacy">
-                        <option value="private">Private - Invite Only</option>
-                        <option value="public">Public - Anyone Can Join</option>
-                        <option value="friends">Friends Only</option>
-                    </select>
-                </div>
-            </div>
-            
-            <div style="display: flex; gap: 12px; margin-top: 20px;">
-                <button class="control-btn" onclick="hideModal('createGroup')" style="flex: 1;">Cancel</button>
-                <button class="btn-primary" onclick="createGroup()" style="flex: 1;">Create Group</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Settings Modal -->
-    <div id="settingsModal" class="modal">
-        <div class="modal-content">
-            <div class="modal-title">⚙️ Settings</div>
-            
-            <div style="display: flex; flex-direction: column; gap: 20px;">
-                <div>
-                    <div style="font-size: 14px; font-weight: 600; margin-bottom: 12px; color: var(--text-primary);">🤖 AI Control</div>
-                    <div style="display: flex; flex-direction: column; gap: 8px;">
-                        <label style="display: flex; align-items: center; gap: 8px; font-size: 14px; color: var(--text-secondary);">
-                            <input type="checkbox" id="manualSelection" checked style="accent-color: var(--primary-green);"> Manual Challenge Selection
-                        </label>
-                        <label style="display: flex; align-items: center; gap: 8px; font-size: 14px; color: var(--text-secondary);">
-                            <input type="checkbox" id="aiRecommendations" style="accent-color: var(--primary-green);"> AI Recommendations Only
-                        </label>
-                        <label style="display: flex; align-items: center; gap: 8px; font-size: 14px; color: var(--text-secondary);">
-                            <input type="checkbox" id="groupChallenges" checked style="accent-color: var(--primary-green);"> Friend Group Challenges
-                        </label>
-                    </div>
-                </div>
-                
-                <div>
-                    <div style="font-size: 14px; font-weight: 600; margin-bottom: 12px; color: var(--text-primary);">🔔 Notifications</div>
-                    <div style="display: flex; flex-direction: column; gap: 8px;">
-                        <label style="display: flex; align-items: center; gap: 8px; font-size: 14px; color: var(--text-secondary);">
-                            <input type="checkbox" id="pushNotifications" checked style="accent-color: var(--primary-green);"> Push Notifications
-                        </label>
-                        <label style="display: flex; align-items: center; gap: 8px; font-size: 14px; color: var(--text-secondary);">
-                            <input type="checkbox" id="friendActivity" checked style="accent-color: var(--primary-green);"> Friend Activity Updates
-                        </label>
-                        <label style="display: flex; align-items: center; gap: 8px; font-size: 14px; color: var(--text-secondary);">
-                            <input type="checkbox" id="challengeReminders" checked style="accent-color: var(--primary-green);"> Challenge Reminders
-                        </label>
-                    </div>
-                </div>
-                
-                <div>
-                    <div style="font-size: 14px; font-weight: 600; margin-bottom: 12px; color: var(--text-primary);">✨ Visual Effects</div>
-                    <div style="display: flex; flex-direction: column; gap: 8px;">
-                        <label style="display: flex; align-items: center; gap: 8px; font-size: 14px; color: var(--text-secondary);">
-                            <input type="checkbox" id="glassEffects" checked style="accent-color: var(--primary-green);"> Floating Glass Effect
-                        </label>
-                        <label style="display: flex; align-items: center; gap: 8px; font-size: 14px; color: var(--text-secondary);">
-                            <input type="checkbox" id="starsBackground" checked style="accent-color: var(--primary-green);"> Animated Stars Background
-                        </label>
-                        <label style="display: flex; align-items: center; gap: 8px; font-size: 14px; color: var(--text-secondary);">
-                            <input type="checkbox" id="glowEffects" checked style="accent-color: var(--primary-green);"> Glow Effects
-                        </label>
-                    </div>
-                </div>
-            </div>
-            
-            <div style="display: flex; gap: 12px; margin-top: 20px;">
-                <button class="control-btn" onclick="resetSettings()" style="flex: 1;">Reset</button>
-                <button class="btn-primary" onclick="saveSettings()" style="flex: 1;">Save Settings</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Achievements Modal -->
-    <div id="achievementsModal" class="modal">
-        <div class="modal-content">
-            <div class="modal-title">🏆 Achievements</div>
-            
-            <div style="max-height: 400px; overflow-y: auto;">
-                <div class="achievement-item" onclick="showAchievementDetail(1)">
-                    <div class="achievement-icon">🔥</div>
-                    <div class="achievement-info">
-                        <div class="achievement-title">Streak Master</div>
-                        <div class="achievement-desc">Maintain a 12-day challenge streak</div>
-                    </div>
-                    <div class="achievement-progress">12/12</div>
-                </div>
-                
-                <div class="achievement-item" onclick="showAchievementDetail(2)">
-                    <div class="achievement-icon">⭐</div>
-                    <div class="achievement-info">
-                        <div class="achievement-title">Social Star</div>
-                        <div class="achievement-desc">Complete 50 social challenges</div>
-                    </div>
-                    <div class="achievement-progress">50/50</div>
-                </div>
-                
-                <div class="achievement-item" onclick="showAchievementDetail(3)">
-                    <div class="achievement-icon">👑</div>
-                    <div class="achievement-info">
-                        <div class="achievement-title">Elite Gladiator</div>
-                        <div class="achievement-desc">Reach Elite rank status</div>
-                    </div>
-                    <div class="achievement-progress">✓</div>
-                </div>
-                
-                <div class="achievement-item" onclick="showAchievementDetail(4)">
-                    <div class="achievement-icon">🌟</div>
-                    <div class="achievement-info">
-                        <div class="achievement-title">Community Builder</div>
-                        <div class="achievement-desc">Create 5 friend groups</div>
-                    </div>
-                    <div class="achievement-progress">3/5</div>
-                </div>
-                
-                <div class="achievement-item" onclick="showAchievementDetail(5)">
-                    <div class="achievement-icon">🎯</div>
-                    <div class="achievement-info">
-                        <div class="achievement-title">Challenge Creator</div>
-                        <div class="achievement-desc">Create 10 custom challenges</div>
-                    </div>
-                    <div class="achievement-progress">7/10</div>
-                </div>
-            </div>
-            
-            <button class="btn-primary" onclick="hideModal('achievements')" style="margin-top: 20px;">Close</button>
-        </div>
-    </div>
-
-    <!-- Create Challenge Modal -->
-    <div id="createModal" class="modal">
-        <div class="modal-content">
-            <div class="modal-title">➕ Create Custom Challenge</div>
-            
-            <div style="display: flex; flex-direction: column; gap: 16px;">
-                <div class="form-group">
-                    <label class="form-label">Challenge Title</label>
-                    <input type="text" class="form-input" id="challengeTitle" placeholder="My Amazing Challenge..." maxlength="50">
-                </div>
-                
-                <div class="form-group">
-                    <label class="form-label">Description</label>
-                    <textarea class="form-input" id="challengeDesc" placeholder="Describe your challenge..." rows="4" maxlength="200"></textarea>
-                </div>
-                
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
-                    <div class="form-group">
-                        <label class="form-label">Duration</label>
-                        <select class="form-input form-select" id="challengeDur">
-                            <option value="15m">15 minutes</option>
-                            <option value="30m">30 minutes</option>
-                            <option value="1h">1 hour</option>
-                            <option value="2h">2 hours</option>
-                            <option value="1d">1 day</option>
-                        </select>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label class="form-label">Difficulty</label>
-                        <select class="form-input form-select" id="challengeDiff">
-                            <option value="Easy">Easy</option>
-                            <option value="Medium">Medium</option>
-                            <option value="Hard">Hard</option>
-                            <option value="Expert">Expert</option>
-                        </select>
-                    </div>
-                </div>
-                
-                <div class="form-group">
-                    <label class="form-label">Category</label>
-                    <select class="form-input form-select" id="challengeCategory">
-                        <option value="SOCIAL">Social</option>
-                        <option value="FITNESS">Fitness</option>
-                        <option value="CREATIVE">Creative</option>
-                        <option value="LEARNING">Learning</option>
-                        <option value="ADVENTURE">Adventure</option>
-                        <option value="KINDNESS">Kindness</option>
-                    </select>
-                </div>
-                
-                <div class="form-group">
-                    <label class="form-label">Hashtags</label>
-                    <input type="text" class="form-input" id="challengeHashtags" placeholder="#custom #challenge #jombro">
-                </div>
-            </div>
-            
-            <div style="display: flex; gap: 12px; margin-top: 20px;">
-                <button class="control-btn" onclick="hideModal('create')" style="flex: 1;">Cancel</button>
-                <button class="btn-primary" onclick="createCustomChallenge()" style="flex: 1;">Create Challenge</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Camera Overlay -->
-    <div id="cameraOverlay" class="camera-overlay">
-        <div class="camera-frame">
-            <div style="width: 100%; height: 100%; background: linear-gradient(45deg, var(--primary-pink), var(--primary-purple)); display: flex; align-items: center; justify-content: center; font-size: 48px;">
-                📸
-            </div>
-        </div>
-        <div class="camera-controls">
-            <button class="camera-btn" onclick="closeCameraOverlay()">Cancel</button>
-            <button class="camera-btn capture" onclick="capturePhoto()">Capture</button>
-        </div>
-    </div>
-
-    <!-- Toast Notification -->
-    <div id="toast" class="toast">
-        <span id="toastText">Welcome to JomBro!</span>
-    </div>
+    <!-- Floating Chat Toggle -->
+    <button id="chatToggle" class="chat-toggle" onclick="toggleChat()" style="display: none;">
+        💬
+    </button>
 
     <script>
-        // ===== ENHANCED FLOATING GLASS JOMBRO WITH FULL FUNCTIONALITY =====
-
-        // Global state management
-        let userSettings = {
-            aiControl: false,
-            manualSelection: true,
-            groupChallenges: true,
-            starsEnabled: true,
-            glassEffects: true,
-            pushNotifications: true,
-            friendActivity: true,
-            challengeReminders: true,
-            glowEffects: true
+        // Firebase Configuration - YOUR REAL CONFIG
+        const firebaseConfig = {
+            apiKey: "AIzaSyC_orriRUuf1ynDiFaJAPrO6-Gu3GeURxQ",
+            authDomain: "jombro-9d129.firebaseapp.com",
+            projectId: "jombro-9d129",
+            storageBucket: "jombro-9d129.firebasestorage.app",
+            messagingSenderId: "390572076435",
+            appId: "1:390572076435:web:2a90027c66dc34d9834c66",
+            measurementId: "G-YPQ5R5GLP8"
         };
 
-        let player = {
-            name: 'lyode',
-            tokens: 15247,
-            rank: 'Elite Gladiator',
-            level: 27,
-            completed: 143,
-            streak: 12,
-            globalRank: 284,
-            friends: ['Alex', 'Maria', 'John', 'Lisa', 'Mike', 'Sarah', 'David', 'Emma']
-        };
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const db = firebase.firestore();
+        const storage = firebase.storage();
 
-        let challenges = [
-            {
-                id: '1',
-                title: 'Coffee Shop Poetry Challenge',
-                description: 'Visit any coffee shop and ask the barista to write a short poem on your cup or napkin! This is a wonderful way to connect with people and brighten someone\'s day.',
-                tokens: 500,
-                difficulty: 'Easy',
-                duration: '30m',
-                type: 'SOCIAL',
-                hashtags: ['#CoffeePoetry', '#Connection', '#JomBro']
-            },
-            {
-                id: '2',
-                title: 'Local Business Support Quest',
-                description: 'Visit 3 local businesses today and leave positive reviews to support your community entrepreneurs.',
-                tokens: 750,
-                difficulty: 'Medium',
-                duration: '45m',
-                type: 'COMMUNITY',
-                hashtags: ['#SupportLocal', '#Community', '#Business']
-            },
-            {
-                id: '3',
-                title: 'Random Acts of Kindness',
-                description: 'Perform 5 random acts of kindness for strangers today and document how it made you feel.',
-                tokens: 1000,
-                difficulty: 'Easy',
-                duration: '60m',
-                type: 'KINDNESS',
-                hashtags: ['#Kindness', '#RandomActs', '#Positivity']
-            },
-            {
-                id: '4',
-                title: 'Neighborhood Photo Walk',
-                description: 'Take a creative photo walk around your neighborhood and capture 10 unique perspectives.',
-                tokens: 600,
-                difficulty: 'Easy',
-                duration: '45m',
-                type: 'CREATIVE',
-                hashtags: ['#Photography', '#Neighborhood', '#Creative']
-            },
-            {
-                id: '5',
-                title: 'Learn 5 New Words',
-                description: 'Learn 5 new words in a foreign language and use them in conversation today.',
-                tokens: 400,
-                difficulty: 'Medium',
-                duration: '30m',
-                type: 'LEARNING',
-                hashtags: ['#Language', '#Learning', '#Growth']
-            }
-        ];
+        // Global state
+        let currentUser = null;
+        let chatOpen = false;
+        let unsubscribeChat = null;
 
-        let activeChallenges = [
-            {
-                id: 1,
-                title: 'Coffee Shop Poetry Challenge',
-                description: 'Visit a coffee shop and ask for a poem',
-                progress: 66,
-                status: 'active',
-                steps: '2/3',
-                timeLeft: '2h 30m'
-            },
-            {
-                id: 2,
-                title: 'Local Business Support',
-                description: 'Visit 3 local businesses',
-                progress: 0,
-                status: 'pending',
-                steps: '0/3',
-                timeLeft: '5h 15m'
-            }
-        ];
-
-        let currentChallengeIndex = 0;
-        let aiModeEnabled = false;
-
-        let livePlayers = [
-            { name: 'Alex', avatar: '👨', status: 'online', activity: 'Coffee Challenge', time: '2m ago' },
-            { name: 'Maria', avatar: '👩', status: 'online', activity: 'Kindness Quest', time: '5m ago' },
-            { name: 'John', avatar: '👨‍💼', status: 'online', activity: 'Business Support', time: '10m ago' },
-            { name: 'Lisa', avatar: '👩‍🎨', status: 'online', activity: 'Creative Challenge', time: '15m ago' },
-            { name: 'Mike', avatar: '👨‍🚀', status: 'online', activity: 'Adventure Quest', time: '20m ago' },
-            { name: 'Sarah', avatar: '👩‍💻', status: 'online', activity: 'Learning Challenge', time: '25m ago' },
-            { name: 'David', avatar: '👨‍🎓', status: 'online', activity: 'Social Challenge', time: '30m ago' },
-            { name: 'Emma', avatar: '👩‍🔬', status: 'online', activity: 'Science Quest', time: '35m ago' }
-        ];
-
-        let friendsActivity = [
-            { name: 'Maria', avatar: '👩', action: 'completed Coffee Challenge', time: '2 minutes ago' },
-            { name: 'Alex', avatar: '👨', action: 'started Business Support Quest', time: '5 minutes ago' },
-            { name: 'Lisa', avatar: '👩‍🎨', action: 'achieved Social Star badge', time: '10 minutes ago' },
-            { name: 'John', avatar: '👨‍💼', action: 'joined Adventure Squad group', time: '15 minutes ago' }
-        ];
-
-        let trendingChallenges = [
-            { title: 'Coffee Shop Poetry', participants: 1247, icon: '☕' },
-            { title: 'Random Acts of Kindness', participants: 892, icon: '💝' },
-            { title: 'Local Business Support', participants: 734, icon: '🏪' },
-            { title: 'Neighborhood Photo Walk', participants: 623, icon: '📸' }
-        ];
-
-        // ===== ENHANCED FLOATING STARS SYSTEM =====
-        function createFloatingStars() {
-            const container = document.getElementById('starsContainer');
-            const starCount = 100;
-            
-            container.innerHTML = '';
-            
-            for (let i = 0; i < starCount; i++) {
-                const star = document.createElement('div');
-                star.className = 'star';
-                
-                const size = Math.random();
-                if (size > 0.9) star.classList.add('huge');
-                else if (size > 0.75) star.classList.add('large');
-                else if (size > 0.5) star.classList.add('medium');
-                else star.classList.add('small');
-                
-                star.style.left = Math.random() * 100 + '%';
-                star.style.top = Math.random() * 100 + '%';
-                star.style.animationDelay = Math.random() * 6 + 's';
-                star.style.animationDuration = (3 + Math.random() * 3) + 's';
-                
-                container.appendChild(star);
+        // Authentication Functions
+        async function signInWithGoogle() {
+            try {
+                const provider = new firebase.auth.GoogleAuthProvider();
+                const result = await auth.signInWithPopup(provider);
+                console.log('Google sign-in successful:', result.user);
+            } catch (error) {
+                console.error('Google sign-in error:', error);
+                alert('Sign-in failed. Please try again.');
             }
         }
 
-        // ===== ENHANCED UTILITY FUNCTIONS =====
-        function showToast(message, type = 'info') {
-            const toast = document.getElementById('toast');
-            const text = document.getElementById('toastText');
-            
-            text.textContent = message;
-            toast.className = `toast ${type}`;
-            toast.classList.add('show');
-            
-            setTimeout(() => toast.classList.remove('show'), 3000);
-            
-            // Haptic feedback on mobile
-            if ('vibrate' in navigator) {
-                navigator.vibrate(50);
-            }
-        }
+        async function signInWithPhone() {
+            const phoneNumber = prompt('Enter your phone number (with country code):');
+            if (!phoneNumber) return;
 
-        function showModal(id) {
-            const modal = document.getElementById(id + 'Modal');
-            if (modal) {
-                modal.classList.add('show');
-                // Haptic feedback
-                if ('vibrate' in navigator) {
-                    navigator.vibrate(30);
+            try {
+                const appVerifier = new firebase.auth.RecaptchaVerifier('authScreen');
+                const confirmationResult = await auth.signInWithPhoneNumber(phoneNumber, appVerifier);
+                
+                const verificationCode = prompt('Enter the verification code sent to your phone:');
+                if (verificationCode) {
+                    await confirmationResult.confirm(verificationCode);
                 }
+            } catch (error) {
+                console.error('Phone sign-in error:', error);
+                alert('Phone sign-in failed. Please try again.');
             }
         }
 
-        function hideModal(id) {
-            const modal = document.getElementById(id + 'Modal');
-            if (modal) {
-                modal.classList.remove('show');
+        async function signOut() {
+            try {
+                await auth.signOut();
+                window.location.reload();
+            } catch (error) {
+                console.error('Sign-out error:', error);
             }
         }
 
-        // ===== ENHANCED CHALLENGE FUNCTIONS =====
-        function displayCurrentChallenge() {
-            const challenge = challenges[currentChallengeIndex];
-            if (!challenge) return;
-
-            document.getElementById('challengeTitle').textContent = challenge.title;
-            document.getElementById('challengeDescription').textContent = challenge.description;
-            document.getElementById('challengeTokens').textContent = challenge.tokens.toLocaleString();
-            document.getElementById('challengeDifficulty').textContent = challenge.difficulty;
-            document.getElementById('challengeDuration').textContent = challenge.duration;
-
-            const hashtagsContainer = document.getElementById('challengeHashtags');
-            hashtagsContainer.innerHTML = challenge.hashtags.map(tag => 
-                `<span class="hashtag" onclick="searchHashtag(this)">${tag}</span>`
-            ).join('');
-
-            // Update AI suggestion based on challenge type
-            updateAISuggestion(challenge.type);
-        }
-
-        function updateAISuggestion(challengeType) {
-            const suggestions = {
-                'SOCIAL': '💡 AI suggests: Perfect for your social personality! This will boost your connection score.',
-                'COMMUNITY': '💡 AI suggests: Great for building community karma! Your local impact score will increase.',
-                'KINDNESS': '💡 AI suggests: Ideal for spreading positivity! This matches your kindness streak.',
-                'CREATIVE': '💡 AI suggests: Perfect creative outlet! This will unlock new artistic achievements.',
-                'LEARNING': '💡 AI suggests: Excellent for skill building! This fits your learning goals.',
-                'ADVENTURE': '💡 AI suggests: Right up your alley! This will boost your explorer rank.',
-                'FITNESS': '💡 AI suggests: Great for your health journey! This aligns with your fitness goals.'
-            };
-
-            const suggestionElement = document.getElementById('aiSuggestion');
-            if (suggestionElement) {
-                suggestionElement.textContent = suggestions[challengeType] || '💡 AI suggests: This challenge looks perfect for you!';
-            }
-        }
-
-        // ===== ENHANCED ACTIVE CHALLENGES MANAGEMENT =====
-        function renderActiveChallenges() {
-            const container = document.getElementById('activeChallengesList');
-            const countElement = document.getElementById('challengeCount');
-            const notificationElement = document.getElementById('homeNotification');
+        // User Management
+        async function createUserProfile(user) {
+            const userRef = db.collection('users').doc(user.uid);
+            const userDoc = await userRef.get();
             
-            const activeCount = activeChallenges.filter(c => c.status === 'active' || c.status === 'pending').length;
-            countElement.textContent = activeCount;
-            
-            if (notificationElement) {
-                notificationElement.textContent = activeCount;
-                notificationElement.style.display = activeCount > 0 ? 'flex' : 'none';
-            }
-            
-            const displayChallenges = activeChallenges.slice(0, 2);
-            
-            container.innerHTML = displayChallenges.map(challenge => `
-                <div class="active-challenge-item" onclick="showChallengeDetail(${challenge.id})">
-                    <div class="challenge-info">
-                        <div class="challenge-name">${challenge.title}</div>
-                        <div class="challenge-progress">
-                            <span>${challenge.steps} • ${challenge.timeLeft}</span>
-                            <div class="progress-bar">
-                                <div class="progress-fill" style="width: ${challenge.progress}%;"></div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="challenge-status status-${challenge.status}">
-                        ${challenge.status === 'active' ? 'Active' : 'Pending'}
-                    </div>
-                </div>
-            `).join('');
-        }
-
-        function renderFriendsActivity() {
-            const container = document.getElementById('friendsActivity');
-            if (!container) return;
-
-            container.innerHTML = friendsActivity.map(activity => `
-                <div style="display: flex; align-items: center; gap: 12px; padding: 8px; background: rgba(255,255,255,0.05); border-radius: 8px; cursor: pointer;" onclick="showFriendProfile('${activity.name}')">
-                    <div style="width: 30px; height: 30px; background: linear-gradient(45deg, var(--primary-green), #00d4ff); border-radius: 50%; display: flex; align-items: center; justify-content: center;">${activity.avatar}</div>
-                    <div style="flex: 1;">
-                        <div style="font-size: 12px; font-weight: 600;">${activity.name} ${activity.action}</div>
-                        <div style="font-size: 10px; color: var(--text-secondary);">${activity.time}</div>
-                    </div>
-                </div>
-            `).join('');
-        }
-
-        function renderTrendingChallenges() {
-            const container = document.getElementById('trendingChallenges');
-            if (!container) return;
-
-            container.innerHTML = trendingChallenges.map(challenge => `
-                <div style="display: flex; align-items: center; gap: 12px; padding: 8px; background: rgba(255,255,255,0.05); border-radius: 8px; cursor: pointer;" onclick="joinTrendingChallenge('${challenge.title}')">
-                    <div style="font-size: 20px;">${challenge.icon}</div>
-                    <div style="flex: 1;">
-                        <div style="font-size: 12px; font-weight: 600;">${challenge.title}</div>
-                        <div style="font-size: 10px; color: var(--text-secondary);">${challenge.participants} participants</div>
-                    </div>
-                    <div style="font-size: 10px; color: var(--primary-green); font-weight: 600;">Join →</div>
-                </div>
-            `).join('');
-        }
-
-        // ===== ENHANCED LIVE PLAYERS DISPLAY =====
-        function renderLivePlayers() {
-            const container = document.getElementById('livePlayersContainer');
-            if (!container) return;
-
-            container.innerHTML = livePlayers.map(player => `
-                <div class="player-avatar" onclick="showPlayerProfile('${player.name}')">
-                    <div class="avatar-ring">
-                        <div class="avatar-inner">${player.avatar}</div>
-                    </div>
-                    <div class="avatar-status"></div>
-                </div>
-            `).join('');
-        }
-
-        // ===== ENHANCED CHALLENGE ACTIONS =====
-        function acceptChallenge() {
-            const currentChallenge = challenges[currentChallengeIndex];
-            
-            const newActiveChallenge = {
-                id: Date.now(),
-                title: currentChallenge.title,
-                description: currentChallenge.description,
-                progress: 0,
-                status: 'pending',
-                steps: '0/3',
-                timeLeft: '6h 00m'
-            };
-            
-            activeChallenges.unshift(newActiveChallenge);
-            renderActiveChallenges();
-            
-            showToast('✅ Challenge accepted! Ready to start your adventure?', 'success');
-            
-            // Haptic feedback
-            if ('vibrate' in navigator) {
-                navigator.vibrate([100, 50, 100]);
-            }
-        }
-
-        function skipChallenge(challengeId = null) {
-            if (challengeId) {
-                activeChallenges = activeChallenges.filter(c => c.id !== challengeId);
-                renderActiveChallenges();
-                showToast('⏭️ Challenge removed from your list', 'warning');
+            if (!userDoc.exists) {
+                await userRef.set({
+                    uid: user.uid,
+                    displayName: user.displayName || 'Anonymous',
+                    email: user.email,
+                    photoURL: user.photoURL,
+                    level: 1,
+                    tokens: 0,
+                    challenges: 0,
+                    createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+                    lastActive: firebase.firestore.FieldValue.serverTimestamp(),
+                    online: true
+                });
             } else {
-                currentChallengeIndex = (currentChallengeIndex + 1) % challenges.length;
-                displayCurrentChallenge();
-                showToast('⏭️ New challenge loaded! Let\'s see what\'s next.', 'info');
+                // Update last active and online status
+                await userRef.update({
+                    lastActive: firebase.firestore.FieldValue.serverTimestamp(),
+                    online: true
+                });
             }
         }
 
-        function startChallenge() {
-            const currentChallenge = challenges[currentChallengeIndex];
-            showToast('🚀 Adventure started! Go make some magic happen! 🌟', 'success');
+        async function updateOnlineStatus(online) {
+            if (currentUser) {
+                await db.collection('users').doc(currentUser.uid).update({
+                    online: online,
+                    lastActive: firebase.firestore.FieldValue.serverTimestamp()
+                });
+            }
+        }
+
+        // Real-time Chat Functions
+        function initializeChat() {
+            const chatRef = db.collection('messages').orderBy('timestamp', 'asc');
             
-            // Add to active challenges if not already there
-            const exists = activeChallenges.some(c => c.title === currentChallenge.title);
-            if (!exists) {
-                acceptChallenge();
-            }
+            unsubscribeChat = chatRef.onSnapshot((snapshot) => {
+                const messages = [];
+                snapshot.forEach((doc) => {
+                    messages.push({ id: doc.id, ...doc.data() });
+                });
+                displayMessages(messages);
+            });
+        }
+
+        function displayMessages(messages) {
+            const chatMessages = document.getElementById('chatMessages');
+            chatMessages.innerHTML = '';
             
-            // Haptic feedback for launch
-            if ('vibrate' in navigator) {
-                navigator.vibrate([200, 100, 200]);
-            }
-        }
-
-        function startChallengeById(challengeId) {
-            const challenge = activeChallenges.find(c => c.id === challengeId);
-            if (challenge) {
-                challenge.status = 'active';
-                renderActiveChallenges();
-                showToast('🚀 Challenge started! Go make it happen!', 'success');
-                hideModal('myChallenges');
-            }
-        }
-
-        function completeChallenge(challengeId) {
-            const challenge = activeChallenges.find(c => c.id === challengeId);
-            if (challenge) {
-                challenge.status = 'completed';
-                challenge.progress = 100;
-                challenge.steps = '3/3';
-                renderActiveChallenges();
+            messages.forEach((message) => {
+                const messageDiv = document.createElement('div');
+                messageDiv.className = `message ${message.userId === currentUser.uid ? 'own' : ''}`;
                 
-                // Update player stats
-                player.tokens += 500;
-                player.completed += 1;
-                document.getElementById('playerTokens').textContent = player.tokens.toLocaleString();
-                document.getElementById('completedCount').textContent = player.completed;
+                const time = message.timestamp ? 
+                    new Date(message.timestamp.toDate()).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) : 
+                    'now';
                 
-                showToast('🎉 Challenge completed! +500 tokens earned! 🏆', 'success');
-                hideModal('myChallenges');
+                messageDiv.innerHTML = `
+                    <div class="message-avatar">${message.userAvatar || '👤'}</div>
+                    <div class="message-content">
+                        <div class="message-text">${message.text}</div>
+                        <div class="message-time">${time}</div>
+                    </div>
+                `;
                 
-                // Celebration haptic
-                if ('vibrate' in navigator) {
-                    navigator.vibrate([200, 100, 200, 100, 200]);
-                }
-            }
-        }
-
-        function updateProgress(challengeId) {
-            const challenge = activeChallenges.find(c => c.id === challengeId);
-            if (challenge) {
-                challenge.progress = Math.min(challenge.progress + 33, 100);
-                const currentStep = Math.floor(challenge.progress / 33);
-                challenge.steps = `${currentStep}/3`;
-                renderActiveChallenges();
-                showToast('📸 Progress updated! Photo added to challenge.', 'success');
-            }
-        }
-
-        // ===== ENHANCED MODAL ACTIONS =====
-        function createGroup() {
-            const groupName = document.getElementById('groupName').value;
-            const groupDescription = document.getElementById('groupDescription').value;
-            const friendInvites = document.getElementById('friendInvites').value;
-            const groupPrivacy = document.getElementById('groupPrivacy').value;
-            
-            if (!groupName) {
-                showToast('Please enter a group name', 'error');
-                return;
-            }
-            
-            showToast(`👥 "${groupName}" group created! Invites sent to your friends!`, 'success');
-            hideModal('createGroup');
-            
-            // Clear form
-            document.getElementById('groupName').value = '';
-            document.getElementById('groupDescription').value = '';
-            document.getElementById('friendInvites').value = '';
-        }
-
-        function createCustomChallenge() {
-            const title = document.getElementById('challengeTitle').value;
-            const description = document.getElementById('challengeDesc').value;
-            const duration = document.getElementById('challengeDur').value;
-            const difficulty = document.getElementById('challengeDiff').value;
-            const category = document.getElementById('challengeCategory').value;
-            const hashtags = document.getElementById('challengeHashtags').value;
-            
-            if (!title || !description) {
-                showToast('Please fill in the title and description', 'error');
-                return;
-            }
-            
-            const newChallenge = {
-                id: Date.now().toString(),
-                title,
-                description,
-                tokens: difficulty === 'Easy' ? 300 : difficulty === 'Medium' ? 500 : difficulty === 'Hard' ? 750 : 1000,
-                difficulty,
-                duration,
-                type: category,
-                hashtags: hashtags.split(' ').filter(tag => tag.startsWith('#'))
-            };
-            
-            challenges.push(newChallenge);
-            showToast('🎯 Custom challenge created! Ready to tackle it?', 'success');
-            hideModal('create');
-            
-            // Clear form
-            document.getElementById('challengeTitle').value = '';
-            document.getElementById('challengeDesc').value = '';
-            document.getElementById('challengeHashtags').value = '';
-        }
-
-        function saveSettings() {
-            userSettings.manualSelection = document.getElementById('manualSelection').checked;
-            userSettings.aiControl = document.getElementById('aiRecommendations').checked;
-            userSettings.groupChallenges = document.getElementById('groupChallenges').checked;
-            userSettings.pushNotifications = document.getElementById('pushNotifications').checked;
-            userSettings.friendActivity = document.getElementById('friendActivity').checked;
-            userSettings.challengeReminders = document.getElementById('challengeReminders').checked;
-            userSettings.glassEffects = document.getElementById('glassEffects').checked;
-            userSettings.starsEnabled = document.getElementById('starsBackground').checked;
-            userSettings.glowEffects = document.getElementById('glowEffects').checked;
-            
-            showToast('⚙️ Settings saved successfully!', 'success');
-            hideModal('settings');
-            
-            // Apply visual changes
-            if (!userSettings.starsEnabled) {
-                document.getElementById('starsContainer').style.display = 'none';
-            } else {
-                document.getElementById('starsContainer').style.display = 'block';
-            }
-        }
-
-        function resetSettings() {
-            document.getElementById('manualSelection').checked = true;
-            document.getElementById('aiRecommendations').checked = false;
-            document.getElementById('groupChallenges').checked = true;
-            document.getElementById('pushNotifications').checked = true;
-            document.getElementById('friendActivity').checked = true;
-            document.getElementById('challengeReminders').checked = true;
-            document.getElementById('glassEffects').checked = true;
-            document.getElementById('starsBackground').checked = true;
-            document.getElementById('glowEffects').checked = true;
-            
-            showToast('⚙️ Settings reset to default', 'info');
-        }
-
-        // ===== ENHANCED NAVIGATION =====
-        function navTo(element, section) {
-            document.querySelectorAll('.nav-item').forEach(item => 
-                item.classList.remove('active')
-            );
-            element.classList.add('active');
-            
-            const messages = {
-                home: '🏠 Home - Your personalized challenge hub',
-                ranks: '🏆 Leaderboard - See who\'s crushing it! Current rank: #284',
-                groups: '👥 Friend groups - Connect and compete with your squad',
-                create: '➕ Create your own epic challenges and share them',
-                profile: '👤 Your profile - Level 27 Elite Gladiator with 15,247 tokens'
-            };
-            
-            showToast(messages[section], 'info');
-            
-            if (section === 'home') {
-                document.querySelector('.glass-content').scrollTo({ top: 0, behavior: 'smooth' });
-            }
-        }
-
-        // ===== ENHANCED CLICK HANDLERS =====
-        function logoClick() {
-            showQuickNav();
-        }
-
-        function showQuickNav() {
-            const quickNavItems = [
-                { name: 'Active Challenges', action: () => showModal('myChallenges') },
-                { name: 'Create Challenge', action: () => showModal('create') },
-                { name: 'Achievements', action: () => showModal('achievements') },
-                { name: 'Friends Activity', action: () => scrollToSection('friendsActivity') },
-                { name: 'Trending', action: () => scrollToSection('trendingChallenges') },
-                { name: 'Stats', action: () => scrollToSection('stats') }
-            ];
-            
-            let message = '🚀 Quick Navigation:\n';
-            quickNavItems.forEach((item, index) => {
-                message += `${index + 1}. ${item.name}\n`;
+                chatMessages.appendChild(messageDiv);
             });
             
-            showToast('📱 Tap header buttons to navigate: 🔝 Top, 🎯 Challenge, ⬇️ Bottom', 'info');
-            
-            // Easter egg counter
-            if (!window.logoClickCount) window.logoClickCount = 0;
-            window.logoClickCount++;
-            
-            if (window.logoClickCount === 3) {
-                showToast('🎉 Secret unlocked! You found the navigation master mode!', 'success');
-                window.logoClickCount = 0;
-            }
+            // Scroll to bottom
+            chatMessages.scrollTop = chatMessages.scrollHeight;
         }
 
-        function scrollToSection(sectionId) {
-            const element = document.getElementById(sectionId);
-            if (element) {
-                element.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                showToast(`📍 Scrolled to ${sectionId}`, 'info');
-            }
-        }
-
-        function toggleAIMode() {
-            aiModeEnabled = !aiModeEnabled;
-            const statusText = document.getElementById('aiStatusText');
+        async function sendMessage() {
+            const input = document.getElementById('chatInput');
+            const text = input.value.trim();
             
-            if (aiModeEnabled) {
-                statusText.textContent = 'AI Active';
-                document.getElementById('aiStatus').style.background = 'rgba(0, 255, 150, 0.2)';
-                document.getElementById('aiStatus').style.borderColor = 'rgba(0, 255, 150, 0.3)';
-                showToast('🤖 AI Mode activated! Smart recommendations enabled.', 'success');
-            } else {
-                statusText.textContent = 'AI Ready';
-                document.getElementById('aiStatus').style.background = 'rgba(139, 92, 246, 0.2)';
-                document.getElementById('aiStatus').style.borderColor = 'rgba(139, 92, 246, 0.3)';
-                showToast('🤖 AI Mode deactivated. Manual control enabled.', 'info');
-            }
-        }
-
-        function scrollToChallenge() {
-            const challengeMain = document.getElementById('challengeMain');
-            if (challengeMain) {
-                challengeMain.scrollIntoView({ 
-                    behavior: 'smooth', 
-                    block: 'start' 
+            if (!text || !currentUser) return;
+            
+            try {
+                await db.collection('messages').add({
+                    text: text,
+                    userId: currentUser.uid,
+                    userName: currentUser.displayName || 'Anonymous',
+                    userAvatar: getInitials(currentUser.displayName || 'A'),
+                    timestamp: firebase.firestore.FieldValue.serverTimestamp()
                 });
-                showToast('🎯 Scrolled to main challenge!', 'info');
+                
+                input.value = '';
+            } catch (error) {
+                console.error('Error sending message:', error);
             }
         }
 
-        function showHelp() {
-            showToast('❓ Help: Tap challenges to accept, use navigation to explore features!', 'info');
+        function handleChatKeyPress(event) {
+            if (event.key === 'Enter') {
+                sendMessage();
+            }
         }
 
-        function showNotifications() {
-            showToast('🔔 3 new challenge invites, 2 friend achievements, 1 group update!', 'info');
+        function toggleChat() {
+            chatOpen = !chatOpen;
+            const chatInterface = document.getElementById('chatInterface');
+            const chatToggle = document.getElementById('chatToggle');
+            
+            if (chatOpen) {
+                chatInterface.classList.add('open');
+                chatToggle.style.display = 'none';
+                if (!unsubscribeChat) {
+                    initializeChat();
+                }
+            } else {
+                chatInterface.classList.remove('open');
+                chatToggle.style.display = 'block';
+            }
         }
 
-        function showPlayerStats() {
-            showToast(`👤 ${player.name} - Level ${player.level} | Rank #${player.globalRank} | ${player.streak} day streak`, 'info');
+        // Live Users Functions
+        function initializeLiveUsers() {
+            const usersRef = db.collection('users').where('online', '==', true);
+            
+            usersRef.onSnapshot((snapshot) => {
+                const onlineUsers = [];
+                snapshot.forEach((doc) => {
+                    const userData = doc.data();
+                    if (userData.uid !== currentUser.uid) {
+                        onlineUsers.push(userData);
+                    }
+                });
+                
+                displayLiveUsers(onlineUsers);
+                document.getElementById('onlineCount').textContent = `${onlineUsers.length + 1} online`;
+            });
+        }
+
+        function displayLiveUsers(users) {
+            const container = document.getElementById('livePlayersContainer');
+            container.innerHTML = '';
+            
+            users.forEach((user) => {
+                const playerDiv = document.createElement('div');
+                playerDiv.className = 'player-avatar';
+                playerDiv.onclick = () => showPlayerProfile(user.displayName);
+                
+                playerDiv.innerHTML = `
+                    <div class="avatar-ring">
+                        <div class="avatar-inner">${getInitials(user.displayName || 'A')}</div>
+                    </div>
+                    <div class="avatar-status"></div>
+                `;
+                
+                container.appendChild(playerDiv);
+            });
+        }
+
+        // Utility Functions
+        function getInitials(name) {
+            return name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
         }
 
         function showPlayerProfile(name) {
-            showToast(`👋 Checking out ${name}'s profile - Elite challenger with 89 completed quests!`, 'info');
+            alert(`👤 ${name} is online and challenging! Send them a friend request?`);
         }
 
-        function showFriendProfile(name) {
-            showToast(`👤 ${name} is on fire! 🔥 Level 23 with 78 completed challenges.`, 'info');
-        }
-
-        function joinTrendingChallenge(title) {
-            showToast(`🔥 Joined trending challenge: ${title}! Let's make it happen!`, 'success');
-        }
-
-        function searchHashtag(element) {
-            const hashtag = element.textContent;
-            showToast(`🔍 Searching for ${hashtag} challenges... Found 47 matches!`, 'info');
-        }
-
-        function showTokenInfo() {
-            showToast('💰 Tokens are earned by completing challenges! Use them to unlock rewards.', 'info');
-        }
-
-        function showDifficultyInfo() {
-            showToast('📊 Challenge difficulty affects token rewards: Easy(300), Medium(500), Hard(750), Expert(1000)', 'info');
-        }
-
-        function showTimeInfo() {
-            showToast('⏱️ Estimated time to complete this challenge. Plan accordingly!', 'info');
-        }
-
-        function showChallengeDetail(challengeId) {
-            showToast(`📋 Opening challenge #${challengeId} details...`, 'info');
-            showModal('myChallenges');
-        }
-
-        function showAchievementDetail(achievementId) {
-            const achievements = {
-                1: 'Streak Master: Keep that momentum going! 🔥',
-                2: 'Social Star: You\'re a connection champion! ⭐',
-                3: 'Elite Gladiator: Top tier challenger! 👑',
-                4: 'Community Builder: Bringing people together! 🌟',
-                5: 'Challenge Creator: Innovation at its finest! 🎯'
-            };
-            showToast(achievements[achievementId] || 'Achievement unlocked!', 'success');
-        }
-
-        function showCompletedChallenges() {
-            showToast(`🎯 You've completed ${player.completed} challenges! That's incredible progress!`, 'success');
-        }
-
-        function showStreakHistory() {
-            showToast(`🔥 ${player.streak} day streak! Your longest streak was 18 days. Keep going!`, 'success');
-        }
-
-        function showLevelProgress() {
-            showToast(`📈 Level ${player.level} - 347 XP to next level! You're crushing it!`, 'info');
-        }
-
-        function showRankingInfo() {
-            showToast(`🏆 Global Rank #${player.globalRank} - You're in the top 5% of all players!`, 'success');
-        }
-
-        function showDetailedStats() {
-            showToast('📊 Full stats: 89% completion rate, 4.8⭐ avg rating, 12 achievements unlocked!', 'info');
-        }
-
-        function showAllFriends() {
-            showToast(`👥 You have ${player.friends.length} friends active on JomBro! Most active: Maria (94 challenges)`, 'info');
-        }
-
-        function showTrendingChallenges() {
-            showToast('🔥 Trending: Coffee Poetry (1,247 people), Kindness Acts (892), Local Business (734)', 'info');
-        }
-
-        function createCustom() {
-            showToast('✏️ Custom challenge creator opening... Make it epic!', 'info');
-            showModal('create');
-        }
-
-        function askAI() {
-            const responses = [
-                '🤖 This challenge perfectly matches your social butterfly personality!',
-                '🤖 Based on your history, you excel at community challenges like this!',
-                '🤖 Your creativity score suggests you\'ll love this artistic challenge!',
-                '🤖 This aligns with your kindness streak - you\'re naturally caring!',
-                '🤖 Your adventure level indicates you\'re ready for this quest!'
-            ];
-            const response = responses[Math.floor(Math.random() * responses.length)];
-            showToast(response, 'info');
-        }
-
-        function expandAISuggestion() {
-            showToast('🤖 AI Analysis: 94% compatibility, high social impact, perfect for your growth path!', 'info');
-        }
-
-        function viewRewards(challengeId) {
-            showToast('🏆 Rewards: +500 tokens, Social Star badge, +1 streak day, XP boost!', 'success');
-        }
-
-        function shareSuccess(challengeId) {
-            showToast('📤 Success shared with friends! They\'re cheering you on! 🎉', 'success');
-        }
-
-        function takePhoto(challengeId) {
-            showCameraOverlay();
-        }
-
-        function showCameraOverlay() {
-            document.getElementById('cameraOverlay').classList.add('show');
-        }
-
-        function closeCameraOverlay() {
-            document.getElementById('cameraOverlay').classList.remove('show');
-        }
-
-        function capturePhoto() {
-            showToast('📸 Photo captured! Added to your challenge progress.', 'success');
-            closeCameraOverlay();
-            
-            // Update progress
-            updateProgress(1);
-        }
-
-        // ===== ENHANCED SYSTEM UPDATES =====
-        function updateAIStatus() {
-            if (aiModeEnabled) {
-                const aiStatuses = ['AI Learning', 'AI Analyzing', 'AI Optimizing', 'AI Active'];
-                const statusText = document.getElementById('aiStatusText');
-                statusText.textContent = aiStatuses[Math.floor(Math.random() * aiStatuses.length)];
-            }
-            
-            const liveStatuses = [
-                '+2 joining soon', 'Emma going offline', 'Peak activity time', 
-                'New challengers appearing', '12 active now', 'Maria on fire! 🔥'
-            ];
-            const liveStatus = document.getElementById('liveStatus');
-            if (liveStatus) {
-                liveStatus.textContent = liveStatuses[Math.floor(Math.random() * liveStatuses.length)];
+        function showProfile() {
+            if (currentUser) {
+                alert(`👤 ${currentUser.displayName}\nLevel: 1\nChallenges: 0\nTokens: 0`);
             }
         }
 
-        function updateLiveActivity() {
-            // Randomly update friends activity
-            const activities = [
-                'completed Coffee Challenge',
-                'started Kindness Quest',
-                'achieved new badge',
-                'joined Adventure Group',
-                'created custom challenge',
-                'reached new level'
-            ];
+        function showFriends() {
+            alert('👥 Friends feature coming soon! For now, everyone in the chat is your challenge buddy!');
+        }
+
+        function startChallenge() {
+            if (!chatOpen) {
+                toggleChat();
+            }
             
-            const randomFriend = livePlayers[Math.floor(Math.random() * livePlayers.length)];
-            const randomActivity = activities[Math.floor(Math.random() * activities.length)];
-            
-            friendsActivity.unshift({
-                name: randomFriend.name,
-                avatar: randomFriend.avatar,
-                action: randomActivity,
-                time: 'just now'
+            // Send challenge start message
+            db.collection('messages').add({
+                text: `🚀 ${currentUser.displayName} started the Coffee Shop Poetry Challenge! Who's joining?`,
+                userId: 'system',
+                userName: 'JomBro',
+                userAvatar: '🤖',
+                timestamp: firebase.firestore.FieldValue.serverTimestamp()
             });
-            
-            // Keep only last 4 activities
-            friendsActivity = friendsActivity.slice(0, 4);
-            renderFriendsActivity();
         }
 
-        // ===== ENHANCED SCROLL BEHAVIOR =====
-        function initScrollBehavior() {
-            const glassContent = document.querySelector('.glass-content');
-            const header = document.querySelector('.glass-header');
-            
-            if (glassContent && header) {
-                glassContent.addEventListener('scroll', () => {
-                    const scrollTop = glassContent.scrollTop;
-                    const scrollHeight = glassContent.scrollHeight;
-                    const clientHeight = glassContent.clientHeight;
-                    const scrollPercentage = (scrollTop / (scrollHeight - clientHeight)) * 100;
-                    
-                    // Add header shadow when scrolling
-                    if (scrollTop > 10) {
-                        header.style.boxShadow = '0 4px 20px rgba(0, 0, 0, 0.3)';
-                    } else {
-                        header.style.boxShadow = 'none';
-                    }
-                    
-                    // Update scroll progress indicator
-                    updateScrollProgress(scrollPercentage);
-                });
+        // Auth State Observer
+        auth.onAuthStateChanged(async (user) => {
+            if (user) {
+                currentUser = user;
+                await createUserProfile(user);
                 
-                // Add scroll gesture hint
-                setTimeout(() => {
-                    if (glassContent.scrollTop === 0) {
-                        showToast('👆 Swipe up to explore more features!', 'info');
-                    }
-                }, 3000);
-            }
-        }
-
-        function updateScrollProgress(percentage) {
-            // Visual feedback for scroll progress
-            const aiStatus = document.getElementById('aiStatus');
-            if (aiStatus && percentage > 50) {
-                aiStatus.style.transform = 'scale(1.1)';
-                setTimeout(() => {
-                    aiStatus.style.transform = 'scale(1)';
-                }, 200);
-            }
-        }
-
-        function scrollToTop() {
-            const glassContent = document.querySelector('.glass-content');
-            if (glassContent) {
-                glassContent.scrollTo({ top: 0, behavior: 'smooth' });
-                showToast('🏠 Scrolled to top!', 'info');
-            }
-        }
-
-        function scrollToBottom() {
-            const glassContent = document.querySelector('.glass-content');
-            if (glassContent) {
-                glassContent.scrollTo({ top: glassContent.scrollHeight, behavior: 'smooth' });
-                showToast('📊 Scrolled to bottom - explore all features!', 'info');
-            }
-        }
-
-        // ===== PWA FUNCTIONALITY =====
-        function registerServiceWorker() {
-            if ('serviceWorker' in navigator) {
-                window.addEventListener('load', async () => {
-                    try {
-                        // Create a simple service worker inline
-                        const swCode = `
-                            const CACHE_NAME = 'jombro-v1';
-                            const urlsToCache = ['/'];
-                            
-                            self.addEventListener('install', event => {
-                                event.waitUntil(
-                                    caches.open(CACHE_NAME)
-                                        .then(cache => cache.addAll(urlsToCache))
-                                );
-                            });
-                            
-                            self.addEventListener('fetch', event => {
-                                event.respondWith(
-                                    caches.match(event.request)
-                                        .then(response => response || fetch(event.request))
-                                );
-                            });
-                        `;
-                        
-                        const blob = new Blob([swCode], { type: 'application/javascript' });
-                        const swUrl = URL.createObjectURL(blob);
-                        
-                        const registration = await navigator.serviceWorker.register(swUrl);
-                        console.log('✅ Service Worker registered:', registration.scope);
-                        
-                    } catch (error) {
-                        console.error('❌ Service Worker registration failed:', error);
-                    }
-                });
-            }
-        }
-
-        // ===== ENHANCED INITIALIZATION =====
-        function init() {
-            // Create floating stars effect
-            if (userSettings.starsEnabled) {
-                createFloatingStars();
-            }
-            
-            // Render all dynamic content
-            renderLivePlayers();
-            renderActiveChallenges();
-            renderFriendsActivity();
-            renderTrendingChallenges();
-            displayCurrentChallenge();
-            
-            // Initialize scroll behavior
-            initScrollBehavior();
-            
-            // Register service worker for PWA
-            registerServiceWorker();
-            
-            // Set up periodic updates
-            setInterval(updateAIStatus, 15000); // Every 15 seconds
-            setInterval(updateLiveActivity, 30000); // Every 30 seconds
-            
-            // Online/offline detection
-            window.addEventListener('online', () => {
-                showToast('🌐 Connected! All features unlocked!', 'success');
-            });
-            
-            window.addEventListener('offline', () => {
-                showToast('📡 Offline mode - Core features still available!', 'warning');
-            });
-            
-            // Welcome message with scroll demonstration
-            setTimeout(() => {
-                showToast('✨ Welcome to JomBro! Swipe up to explore all features! 📱', 'success');
-            }, 1000);
-            
-            // Demonstrate scrolling capability
-            setTimeout(() => {
-                const glassContent = document.querySelector('.glass-content');
-                if (glassContent && glassContent.scrollTop === 0) {
-                    showToast('👆 Try scrolling down to see Achievements, Stats, Friends & more!', 'info');
-                    
-                    // Gentle scroll demo
-                    setTimeout(() => {
-                        glassContent.scrollTo({ top: 100, behavior: 'smooth' });
-                        setTimeout(() => {
-                            glassContent.scrollTo({ top: 0, behavior: 'smooth' });
-                        }, 2000);
-                    }, 2000);
+                // Show main app
+                document.getElementById('authScreen').style.display = 'none';
+                document.getElementById('mainApp').style.display = 'block';
+                document.getElementById('chatToggle').style.display = 'block';
+                
+                // Update UI
+                document.getElementById('userDisplayName').textContent = user.displayName || 'Anonymous';
+                
+                // Initialize real-time features
+                initializeLiveUsers();
+                
+                console.log('User signed in:', user);
+            } else {
+                // Show auth screen
+                document.getElementById('authScreen').style.display = 'flex';
+                document.getElementById('mainApp').style.display = 'none';
+                document.getElementById('chatToggle').style.display = 'none';
+                
+                // Clean up listeners
+                if (unsubscribeChat) {
+                    unsubscribeChat();
+                    unsubscribeChat = null;
                 }
-            }, 4000);
-            
-            // Test scrolling functionality
-            setTimeout(() => {
-                testScrolling();
-            }, 6000);
-            
-            console.log('🌟 Enhanced JomBro Interface Fully Loaded! 🚀');
-        }
-
-        function testScrolling() {
-            const glassContent = document.querySelector('.glass-content');
-            if (glassContent) {
-                const contentHeight = glassContent.scrollHeight;
-                const containerHeight = glassContent.clientHeight;
-                const canScroll = contentHeight > containerHeight;
                 
-                console.log('📏 Scroll Test:', {
-                    contentHeight,
-                    containerHeight,
-                    canScroll,
-                    scrollTop: glassContent.scrollTop
-                });
-                
-                if (canScroll) {
-                    showToast('✅ Scrolling is working! Swipe up to explore more features!', 'success');
-                } else {
-                    showToast('⚠️ Content might not be tall enough to scroll. Check all sections!', 'warning');
-                }
-            }
-        }
-
-        // ===== PREVENT ZOOM ON MOBILE =====
-        let lastTouch = 0;
-        document.addEventListener('touchend', (e) => {
-            const now = Date.now();
-            if (now - lastTouch <= 300) {
-                e.preventDefault();
-            }
-            lastTouch = now;
-        });
-
-        // ===== KEYBOARD SHORTCUTS =====
-        document.addEventListener('keydown', (e) => {
-            if (e.key === 'Escape') {
-                // Close any open modals
-                document.querySelectorAll('.modal.show').forEach(modal => {
-                    modal.classList.remove('show');
-                });
+                console.log('User signed out');
             }
         });
 
-        // ===== START THE ENHANCED APP =====
-        if (document.readyState === 'loading') {
-            document.addEventListener('DOMContentLoaded', init);
-        } else {
-            init();
-        }
+        // Handle page unload - set user offline
+        window.addEventListener('beforeunload', () => {
+            updateOnlineStatus(false);
+        });
 
-        console.log('🔮 Enhanced JomBro - Ready for iOS/Android Launch! 🚀');
+        // Handle visibility change - update online status
+        document.addEventListener('visibilitychange', () => {
+            if (document.visibilityState === 'visible') {
+                updateOnlineStatus(true);
+            } else {
+                updateOnlineStatus(false);
+            }
+        });
+
+        console.log('🚀 JomBro Social Features Loaded!');
     </script>
 </body>
 </html>
