@@ -1689,12 +1689,18 @@
                         🚀 Quick Actions
                     </h3>
                     
-                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px;">
                         <button class="btn-secondary" onclick="resetToDefaults()" style="font-size: 12px;">
                             🔄 Reset All
                         </button>
                         <button class="btn-secondary" onclick="exportSettings()" style="font-size: 12px;">
                             📤 Export Settings
+                        </button>
+                    </div>
+                    
+                    <div style="display: grid; grid-template-columns: 1fr; gap: 10px;">
+                        <button class="btn-secondary" onclick="configureAI()" style="font-size: 12px; background: linear-gradient(45deg, #ff6b9d, #8b5cf6); color: white; border: 1px solid rgba(255, 255, 255, 0.2);">
+                            🤖 Configure AI Challenges
                         </button>
                     </div>
                 </div>
@@ -1854,51 +1860,569 @@
             console.log('📱 App fully loaded with avatar system!');
         }
 
-        // Challenge System
-        const sampleChallenges = [
-            {
-                title: 'Coffee Shop Poetry Challenge',
-                description: 'Visit any coffee shop and ask the barista to write a short poem on your cup or napkin!',
-                difficulty: 'Easy',
-                duration: '30m',
-                tokens: 500,
-                category: 'Social Connection',
-                icon: '👥',
-                color: '#ff6b9d'
+        // Advanced AI Challenge System with API Integration
+        const API_CONFIG = {
+            openAI: {
+                apiKey: '', // Users can add their OpenAI API key
+                endpoint: 'https://api.openai.com/v1/chat/completions',
+                model: 'gpt-3.5-turbo'
             },
-            {
-                title: 'Sunrise Workout',
-                description: 'Wake up early and do a 20-minute workout outside during sunrise. Capture the moment!',
-                difficulty: 'Medium',
-                duration: '45m',
-                tokens: 600,
-                category: 'Fitness & Health',
-                icon: '💪',
-                color: '#10b981'
+            gemini: {
+                apiKey: '', // Users can add their Gemini API key
+                endpoint: 'https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent'
             },
-            {
-                title: 'One-Minute Story Challenge',
-                description: 'Record yourself telling a complete story in exactly 60 seconds. Make it engaging!',
-                difficulty: 'Medium',
-                duration: '30m',
-                tokens: 550,
-                category: 'Creative Expression',
-                icon: '🎨',
-                color: '#8b5cf6'
+            claude: {
+                apiKey: '', // Users can add their Claude API key
+                endpoint: 'https://api.anthropic.com/v1/messages'
             }
-        ];
+        };
 
+        // Comprehensive Challenge Database (25+ Unique Challenges)
+        const MASTER_CHALLENGE_DATABASE = {
+            SOCIAL: {
+                name: 'Social Connection',
+                icon: '👥',
+                color: '#ff6b9d',
+                challenges: [
+                    {
+                        id: 'social_001',
+                        title: 'Coffee Shop Poetry Challenge',
+                        description: 'Visit any coffee shop and ask the barista to write a short poem on your cup or napkin! Share your experience with friends and see who gets the most creative poem!',
+                        difficulty: 'Easy',
+                        duration: '30m',
+                        tokens: 500,
+                        hashtags: ['#CoffeePoetry', '#Connection', '#JomBro'],
+                        aiPrompt: 'Create a social challenge involving coffee shops and creativity'
+                    },
+                    {
+                        id: 'social_002',
+                        title: 'Random Compliment Challenge',
+                        description: 'Give genuine compliments to 5 strangers today. Watch how their faces light up and document the positive reactions!',
+                        difficulty: 'Easy',
+                        duration: '1h',
+                        tokens: 400,
+                        hashtags: ['#Kindness', '#Social', '#GoodVibes'],
+                        aiPrompt: 'Create a kindness-based social interaction challenge'
+                    },
+                    {
+                        id: 'social_003',
+                        title: 'Language Exchange Adventure',
+                        description: 'Find someone who speaks a different language and teach each other 10 words. Record a video of your mini language lesson!',
+                        difficulty: 'Medium',
+                        duration: '45m',
+                        tokens: 650,
+                        hashtags: ['#Language', '#Cultural', '#Learning'],
+                        aiPrompt: 'Create a cultural exchange challenge involving language'
+                    },
+                    {
+                        id: 'social_004',
+                        title: 'Elderly Wisdom Quest',
+                        description: 'Spend 30 minutes talking to an elderly person and learn one life lesson from them. Share their wisdom (with permission)!',
+                        difficulty: 'Medium',
+                        duration: '45m',
+                        tokens: 700,
+                        hashtags: ['#Wisdom', '#Respect', '#Generations'],
+                        aiPrompt: 'Create an intergenerational connection challenge'
+                    },
+                    {
+                        id: 'social_005',
+                        title: 'Public Thank You Mission',
+                        description: 'Publicly thank 3 service workers (cashier, cleaner, security guard, etc.) and tell them specifically why you appreciate their work!',
+                        difficulty: 'Easy',
+                        duration: '1h',
+                        tokens: 450,
+                        hashtags: ['#Gratitude', '#ServiceWorkers', '#Appreciation'],
+                        aiPrompt: 'Create a gratitude-focused social challenge'
+                    }
+                ]
+            },
+            FITNESS: {
+                name: 'Fitness & Health',
+                icon: '💪',
+                color: '#10b981',
+                challenges: [
+                    {
+                        id: 'fitness_001',
+                        title: 'Sunrise Workout Challenge',
+                        description: 'Wake up early and do a 20-minute workout outside during sunrise. Capture the golden hour and inspire others with your dedication!',
+                        difficulty: 'Medium',
+                        duration: '45m',
+                        tokens: 600,
+                        hashtags: ['#SunriseWorkout', '#Fitness', '#EarlyBird'],
+                        aiPrompt: 'Create a morning fitness challenge with nature'
+                    },
+                    {
+                        id: 'fitness_002',
+                        title: 'Stair Climbing Marathon',
+                        description: 'For one full day, take stairs instead of elevators/escalators. Count total floors climbed and celebrate your achievement!',
+                        difficulty: 'Easy',
+                        duration: '1 day',
+                        tokens: 400,
+                        hashtags: ['#Stairs', '#Fitness', '#HealthyChoices'],
+                        aiPrompt: 'Create a daily fitness habit challenge'
+                    },
+                    {
+                        id: 'fitness_003',
+                        title: 'Dance Battle Flashmob',
+                        description: 'Learn a 1-minute dance routine and perform it in a public space. Record the reactions and spread joy through movement!',
+                        difficulty: 'Hard',
+                        duration: '2h',
+                        tokens: 800,
+                        hashtags: ['#Dance', '#PublicPerformance', '#Joy'],
+                        aiPrompt: 'Create a dance-based fitness challenge'
+                    },
+                    {
+                        id: 'fitness_004',
+                        title: 'Nature Obstacle Course',
+                        description: 'Create and complete an obstacle course using only natural elements (logs, rocks, trees). Document your creative course!',
+                        difficulty: 'Medium',
+                        duration: '1h',
+                        tokens: 550,
+                        hashtags: ['#Nature', '#Obstacle', '#Creativity'],
+                        aiPrompt: 'Create a nature-based fitness challenge'
+                    },
+                    {
+                        id: 'fitness_005',
+                        title: 'Walking Meeting Challenge',
+                        description: 'Replace all your meetings/calls today with walking meetings. Track distance and share how movement improved your conversations!',
+                        difficulty: 'Easy',
+                        duration: '1 day',
+                        tokens: 350,
+                        hashtags: ['#Walking', '#Productivity', '#Health'],
+                        aiPrompt: 'Create a workplace fitness integration challenge'
+                    }
+                ]
+            },
+            CREATIVE: {
+                name: 'Creative Expression',
+                icon: '🎨',
+                color: '#8b5cf6',
+                challenges: [
+                    {
+                        id: 'creative_001',
+                        title: 'One-Minute Story Challenge',
+                        description: 'Record yourself telling a complete story in exactly 60 seconds. It can be real or fictional - just make it engaging and memorable!',
+                        difficulty: 'Medium',
+                        duration: '30m',
+                        tokens: 550,
+                        hashtags: ['#Storytelling', '#Creative', '#VideoChallenge'],
+                        aiPrompt: 'Create a storytelling-based creative challenge'
+                    },
+                    {
+                        id: 'creative_002',
+                        title: 'Food Art Masterpiece',
+                        description: 'Create art using only food items. Make a face with your breakfast, build a landscape with vegetables, or design edible sculptures!',
+                        difficulty: 'Easy',
+                        duration: '20m',
+                        tokens: 350,
+                        hashtags: ['#FoodArt', '#Creative', '#Breakfast'],
+                        aiPrompt: 'Create a food-based artistic challenge'
+                    },
+                    {
+                        id: 'creative_003',
+                        title: 'Trash to Treasure Challenge',
+                        description: 'Create something beautiful or useful from items you would normally throw away. Document your transformation process!',
+                        difficulty: 'Medium',
+                        duration: '1h',
+                        tokens: 600,
+                        hashtags: ['#Upcycle', '#Sustainability', '#Art'],
+                        aiPrompt: 'Create an eco-friendly creative challenge'
+                    },
+                    {
+                        id: 'creative_004',
+                        title: 'Shadow Art Photography',
+                        description: 'Create and photograph 5 different artistic shadows using everyday objects. Play with light, angles, and creativity!',
+                        difficulty: 'Medium',
+                        duration: '45m',
+                        tokens: 500,
+                        hashtags: ['#Shadow', '#Photography', '#Light'],
+                        aiPrompt: 'Create a light and shadow photography challenge'
+                    },
+                    {
+                        id: 'creative_005',
+                        title: 'Musical Instrument Innovation',
+                        description: 'Create a musical instrument from household items and compose a 30-second song. Record your performance!',
+                        difficulty: 'Hard',
+                        duration: '1h',
+                        tokens: 750,
+                        hashtags: ['#Music', '#Innovation', '#DIY'],
+                        aiPrompt: 'Create a music creation challenge with household items'
+                    }
+                ]
+            },
+            ADVENTURE: {
+                name: 'Adventure & Exploration',
+                icon: '🗺️',
+                color: '#f59e0b',
+                challenges: [
+                    {
+                        id: 'adventure_001',
+                        title: 'Mystery Location Challenge',
+                        description: 'Close your eyes, point to a spot on a map within 10km, and visit that exact location. Discover something new about your area!',
+                        difficulty: 'Hard',
+                        duration: '3h',
+                        tokens: 900,
+                        hashtags: ['#Adventure', '#Exploration', '#Mystery'],
+                        aiPrompt: 'Create a random exploration adventure challenge'
+                    },
+                    {
+                        id: 'adventure_002',
+                        title: 'Photo Scavenger Hunt',
+                        description: 'Find and photograph: something blue, something old, something that makes you smile, something unexpected, and something moving!',
+                        difficulty: 'Medium',
+                        duration: '1h',
+                        tokens: 650,
+                        hashtags: ['#ScavengerHunt', '#Photography', '#Adventure'],
+                        aiPrompt: 'Create a photo-based scavenger hunt challenge'
+                    },
+                    {
+                        id: 'adventure_003',
+                        title: 'Transportation Roulette',
+                        description: 'Use 3 different modes of transportation in one journey (bus, bike, walking, etc.). Document your multi-modal adventure!',
+                        difficulty: 'Medium',
+                        duration: '2h',
+                        tokens: 700,
+                        hashtags: ['#Transport', '#Urban', '#Journey'],
+                        aiPrompt: 'Create a transportation variety challenge'
+                    },
+                    {
+                        id: 'adventure_004',
+                        title: 'Sunrise to Sunset Quest',
+                        description: 'Document your city from sunrise to sunset by taking photos every 2 hours. Create a time-lapse of your day!',
+                        difficulty: 'Hard',
+                        duration: '1 day',
+                        tokens: 1000,
+                        hashtags: ['#TimelineRoulette', '#Photography', '#FullDay'],
+                        aiPrompt: 'Create a full-day documentation challenge'
+                    },
+                    {
+                        id: 'adventure_005',
+                        title: 'Local Legend Investigation',
+                        description: 'Research a local legend, myth, or historical story, then visit the location and create content about your findings!',
+                        difficulty: 'Medium',
+                        duration: '2h',
+                        tokens: 800,
+                        hashtags: ['#History', '#Local', '#Research'],
+                        aiPrompt: 'Create a local history investigation challenge'
+                    }
+                ]
+            },
+            MINDFULNESS: {
+                name: 'Mindfulness & Growth',
+                icon: '🧠',
+                color: '#06b6d4',
+                challenges: [
+                    {
+                        id: 'mindful_001',
+                        title: 'Digital Detox Hour',
+                        description: 'Spend 1 hour completely disconnected from all digital devices. Document what you discovered about yourself during this time!',
+                        difficulty: 'Hard',
+                        duration: '1h',
+                        tokens: 600,
+                        hashtags: ['#DigitalDetox', '#Mindfulness', '#SelfCare'],
+                        aiPrompt: 'Create a mindfulness and digital wellness challenge'
+                    },
+                    {
+                        id: 'mindful_002',
+                        title: 'Gratitude Photography',
+                        description: 'Take photos of 10 things you\'re grateful for today. Write a short caption for each explaining why it matters to you!',
+                        difficulty: 'Easy',
+                        duration: '30m',
+                        tokens: 400,
+                        hashtags: ['#Gratitude', '#Photography', '#Positive'],
+                        aiPrompt: 'Create a gratitude-based mindfulness challenge'
+                    },
+                    {
+                        id: 'mindful_003',
+                        title: 'Random Acts Documentation',
+                        description: 'Perform 3 random acts of kindness and document the impact (with permission). Spread positivity and track the ripple effect!',
+                        difficulty: 'Medium',
+                        duration: '2h',
+                        tokens: 750,
+                        hashtags: ['#Kindness', '#Impact', '#Community'],
+                        aiPrompt: 'Create a kindness documentation challenge'
+                    },
+                    {
+                        id: 'mindful_004',
+                        title: 'Fear Facing Challenge',
+                        description: 'Do something that scares you (but is safe) - public speaking, trying new food, talking to strangers. Document your growth!',
+                        difficulty: 'Hard',
+                        duration: '1h',
+                        tokens: 800,
+                        hashtags: ['#GrowthMindset', '#Courage', '#PersonalDevelopment'],
+                        aiPrompt: 'Create a courage and personal growth challenge'
+                    },
+                    {
+                        id: 'mindful_005',
+                        title: 'Meditation Spot Hunt',
+                        description: 'Find the most peaceful spot in your area and meditate there for 15 minutes. Share your hidden gem with others!',
+                        difficulty: 'Easy',
+                        duration: '45m',
+                        tokens: 450,
+                        hashtags: ['#Meditation', '#PeacefulPlaces', '#Mindfulness'],
+                        aiPrompt: 'Create a meditation and peaceful space discovery challenge'
+                    }
+                ]
+            }
+        };
+
+        // Challenge Management System
+        let challengeHistory = [];
+        let availableChallenges = [];
+        let currentChallengeSet = [];
+        let usedChallengeIds = new Set();
+
+        // AI Integration Functions
+        async function generateAIChallenge(category, difficulty = 'Medium') {
+            const apiKey = API_CONFIG.openAI.apiKey;
+            
+            if (!apiKey) {
+                console.log('No AI API key configured, using preset challenges');
+                return null;
+            }
+
+            try {
+                const prompt = `Create a unique ${category.toLowerCase()} challenge for a social app. 
+                Requirements:
+                - Difficulty: ${difficulty}
+                - Duration: 30-120 minutes
+                - Must be safe and legal
+                - Should encourage social interaction or personal growth
+                - Include specific actionable steps
+                - Be creative and engaging
+                
+                Format response as JSON:
+                {
+                    "title": "Challenge Title",
+                    "description": "Detailed description with specific actions",
+                    "difficulty": "${difficulty}",
+                    "duration": "estimated time",
+                    "tokens": number_between_300_1000,
+                    "hashtags": ["#tag1", "#tag2", "#tag3"]
+                }`;
+
+                const response = await fetch(API_CONFIG.openAI.endpoint, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${apiKey}`
+                    },
+                    body: JSON.stringify({
+                        model: API_CONFIG.openAI.model,
+                        messages: [
+                            {
+                                role: 'system',
+                                content: 'You are a creative challenge designer for a social platform. Create engaging, safe, and fun challenges.'
+                            },
+                            {
+                                role: 'user',
+                                content: prompt
+                            }
+                        ],
+                        max_tokens: 500,
+                        temperature: 0.8
+                    })
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    const challengeData = JSON.parse(data.choices[0].message.content);
+                    
+                    return {
+                        id: `ai_${Date.now()}`,
+                        ...challengeData,
+                        category: category,
+                        categoryInfo: {
+                            name: category,
+                            icon: getCategoryIcon(category),
+                            color: getCategoryColor(category)
+                        },
+                        aiGenerated: true
+                    };
+                }
+            } catch (error) {
+                console.error('AI Challenge generation failed:', error);
+            }
+            
+            return null;
+        }
+
+        function getCategoryIcon(category) {
+            const icons = {
+                'Social': '👥',
+                'Fitness': '💪',
+                'Creative': '🎨',
+                'Adventure': '🗺️',
+                'Mindfulness': '🧠'
+            };
+            return icons[category] || '🎯';
+        }
+
+        function getCategoryColor(category) {
+            const colors = {
+                'Social': '#ff6b9d',
+                'Fitness': '#10b981',
+                'Creative': '#8b5cf6',
+                'Adventure': '#f59e0b',
+                'Mindfulness': '#06b6d4'
+            };
+            return colors[category] || '#6b7280';
+        }
+
+        // Smart Challenge Selection System
+        function getAllChallenges() {
+            const allChallenges = [];
+            Object.keys(MASTER_CHALLENGE_DATABASE).forEach(categoryKey => {
+                const category = MASTER_CHALLENGE_DATABASE[categoryKey];
+                category.challenges.forEach(challenge => {
+                    allChallenges.push({
+                        ...challenge,
+                        category: categoryKey,
+                        categoryInfo: category
+                    });
+                });
+            });
+            return allChallenges;
+        }
+
+        async function generateSmartChallengeSet(count = 3) {
+            const allChallenges = getAllChallenges();
+            const totalChallenges = allChallenges.length;
+            
+            // Reset used challenges if we've cycled through all
+            if (usedChallengeIds.size >= totalChallenges) {
+                usedChallengeIds.clear();
+                challengeHistory = [];
+                showToast('🔄 Challenge cycle completed! Starting fresh rotation.', 'info');
+            }
+            
+            // Filter out used challenges
+            const unusedChallenges = allChallenges.filter(challenge => 
+                !usedChallengeIds.has(challenge.id)
+            );
+            
+            // If we need AI challenges and have API key
+            let selectedChallenges = [];
+            
+            // Try to get AI challenges if API is configured
+            if (API_CONFIG.openAI.apiKey && Math.random() > 0.7) {
+                try {
+                    const categories = ['Social', 'Creative', 'Adventure', 'Fitness', 'Mindfulness'];
+                    const randomCategory = categories[Math.floor(Math.random() * categories.length)];
+                    const aiChallenge = await generateAIChallenge(randomCategory);
+                    
+                    if (aiChallenge) {
+                        selectedChallenges.push(aiChallenge);
+                        count--;
+                    }
+                } catch (error) {
+                    console.log('AI challenge generation skipped');
+                }
+            }
+            
+            // Fill remaining slots with unused preset challenges
+            if (unusedChallenges.length >= count) {
+                // Ensure variety across categories
+                const categoriesUsed = new Set();
+                const finalChallenges = [];
+                
+                // Shuffle unused challenges
+                const shuffled = unusedChallenges.sort(() => 0.5 - Math.random());
+                
+                for (const challenge of shuffled) {
+                    if (finalChallenges.length >= count) break;
+                    
+                    // Prefer challenges from unused categories
+                    if (!categoriesUsed.has(challenge.category) || finalChallenges.length >= count - 1) {
+                        finalChallenges.push(challenge);
+                        categoriesUsed.add(challenge.category);
+                        usedChallengeIds.add(challenge.id);
+                    }
+                }
+                
+                selectedChallenges = [...selectedChallenges, ...finalChallenges];
+            } else {
+                // Not enough unused challenges, mix with some used ones
+                selectedChallenges = [...selectedChallenges, ...unusedChallenges];
+                const stillNeeded = count - selectedChallenges.length;
+                
+                if (stillNeeded > 0) {
+                    const usedChallenges = allChallenges
+                        .filter(c => usedChallengeIds.has(c.id))
+                        .sort(() => 0.5 - Math.random())
+                        .slice(0, stillNeeded);
+                    selectedChallenges = [...selectedChallenges, ...usedChallenges];
+                }
+            }
+            
+            // Mark as used and add to history
+            selectedChallenges.forEach(challenge => {
+                if (!challenge.aiGenerated) {
+                    usedChallengeIds.add(challenge.id);
+                }
+                challengeHistory.push({
+                    challenge,
+                    timestamp: new Date(),
+                    used: true
+                });
+            });
+            
+            return selectedChallenges.slice(0, count);
+        }
+
+        // Enhanced Challenge Display
         function initializeChallenges() {
-            displayChallengeSelection();
+            generateAndDisplayChallenges();
+        }
+
+        async function generateAndDisplayChallenges() {
+            try {
+                currentChallengeSet = await generateSmartChallengeSet(3);
+                displayChallengeSelection();
+                
+                // Update progress indicator
+                const totalChallenges = getAllChallenges().length;
+                const used = usedChallengeIds.size;
+                const progress = Math.round((used / totalChallenges) * 100);
+                
+                const progressElement = document.getElementById('challengeProgress');
+                if (progressElement) {
+                    if (used > 0) {
+                        progressElement.textContent = `${used}/${totalChallenges} Explored (${progress}%)`;
+                        progressElement.style.background = `linear-gradient(90deg, var(--primary-pink) ${progress}%, rgba(255, 255, 255, 0.1) ${progress}%)`;
+                    } else {
+                        progressElement.textContent = '25+ Unique Challenges';
+                        progressElement.style.background = 'rgba(255, 255, 255, 0.1)';
+                    }
+                }
+                
+                if (used > 0) {
+                    showToast(`🎯 Challenge ${used}/${totalChallenges} (${progress}% explored)`, 'info');
+                }
+            } catch (error) {
+                console.error('Challenge generation failed:', error);
+                showToast('⚠️ Challenge generation failed, using fallback', 'error');
+                currentChallengeSet = getAllChallenges().slice(0, 3);
+                displayChallengeSelection();
+            }
         }
 
         function displayChallengeSelection() {
             const container = document.getElementById('challengeSelection');
-            container.innerHTML = sampleChallenges.map((challenge, index) => `
-                <div class="challenge-card">
-                    <div class="challenge-category-badge" style="background: ${challenge.color}; color: white;">
-                        ${challenge.icon} ${challenge.category}
+            container.innerHTML = '';
+
+            currentChallengeSet.forEach((challenge, index) => {
+                const challengeCard = document.createElement('div');
+                challengeCard.className = 'challenge-card';
+                
+                const aiIndicator = challenge.aiGenerated ? 
+                    `<div style="position: absolute; top: 45px; right: 15px; background: linear-gradient(45deg, #ff6b9d, #8b5cf6); color: white; padding: 3px 8px; border-radius: 6px; font-size: 9px; font-weight: 700;">🤖 AI CREATED</div>` : '';
+                
+                challengeCard.innerHTML = `
+                    <div class="challenge-category-badge" style="background: ${challenge.categoryInfo.color}">
+                        ${challenge.categoryInfo.icon} ${challenge.categoryInfo.name}
                     </div>
+                    ${aiIndicator}
                     <div style="margin-top: 30px;">
                         <div style="font-size: 18px; font-weight: 600; margin-bottom: 10px; color: var(--primary-pink);">
                             ${challenge.title}
@@ -1920,23 +2444,86 @@
                                 <div style="font-size: 9px; color: var(--text-secondary);">TIME</div>
                             </div>
                         </div>
+                        <div style="display: flex; flex-wrap: wrap; gap: 4px; margin-bottom: 15px;">
+                            ${challenge.hashtags.map(tag => `<span class="hashtag" style="font-size: 9px; padding: 2px 6px;">${tag}</span>`).join('')}
+                        </div>
                         <button class="btn-primary" onclick="takeChallenge(${index})" style="width: 100%; padding: 12px; font-size: 13px;">
                             🚀 TAKE CHALLENGE
                         </button>
                     </div>
-                </div>
-            `).join('');
+                `;
+
+                container.appendChild(challengeCard);
+            });
         }
 
-        window.refreshChallenges = function() {
-            displayChallengeSelection();
-            showToast('✨ New AI challenges generated!', 'success');
+        window.refreshChallenges = async function() {
+            const refreshBtn = document.querySelector('[onclick="refreshChallenges()"]');
+            refreshBtn.style.opacity = '0.5';
+            refreshBtn.style.pointerEvents = 'none';
+            
+            try {
+                await generateAndDisplayChallenges();
+                showToast('✨ New AI challenges generated!', 'success');
+            } catch (error) {
+                showToast('⚠️ Challenge refresh failed', 'error');
+            } finally {
+                refreshBtn.style.opacity = '1';
+                refreshBtn.style.pointerEvents = 'auto';
+            }
         }
 
         window.takeChallenge = function(index) {
-            const challenge = sampleChallenges[index];
-            if (confirm(`🎯 Ready to take on "${challenge.title}"?\n\nThis challenge will reward you with ${challenge.tokens} tokens!`)) {
-                showToast(`🎯 Challenge "${challenge.title}" accepted!`, 'success');
+            const challenge = currentChallengeSet[index];
+            if (!challenge) {
+                showToast('⚠️ Challenge not found!', 'error');
+                return;
+            }
+
+            if (confirm(`🎯 Ready to take on "${challenge.title}"?\n\n${challenge.aiGenerated ? '🤖 This AI-generated challenge' : 'This challenge'} will reward you with ${challenge.tokens} tokens!\n\nClick OK to accept!`)) {
+                showToast(`🎯 Challenge "${challenge.title}" accepted! ${challenge.aiGenerated ? '🤖 AI Challenge' : ''}`, 'success');
+                
+                // Track challenge acceptance
+                challengeHistory.push({
+                    challenge,
+                    timestamp: new Date(),
+                    accepted: true
+                });
+            }
+        }
+
+        // API Configuration Functions
+        window.configureAI = function() {
+            const currentKey = API_CONFIG.openAI.apiKey;
+            const newKey = prompt(`Configure OpenAI API Key for AI-generated challenges:\n\nCurrent: ${currentKey ? '***' + currentKey.slice(-4) : 'Not set'}\n\nEnter new API key (or leave empty to disable):`, '');
+            
+            if (newKey !== null) {
+                API_CONFIG.openAI.apiKey = newKey.trim();
+                if (newKey.trim()) {
+                    showToast('🤖 AI Challenge generation enabled!', 'success');
+                } else {
+                    showToast('🔧 AI disabled, using preset challenges only', 'info');
+                }
+                
+                // Save to localStorage
+                try {
+                    localStorage.setItem('jombroApiConfig', JSON.stringify(API_CONFIG));
+                } catch (e) {
+                    console.log('Could not save API config');
+                }
+            }
+        }
+
+        // Load API configuration on startup
+        function loadAPIConfig() {
+            try {
+                const saved = localStorage.getItem('jombroApiConfig');
+                if (saved) {
+                    const savedConfig = JSON.parse(saved);
+                    Object.assign(API_CONFIG, savedConfig);
+                }
+            } catch (e) {
+                console.log('Could not load API config');
             }
         }
 
@@ -2578,9 +3165,11 @@
         document.addEventListener('DOMContentLoaded', function() {
             console.log('🚀 JomBro Cutting-Edge Layered Glass Interface Loaded!');
             console.log('✨ Features: Layered Glass Effect, Animated Backgrounds, Video Support');
+            console.log('🤖 AI Challenge System: 25+ Unique Challenges with Smart Rotation');
             
-            // Load saved settings
+            // Load saved settings and API configuration
             loadSettings();
+            loadAPIConfig();
             
             // Initialize default UI state
             updateSettingsUI();
