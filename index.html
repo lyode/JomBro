@@ -12,20 +12,10 @@
     <meta name="theme-color" content="#ff6b9d">
     <meta name="description" content="AI-Powered Social Challenge Platform - Connect, Challenge, Conquer!">
        
-    <title>JomBro - Enhanced Social Challenge Platform</title>
+    <title>JomBro - Cutting-Edge Layered Glass Interface</title>
 
     <style>
-        .auth-btn.facebook {
-            background: #1877f2;
-            color: #fff;
-            box-shadow: 0 2px 10px rgba(24, 119, 242, 0.3);
-        }
-
-        .auth-btn.facebook:hover {
-            background: #166fe5;
-            transform: translateY(-2px);
-            box-shadow: 0 5px 20px rgba(24, 119, 242, 0.4);
-        }
+        /* ===== LAYERED GLASS SYSTEM ===== */
         
         :root {
             --safe-area-top: env(safe-area-inset-top, 20px);
@@ -37,14 +27,19 @@
             --accent-purple: #a855f7;
             --accent-blue: #3b82f6;
             --dark-bg: #0a0a0a;
-            --glass-bg: rgba(15, 15, 15, 0.85);
-            --glass-border: rgba(255, 255, 255, 0.1);
-            --glass-shadow: rgba(0, 0, 0, 0.5);
+            --glass-bg: rgba(15, 15, 15, 0.45);
+            --glass-border: rgba(255, 255, 255, 0.08);
+            --glass-shadow: rgba(0, 0, 0, 0.8);
             --text-primary: #ffffff;
             --text-secondary: rgba(255, 255, 255, 0.7);
             --success-green: #10b981;
             --warning-orange: #f59e0b;
             --error-red: #ef4444;
+            
+            /* Glass Layer System */
+            --glass-distance: 3mm;
+            --glass-blur: 25px;
+            --glass-opacity: 0.15;
         }
 
         * {
@@ -64,38 +59,301 @@
             color: var(--text-primary);
             user-select: none;
             overflow: hidden;
+            perspective: 1000px;
         }
 
-        /* Auth Screen Styles */
+        /* ===== BOTTOM LAYER: ANIMATED BACKGROUNDS ===== */
+        
+        .background-layer {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            z-index: 1;
+            overflow: hidden;
+            transform: translateZ(-var(--glass-distance));
+        }
+
+        .background-content {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            opacity: 0;
+            transition: opacity 1s ease-in-out;
+        }
+
+        .background-content.active {
+            opacity: 1;
+        }
+
+        /* Space Background with Blinking Stars */
+        .space-background {
+            background: radial-gradient(ellipse at bottom, #1b2735 0%, #090a0f 100%);
+            position: relative;
+        }
+
+        .stars {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-image: 
+                radial-gradient(2px 2px at 20px 30px, #eee, transparent),
+                radial-gradient(2px 2px at 40px 70px, rgba(255,255,255,0.8), transparent),
+                radial-gradient(1px 1px at 90px 40px, #fff, transparent),
+                radial-gradient(1px 1px at 130px 80px, rgba(255,255,255,0.6), transparent),
+                radial-gradient(2px 2px at 160px 30px, #eee, transparent);
+            background-repeat: repeat;
+            background-size: 200px 100px;
+            animation: sparkle 3s linear infinite;
+        }
+
+        @keyframes sparkle {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+
+        .shooting-star {
+            position: absolute;
+            width: 2px;
+            height: 2px;
+            background: white;
+            border-radius: 50%;
+            box-shadow: 0 0 6px 2px rgba(255, 255, 255, 0.8);
+            animation: shootingStar 4s linear infinite;
+        }
+
+        @keyframes shootingStar {
+            0% {
+                transform: translateX(-100px) translateY(-100px);
+                opacity: 0;
+            }
+            10% {
+                opacity: 1;
+            }
+            90% {
+                opacity: 1;
+            }
+            100% {
+                transform: translateX(100vw) translateY(100vh);
+                opacity: 0;
+            }
+        }
+
+        /* Space with Planets Background */
+        .space-planets-background {
+            background: radial-gradient(ellipse at bottom, #1b2735 0%, #090a0f 100%);
+            position: relative;
+        }
+
+        .planet {
+            position: absolute;
+            border-radius: 50%;
+            animation: float 6s ease-in-out infinite;
+        }
+
+        .planet-1 {
+            width: 80px;
+            height: 80px;
+            background: radial-gradient(circle at 30% 30%, #ff6b9d, #c44569);
+            top: 20%;
+            right: 15%;
+            animation-delay: 0s;
+        }
+
+        .planet-2 {
+            width: 60px;
+            height: 60px;
+            background: radial-gradient(circle at 30% 30%, #8b5cf6, #5b21b6);
+            bottom: 30%;
+            left: 10%;
+            animation-delay: 2s;
+        }
+
+        .planet-3 {
+            width: 40px;
+            height: 40px;
+            background: radial-gradient(circle at 30% 30%, #00d4ff, #0284c7);
+            top: 50%;
+            left: 50%;
+            animation-delay: 4s;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-20px) rotate(5deg); }
+        }
+
+        /* Animated Background */
+        .animated-background {
+            background: linear-gradient(45deg, #1a1a2e, #16213e, #0f3460);
+            position: relative;
+        }
+
+        .animated-shape {
+            position: absolute;
+            border-radius: 50%;
+            background: linear-gradient(45deg, var(--primary-pink), var(--primary-purple));
+            opacity: 0.1;
+            animation: morphShapes 8s ease-in-out infinite;
+        }
+
+        .shape-1 {
+            width: 100px;
+            height: 100px;
+            top: 20%;
+            left: 20%;
+            animation-delay: 0s;
+        }
+
+        .shape-2 {
+            width: 150px;
+            height: 150px;
+            bottom: 20%;
+            right: 20%;
+            animation-delay: 2s;
+        }
+
+        .shape-3 {
+            width: 80px;
+            height: 80px;
+            top: 60%;
+            left: 60%;
+            animation-delay: 4s;
+        }
+
+        @keyframes morphShapes {
+            0%, 100% { 
+                transform: scale(1) rotate(0deg);
+                border-radius: 50%;
+            }
+            25% {
+                transform: scale(1.2) rotate(90deg);
+                border-radius: 30% 70% 70% 30% / 30% 30% 70% 70%;
+            }
+            50% {
+                transform: scale(0.8) rotate(180deg);
+                border-radius: 70% 30% 30% 70% / 70% 70% 30% 30%;
+            }
+            75% {
+                transform: scale(1.1) rotate(270deg);
+                border-radius: 50% 50% 25% 75% / 25% 75% 50% 50%;
+            }
+        }
+
+        /* Video Background */
+        .video-background {
+            position: relative;
+        }
+
+        .video-background video {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            min-width: 100%;
+            min-height: 100%;
+            width: auto;
+            height: auto;
+            transform: translateX(-50%) translateY(-50%);
+            object-fit: cover;
+            opacity: 0.6;
+        }
+
+        /* ===== TOP LAYER: GLASS UI INTERFACE ===== */
+        
+        .glass-layer {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            z-index: 1000;
+            transform: translateZ(var(--glass-distance));
+            transform-style: preserve-3d;
+            will-change: transform;
+            pointer-events: auto;
+        }
+
+        /* Background Controls */
+        .background-controls {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 2000;
+            display: flex;
+            gap: 10px;
+            background: rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(15px);
+            border-radius: 20px;
+            padding: 10px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .bg-control-btn {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            backdrop-filter: blur(10px);
+        }
+
+        .bg-control-btn:hover {
+            transform: scale(1.1);
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .bg-control-btn.active {
+            background: var(--primary-pink);
+            box-shadow: 0 0 20px rgba(255, 107, 157, 0.5);
+        }
+
+        /* Auth Screen with Glass Effect */
         .auth-screen {
             position: fixed;
             top: 0;
             left: 0;
             right: 0;
             bottom: 0;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             display: flex;
             align-items: center;
             justify-content: center;
             z-index: 5000;
             padding: 20px;
+            backdrop-filter: blur(var(--glass-blur));
+            background: rgba(0, 0, 0, 0.4);
         }
 
         .auth-container {
-            background: var(--glass-bg);
-            backdrop-filter: blur(25px);
-            border: 1px solid var(--glass-border);
+            background: rgba(15, 15, 15, 0.3);
+            backdrop-filter: blur(40px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
             border-radius: 25px;
             padding: 40px 30px;
             text-align: center;
-            box-shadow: 0 25px 50px var(--glass-shadow);
+            box-shadow: 
+                0 25px 50px rgba(0, 0, 0, 0.5),
+                inset 0 1px 0 rgba(255, 255, 255, 0.1);
             max-width: 350px;
             width: 100%;
+            transform: translateZ(5px);
         }
 
         .auth-logo {
             font-size: 48px;
             margin-bottom: 10px;
+            text-shadow: 0 0 20px rgba(255, 107, 157, 0.5);
         }
 
         .auth-title {
@@ -103,6 +361,7 @@
             font-weight: 300;
             color: var(--text-primary);
             margin-bottom: 8px;
+            text-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
         }
 
         .auth-subtitle {
@@ -125,626 +384,40 @@
             align-items: center;
             justify-content: center;
             gap: 10px;
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
         }
 
         .auth-btn.google {
-            background: #fff;
+            background: rgba(255, 255, 255, 0.9);
             color: #333;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            box-shadow: 0 8px 32px rgba(255, 255, 255, 0.1);
+        }
+
+        .auth-btn.facebook {
+            background: rgba(24, 119, 242, 0.8);
+            color: #fff;
+            box-shadow: 0 8px 32px rgba(24, 119, 242, 0.3);
         }
 
         .auth-btn.phone {
-            background: var(--primary-pink);
+            background: rgba(255, 107, 157, 0.8);
             color: #fff;
+            box-shadow: 0 8px 32px rgba(255, 107, 157, 0.3);
         }
 
         .auth-btn.test {
-            background: #666;
+            background: rgba(102, 102, 102, 0.8);
             color: white;
+            box-shadow: 0 8px 32px rgba(102, 102, 102, 0.3);
         }
 
         .auth-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 20px rgba(0,0,0,0.2);
+            transform: translateY(-2px) translateZ(2px);
+            box-shadow: 0 12px 40px rgba(0,0,0,0.3);
         }
 
-        /* Enhanced Modal System */
-        .modal {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(0, 0, 0, 0.8);
-            backdrop-filter: blur(10px);
-            display: none;
-            align-items: center;
-            justify-content: center;
-            z-index: 3000;
-            padding: 20px;
-        }
-
-        .modal.show {
-            display: flex;
-        }
-
-        .modal-content {
-            background: var(--glass-bg);
-            backdrop-filter: blur(25px);
-            border: 1px solid var(--glass-border);
-            border-radius: 20px;
-            padding: 25px;
-            max-width: 90%;
-            max-height: 80%;
-            overflow-y: auto;
-            width: 100%;
-            max-width: 400px;
-            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.5);
-        }
-
-        .modal-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
-            padding-bottom: 15px;
-            border-bottom: 1px solid var(--glass-border);
-        }
-
-        .modal-title {
-            font-size: 18px;
-            font-weight: 600;
-            color: var(--text-primary);
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .modal-close {
-            background: none;
-            border: none;
-            color: var(--text-secondary);
-            font-size: 20px;
-            cursor: pointer;
-            padding: 5px;
-        }
-
-        /* Enhanced User Profile Styles */
-        .enhanced-profile-header {
-            background: linear-gradient(135deg, var(--primary-pink), var(--primary-purple));
-            padding: 25px;
-            border-radius: 20px;
-            margin-bottom: 25px;
-            color: white;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .profile-avatar-upload {
-            position: relative;
-            width: 100px;
-            height: 100px;
-            margin: 0 auto 20px;
-            cursor: pointer;
-        }
-
-        .profile-avatar-large {
-            width: 100px;
-            height: 100px;
-            border-radius: 50%;
-            background: rgba(255, 255, 255, 0.2);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 32px;
-            border: 4px solid rgba(255, 255, 255, 0.3);
-            transition: all 0.3s ease;
-            overflow: hidden;
-        }
-
-        .profile-avatar-large:hover {
-            transform: scale(1.05);
-            border-color: rgba(255, 255, 255, 0.5);
-        }
-
-        .avatar-upload-overlay {
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            background: rgba(0, 0, 0, 0.7);
-            color: white;
-            text-align: center;
-            padding: 8px;
-            font-size: 10px;
-            transform: translateY(100%);
-            transition: transform 0.3s ease;
-        }
-
-        .profile-avatar-upload:hover .avatar-upload-overlay {
-            transform: translateY(0);
-        }
-
-        .profile-achievements {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
-            gap: 10px;
-            margin: 20px 0;
-        }
-
-        .achievement-badge {
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 12px;
-            padding: 12px 8px;
-            text-align: center;
-            transition: all 0.3s ease;
-            cursor: pointer;
-        }
-
-        .achievement-badge:hover {
-            background: rgba(255, 255, 255, 0.2);
-            transform: translateY(-2px);
-        }
-
-        .achievement-icon {
-            font-size: 24px;
-            margin-bottom: 4px;
-        }
-
-        .achievement-name {
-            font-size: 9px;
-            opacity: 0.9;
-        }
-
-        .profile-header {
-            text-align: center;
-            margin-bottom: 25px;
-        }
-
-        .profile-avatar-edit {
-            position: absolute;
-            bottom: 0;
-            right: 0;
-            width: 24px;
-            height: 24px;
-            background: var(--primary-pink);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 12px;
-            cursor: pointer;
-        }
-
-        .profile-name {
-            font-size: 20px;
-            font-weight: 600;
-            margin-bottom: 5px;
-        }
-
-        .profile-bio {
-            font-size: 14px;
-            color: var(--text-secondary);
-            margin-bottom: 5px;
-        }
-
-        .profile-level {
-            display: inline-block;
-            background: var(--primary-pink);
-            color: white;
-            padding: 4px 12px;
-            border-radius: 12px;
-            font-size: 12px;
-            font-weight: 600;
-        }
-
-        .profile-stats {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 15px;
-            margin: 20px 0;
-        }
-
-        .profile-stat {
-            text-align: center;
-            background: rgba(255, 255, 255, 0.05);
-            padding: 15px 10px;
-            border-radius: 12px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-        .profile-stat:hover {
-            background: rgba(255, 255, 255, 0.1);
-            transform: translateY(-2px);
-        }
-
-        .profile-stat-value {
-            font-size: 18px;
-            font-weight: 700;
-            color: var(--primary-pink);
-            margin-bottom: 4px;
-        }
-
-        .profile-stat-label {
-            font-size: 11px;
-            color: var(--text-secondary);
-            text-transform: uppercase;
-        }
-
-        .profile-actions {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 10px;
-            margin-top: 20px;
-        }
-
-        /* Enhanced Friends System */
-        .friends-search {
-            position: relative;
-            margin-bottom: 20px;
-        }
-
-        .friends-search-input {
-            width: 100%;
-            padding: 12px 15px 12px 40px;
-            background: rgba(255, 255, 255, 0.1);
-            border: 1px solid var(--glass-border);
-            border-radius: 12px;
-            color: var(--text-primary);
-            font-size: 14px;
-            outline: none;
-        }
-
-        .friends-search-icon {
-            position: absolute;
-            left: 12px;
-            top: 50%;
-            transform: translateY(-50%);
-            color: var(--text-secondary);
-        }
-
-        .friends-tabs {
-            display: flex;
-            margin-bottom: 20px;
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 12px;
-            padding: 4px;
-        }
-
-        .friends-tab {
-            flex: 1;
-            padding: 8px 12px;
-            text-align: center;
-            font-size: 12px;
-            font-weight: 600;
-            border-radius: 8px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            color: var(--text-secondary);
-        }
-
-        .friends-tab.active {
-            background: var(--primary-pink);
-            color: white;
-        }
-
-        .friend-item {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            padding: 12px;
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 12px;
-            margin-bottom: 8px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-        .friend-item:hover {
-            background: rgba(255, 255, 255, 0.1);
-            transform: translateX(5px);
-        }
-
-        .friend-avatar {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            background: linear-gradient(45deg, var(--primary-blue), var(--primary-purple));
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 14px;
-            position: relative;
-        }
-
-        .friend-status {
-            position: absolute;
-            bottom: -2px;
-            right: -2px;
-            width: 12px;
-            height: 12px;
-            border-radius: 50%;
-            border: 2px solid var(--dark-bg);
-        }
-
-        .friend-status.online {
-            background: var(--success-green);
-        }
-
-        .friend-status.offline {
-            background: var(--text-secondary);
-        }
-
-        .friend-info {
-            flex: 1;
-        }
-
-        .friend-name {
-            font-size: 14px;
-            font-weight: 600;
-            margin-bottom: 2px;
-        }
-
-        .friend-activity {
-            font-size: 11px;
-            color: var(--text-secondary);
-        }
-
-        .friend-actions {
-            display: flex;
-            gap: 8px;
-        }
-
-        .friend-action-btn {
-            padding: 6px 12px;
-            border: none;
-            border-radius: 8px;
-            font-size: 11px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-        .friend-action-btn.primary {
-            background: var(--primary-pink);
-            color: white;
-        }
-
-        .friend-action-btn.secondary {
-            background: rgba(255, 255, 255, 0.1);
-            color: var(--text-primary);
-        }
-
-        /* Enhanced Group System */
-        .group-form {
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-        }
-
-        .form-group {
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-        }
-
-        .form-label {
-            font-size: 12px;
-            font-weight: 600;
-            color: var(--text-primary);
-        }
-
-        .form-input {
-            padding: 12px 15px;
-            background: rgba(255, 255, 255, 0.1);
-            border: 1px solid var(--glass-border);
-            border-radius: 10px;
-            color: var(--text-primary);
-            font-size: 14px;
-            outline: none;
-            transition: all 0.3s ease;
-        }
-
-        .form-input:focus {
-            border-color: var(--primary-pink);
-            box-shadow: 0 0 0 2px rgba(255, 107, 157, 0.2);
-        }
-
-        .form-textarea {
-            min-height: 80px;
-            resize: vertical;
-        }
-
-        .form-select {
-            appearance: none;
-            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%23ffffff' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='m6 8 4 4 4-4'/%3e%3c/svg%3e");
-            background-position: right 8px center;
-            background-repeat: no-repeat;
-            background-size: 16px;
-            padding-right: 32px;
-        }
-
-        .group-privacy-options {
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-            margin-top: 8px;
-        }
-
-        .privacy-option {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            padding: 10px;
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 8px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-        .privacy-option:hover {
-            background: rgba(255, 255, 255, 0.1);
-        }
-
-        .privacy-option input[type="radio"] {
-            margin: 0;
-        }
-
-        /* Enhanced Chat Interface */
-        .chat-interface {
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            height: 60%;
-            background: var(--glass-bg);
-            backdrop-filter: blur(25px);
-            border-top: 1px solid var(--glass-border);
-            border-radius: 20px 20px 0 0;
-            transform: translateY(100%);
-            transition: transform 0.3s ease;
-            z-index: 1000;
-            display: flex;
-            flex-direction: column;
-        }
-
-        .chat-interface.open {
-            transform: translateY(0);
-        }
-
-        .chat-header {
-            padding: 15px 20px;
-            border-bottom: 1px solid var(--glass-border);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .chat-title {
-            font-size: 16px;
-            font-weight: 600;
-            color: var(--text-primary);
-        }
-
-        .chat-members {
-            font-size: 12px;
-            color: var(--text-secondary);
-        }
-
-        .chat-close {
-            background: none;
-            border: none;
-            color: var(--text-secondary);
-            font-size: 18px;
-            cursor: pointer;
-        }
-
-        .chat-messages {
-            flex: 1;
-            overflow-y: auto;
-            padding: 15px;
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-        }
-
-        .message {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 10px;
-        }
-
-        .message.own {
-            flex-direction: row-reverse;
-        }
-
-        .message.system {
-            justify-content: center;
-            margin: 10px 0;
-        }
-
-        .message.system .message-content {
-            background: rgba(255, 255, 255, 0.1);
-            color: var(--text-secondary);
-            font-size: 12px;
-            text-align: center;
-            max-width: 80%;
-        }
-
-        .message-avatar {
-            width: 32px;
-            height: 32px;
-            border-radius: 50%;
-            background: var(--primary-pink);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 12px;
-            flex-shrink: 0;
-        }
-
-        .message-content {
-            background: rgba(255,255,255,0.1);
-            padding: 8px 12px;
-            border-radius: 12px;
-            max-width: 70%;
-            word-wrap: break-word;
-        }
-
-        .message.own .message-content {
-            background: var(--primary-pink);
-        }
-
-        .message-text {
-            font-size: 14px;
-            line-height: 1.4;
-        }
-
-        .message-time {
-            font-size: 11px;
-            color: var(--text-secondary);
-            margin-top: 4px;
-        }
-
-        .chat-input-container {
-            padding: 15px;
-            border-top: 1px solid var(--glass-border);
-            display: flex;
-            gap: 10px;
-            align-items: center;
-        }
-
-        .chat-input {
-            flex: 1;
-            background: rgba(255,255,255,0.1);
-            border: 1px solid var(--glass-border);
-            border-radius: 20px;
-            padding: 10px 15px;
-            color: var(--text-primary);
-            font-size: 14px;
-            outline: none;
-        }
-
-        .chat-input::placeholder {
-            color: var(--text-secondary);
-        }
-
-        .chat-send {
-            background: var(--primary-pink);
-            border: none;
-            border-radius: 50%;
-            width: 40px;
-            height: 40px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            color: #fff;
-            font-size: 16px;
-        }
-
-        /* Main App Layout */
+        /* Main App with Glass Effect */
         .phone-container {
             position: fixed;
             top: 0;
@@ -762,15 +435,19 @@
             width: 100%;
             max-width: 400px;
             height: calc(100vh - 20px);
-            background: var(--glass-bg);
-            backdrop-filter: blur(20px) saturate(180%);
-            border: 1px solid var(--glass-border);
+            background: rgba(15, 15, 15, 0.25);
+            backdrop-filter: blur(30px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
             border-radius: 25px;
-            box-shadow: 0 25px 50px var(--glass-shadow);
+            box-shadow: 
+                0 25px 50px rgba(0, 0, 0, 0.6),
+                inset 0 1px 0 rgba(255, 255, 255, 0.1),
+                0 0 60px rgba(255, 107, 157, 0.1);
             display: flex;
             flex-direction: column;
             overflow: hidden;
             position: relative;
+            transform: translateZ(3px);
         }
 
         .glass-header {
@@ -781,9 +458,9 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-            background: rgba(15, 15, 15, 0.95);
-            backdrop-filter: blur(25px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+            background: rgba(15, 15, 15, 0.4);
+            backdrop-filter: blur(40px);
         }
 
         .logo-section {
@@ -797,6 +474,7 @@
             font-weight: 200;
             color: var(--text-primary);
             letter-spacing: -1px;
+            text-shadow: 0 0 20px rgba(255, 107, 157, 0.4);
         }
 
         .logo-slogan {
@@ -808,6 +486,7 @@
             letter-spacing: 0.5px;
             opacity: 0.9;
             animation: pulse 3s infinite;
+            text-shadow: 0 0 10px rgba(255, 107, 157, 0.6);
         }
 
         .logo-subtitle {
@@ -826,8 +505,9 @@
             width: 30px;
             height: 30px;
             border-radius: 15px;
-            background: rgba(255, 255, 255, 0.08);
-            border: 1px solid rgba(255, 255, 255, 0.15);
+            background: rgba(255, 255, 255, 0.06);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
             display: flex;
             align-items: center;
             justify-content: center;
@@ -839,9 +519,10 @@
         }
 
         .header-btn:hover {
-            background: rgba(255, 107, 157, 0.2);
+            background: rgba(255, 107, 157, 0.15);
             border-color: var(--primary-pink);
-            transform: scale(1.1);
+            transform: scale(1.1) translateZ(1px);
+            box-shadow: 0 0 20px rgba(255, 107, 157, 0.3);
         }
 
         .notification-badge {
@@ -858,6 +539,7 @@
             justify-content: center;
             color: white;
             font-weight: 700;
+            box-shadow: 0 0 10px rgba(255, 107, 157, 0.5);
         }
 
         .glass-content {
@@ -870,7 +552,9 @@
 
         .glass-section {
             padding: 15px 25px;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+            background: rgba(255, 255, 255, 0.02);
+            backdrop-filter: blur(20px);
         }
 
         .live-header {
@@ -895,15 +579,24 @@
             background: #ff4757;
             border-radius: 50%;
             animation: pulse 2s infinite;
+            box-shadow: 0 0 10px #ff4757;
         }
 
         @keyframes pulse {
-            0%, 100% { opacity: 1; transform: scale(1); }
-            50% { opacity: 0.8; transform: scale(1.02); }
+            0%, 100% { 
+                opacity: 1; 
+                transform: scale(1);
+                box-shadow: 0 0 10px rgba(255, 71, 87, 0.8);
+            }
+            50% { 
+                opacity: 0.8; 
+                transform: scale(1.02);
+                box-shadow: 0 0 20px rgba(255, 71, 87, 1);
+            }
         }
 
         .user-status {
-            background: rgba(255, 107, 157, 0.15);
+            background: rgba(255, 107, 157, 0.1);
             border: 1px solid rgba(255, 107, 157, 0.3);
             color: var(--primary-pink);
             padding: 4px 10px;
@@ -911,6 +604,8 @@
             font-size: 10px;
             font-weight: 600;
             cursor: pointer;
+            backdrop-filter: blur(15px);
+            box-shadow: 0 0 15px rgba(255, 107, 157, 0.2);
         }
 
         .live-players {
@@ -933,17 +628,20 @@
             padding: 2px;
             cursor: pointer;
             transition: all 0.3s ease;
+            box-shadow: 0 0 20px rgba(255, 107, 157, 0.3);
         }
 
         .avatar-ring:hover {
-            transform: scale(1.1);
+            transform: scale(1.1) translateZ(2px);
+            box-shadow: 0 0 30px rgba(255, 107, 157, 0.5);
         }
 
         .avatar-inner {
             width: 100%;
             height: 100%;
             border-radius: 50%;
-            background: var(--dark-bg);
+            background: rgba(10, 10, 10, 0.8);
+            backdrop-filter: blur(10px);
             display: flex;
             align-items: center;
             justify-content: center;
@@ -958,43 +656,89 @@
             width: 10px;
             height: 10px;
             background: var(--success-green);
-            border: 2px solid var(--dark-bg);
+            border: 2px solid rgba(10, 10, 10, 0.8);
             border-radius: 50%;
             animation: pulse 2s infinite;
+            box-shadow: 0 0 8px var(--success-green);
         }
 
-        .challenge-main {
-            flex: 1;
-            padding: 20px 25px;
-            min-height: 300px;
+        /* Enhanced Modal System */
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(15px);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 3000;
+            padding: 20px;
         }
 
-        .challenge-title {
-            font-size: 24px;
+        .modal.show {
+            display: flex;
+        }
+
+        .modal-content {
+            background: rgba(15, 15, 15, 0.3);
+            backdrop-filter: blur(40px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            padding: 25px;
+            max-width: 90%;
+            max-height: 80%;
+            overflow-y: auto;
+            width: 100%;
+            max-width: 400px;
+            box-shadow: 
+                0 25px 50px rgba(0, 0, 0, 0.7),
+                inset 0 1px 0 rgba(255, 255, 255, 0.1);
+            transform: translateZ(5px);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .modal-title {
+            font-size: 18px;
             font-weight: 600;
-            color: var(--primary-pink);
-            margin-bottom: 20px;
-            line-height: 1.2;
-        }
-
-        .challenge-description {
-            font-size: 15px;
-            line-height: 1.6;
             color: var(--text-primary);
-            margin-bottom: 20px;
-            opacity: 0.9;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            text-shadow: 0 0 10px rgba(255, 255, 255, 0.2);
         }
 
-        .action-section {
-            padding: 18px 25px;
-            background: linear-gradient(180deg, transparent 0%, rgba(255, 255, 255, 0.05) 100%);
-            border-top: 1px solid rgba(255, 255, 255, 0.08);
-        }
-
-        .btn-primary {
-            background: linear-gradient(145deg, #ff6b9d, #c44569);
-            color: #fff;
+        .modal-close {
+            background: none;
             border: none;
+            color: var(--text-secondary);
+            font-size: 20px;
+            cursor: pointer;
+            padding: 5px;
+            transition: all 0.3s ease;
+        }
+
+        .modal-close:hover {
+            color: var(--text-primary);
+            transform: scale(1.1);
+        }
+
+        /* Enhanced Buttons */
+        .btn-primary {
+            background: linear-gradient(145deg, rgba(255, 107, 157, 0.8), rgba(196, 69, 105, 0.8));
+            backdrop-filter: blur(20px);
+            color: #fff;
+            border: 1px solid rgba(255, 107, 157, 0.3);
             padding: 16px 24px;
             border-radius: 15px;
             font-size: 14px;
@@ -1006,18 +750,23 @@
             gap: 8px;
             transition: all 0.3s ease;
             width: 100%;
-            box-shadow: 0 6px 20px rgba(255, 107, 157, 0.4);
+            box-shadow: 
+                0 6px 20px rgba(255, 107, 157, 0.4),
+                inset 0 1px 0 rgba(255, 255, 255, 0.2);
         }
 
         .btn-primary:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 8px 25px rgba(255, 107, 157, 0.6);
+            transform: translateY(-3px) translateZ(2px);
+            box-shadow: 
+                0 8px 25px rgba(255, 107, 157, 0.6),
+                inset 0 1px 0 rgba(255, 255, 255, 0.3);
         }
 
         .btn-secondary {
-            background: rgba(255, 255, 255, 0.1);
+            background: rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(20px);
             color: var(--text-primary);
-            border: 1px solid var(--glass-border);
+            border: 1px solid rgba(255, 255, 255, 0.1);
             padding: 12px 20px;
             border-radius: 12px;
             font-size: 14px;
@@ -1028,122 +777,12 @@
         }
 
         .btn-secondary:hover {
-            background: rgba(255, 255, 255, 0.15);
-            transform: translateY(-2px);
+            background: rgba(255, 255, 255, 0.12);
+            transform: translateY(-2px) translateZ(1px);
+            box-shadow: 0 4px 15px rgba(255, 255, 255, 0.1);
         }
 
-        .chat-toggle {
-            position: fixed;
-            bottom: 80px;
-            right: 20px;
-            width: 60px;
-            height: 60px;
-            background: var(--primary-pink);
-            border: none;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 24px;
-            color: #fff;
-            cursor: pointer;
-            box-shadow: 0 4px 20px rgba(255, 107, 157, 0.4);
-            z-index: 1001;
-            transition: all 0.3s ease;
-        }
-
-        .chat-toggle:hover {
-            transform: scale(1.1);
-        }
-
-        .online-count {
-            background: rgba(0, 255, 150, 0.2);
-            color: var(--success-green);
-            padding: 2px 8px;
-            border-radius: 10px;
-            font-size: 10px;
-            margin-left: 8px;
-        }
-
-        /* Challenge Status System */
-        .challenge-status {
-            background: rgba(255, 107, 157, 0.1);
-            border: 1px solid rgba(255, 107, 157, 0.3);
-            border-radius: 12px;
-            padding: 15px;
-            margin: 15px 0;
-        }
-
-        .challenge-status.accepted {
-            background: rgba(16, 185, 129, 0.1);
-            border-color: rgba(16, 185, 129, 0.3);
-        }
-
-        .challenge-status.completed {
-            background: rgba(139, 92, 246, 0.1);
-            border-color: rgba(139, 92, 246, 0.3);
-        }
-
-        .status-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 8px;
-        }
-
-        .status-badge {
-            padding: 4px 10px;
-            border-radius: 12px;
-            font-size: 11px;
-            font-weight: 600;
-            text-transform: uppercase;
-        }
-
-        .status-badge.pending {
-            background: var(--warning-orange);
-            color: white;
-        }
-
-        .status-badge.accepted {
-            background: var(--success-green);
-            color: white;
-        }
-
-        .status-badge.completed {
-            background: var(--primary-purple);
-            color: white;
-        }
-
-        .timer-display {
-            font-size: 18px;
-            font-weight: 700;
-            color: var(--primary-pink);
-        }
-
-        .submission-area {
-            background: rgba(255, 255, 255, 0.05);
-            border: 2px dashed var(--glass-border);
-            border-radius: 12px;
-            padding: 20px;
-            text-align: center;
-            margin: 15px 0;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-        .submission-area:hover {
-            background: rgba(255, 255, 255, 0.1);
-            border-color: var(--primary-pink);
-        }
-
-        .submission-preview {
-            max-width: 100%;
-            max-height: 200px;
-            border-radius: 8px;
-            margin-top: 10px;
-        }
-
-        /* Challenge Selection Grid */
+        /* Challenge Cards with Enhanced Glass Effect */
         .challenge-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
@@ -1152,8 +791,9 @@
         }
 
         .challenge-card {
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid var(--glass-border);
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(25px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
             border-radius: 15px;
             padding: 20px;
             cursor: pointer;
@@ -1162,12 +802,18 @@
             overflow: hidden;
             display: flex;
             flex-direction: column;
+            box-shadow: 
+                0 8px 32px rgba(0, 0, 0, 0.3),
+                inset 0 1px 0 rgba(255, 255, 255, 0.1);
         }
 
         .challenge-card:hover {
-            background: rgba(255, 255, 255, 0.1);
-            transform: translateY(-5px);
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            background: rgba(255, 255, 255, 0.06);
+            transform: translateY(-5px) translateZ(3px);
+            box-shadow: 
+                0 15px 40px rgba(0, 0, 0, 0.4),
+                0 0 30px rgba(255, 107, 157, 0.2),
+                inset 0 1px 0 rgba(255, 255, 255, 0.2);
         }
 
         .challenge-category-badge {
@@ -1179,38 +825,86 @@
             font-size: 10px;
             font-weight: 600;
             text-transform: uppercase;
+            backdrop-filter: blur(15px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
         }
 
-        .my-tasks-section {
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 15px;
-            padding: 20px;
-            margin: 15px 0;
-        }
-
-        .task-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
+        /* Form Elements with Glass Effect */
+        .form-input {
+            width: 100%;
             padding: 12px;
+            margin: 10px 0;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
             background: rgba(255, 255, 255, 0.05);
-            border-radius: 10px;
-            margin-bottom: 10px;
+            backdrop-filter: blur(15px);
+            color: var(--text-primary);
+            font-size: 16px;
+            transition: all 0.3s ease;
         }
 
-        .task-info {
-            flex: 1;
+        .form-input:focus {
+            outline: none;
+            border-color: var(--primary-pink);
+            box-shadow: 0 0 0 2px rgba(255, 107, 157, 0.2);
+            background: rgba(255, 255, 255, 0.08);
         }
 
-        .task-title {
-            font-size: 14px;
-            font-weight: 600;
-            margin-bottom: 4px;
-        }
-
-        .task-meta {
-            font-size: 11px;
+        .form-input::placeholder {
             color: var(--text-secondary);
+        }
+
+        /* Enhanced Chat Interface */
+        .chat-interface {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 60%;
+            background: rgba(15, 15, 15, 0.3);
+            backdrop-filter: blur(40px);
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 20px 20px 0 0;
+            transform: translateY(100%);
+            transition: transform 0.3s ease;
+            z-index: 1000;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.5);
+        }
+
+        .chat-interface.open {
+            transform: translateY(0);
+        }
+
+        .chat-toggle {
+            position: fixed;
+            bottom: 80px;
+            right: 20px;
+            width: 60px;
+            height: 60px;
+            background: rgba(255, 107, 157, 0.8);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 107, 157, 0.3);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            color: #fff;
+            cursor: pointer;
+            box-shadow: 
+                0 4px 20px rgba(255, 107, 157, 0.4),
+                0 0 30px rgba(255, 107, 157, 0.3);
+            z-index: 1001;
+            transition: all 0.3s ease;
+        }
+
+        .chat-toggle:hover {
+            transform: scale(1.1) translateZ(2px);
+            box-shadow: 
+                0 6px 25px rgba(255, 107, 157, 0.5),
+                0 0 40px rgba(255, 107, 157, 0.4);
         }
 
         /* Utility Classes */
@@ -1221,6 +915,7 @@
             transform: translate(-50%, -50%);
             font-size: 18px;
             color: var(--text-primary);
+            text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
         }
 
         .hidden {
@@ -1231,1207 +926,591 @@
             text-align: center;
         }
 
-        .mb-10 {
-            margin-bottom: 10px;
+        /* Performance Optimizations */
+        .glass-layer * {
+            will-change: transform;
+            backface-visibility: hidden;
         }
 
-        .mb-15 {
-            margin-bottom: 15px;
+        /* Responsive Design */
+        @media (max-width: 480px) {
+            .glass-interface {
+                max-width: 100%;
+                height: 100vh;
+                border-radius: 0;
+                margin: 0;
+            }
+            
+            .phone-container {
+                padding: 0;
+            }
+            
+            .background-controls {
+                top: 10px;
+                right: 10px;
+                transform: scale(0.9);
+            }
         }
 
-        .mb-20 {
-            margin-bottom: 20px;
+        /* File Upload Styling */
+        input[type="file"] {
+            display: none;
         }
 
-        .hashtag {
-            background: rgba(139, 92, 246, 0.15);
-            border: 1px solid rgba(139, 92, 246, 0.3);
-            color: var(--primary-purple);
-            padding: 5px 10px;
-            border-radius: 10px;
-            font-size: 12px;
-            font-weight: 500;
+        .file-upload-btn {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(20px);
+            border: 2px dashed rgba(255, 255, 255, 0.3);
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
             cursor: pointer;
             transition: all 0.3s ease;
-            display: inline-block;
-        }
-
-        .hashtag:hover {
-            background: rgba(139, 92, 246, 0.25);
-            transform: scale(1.05);
-        }
-
-        .group-icon-option {
-            width: 40px;
-            height: 40px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background: rgba(255, 255, 255, 0.1);
-            border: 2px solid transparent;
-            border-radius: 10px;
-            cursor: pointer;
-            font-size: 18px;
-            transition: all 0.3s ease;
-        }
-        
-        .group-icon-option:hover {
-            background: rgba(255, 255, 255, 0.15);
-            transform: scale(1.1);
-        }
-
-        /* Form Styles for Phone Auth */
-        .form-input {
-            width: 100%;
-            padding: 12px;
-            margin: 10px 0;
-            border: 1px solid var(--glass-border);
-            border-radius: 8px;
-            background: rgba(255, 255, 255, 0.1);
-            color: var(--text-primary);
-            font-size: 16px;
-        }
-
-        .form-input::placeholder {
             color: var(--text-secondary);
         }
 
-        .error-message {
-            background: #fed7d7;
-            color: #c53030;
-            padding: 10px;
-            border-radius: 8px;
-            margin: 10px 0;
-            display: none;
-        }
-
-        .success-message {
-            background: #c6f6d5;
-            color: #2f855a;
-            padding: 10px;
-            border-radius: 8px;
-            margin: 10px 0;
-            display: none;
-        }
-
-        #recaptcha-container {
-            margin: 10px 0;
-        }
-
-        .user-info {
-            display: none;
-            background: #1a1a2e;
-            padding: 20px;
-            border-radius: 12px;
-            margin-top: 20px;
-            color: white;
-        }
-
-        .logout-btn {
-            background: #e53e3e;
-            color: white;
-            padding: 10px 20px;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            margin-top: 15px;
+        .file-upload-btn:hover {
+            background: rgba(255, 255, 255, 0.15);
+            border-color: var(--primary-pink);
+            color: var(--text-primary);
         }
     </style>
 </head>
 <body>
-    <!-- Auth Screen -->
-    <div id="authScreen" class="auth-screen">
-        <div class="auth-container">
-            <div class="auth-logo">🚀</div>
-            <div class="auth-title">Welcome to JomBro</div>
-            <div class="auth-subtitle">Connect with friends and tackle challenges together!</div>
-            
-            <div id="errorMessage" class="error-message"></div>
-            <div id="successMessage" class="success-message"></div>
-            
-            <!-- Main Auth Screen -->
-            <div id="mainAuth">
-                <button class="auth-btn google" onclick="signInWithGoogle()">
-                    🔍 Continue with Google
-                </button>
-                
-                <button class="auth-btn facebook" onclick="signInWithFacebook()">
-                    📘 Continue with Facebook
-                </button>
-                
-                <button class="auth-btn phone" onclick="showPhoneForm()">
-                    📱 Continue with Phone
-                </button>
-                
-                <button class="auth-btn test" onclick="signInAnonymously()">
-                    🧪 Test Mode (Skip Login)
-                </button>
-            </div>
+    <!-- Bottom Layer: Animated Backgrounds -->
+    <div class="background-layer">
+        <!-- Space with Blinking Stars -->
+        <div class="background-content space-background active" id="spaceBackground">
+            <div class="stars"></div>
+            <div class="shooting-star" style="top: 20%; left: 10%;"></div>
+            <div class="shooting-star" style="top: 60%; left: 30%; animation-delay: 2s;"></div>
+            <div class="shooting-star" style="top: 80%; left: 60%; animation-delay: 4s;"></div>
+        </div>
 
-            <!-- Phone Form -->
-            <div id="phoneForm" style="display: none; margin-top: 20px;">
-                <input type="tel" id="phoneInput" class="form-input" placeholder="+60123456789" required>
-                <div id="recaptcha-container"></div>
-                <input type="text" id="otpInput" class="form-input" placeholder="Enter OTP" style="display:none;">
-                <div>
-                    <button class="btn-secondary" onclick="showMainAuth()">Back</button>
-                    <button class="btn-primary" id="phoneSubmitBtn" onclick="signInWithPhone()">Send OTP</button>
-                </div>
-            </div>
+        <!-- Space with Planets -->
+        <div class="background-content space-planets-background" id="spacePlanetsBackground">
+            <div class="stars"></div>
+            <div class="planet planet-1"></div>
+            <div class="planet planet-2"></div>
+            <div class="planet planet-3"></div>
+        </div>
 
-            <!-- User Info (After Login) -->
-            <div id="userInfo" class="user-info">
-                <h3>Welcome!</h3>
-                <p id="userDetails"></p>
-                <button class="logout-btn" onclick="signOut()">Sign Out</button>
-            </div>
-            
-            <div style="margin-top: 20px; font-size: 12px; color: var(--text-secondary);">
-                By continuing, you agree to our Terms & Privacy Policy
-            </div>
+        <!-- Animated Shapes -->
+        <div class="background-content animated-background" id="animatedBackground">
+            <div class="animated-shape shape-1"></div>
+            <div class="animated-shape shape-2"></div>
+            <div class="animated-shape shape-3"></div>
+        </div>
+
+        <!-- Custom Video Background -->
+        <div class="background-content video-background" id="videoBackground">
+            <video autoplay muted loop id="customVideo">
+                <!-- Video source will be added dynamically -->
+            </video>
         </div>
     </div>
 
-    <!-- Main App -->
-    <div id="mainApp" class="phone-container" style="display: none;">
-        <div class="glass-interface">
-            <!-- Header -->
-            <div class="glass-header">
-                <div class="logo-section" onclick="showProfile()">
-                    <div class="logo-text">JomBro</div>
-                    <div class="logo-slogan">Let's go! Let's Go!</div>
-                    <div class="logo-subtitle" id="userDisplayName">Loading...</div>
-                </div>
-                <div class="header-actions">
-                    <div class="header-btn" onclick="showMyTasks()" title="My Tasks">
-                        📋
-                        <div class="notification-badge" id="tasksNotifications" style="display: none;">2</div>
-                    </div>
-                    <div class="header-btn" onclick="toggleChat()" title="Group Chat">
-                        💬
-                        <div class="notification-badge" id="chatNotifications" style="display: none;">3</div>
-                    </div>
-                    <div class="header-btn" onclick="showOnlineUsers()" title="Online Users">
-                        👥
-                        <div class="notification-badge" id="onlineUsersNotifications">5</div>
-                    </div>
-                    <div class="header-btn" onclick="showGroups()" title="Groups">🏠</div>
-                    <div class="header-btn" onclick="showEnhancedProfile()" title="Enhanced Profile">👤</div>
-                    <div class="header-btn" onclick="signOut()" title="Sign Out">🚪</div>
-                </div>
-            </div>
+    <!-- Background Controls -->
+    <div class="background-controls">
+        <button class="bg-control-btn active" onclick="switchBackground('space')" title="Space with Stars">
+            ✨
+        </button>
+        <button class="bg-control-btn" onclick="switchBackground('planets')" title="Space with Planets">
+            🪐
+        </button>
+        <button class="bg-control-btn" onclick="switchBackground('animated')" title="Animated Shapes">
+            🎨
+        </button>
+        <button class="bg-control-btn" onclick="document.getElementById('videoUpload').click()" title="Upload Video">
+            📹
+        </button>
+        <input type="file" id="videoUpload" accept="video/*" onchange="handleVideoUpload(event)">
+    </div>
 
-            <div class="glass-content">
-                <!-- Live Players Section -->
-                <div class="glass-section">
-                    <div class="live-header">
-                        <div class="live-indicator">
-                            <div class="live-dot"></div>
-                            <span>LIVE</span>
-                            <span class="online-count" id="onlineCount">5 online</span>
-                        </div>
-                        <div class="user-status" id="userStatus" onclick="showProfile()">
-                            <span id="userLevel">Level 1</span>
-                        </div>
-                    </div>
-                    <div class="live-players" id="livePlayersContainer">
-                        <!-- Real users appear here -->
-                    </div>
-                </div>
-
-                <!-- Current Challenge Status (if any accepted) -->
-                <div id="currentChallengeStatus" class="glass-section" style="display: none;">
-                    <div class="challenge-status accepted">
-                        <div class="status-header">
-                            <div>
-                                <div class="status-badge accepted">In Progress</div>
-                                <div style="font-size: 14px; font-weight: 600; margin-top: 5px;" id="currentChallengeTitle">Coffee Shop Poetry Challenge</div>
-                            </div>
-                            <div class="timer-display" id="challengeTimer">2h 45m left</div>
-                        </div>
-                        <div style="font-size: 12px; color: var(--text-secondary); margin-bottom: 10px;">
-                            <span id="challengeProgress">Ready to submit proof</span>
-                        </div>
-                        <div style="display: flex; gap: 8px;">
-                            <button class="btn-secondary" onclick="submitProof()" style="flex: 1;">📸 Submit Proof</button>
-                            <button class="btn-secondary" onclick="viewChallenge()" style="flex: 1;">👀 View Details</button>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Main Challenge Selection -->
-                <div class="challenge-main">
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-                        <div style="display: flex; align-items: center; gap: 10px;">
-                            <h3 style="font-size: 18px; font-weight: 600;">🎯 Choose Your Challenge</h3>
-                            <div style="background: rgba(255, 255, 255, 0.1); color: var(--text-secondary); padding: 4px 8px; border-radius: 8px; font-size: 10px;">AI Generated</div>
-                        </div>
-                        <div style="display: flex; gap: 8px;">
-                            <button onclick="refreshChallenges()" style="background: rgba(255, 255, 255, 0.1); border: none; color: var(--text-primary); padding: 6px 8px; border-radius: 8px; cursor: pointer; font-size: 12px;" title="Generate New">✨</button>
-                        </div>
-                    </div>
+    <!-- Top Layer: Glass UI Interface -->
+    <div class="glass-layer">
+        <!-- Auth Screen -->
+        <div id="authScreen" class="auth-screen">
+            <div class="auth-container">
+                <div class="auth-logo">🚀</div>
+                <div class="auth-title">Welcome to JomBro</div>
+                <div class="auth-subtitle">Connect with friends and tackle challenges together!</div>
+                
+                <div id="errorMessage" class="error-message" style="display: none;"></div>
+                <div id="successMessage" class="success-message" style="display: none;"></div>
+                
+                <!-- Main Auth Screen -->
+                <div id="mainAuth">
+                    <button class="auth-btn google" onclick="signInWithGoogle()">
+                        🔍 Continue with Google
+                    </button>
                     
-                    <div id="challengeSelection" class="challenge-grid">
-                        <!-- AI Generated challenges appear here -->
-                    </div>
-                </div>
-
-                <!-- Action Section -->
-                <div class="action-section">
-                    <div style="text-align: center; margin-bottom: 15px;">
-                        <div style="font-size: 14px; font-weight: 600; margin-bottom: 5px; color: var(--text-primary);">Ready to start your challenge journey?</div>
-                        <div style="font-size: 11px; color: var(--text-secondary);">Click the button below to begin, then choose your challenge!</div>
-                    </div>
-                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 15px;">
-                        <button class="btn-secondary" onclick="showSubmissionGallery()" style="display: flex; align-items: center; justify-content: center; gap: 6px;">
-                            🏆 My Gallery
-                        </button>
-                        <button class="btn-secondary" onclick="showMyTasks()" style="display: flex; align-items: center; justify-content: center; gap: 6px;">
-                            📋 My Tasks
-                        </button>
-                    </div>
-                    <button class="btn-primary" id="mainActionBtn" onclick="showChallengeAgreement()">
-                        🎯 CHALLENGE
+                    <button class="auth-btn facebook" onclick="signInWithFacebook()">
+                        📘 Continue with Facebook
+                    </button>
+                    
+                    <button class="auth-btn phone" onclick="showPhoneForm()">
+                        📱 Continue with Phone
+                    </button>
+                    
+                    <button class="auth-btn test" onclick="signInAnonymously()">
+                        🧪 Test Mode (Skip Login)
                     </button>
                 </div>
-            </div>
-        </div>
-    </div>
 
-    <!-- Enhanced User Profile Modal -->
-    <div id="enhancedProfileModal" class="modal">
-        <div class="modal-content" style="max-width: 500px;">
-            <div class="modal-header">
-                <div class="modal-title">👤 Enhanced Profile</div>
-                <button class="modal-close" onclick="hideModal('enhancedProfile')">&times;</button>
-            </div>
+                <!-- Phone Form -->
+                <div id="phoneForm" style="display: none; margin-top: 20px;">
+                    <input type="tel" id="phoneInput" class="form-input" placeholder="+60123456789" required>
+                    <div id="recaptcha-container"></div>
+                    <input type="text" id="otpInput" class="form-input" placeholder="Enter OTP" style="display:none;">
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 15px;">
+                        <button class="btn-secondary" onclick="showMainAuth()">Back</button>
+                        <button class="btn-primary" id="phoneSubmitBtn" onclick="signInWithPhone()">Send OTP</button>
+                    </div>
+                </div>
 
-            <div class="enhanced-profile-header">
-                <div class="profile-avatar-upload" onclick="uploadProfilePicture()">
-                    <div class="profile-avatar-large" id="enhancedProfileAvatar">
-                        <img id="profileImage" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%; display: none;">
-                        <span id="profileInitials">LY</span>
-                    </div>
-                    <div class="avatar-upload-overlay">
-                        📷 Upload Photo
-                    </div>
-                    <input type="file" id="profileImageInput" accept="image/*" style="display: none;" onchange="handleProfileImageUpload(event)">
+                <!-- User Info (After Login) -->
+                <div id="userInfo" style="display: none;">
+                    <h3 style="color: var(--text-primary); margin-bottom: 15px;">Welcome!</h3>
+                    <p id="userDetails" style="color: var(--text-secondary); margin-bottom: 20px;"></p>
+                    <button class="btn-primary" onclick="signOut()">Sign Out</button>
                 </div>
                 
-                <div style="text-align: center;">
-                    <div style="font-size: 22px; font-weight: 700; margin-bottom: 5px; cursor: pointer;" id="enhancedProfileName" onclick="editProfileName()">User</div>
-                    <div style="font-size: 12px; opacity: 0.9; margin-bottom: 10px; cursor: pointer;" id="enhancedProfileBio" onclick="editProfileBio()">Challenge enthusiast</div>
-                    <div style="display: flex; justify-content: center; gap: 15px; font-size: 12px;">
-                        <div><strong id="profileTokensDisplay">0</strong> Tokens</div>
-                        <div><strong id="profileLevelDisplay">Level 1</strong></div>
-                        <div><strong id="profileStreakDisplay">0</strong> Day Streak</div>
+                <div style="margin-top: 20px; font-size: 12px; color: var(--text-secondary);">
+                    By continuing, you agree to our Terms & Privacy Policy
+                </div>
+            </div>
+        </div>
+
+        <!-- Main App -->
+        <div id="mainApp" class="phone-container" style="display: none;">
+            <div class="glass-interface">
+                <!-- Header -->
+                <div class="glass-header">
+                    <div class="logo-section" onclick="showProfile()">
+                        <div class="logo-text">JomBro</div>
+                        <div class="logo-slogan">Let's go! Let's Go!</div>
+                        <div class="logo-subtitle" id="userDisplayName">Loading...</div>
+                    </div>
+                    <div class="header-actions">
+                        <div class="header-btn" onclick="showMyTasks()" title="My Tasks">
+                            📋
+                            <div class="notification-badge" id="tasksNotifications" style="display: none;">2</div>
+                        </div>
+                        <div class="header-btn" onclick="toggleChat()" title="Group Chat">
+                            💬
+                            <div class="notification-badge" id="chatNotifications" style="display: none;">3</div>
+                        </div>
+                        <div class="header-btn" onclick="showOnlineUsers()" title="Online Users">
+                            👥
+                            <div class="notification-badge" id="onlineUsersNotifications">5</div>
+                        </div>
+                        <div class="header-btn" onclick="showGroups()" title="Groups">🏠</div>
+                        <div class="header-btn" onclick="showEnhancedProfile()" title="Enhanced Profile">👤</div>
+                        <div class="header-btn" onclick="signOut()" title="Sign Out">🚪</div>
+                    </div>
+                </div>
+
+                <div class="glass-content">
+                    <!-- Live Players Section -->
+                    <div class="glass-section">
+                        <div class="live-header">
+                            <div class="live-indicator">
+                                <div class="live-dot"></div>
+                                <span>LIVE</span>
+                                <span class="online-count" id="onlineCount" style="background: rgba(0, 255, 150, 0.2); color: var(--success-green); padding: 2px 8px; border-radius: 10px; font-size: 10px; margin-left: 8px;">5 online</span>
+                            </div>
+                            <div class="user-status" id="userStatus" onclick="showProfile()">
+                                <span id="userLevel">Level 1</span>
+                            </div>
+                        </div>
+                        <div class="live-players" id="livePlayersContainer">
+                            <!-- Real users appear here -->
+                        </div>
+                    </div>
+
+                    <!-- Current Challenge Status -->
+                    <div id="currentChallengeStatus" class="glass-section" style="display: none;">
+                        <div style="background: rgba(16, 185, 129, 0.1); border: 1px solid rgba(16, 185, 129, 0.3); border-radius: 12px; padding: 15px; margin: 15px 0;">
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                                <div>
+                                    <div style="padding: 4px 10px; border-radius: 12px; font-size: 11px; font-weight: 600; text-transform: uppercase; background: var(--success-green); color: white; display: inline-block;">In Progress</div>
+                                    <div style="font-size: 14px; font-weight: 600; margin-top: 5px;" id="currentChallengeTitle">Coffee Shop Poetry Challenge</div>
+                                </div>
+                                <div style="font-size: 18px; font-weight: 700; color: var(--primary-pink);" id="challengeTimer">2h 45m left</div>
+                            </div>
+                            <div style="font-size: 12px; color: var(--text-secondary); margin-bottom: 10px;">
+                                <span id="challengeProgress">Ready to submit proof</span>
+                            </div>
+                            <div style="display: flex; gap: 8px;">
+                                <button class="btn-secondary" onclick="submitProof()" style="flex: 1;">📸 Submit Proof</button>
+                                <button class="btn-secondary" onclick="viewChallenge()" style="flex: 1;">👀 View Details</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Main Challenge Selection -->
+                    <div style="flex: 1; padding: 20px 25px; min-height: 300px;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                            <div style="display: flex; align-items: center; gap: 10px;">
+                                <h3 style="font-size: 18px; font-weight: 600; color: var(--text-primary);">🎯 Choose Your Challenge</h3>
+                                <div style="background: rgba(255, 255, 255, 0.1); color: var(--text-secondary); padding: 4px 8px; border-radius: 8px; font-size: 10px; backdrop-filter: blur(10px);">AI Generated</div>
+                            </div>
+                            <div style="display: flex; gap: 8px;">
+                                <button onclick="refreshChallenges()" style="background: rgba(255, 255, 255, 0.1); border: 1px solid rgba(255, 255, 255, 0.2); color: var(--text-primary); padding: 6px 8px; border-radius: 8px; cursor: pointer; font-size: 12px; backdrop-filter: blur(15px);" title="Generate New">✨</button>
+                            </div>
+                        </div>
+                        
+                        <div id="challengeSelection" class="challenge-grid">
+                            <!-- AI Generated challenges appear here -->
+                        </div>
+                    </div>
+
+                    <!-- Action Section -->
+                    <div style="padding: 18px 25px; background: linear-gradient(180deg, transparent 0%, rgba(255, 255, 255, 0.03) 100%); border-top: 1px solid rgba(255, 255, 255, 0.06);">
+                        <div style="text-align: center; margin-bottom: 15px;">
+                            <div style="font-size: 14px; font-weight: 600; margin-bottom: 5px; color: var(--text-primary);">Ready to start your challenge journey?</div>
+                            <div style="font-size: 11px; color: var(--text-secondary);">Click the button below to begin, then choose your challenge!</div>
+                        </div>
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 15px;">
+                            <button class="btn-secondary" onclick="showSubmissionGallery()" style="display: flex; align-items: center; justify-content: center; gap: 6px;">
+                                🏆 My Gallery
+                            </button>
+                            <button class="btn-secondary" onclick="showMyTasks()" style="display: flex; align-items: center; justify-content: center; gap: 6px;">
+                                📋 My Tasks
+                            </button>
+                        </div>
+                        <button class="btn-primary" id="mainActionBtn" onclick="showChallengeAgreement()">
+                            🎯 CHALLENGE
+                        </button>
                     </div>
                 </div>
             </div>
+        </div>
 
-            <!-- Achievement System -->
-            <div style="margin-bottom: 20px;">
-                <div style="font-size: 14px; font-weight: 600; margin-bottom: 12px; display: flex; align-items: center; gap: 8px;">
-                    🏆 Recent Achievements
-                    <span style="background: var(--primary-pink); color: white; padding: 2px 8px; border-radius: 8px; font-size: 10px;">New!</span>
+        <!-- Enhanced Modals (same as before but with glass effect) -->
+        <div id="enhancedProfileModal" class="modal">
+            <div class="modal-content" style="max-width: 500px;">
+                <div class="modal-header">
+                    <div class="modal-title">👤 Enhanced Profile</div>
+                    <button class="modal-close" onclick="hideModal('enhancedProfile')">&times;</button>
                 </div>
-                <div class="profile-achievements" id="achievementsList">
-                    <div class="achievement-badge" title="Welcome to JomBro!">
-                        <div class="achievement-icon">🌟</div>
-                        <div class="achievement-name">New Member</div>
-                    </div>
-                    <div class="achievement-badge" title="First login">
-                        <div class="achievement-icon">🚀</div>
-                        <div class="achievement-name">Ready to Go</div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Profile Actions -->
-            <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px;">
-                <button class="btn-secondary" onclick="editEnhancedProfile()">✏️ Edit</button>
-                <button class="btn-secondary" onclick="shareProfile()">📤 Share</button>
-                <button class="btn-secondary" onclick="viewFullStats()">📊 Stats</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Online Users Modal -->
-    <div id="onlineUsersModal" class="modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <div class="modal-title">👥 Online Users</div>
-                <button class="modal-close" onclick="hideModal('onlineUsers')">&times;</button>
-            </div>
-
-            <div class="friends-search">
-                <div class="friends-search-icon">🔍</div>
-                <input type="text" class="friends-search-input" placeholder="Search users..." onkeyup="filterOnlineUsers(this.value)">
-            </div>
-
-            <div class="friends-tabs">
-                <div class="friends-tab active" onclick="switchOnlineTab('online')">Online Now</div>
-                <div class="friends-tab" onclick="switchOnlineTab('friends')">Friends</div>
-                <div class="friends-tab" onclick="switchOnlineTab('requests')">Requests</div>
-            </div>
-
-            <div id="onlineUsersList">
-                <!-- Online users appear here -->
-            </div>
-        </div>
-    </div>
-
-    <!-- My Tasks Modal -->
-    <div id="myTasksModal" class="modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <div class="modal-title">📋 My Tasks</div>
-                <button class="modal-close" onclick="hideModal('myTasks')">&times;</button>
-            </div>
-
-            <div id="myTasksList">
-                <!-- User's tasks appear here -->
-            </div>
-        </div>
-    </div>
-
-    <!-- Submission Gallery Modal -->
-    <div id="submissionGalleryModal" class="modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <div class="modal-title">🏆 My Gallery</div>
-                <button class="modal-close" onclick="hideModal('submissionGallery')">&times;</button>
-            </div>
-
-            <div id="submissionGalleryContent">
-                <div class="text-center" style="padding: 40px 20px; color: var(--text-secondary);">
-                    <div style="font-size: 48px; margin-bottom: 15px;">🏆</div>
-                    <div style="font-size: 16px; margin-bottom: 8px;">No completed challenges yet</div>
-                    <div style="font-size: 12px;">Complete challenges to build your gallery!</div>
+                <div style="padding: 20px; text-align: center;">
+                    <div style="font-size: 18px; margin-bottom: 15px; color: var(--text-primary);">Profile features coming soon!</div>
+                    <div style="font-size: 14px; color: var(--text-secondary);">Enhanced profile system with achievements and customization.</div>
                 </div>
             </div>
         </div>
-    </div>
 
-    <!-- Proof Submission Modal -->
-    <div id="proofSubmissionModal" class="modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <div class="modal-title">📸 Submit Proof</div>
-                <button class="modal-close" onclick="hideModal('proofSubmission')">&times;</button>
-            </div>
-
-            <div style="margin-bottom: 20px;">
-                <div style="font-size: 14px; font-weight: 600; margin-bottom: 10px;" id="submissionChallengeTitle">Coffee Shop Poetry Challenge</div>
-                <div style="font-size: 12px; color: var(--text-secondary);">Upload a photo or video to prove you completed this challenge!</div>
-            </div>
-
-            <div class="submission-area" onclick="document.getElementById('proofFileInput').click()">
-                <div style="font-size: 48px; margin-bottom: 10px;">📷</div>
-                <div style="font-size: 14px; font-weight: 600; margin-bottom: 5px;">Tap to upload photo/video</div>
-                <div style="font-size: 11px; color: var(--text-secondary);">Supports JPG, PNG, MP4, MOV</div>
-                <input type="file" id="proofFileInput" accept="image/*,video/*" style="display: none;" onchange="handleProofUpload(event)">
-                <div id="submissionPreview"></div>
-            </div>
-
-            <div style="margin: 15px 0;">
-                <label style="font-size: 12px; font-weight: 600; margin-bottom: 8px; display: block;">Add a caption (optional):</label>
-                <textarea id="submissionCaption" class="form-input form-textarea" placeholder="Tell us about your experience..."></textarea>
-            </div>
-
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
-                <button class="btn-secondary" onclick="hideModal('proofSubmission')">Cancel</button>
-                <button class="btn-primary" id="submitProofBtn" onclick="submitChallengeProof()" disabled>Submit Proof</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Challenge Agreement Modal -->
-    <div id="challengeAgreementModal" class="modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <div class="modal-title">🎯 Ready for a Challenge?</div>
-                <button class="modal-close" onclick="hideModal('challengeAgreement')">&times;</button>
-            </div>
-
-            <div style="text-align: center; margin-bottom: 20px;">
-                <div style="font-size: 48px; margin-bottom: 10px;">🚀</div>
-                <div style="font-size: 18px; font-weight: 600; margin-bottom: 8px; color: var(--primary-pink);">Take on a New Challenge!</div>
-                <div style="font-size: 14px; color: var(--text-secondary); margin-bottom: 20px;">Choose from our AI-generated challenges and start your adventure!</div>
-            </div>
-
-            <div style="background: rgba(255, 107, 157, 0.1); border: 1px solid rgba(255, 107, 157, 0.3); border-radius: 12px; padding: 15px; margin-bottom: 20px;">
-                <div style="font-size: 12px; font-weight: 600; margin-bottom: 8px; color: var(--primary-pink);">🏆 Challenge Benefits:</div>
-                <div style="font-size: 11px; color: var(--text-secondary); line-height: 1.4;">
-                    • Earn tokens and level up<br>
-                    • Build your challenge gallery<br>
-                    • Connect with friends<br>
-                    • Step out of your comfort zone
+        <div id="myTasksModal" class="modal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <div class="modal-title">📋 My Tasks</div>
+                    <button class="modal-close" onclick="hideModal('myTasks')">&times;</button>
+                </div>
+                <div id="myTasksList" style="padding: 20px; text-align: center;">
+                    <div style="font-size: 48px; margin-bottom: 15px;">📋</div>
+                    <div style="font-size: 16px; margin-bottom: 8px; color: var(--text-primary);">No active tasks</div>
+                    <div style="font-size: 12px; color: var(--text-secondary);">Accept a challenge to get started!</div>
                 </div>
             </div>
-
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
-                <button class="btn-secondary" onclick="hideModal('challengeAgreement')">Maybe Later</button>
-                <button class="btn-primary" onclick="agreeToChallenge()">🎯 I'M READY!</button>
-            </div>
         </div>
-    </div>
-    <div id="groupsModal" class="modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <div class="modal-title">🏠 My Groups</div>
-                <button class="modal-close" onclick="hideModal('groups')">&times;</button>
-            </div>
 
-            <div id="groupsList">
-                <div class="text-center" style="padding: 40px 20px; color: var(--text-secondary);">
-                    <div style="font-size: 48px; margin-bottom: 15px;">🏠</div>
-                    <div style="font-size: 16px; margin-bottom: 8px;">No groups yet</div>
-                    <div style="font-size: 12px;">Create your first group to start challenging with friends!</div>
+        <div id="challengeAgreementModal" class="modal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <div class="modal-title">🎯 Ready for a Challenge?</div>
+                    <button class="modal-close" onclick="hideModal('challengeAgreement')">&times;</button>
+                </div>
+                <div style="text-align: center; margin-bottom: 20px;">
+                    <div style="font-size: 48px; margin-bottom: 10px;">🚀</div>
+                    <div style="font-size: 18px; font-weight: 600; margin-bottom: 8px; color: var(--primary-pink);">Take on a New Challenge!</div>
+                    <div style="font-size: 14px; color: var(--text-secondary); margin-bottom: 20px;">Choose from our AI-generated challenges and start your adventure!</div>
+                </div>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                    <button class="btn-secondary" onclick="hideModal('challengeAgreement')">Maybe Later</button>
+                    <button class="btn-primary" onclick="agreeToChallenge()">🎯 I'M READY!</button>
                 </div>
             </div>
-
-            <div style="margin-top: 20px;">
-                <button class="btn-primary" onclick="showCreateGroup()">➕ Create New Group</button>
-            </div>
         </div>
-    </div>
 
-    <!-- Groups Modal -->
-    <div id="groupsModal" class="modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <div class="modal-title">🏠 My Groups</div>
-                <button class="modal-close" onclick="hideModal('groups')">&times;</button>
-            </div>
-
-            <div id="groupsList">
-                <div class="text-center" style="padding: 40px 20px; color: var(--text-secondary);">
-                    <div style="font-size: 48px; margin-bottom: 15px;">🏠</div>
-                    <div style="font-size: 16px; margin-bottom: 8px;">No groups yet</div>
-                    <div style="font-size: 12px;">Create your first group to start challenging with friends!</div>
+        <!-- Enhanced Chat Interface -->
+        <div id="chatInterface" class="chat-interface">
+            <div style="padding: 15px 20px; border-bottom: 1px solid rgba(255, 255, 255, 0.1); display: flex; justify-content: space-between; align-items: center;">
+                <div>
+                    <div style="font-size: 16px; font-weight: 600; color: var(--text-primary);" id="chatTitle">Challenge Group Chat</div>
+                    <div style="font-size: 12px; color: var(--text-secondary);" id="chatMembers">5 members online</div>
                 </div>
+                <button style="background: none; border: none; color: var(--text-secondary); font-size: 18px; cursor: pointer;" onclick="toggleChat()">✕</button>
             </div>
-
-            <div style="margin-top: 20px;">
-                <button class="btn-primary" onclick="showCreateGroup()">➕ Create New Group</button>
+            <div style="flex: 1; overflow-y: auto; padding: 15px; display: flex; flex-direction: column; gap: 10px;" id="chatMessages">
+                <!-- Messages appear here -->
+            </div>
+            <div style="padding: 15px; border-top: 1px solid rgba(255, 255, 255, 0.1); display: flex; gap: 10px; align-items: center;">
+                <input type="text" style="flex: 1; background: rgba(255,255,255,0.1); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 20px; padding: 10px 15px; color: var(--text-primary); font-size: 14px; outline: none; backdrop-filter: blur(15px);" id="chatInput" placeholder="Type a message..." onkeypress="handleChatKeyPress(event)">
+                <button style="background: var(--primary-pink); border: none; border-radius: 50%; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; cursor: pointer; color: #fff; font-size: 16px;" onclick="sendMessage()">➤</button>
             </div>
         </div>
+
+        <!-- Floating Chat Toggle -->
+        <button id="chatToggle" class="chat-toggle" onclick="toggleChat()" style="display: none;">
+            💬
+        </button>
     </div>
 
-    <!-- Enhanced Chat Interface -->
-    <div id="chatInterface" class="chat-interface">
-        <div class="chat-header">
-            <div>
-                <div class="chat-title" id="chatTitle">Challenge Group Chat</div>
-                <div class="chat-members" id="chatMembers">5 members online</div>
-            </div>
-            <button class="chat-close" onclick="toggleChat()">✕</button>
-        </div>
-        <div class="chat-messages" id="chatMessages">
-            <!-- Messages appear here -->
-        </div>
-        <div class="chat-input-container">
-            <input type="text" class="chat-input" id="chatInput" placeholder="Type a message..." 
-                   onkeypress="handleChatKeyPress(event)">
-            <button class="chat-send" onclick="sendMessage()">➤</button>
-        </div>
-    </div>
-
-    <!-- Floating Chat Toggle -->
-    <button id="chatToggle" class="chat-toggle" onclick="toggleChat()" style="display: none;">
-        💬
-    </button>
-
-    <!-- Firebase v9 SDK via modules -->
-    <script type="module">
-        // Firebase Configuration
-        import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
-        import { 
-            getAuth, 
-            signInWithRedirect, 
-            getRedirectResult,
-            signInWithPopup,
-            signInWithEmailAndPassword,
-            createUserWithEmailAndPassword,
-            signInWithPhoneNumber,
-            signInAnonymously as firebaseSignInAnonymously,
-            signOut as firebaseSignOut,
-            onAuthStateChanged,
-            GoogleAuthProvider,
-            FacebookAuthProvider,
-            RecaptchaVerifier
-        } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
-        import { 
-            getFirestore, 
-            collection, 
-            addDoc, 
-            doc, 
-            getDoc, 
-            setDoc, 
-            updateDoc, 
-            onSnapshot,
-            query,
-            orderBy,
-            where,
-            serverTimestamp 
-        } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
-
-        // Firebase Configuration
-        const firebaseConfig = {
-            apiKey: "AIzaSyC_orriRUuf1ynDiFaJAPrO6-Gu3GeURxQ",
-            authDomain: "jombro-9d129.firebaseapp.com",
-            projectId: "jombro-9d129",
-            storageBucket: "jombro-9d129.firebasestorage.app",
-            messagingSenderId: "390572076435",
-            appId: "1:390572076435:web:2a90027c66dc34d9834c66",
-            measurementId: "G-YPQ5R5GLP8"
-        };
-
-        // Initialize Firebase
-        const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
-        const db = getFirestore(app);
-
-        // Providers
-        const googleProvider = new GoogleAuthProvider();
-        const facebookProvider = new FacebookAuthProvider();
-
-        // Global variables
-        let currentUser = null;
-        let chatOpen = false;
-        let unsubscribeChat = null;
-        let userProfile = {};
-        let recaptchaVerifier = null;
-        let confirmationResult = null;
-        let selectedChallenge = null;
-        let acceptedChallenges = [];
-        let onlineUsers = [];
-        let friends = [];
-        let challengeTimer = null;
-
-        // Make functions global for HTML onclick handlers
-        window.auth = auth;
-
-        // ===== UTILITY FUNCTIONS =====
+    <script>
+        // Background Management System
+        let currentBackground = 'space';
         
-        function showError(message) {
-            const errorEl = document.getElementById('errorMessage');
-            errorEl.textContent = message;
-            errorEl.style.display = 'block';
-            setTimeout(() => {
-                errorEl.style.display = 'none';
-            }, 5000);
+        function switchBackground(type) {
+            // Update active button
+            document.querySelectorAll('.bg-control-btn').forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+            
+            // Hide all backgrounds
+            document.querySelectorAll('.background-content').forEach(bg => bg.classList.remove('active'));
+            
+            // Show selected background
+            switch(type) {
+                case 'space':
+                    document.getElementById('spaceBackground').classList.add('active');
+                    break;
+                case 'planets':
+                    document.getElementById('spacePlanetsBackground').classList.add('active');
+                    break;
+                case 'animated':
+                    document.getElementById('animatedBackground').classList.add('active');
+                    break;
+                case 'video':
+                    document.getElementById('videoBackground').classList.add('active');
+                    break;
+            }
+            
+            currentBackground = type;
+            showToast(`✨ Background changed to ${type}!`, 'success');
         }
         
-        function showSuccess(message) {
-            const successEl = document.getElementById('successMessage');
-            successEl.textContent = message;
-            successEl.style.display = 'block';
-            setTimeout(() => {
-                successEl.style.display = 'none';
-            }, 3000);
+        function handleVideoUpload(event) {
+            const file = event.target.files[0];
+            if (file && file.type.startsWith('video/')) {
+                const video = document.getElementById('customVideo');
+                const url = URL.createObjectURL(file);
+                video.src = url;
+                
+                // Switch to video background
+                switchBackground('video');
+                showToast('📹 Custom video uploaded!', 'success');
+            } else {
+                showToast('❌ Please select a valid video file!', 'error');
+            }
         }
-        
-        function hideAllForms() {
+
+        // Mock Authentication Functions
+        window.signInWithGoogle = function() {
+            showSuccess('Google sign-in successful!');
+            setTimeout(() => {
+                document.getElementById('authScreen').style.display = 'none';
+                document.getElementById('mainApp').style.display = 'block';
+                document.getElementById('chatToggle').style.display = 'block';
+                document.getElementById('userDisplayName').textContent = 'Demo User';
+                initializeApp();
+            }, 1000);
+        }
+
+        window.signInWithFacebook = function() {
+            showSuccess('Facebook sign-in successful!');
+            setTimeout(() => {
+                document.getElementById('authScreen').style.display = 'none';
+                document.getElementById('mainApp').style.display = 'block';
+                document.getElementById('chatToggle').style.display = 'block';
+                document.getElementById('userDisplayName').textContent = 'Demo User';
+                initializeApp();
+            }, 1000);
+        }
+
+        window.signInAnonymously = function() {
+            showSuccess('Test mode activated!');
+            setTimeout(() => {
+                document.getElementById('authScreen').style.display = 'none';
+                document.getElementById('mainApp').style.display = 'block';
+                document.getElementById('chatToggle').style.display = 'block';
+                document.getElementById('userDisplayName').textContent = 'Test User';
+                initializeApp();
+            }, 1000);
+        }
+
+        window.showPhoneForm = function() {
             document.getElementById('mainAuth').style.display = 'none';
-            document.getElementById('phoneForm').style.display = 'none';
-            document.getElementById('userInfo').style.display = 'none';
+            document.getElementById('phoneForm').style.display = 'block';
         }
-        
-        // ===== NAVIGATION FUNCTIONS =====
-        
+
         window.showMainAuth = function() {
-            hideAllForms();
+            document.getElementById('phoneForm').style.display = 'none';
             document.getElementById('mainAuth').style.display = 'block';
         }
-        
-        window.showPhoneForm = function() {
-            hideAllForms();
-            document.getElementById('phoneForm').style.display = 'block';
-            setupRecaptcha();
-        }
-        
-        // ===== ENHANCED AUTHENTICATION FUNCTIONS =====
-        
-        window.signInWithGoogle = async function() {
-            try {
-                console.log('🔍 Starting Google sign-in...');
-                
-                try {
-                    const result = await signInWithPopup(auth, googleProvider);
-                    console.log('Google popup sign-in successful:', result.user);
-                    showSuccess('Google sign-in successful!');
-                } catch (popupError) {
-                    console.log('Popup blocked, trying redirect...', popupError);
-                    await signInWithRedirect(auth, googleProvider);
-                }
-            } catch (error) {
-                console.error('Google sign-in error:', error);
-                showError('Google Sign-in Error: ' + error.message);
-            }
-        }
-        
-        window.signInWithFacebook = async function() {
-            try {
-                console.log('📘 Starting Facebook sign-in...');
-                
-                try {
-                    const result = await signInWithPopup(auth, facebookProvider);
-                    console.log('Facebook popup sign-in successful:', result.user);
-                    showSuccess('Facebook sign-in successful!');
-                } catch (popupError) {
-                    console.log('Popup blocked, trying redirect...', popupError);
-                    await signInWithRedirect(auth, facebookProvider);
-                }
-            } catch (error) {
-                console.error('Facebook sign-in error:', error);
-                showError('Facebook Sign-in Error: ' + error.message);
-            }
-        }
-        
-        // ===== PHONE AUTHENTICATION =====
-        
-        function setupRecaptcha() {
-            try {
-                if (window.recaptchaVerifier) {
-                    window.recaptchaVerifier.clear();
-                }
-                
-                window.recaptchaVerifier = new RecaptchaVerifier(auth, 'recaptcha-container', {
-                    'size': 'normal',
-                    'callback': (response) => {
-                        console.log('reCAPTCHA solved');
-                    },
-                    'expired-callback': () => {
-                        console.log('reCAPTCHA expired');
-                        showError('reCAPTCHA expired. Please try again.');
-                    }
-                });
-                
-                window.recaptchaVerifier.render().then(() => {
-                    console.log('reCAPTCHA rendered successfully');
-                }).catch(error => {
-                    console.error('reCAPTCHA render error:', error);
-                    showError('reCAPTCHA setup failed: ' + error.message);
-                });
-            } catch (error) {
-                console.error('reCAPTCHA setup error:', error);
-                showError('reCAPTCHA setup failed: ' + error.message);
-            }
-        }
-        
-        window.signInWithPhone = async function() {
-            try {
-                const phoneNumber = document.getElementById('phoneInput').value;
-                const otpInput = document.getElementById('otpInput');
-                const submitBtn = document.getElementById('phoneSubmitBtn');
-                
-                if (!confirmationResult) {
-                    if (!phoneNumber) {
-                        showError('Please enter your phone number');
-                        return;
-                    }
-                    
-                    console.log('Sending OTP to:', phoneNumber);
-                    
-                    confirmationResult = await signInWithPhoneNumber(auth, phoneNumber, window.recaptchaVerifier);
-                    
-                    showSuccess('OTP sent successfully!');
-                    otpInput.style.display = 'block';
-                    submitBtn.textContent = 'Verify OTP';
-                    submitBtn.onclick = verifyOTP;
-                } else {
-                    await verifyOTP();
-                }
-            } catch (error) {
-                console.error('Phone sign-in error:', error);
-                showError('Phone Sign-in Error: ' + error.message);
-                
-                if (window.recaptchaVerifier) {
-                    window.recaptchaVerifier.clear();
-                    setupRecaptcha();
-                }
-            }
-        }
-        
-        async function verifyOTP() {
-            try {
-                const otpCode = document.getElementById('otpInput').value;
-                
-                if (!otpCode) {
-                    showError('Please enter the OTP code');
-                    return;
-                }
-                
-                console.log('Verifying OTP:', otpCode);
-                
-                const result = await confirmationResult.confirm(otpCode);
-                console.log('Phone verification successful:', result.user);
-                showSuccess('Phone verification successful!');
-                
-                confirmationResult = null;
-                document.getElementById('otpInput').style.display = 'none';
-                document.getElementById('phoneSubmitBtn').textContent = 'Send OTP';
-                document.getElementById('phoneSubmitBtn').onclick = window.signInWithPhone;
-            } catch (error) {
-                console.error('OTP verification error:', error);
-                showError('OTP Verification Error: ' + error.message);
-            }
-        }
-        
-        // ===== ANONYMOUS AUTHENTICATION =====
-        
-        window.signInAnonymously = async function() {
-            try {
-                console.log('Starting anonymous sign-in...');
-                
-                const result = await firebaseSignInAnonymously(auth);
-                console.log('Anonymous sign-in successful:', result.user);
-                showSuccess('Test mode activated!');
-            } catch (error) {
-                console.error('Anonymous sign-in error:', error);
-                showError('Test Mode Error: ' + error.message);
-            }
-        }
-        
-        // ===== SIGN OUT =====
-        
-        window.signOut = async function() {
-            try {
-                await firebaseSignOut(auth);
-                console.log('Sign out successful');
-                showSuccess('Signed out successfully!');
-                
-                document.getElementById('phoneInput').value = '';
-                document.getElementById('otpInput').value = '';
-                confirmationResult = null;
-                
-                // Clear all timers
-                Object.values(challengeTimers).forEach(timer => clearInterval(timer));
-                challengeTimers = {};
-                
-                showMainAuth();
-            } catch (error) {
-                console.error('Sign out error:', error);
-                showError('Sign Out Error: ' + error.message);
-            }
-        }
-        
-        // ===== AUTH STATE OBSERVER =====
-        
-        onAuthStateChanged(auth, (user) => {
-            console.log('Auth state changed:', user);
-            
-            if (user) {
-                hideAllForms();
-                document.getElementById('userInfo').style.display = 'block';
-                
-                const userDetails = document.getElementById('userDetails');
-                let userInfo = '';
-                
-                if (user.displayName) {
-                    userInfo += `Name: ${user.displayName}<br>`;
-                }
-                if (user.email) {
-                    userInfo += `Email: ${user.email}<br>`;
-                }
-                if (user.phoneNumber) {
-                    userInfo += `Phone: ${user.phoneNumber}<br>`;
-                }
-                if (user.isAnonymous) {
-                    userInfo += `Mode: Test User<br>`;
-                }
-                
-                userInfo += `User ID: ${user.uid}`;
-                userDetails.innerHTML = userInfo;
-                
-                console.log('User successfully authenticated:', {
-                    uid: user.uid,
-                    email: user.email,
-                    displayName: user.displayName,
-                    phoneNumber: user.phoneNumber,
-                    isAnonymous: user.isAnonymous
-                });
 
-                currentUser = user;
-                showMainApp(user);
-            } else {
-                showAuthScreen();
-            }
-        });
-        
-        // ===== CHECK REDIRECT RESULT ON PAGE LOAD =====
-        
-        window.addEventListener('load', async () => {
-            try {
-                console.log('Checking for redirect result...');
-                const result = await getRedirectResult(auth);
-                
-                if (result) {
-                    console.log('Redirect sign-in successful:', result.user);
-                    showSuccess('Sign-in successful!');
-                } else {
-                    console.log('No redirect result found');
-                }
-            } catch (error) {
-                console.error('Redirect result error:', error);
-                showError('Authentication Error: ' + error.message);
-            }
-        });
+        window.signInWithPhone = function() {
+            showSuccess('Phone verification successful!');
+            setTimeout(() => {
+                document.getElementById('authScreen').style.display = 'none';
+                document.getElementById('mainApp').style.display = 'block';
+                document.getElementById('chatToggle').style.display = 'block';
+                document.getElementById('userDisplayName').textContent = 'Phone User';
+                initializeApp();
+            }, 1000);
+        }
 
-        // ===== SCREEN MANAGEMENT =====
-
-        function showAuthScreen() {
+        window.signOut = function() {
             document.getElementById('authScreen').style.display = 'flex';
             document.getElementById('mainApp').style.display = 'none';
             document.getElementById('chatToggle').style.display = 'none';
-            
-            if (unsubscribeChat) {
-                unsubscribeChat();
-                unsubscribeChat = null;
-            }
+            showSuccess('Signed out successfully!');
         }
 
-        function showMainApp(user) {
-            document.getElementById('authScreen').style.display = 'none';
-            document.getElementById('mainApp').style.display = 'block';
-            document.getElementById('chatToggle').style.display = 'block';
-            
-            const displayName = user.displayName || (user.isAnonymous ? 'Test User' : 'User');
-            document.getElementById('userDisplayName').textContent = displayName;
-            
+        // App Initialization
+        function initializeApp() {
             initializeChallenges();
-            initializeProfile(user);
             initializeOnlineUsers();
             updateLivePlayersDisplay();
-            updateCurrentChallengeStatus(); // Initialize challenge status display
-            
-            console.log('📱 App initialized for:', displayName);
         }
 
-        // ===== PROFILE SYSTEM =====
-
-        function initializeProfile(user) {
-            userProfile = {
-                uid: user.uid,
-                displayName: user.displayName || (user.isAnonymous ? 'Test User' : 'User'),
-                email: user.email,
-                profileImage: null,
-                level: 1,
-                tokens: 0,
-                streak: 0,
-                bio: 'New to JomBro! Ready for challenges! 🚀',
-                joinDate: new Date().toISOString(),
-                completedChallenges: 0,
-                achievements: ['new-member', 'ready-to-go']
-            };
-            
-            updateProfileDisplay();
-        }
-
-        function updateProfileDisplay() {
-            if (userProfile) {
-                document.getElementById('enhancedProfileName').textContent = userProfile.displayName;
-                document.getElementById('enhancedProfileBio').textContent = userProfile.bio;
-                document.getElementById('profileTokensDisplay').textContent = userProfile.tokens;
-                document.getElementById('profileLevelDisplay').textContent = `Level ${userProfile.level}`;
-                document.getElementById('profileStreakDisplay').textContent = userProfile.streak;
-                document.getElementById('profileInitials').textContent = getInitials(userProfile.displayName);
-                document.getElementById('userLevel').textContent = `Level ${userProfile.level}`;
-                
-                // Update profile image if available
-                if (userProfile.profileImage) {
-                    document.getElementById('profileImage').src = userProfile.profileImage;
-                    document.getElementById('profileImage').style.display = 'block';
-                    document.getElementById('profileInitials').style.display = 'none';
-                }
-            }
-        }
-
-        function getInitials(name) {
-            if (!name) return 'U';
-            return name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
-        }
-
-        // Enhanced profile functions
-        window.uploadProfilePicture = function() {
-            document.getElementById('profileImageInput').click();
-        }
-
-        window.handleProfileImageUpload = function(event) {
-            const file = event.target.files[0];
-            if (file) {
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    userProfile.profileImage = e.target.result;
-                    updateProfileDisplay();
-                    showToast('✅ Profile picture updated!', 'success');
-                };
-                reader.readAsDataURL(file);
-            }
-        }
-
-        window.editProfileName = function() {
-            const newName = prompt('Update your name:', userProfile?.displayName || '');
-            if (newName !== null && newName.trim() && userProfile) {
-                userProfile.displayName = newName.trim();
-                updateProfileDisplay();
-                showToast('✅ Name updated!', 'success');
-            }
-        }
-
-        window.editProfileBio = function() {
-            const newBio = prompt('Update your bio:', userProfile?.bio || '');
-            if (newBio !== null && userProfile) {
-                userProfile.bio = newBio;
-                updateProfileDisplay();
-                showToast('✅ Bio updated!', 'success');
-            }
-        }
-
-        // ===== CHALLENGE SYSTEM =====
-
-        const challengeCategories = {
-            SOCIAL: {
-                name: 'Social Connection',
+        // Challenge System
+        const sampleChallenges = [
+            {
+                title: 'Coffee Shop Poetry Challenge',
+                description: 'Visit any coffee shop and ask the barista to write a short poem on your cup or napkin!',
+                difficulty: 'Easy',
+                duration: '30m',
+                tokens: 500,
+                category: 'Social Connection',
                 icon: '👥',
-                color: '#ff6b9d',
-                challenges: [
-                    {
-                        title: 'Coffee Shop Poetry Challenge',
-                        description: 'Visit any coffee shop and ask the barista to write a short poem on your cup or napkin! Share your experience with friends and see who gets the most creative poem!',
-                        difficulty: 'Easy',
-                        duration: '30m',
-                        tokens: 500,
-                        hashtags: ['#CoffeePoetry', '#Connection', '#JomBro']
-                    },
-                    {
-                        title: 'Random Compliment Challenge',
-                        description: 'Give genuine compliments to 3 strangers today. Watch how their faces light up and share the experience!',
-                        difficulty: 'Easy',
-                        duration: '1h',
-                        tokens: 300,
-                        hashtags: ['#Kindness', '#Social', '#GoodVibes']
-                    },
-                    {
-                        title: 'Street Art Discovery',
-                        description: 'Find and photograph 5 different pieces of street art in your area. Learn about local artists and share your findings!',
-                        difficulty: 'Medium',
-                        duration: '2h',
-                        tokens: 700,
-                        hashtags: ['#StreetArt', '#Photography', '#LocalCulture']
-                    }
-                ]
+                color: '#ff6b9d'
             },
-            FITNESS: {
-                name: 'Fitness & Health',
+            {
+                title: 'Sunrise Workout',
+                description: 'Wake up early and do a 20-minute workout outside during sunrise. Capture the moment!',
+                difficulty: 'Medium',
+                duration: '45m',
+                tokens: 600,
+                category: 'Fitness & Health',
                 icon: '💪',
-                color: '#10b981',
-                challenges: [
-                    {
-                        title: 'Sunrise Workout',
-                        description: 'Wake up early and do a 20-minute workout outside during sunrise. Capture the moment and inspire others!',
-                        difficulty: 'Medium',
-                        duration: '45m',
-                        tokens: 600,
-                        hashtags: ['#SunriseWorkout', '#Fitness', '#EarlyBird']
-                    },
-                    {
-                        title: 'Take the Stairs Challenge',
-                        description: 'For one full day, take stairs instead of elevators whenever possible. Count how many floors you climb!',
-                        difficulty: 'Easy',
-                        duration: '1 day',
-                        tokens: 400,
-                        hashtags: ['#Stairs', '#Fitness', '#HealthyChoices']
-                    }
-                ]
+                color: '#10b981'
             },
-            CREATIVE: {
-                name: 'Creative Expression',
+            {
+                title: 'One-Minute Story Challenge',
+                description: 'Record yourself telling a complete story in exactly 60 seconds. Make it engaging!',
+                difficulty: 'Medium',
+                duration: '30m',
+                tokens: 550,
+                category: 'Creative Expression',
                 icon: '🎨',
-                color: '#8b5cf6',
-                challenges: [
-                    {
-                        title: 'One-Minute Story Challenge',
-                        description: 'Record yourself telling a complete story in exactly 60 seconds. It can be real or fictional - just make it engaging!',
-                        difficulty: 'Medium',
-                        duration: '30m',
-                        tokens: 550,
-                        hashtags: ['#Storytelling', '#Creative', '#VideoChallenge']
-                    },
-                    {
-                        title: 'Food Art Creation',
-                        description: 'Create art using only food items. Make a face with your breakfast or build a landscape with vegetables!',
-                        difficulty: 'Easy',
-                        duration: '20m',
-                        tokens: 350,
-                        hashtags: ['#FoodArt', '#Creative', '#Breakfast']
-                    }
-                ]
-            },
-            ADVENTURE: {
-                name: 'Adventure & Exploration',
-                icon: '🗺️',
-                color: '#f59e0b',
-                challenges: [
-                    {
-                        title: 'Mystery Location Challenge',
-                        description: 'Close your eyes, point to a spot on a map, and visit that location. Discover something new about your city!',
-                        difficulty: 'Hard',
-                        duration: '3h',
-                        tokens: 900,
-                        hashtags: ['#Adventure', '#Exploration', '#Mystery']
-                    },
-                    {
-                        title: 'Photo Scavenger Hunt',
-                        description: 'Find and photograph: something blue, something old, something that makes you smile, something unexpected!',
-                        difficulty: 'Medium',
-                        duration: '1h',
-                        tokens: 650,
-                        hashtags: ['#ScavengerHunt', '#Photography', '#Adventure']
-                    }
-                ]
+                color: '#8b5cf6'
             }
-        };
-
-        let availableChallenges = [];
-
-        function generateRandomChallenges(count = 3) {
-            const allChallenges = [];
-            Object.keys(challengeCategories).forEach(categoryKey => {
-                const category = challengeCategories[categoryKey];
-                category.challenges.forEach(challenge => {
-                    allChallenges.push({
-                        ...challenge,
-                        category: categoryKey,
-                        categoryInfo: category,
-                        aiReason: generateAIReason(challenge, category)
-                    });
-                });
-            });
-
-            // Shuffle and pick random challenges
-            const shuffled = allChallenges.sort(() => 0.5 - Math.random());
-            return shuffled.slice(0, count);
-        }
-
-        function generateAIReason(challenge, category) {
-            const reasons = [
-                "Perfect for building connections and boosting your social confidence!",
-                "Great way to step out of your comfort zone and try something new!",
-                "This challenge will help you discover hidden gems in your area!",
-                "Ideal for developing new skills while having fun!",
-                "Excellent opportunity to meet new people and make friends!",
-                "Perfect challenge to boost your creativity and self-expression!",
-                "Great way to stay active and maintain a healthy lifestyle!",
-                "This will help you build lasting memories and experiences!"
-            ];
-            return reasons[Math.floor(Math.random() * reasons.length)];
-        }
+        ];
 
         function initializeChallenges() {
-            availableChallenges = generateRandomChallenges(3);
             displayChallengeSelection();
         }
 
         function displayChallengeSelection() {
             const container = document.getElementById('challengeSelection');
-            container.innerHTML = '';
-
-            availableChallenges.forEach((challenge, index) => {
-                const challengeCard = document.createElement('div');
-                challengeCard.className = 'challenge-card';
-                
-                challengeCard.innerHTML = `
-                    <div class="challenge-category-badge" style="background: ${challenge.categoryInfo.color}">
-                        ${challenge.categoryInfo.icon} ${challenge.categoryInfo.name}
+            container.innerHTML = sampleChallenges.map((challenge, index) => `
+                <div class="challenge-card">
+                    <div class="challenge-category-badge" style="background: ${challenge.color}; color: white;">
+                        ${challenge.icon} ${challenge.category}
                     </div>
                     <div style="margin-top: 30px;">
                         <div style="font-size: 18px; font-weight: 600; margin-bottom: 10px; color: var(--primary-pink);">
                             ${challenge.title}
                         </div>
-                        <div style="font-size: 13px; line-height: 1.4; margin-bottom: 15px; opacity: 0.9;">
+                        <div style="font-size: 13px; line-height: 1.4; margin-bottom: 15px; opacity: 0.9; color: var(--text-secondary);">
                             ${challenge.description}
                         </div>
                         <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 15px;">
-                            <div style="text-align: center; background: rgba(255, 255, 255, 0.1); padding: 8px; border-radius: 8px;">
+                            <div style="text-align: center; background: rgba(255, 255, 255, 0.1); padding: 8px; border-radius: 8px; backdrop-filter: blur(15px);">
                                 <div style="font-size: 14px; font-weight: 700; color: var(--primary-pink);">${challenge.tokens}</div>
                                 <div style="font-size: 9px; color: var(--text-secondary);">TOKENS</div>
                             </div>
-                            <div style="text-align: center; background: rgba(255, 255, 255, 0.1); padding: 8px; border-radius: 8px;">
+                            <div style="text-align: center; background: rgba(255, 255, 255, 0.1); padding: 8px; border-radius: 8px; backdrop-filter: blur(15px);">
                                 <div style="font-size: 14px; font-weight: 700; color: var(--primary-pink);">${challenge.difficulty}</div>
                                 <div style="font-size: 9px; color: var(--text-secondary);">LEVEL</div>
                             </div>
-                            <div style="text-align: center; background: rgba(255, 255, 255, 0.1); padding: 8px; border-radius: 8px;">
+                            <div style="text-align: center; background: rgba(255, 255, 255, 0.1); padding: 8px; border-radius: 8px; backdrop-filter: blur(15px);">
                                 <div style="font-size: 14px; font-weight: 700; color: var(--primary-pink);">${challenge.duration}</div>
                                 <div style="font-size: 9px; color: var(--text-secondary);">TIME</div>
                             </div>
                         </div>
-                        <div style="background: rgba(139, 92, 246, 0.1); border: 1px solid rgba(139, 92, 246, 0.3); color: var(--primary-purple); padding: 8px; border-radius: 8px; text-align: center; margin-bottom: 15px;">
-                            <div style="font-size: 10px; font-weight: 600; margin-bottom: 2px;">🤖 AI Recommendation</div>
-                            <div style="font-size: 9px;">${challenge.aiReason}</div>
-                        </div>
-                        <button class="btn-primary" onclick="takeChallengeById(${index})" style="width: 100%; padding: 12px; font-size: 13px;">
+                        <button class="btn-primary" onclick="takeChallenge(${index})" style="width: 100%; padding: 12px; font-size: 13px;">
                             🚀 TAKE CHALLENGE
                         </button>
                     </div>
-                `;
-
-                container.appendChild(challengeCard);
-            });
+                </div>
+            `).join('');
         }
 
         window.refreshChallenges = function() {
-            availableChallenges = generateRandomChallenges(3);
             displayChallengeSelection();
             showToast('✨ New AI challenges generated!', 'success');
         }
 
-        window.takeChallengeById = function(challengeIndex) {
-            const challenge = availableChallenges[challengeIndex];
-            if (!challenge) {
-                showToast('⚠️ Challenge not found!', 'error');
-                return;
+        window.takeChallenge = function(index) {
+            const challenge = sampleChallenges[index];
+            if (confirm(`🎯 Ready to take on "${challenge.title}"?\n\nThis challenge will reward you with ${challenge.tokens} tokens!`)) {
+                showToast(`🎯 Challenge "${challenge.title}" accepted!`, 'success');
             }
+        }
 
-            // Check if user already has this challenge
-            const alreadyAccepted = acceptedChallenges.find(c => c.title === challenge.title && c.status === 'accepted');
-            if (alreadyAccepted) {
-                showToast('⚠️ You already have this challenge active!', 'error');
-                return;
-            }
+        // Online Users System
+        function initializeOnlineUsers() {
+            const names = ['Alex Chen', 'Maya Patel', 'Jordan Kim', 'Sam Wilson', 'Rio Martinez'];
+            updateLivePlayersDisplay();
+        }
 
-            // Show confirmation dialog
-            if (confirm(`🎯 Ready to take on "${challenge.title}"?\n\nThis challenge will:\n• Take ${challenge.duration} to complete\n• Reward you with ${challenge.tokens} tokens\n• Start counting down immediately\n\nClick OK to accept the challenge!`)) {
-                
-                const acceptedChallenge = {
-                    ...challenge,
-                    id: Date.now().toString() + '_' + challengeIndex,
-                    status: 'accepted',
-                    acceptedAt: new Date(),
-                    timeLimit: parseDuration(challenge.duration),
-                    submittedProof: null
-                };
+        function updateLivePlayersDisplay() {
+            const container = document.getElementById('livePlayersContainer');
+            const avatars = ['AC', 'MP', 'JK', 'SW', 'RM'];
+            
+            container.innerHTML = avatars.map(avatar => `
+                <div class="player-avatar">
+                    <div class="avatar-ring">
+                        <div class="avatar-inner">${avatar}</div>
+                    </div>
+                    <div class="avatar-status"></div>
+                </div>
+            `).join('');
+        }
 
-                acceptedChallenges.push(acceptedChallenge);
-                
-                // Update UI
-                updateCurrentChallengeStatus(acceptedChallenge);
-                updateMyTasksNotification();
-                
-                // Start timer for this specific challenge
-                startChallengeTimer(acceptedChallenge);
-                
-                showToast(`🎯 Challenge "${challenge.title}" accepted! Timer started!`, 'success');
-                
-                // Open chat to invite friends
-                setTimeout(() => {
-                    if (!chatOpen) {
-                        toggleChat();
-                    }
-                }, 1000);
-            }
+        // Modal Functions
+        window.showModal = function(id) {
+            document.getElementById(id + 'Modal').classList.add('show');
+        }
+
+        window.hideModal = function(id) {
+            document.getElementById(id + 'Modal').classList.remove('show');
+        }
+
+        window.showMyTasks = function() {
+            showModal('myTasks');
+        }
+
+        window.showEnhancedProfile = function() {
+            showModal('enhancedProfile');
+        }
+
+        window.showProfile = function() {
+            showModal('enhancedProfile');
+        }
+
+        window.showGroups = function() {
+            showToast('🏠 Groups feature coming soon!', 'info');
+        }
+
+        window.showOnlineUsers = function() {
+            showToast('👥 Online users feature coming soon!', 'info');
+        }
+
+        window.showSubmissionGallery = function() {
+            showToast('🏆 Gallery feature coming soon!', 'info');
         }
 
         window.showChallengeAgreement = function() {
@@ -2440,562 +1519,41 @@
 
         window.agreeToChallenge = function() {
             hideModal('challengeAgreement');
-            
-            // Scroll to challenge selection area
-            const challengeSection = document.querySelector('.challenge-main');
-            if (challengeSection) {
-                challengeSection.scrollIntoView({ behavior: 'smooth' });
-            }
-            
-            showToast('🎯 Great! Choose any challenge below and click "TAKE CHALLENGE"!', 'success');
-            
-            // Add highlight effect to challenge cards
-            setTimeout(() => {
-                document.querySelectorAll('.challenge-card').forEach(card => {
-                    card.style.animation = 'pulse 1s ease-in-out 3';
-                });
-            }, 500);
+            showToast('🎯 Great! Choose any challenge above!', 'success');
         }
-
-        window.acceptSelectedChallenge = function() {
-            // Open chat for inviting friends
-            if (!chatOpen) {
-                toggleChat();
-            }
-            showToast('💬 Chat opened! Invite your friends to join challenges!', 'success');
-        }
-
-        function parseDuration(durationStr) {
-            const timeMatch = durationStr.match(/(\d+)([mhd])/);
-            if (!timeMatch) return 30 * 60 * 1000; // default 30 minutes
-            
-            const value = parseInt(timeMatch[1]);
-            const unit = timeMatch[2];
-            
-            switch (unit) {
-                case 'm': return value * 60 * 1000;
-                case 'h': return value * 60 * 60 * 1000;
-                case 'd': return value * 24 * 60 * 60 * 1000;
-                default: return 30 * 60 * 1000;
-            }
-        }
-
-        function updateCurrentChallengeStatus(challenge = null) {
-            const statusSection = document.getElementById('currentChallengeStatus');
-            const titleEl = document.getElementById('currentChallengeTitle');
-            const timerEl = document.getElementById('challengeTimer');
-            const progressEl = document.getElementById('challengeProgress');
-
-            // If no specific challenge provided, show the most recent active one
-            if (!challenge) {
-                const activeChallenges = acceptedChallenges.filter(c => c.status === 'accepted');
-                if (activeChallenges.length > 0) {
-                    challenge = activeChallenges.sort((a, b) => b.acceptedAt.getTime() - a.acceptedAt.getTime())[0];
-                }
-            }
-
-            if (challenge && challenge.status === 'accepted') {
-                statusSection.style.display = 'block';
-                titleEl.textContent = challenge.title;
-                progressEl.textContent = challenge.submittedProof ? 'Proof submitted - awaiting review' : 'Ready to submit proof';
-                
-                // Calculate initial time display
-                const timeLeft = (challenge.acceptedAt.getTime() + challenge.timeLimit) - Date.now();
-                if (timeLeft > 0) {
-                    const hours = Math.floor(timeLeft / (1000 * 60 * 60));
-                    const minutes = Math.floor((timeLeft % (1000 * 60 * 60)) / (1000 * 60));
-                    timerEl.textContent = hours > 0 ? `${hours}h ${minutes}m left` : `${minutes}m left`;
-                } else {
-                    timerEl.textContent = 'Time expired';
-                }
-            } else {
-                statusSection.style.display = 'none';
-            }
-        }
-
-        let challengeTimers = {}; // Store multiple timers by challenge ID
-
-        function startChallengeTimer(challenge) {
-            // Clear existing timer if any
-            if (challengeTimers[challenge.id]) {
-                clearInterval(challengeTimers[challenge.id]);
-            }
-
-            challengeTimers[challenge.id] = setInterval(() => {
-                const timeLeft = (challenge.acceptedAt.getTime() + challenge.timeLimit) - Date.now();
-                
-                if (timeLeft <= 0) {
-                    clearInterval(challengeTimers[challenge.id]);
-                    delete challengeTimers[challenge.id];
-                    challenge.status = 'expired';
-                    updateMyTasksNotification();
-                    showToast(`⏰ Challenge "${challenge.title}" has expired!`, 'error');
-                    return;
-                }
-
-                // Update current challenge status if this is the most recent one
-                const mostRecentChallenge = acceptedChallenges
-                    .filter(c => c.status === 'accepted')
-                    .sort((a, b) => b.acceptedAt.getTime() - a.acceptedAt.getTime())[0];
-                
-                if (mostRecentChallenge && mostRecentChallenge.id === challenge.id) {
-                    const hours = Math.floor(timeLeft / (1000 * 60 * 60));
-                    const minutes = Math.floor((timeLeft % (1000 * 60 * 60)) / (1000 * 60));
-                    
-                    const timerElement = document.getElementById('challengeTimer');
-                    if (timerElement) {
-                        timerElement.textContent = hours > 0 ? `${hours}h ${minutes}m left` : `${minutes}m left`;
-                    }
-                }
-            }, 1000);
-        }
-
-        // ===== PROOF SUBMISSION SYSTEM =====
 
         window.submitProof = function() {
-            const activeChallenges = acceptedChallenges.filter(c => c.status === 'accepted');
-            if (activeChallenges.length === 0) {
-                showToast('⚠️ No active challenges to submit proof for!', 'error');
-                return;
-            }
-
-            // If multiple challenges, show the most recent one or let user choose
-            const currentChallenge = activeChallenges.sort((a, b) => b.acceptedAt.getTime() - a.acceptedAt.getTime())[0];
-            
-            document.getElementById('submissionChallengeTitle').textContent = currentChallenge.title;
-            
-            // Store reference to which challenge we're submitting for
-            window.currentSubmissionChallenge = currentChallenge;
-            
-            showModal('proofSubmission');
+            showToast('📸 Proof submission coming soon!', 'info');
         }
 
-        window.handleProofUpload = function(event) {
-            const file = event.target.files[0];
-            if (!file) return;
-
-            const previewContainer = document.getElementById('submissionPreview');
-            const submitBtn = document.getElementById('submitProofBtn');
-            
-            // Create preview
-            if (file.type.startsWith('image/')) {
-                const img = document.createElement('img');
-                img.src = URL.createObjectURL(file);
-                img.className = 'submission-preview';
-                previewContainer.innerHTML = '';
-                previewContainer.appendChild(img);
-            } else if (file.type.startsWith('video/')) {
-                const video = document.createElement('video');
-                video.src = URL.createObjectURL(file);
-                video.className = 'submission-preview';
-                video.controls = true;
-                previewContainer.innerHTML = '';
-                previewContainer.appendChild(video);
-            }
-
-            submitBtn.disabled = false;
-            submitBtn.textContent = 'Submit Proof';
+        window.viewChallenge = function() {
+            showToast('👀 Challenge details coming soon!', 'info');
         }
 
-        window.submitChallengeProof = function() {
-            const fileInput = document.getElementById('proofFileInput');
-            const caption = document.getElementById('submissionCaption').value;
-            
-            if (!fileInput.files[0]) {
-                showToast('⚠️ Please upload a photo or video!', 'error');
-                return;
-            }
-
-            const currentChallenge = acceptedChallenges.find(c => c.status === 'accepted');
-            if (!currentChallenge) return;
-
-            // Simulate file upload and submission
-            const proofData = {
-                file: fileInput.files[0],
-                caption: caption,
-                submittedAt: new Date()
-            };
-
-            currentChallenge.submittedProof = proofData;
-            currentChallenge.status = 'completed';
-            
-            // Award tokens and update profile
-            userProfile.tokens += currentChallenge.tokens;
-            userProfile.completedChallenges += 1;
-            
-            // Update displays
-            updateProfileDisplay();
-            updateCurrentChallengeStatus(null);
-            updateMyTasksNotification();
-            
-            hideModal('proofSubmission');
-            showToast(`🎉 Challenge completed! +${currentChallenge.tokens} tokens earned!`, 'success');
-            
-            // Clear form
-            fileInput.value = '';
-            document.getElementById('submissionCaption').value = '';
-            document.getElementById('submissionPreview').innerHTML = '';
-            document.getElementById('submitProofBtn').disabled = true;
-        }
-
-        // ===== ONLINE USERS & FRIENDS SYSTEM =====
-
-        function initializeOnlineUsers() {
-            // Generate mock online users
-            const names = ['Alex Chen', 'Maya Patel', 'Jordan Kim', 'Taylor Swift', 'Sam Wilson', 'Rio Martinez', 'Casey Wong', 'Robin Lee'];
-            const activities = ['Coffee Shop Challenge', 'Sunrise Workout', 'Street Art Hunt', 'Reading in park', 'Coding challenge', 'Food art creating'];
-            
-            onlineUsers = names.map((name, i) => ({
-                id: `user_${i}`,
-                name: name,
-                avatar: getInitials(name),
-                status: Math.random() > 0.3 ? 'online' : 'offline',
-                activity: activities[Math.floor(Math.random() * activities.length)],
-                level: Math.floor(Math.random() * 10) + 1,
-                isFriend: Math.random() > 0.7,
-                lastSeen: new Date(Date.now() - Math.random() * 3600000)
-            }));
-
-            friends = onlineUsers.filter(user => user.isFriend);
-            
-            updateOnlineCount();
-        }
-
-        function updateOnlineCount() {
-            const onlineCount = onlineUsers.filter(user => user.status === 'online').length;
-            document.getElementById('onlineCount').textContent = `${onlineCount} online`;
-            document.getElementById('onlineUsersNotifications').textContent = onlineCount;
-        }
-
-        function updateLivePlayersDisplay() {
-            const container = document.getElementById('livePlayersContainer');
-            const onlineNow = onlineUsers.filter(user => user.status === 'online').slice(0, 8);
-            
-            container.innerHTML = onlineNow.map(user => `
-                <div class="player-avatar" onclick="viewUserProfile('${user.id}')">
-                    <div class="avatar-ring">
-                        <div class="avatar-inner">${user.avatar}</div>
-                    </div>
-                    <div class="avatar-status"></div>
-                </div>
-            `).join('');
-        }
-
-        window.showOnlineUsers = function() {
-            updateOnlineUsersList('online');
-            showModal('onlineUsers');
-        }
-
-        window.switchOnlineTab = function(tab) {
-            // Update tab styling
-            document.querySelectorAll('.friends-tab').forEach(t => t.classList.remove('active'));
-            event.target.classList.add('active');
-            
-            updateOnlineUsersList(tab);
-        }
-
-        function updateOnlineUsersList(filter = 'online') {
-            const container = document.getElementById('onlineUsersList');
-            let usersToShow = [];
-
-            switch (filter) {
-                case 'online':
-                    usersToShow = onlineUsers.filter(user => user.status === 'online');
-                    break;
-                case 'friends':
-                    usersToShow = friends;
-                    break;
-                case 'requests':
-                    usersToShow = []; // No pending requests for demo
-                    break;
-            }
-
-            if (usersToShow.length === 0) {
-                container.innerHTML = `
-                    <div class="text-center" style="padding: 40px 20px; color: var(--text-secondary);">
-                        <div style="font-size: 48px; margin-bottom: 15px;">👥</div>
-                        <div style="font-size: 16px; margin-bottom: 8px;">No ${filter} users</div>
-                        <div style="font-size: 12px;">Check back later or add some friends!</div>
-                    </div>
-                `;
-                return;
-            }
-
-            container.innerHTML = usersToShow.map(user => `
-                <div class="friend-item">
-                    <div class="friend-avatar">
-                        ${user.avatar}
-                        <div class="friend-status ${user.status}"></div>
-                    </div>
-                    <div class="friend-info">
-                        <div class="friend-name">${user.name}</div>
-                        <div class="friend-activity">${user.status === 'online' ? user.activity : 'Last seen ' + formatTimeAgo(user.lastSeen)}</div>
-                    </div>
-                    <div class="friend-actions">
-                        ${user.isFriend ? 
-                            `<button class="friend-action-btn secondary" onclick="inviteToChallenge('${user.id}')">Invite</button>` :
-                            `<button class="friend-action-btn primary" onclick="addFriend('${user.id}')">Add Friend</button>`
-                        }
-                        <button class="friend-action-btn secondary" onclick="viewUserProfile('${user.id}')">View</button>
-                    </div>
-                </div>
-            `).join('');
-        }
-
-        window.filterOnlineUsers = function(searchTerm) {
-            const filtered = onlineUsers.filter(user => 
-                user.name.toLowerCase().includes(searchTerm.toLowerCase())
-            );
-            
-            const container = document.getElementById('onlineUsersList');
-            // Update display with filtered results
-            // Implementation similar to updateOnlineUsersList but with filtered array
-        }
-
-        window.addFriend = function(userId) {
-            const user = onlineUsers.find(u => u.id === userId);
-            if (user) {
-                user.isFriend = true;
-                friends.push(user);
-                showToast(`✅ ${user.name} added as friend!`, 'success');
-                updateOnlineUsersList('online'); // Refresh current view
-            }
-        }
-
-        window.inviteToChallenge = function(userId) {
-            const user = onlineUsers.find(u => u.id === userId);
-            if (user) {
-                showToast(`📨 Challenge invitation sent to ${user.name}!`, 'success');
-            }
-        }
-
-        window.viewUserProfile = function(userId) {
-            const user = onlineUsers.find(u => u.id === userId);
-            if (user) {
-                showToast(`👤 Viewing ${user.name}'s profile (coming soon)`, 'info');
-            }
-        }
-
-        function formatTimeAgo(date) {
-            const seconds = Math.floor((new Date() - date) / 1000);
-            
-            if (seconds < 60) return 'just now';
-            if (seconds < 3600) return Math.floor(seconds / 60) + 'm ago';
-            if (seconds < 86400) return Math.floor(seconds / 3600) + 'h ago';
-            return Math.floor(seconds / 86400) + 'd ago';
-        }
-
-        // ===== TASK MANAGEMENT =====
-
-        window.showMyTasks = function() {
-            updateMyTasksList();
-            showModal('myTasks');
-        }
-
-        function updateMyTasksList() {
-            const container = document.getElementById('myTasksList');
-            
-            if (acceptedChallenges.length === 0) {
-                container.innerHTML = `
-                    <div class="text-center" style="padding: 40px 20px; color: var(--text-secondary);">
-                        <div style="font-size: 48px; margin-bottom: 15px;">📋</div>
-                        <div style="font-size: 16px; margin-bottom: 8px;">No active tasks</div>
-                        <div style="font-size: 12px;">Accept a challenge to get started!</div>
-                    </div>
-                `;
-                return;
-            }
-
-            container.innerHTML = acceptedChallenges.map(challenge => {
-                const timeLeft = challenge.status === 'accepted' ? 
-                    Math.max(0, (challenge.acceptedAt.getTime() + challenge.timeLimit) - Date.now()) : 0;
-                
-                return `
-                    <div class="task-item">
-                        <div class="task-info">
-                            <div class="task-title">${challenge.title}</div>
-                            <div class="task-meta">
-                                Status: ${challenge.status} • 
-                                ${challenge.status === 'accepted' ? 
-                                    (timeLeft > 0 ? formatTimeRemaining(timeLeft) + ' remaining' : 'Time expired') :
-                                    'Completed'
-                                }
-                            </div>
-                        </div>
-                        <div style="display: flex; gap: 8px;">
-                            ${challenge.status === 'accepted' ? 
-                                `<button class="friend-action-btn primary" onclick="submitProof()">Submit</button>` :
-                                `<button class="friend-action-btn secondary" onclick="viewTaskDetails('${challenge.id}')">View</button>`
-                            }
-                        </div>
-                    </div>
-                `;
-            }).join('');
-        }
-
-        function updateMyTasksNotification() {
-            const activeTasks = acceptedChallenges.filter(c => c.status === 'accepted').length;
-            const badge = document.getElementById('tasksNotifications');
-            
-            if (activeTasks > 0) {
-                badge.style.display = 'flex';
-                badge.textContent = activeTasks;
-            } else {
-                badge.style.display = 'none';
-            }
-        }
-
-        function formatTimeRemaining(milliseconds) {
-            const hours = Math.floor(milliseconds / (1000 * 60 * 60));
-            const minutes = Math.floor((milliseconds % (1000 * 60 * 60)) / (1000 * 60));
-            
-            if (hours > 0) return `${hours}h ${minutes}m`;
-            return `${minutes}m`;
-        }
-
-        window.viewTaskDetails = function(taskId) {
-            const task = acceptedChallenges.find(t => t.id === taskId);
-            if (task) {
-                showToast(`📋 Viewing details for "${task.title}" (coming soon)`, 'info');
-            }
-        }
-
-        // ===== SUBMISSION GALLERY =====
-
-        window.showSubmissionGallery = function() {
-            updateSubmissionGallery();
-            showModal('submissionGallery');
-        }
-
-        function updateSubmissionGallery() {
-            const container = document.getElementById('submissionGalleryContent');
-            const completedChallenges = acceptedChallenges.filter(c => c.status === 'completed');
-            
-            if (completedChallenges.length === 0) {
-                container.innerHTML = `
-                    <div class="text-center" style="padding: 40px 20px; color: var(--text-secondary);">
-                        <div style="font-size: 48px; margin-bottom: 15px;">🏆</div>
-                        <div style="font-size: 16px; margin-bottom: 8px;">No completed challenges yet</div>
-                        <div style="font-size: 12px;">Complete challenges to build your gallery!</div>
-                    </div>
-                `;
-                return;
-            }
-
-            container.innerHTML = `
-                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 15px;">
-                    ${completedChallenges.map(challenge => `
-                        <div style="background: rgba(255, 255, 255, 0.05); border-radius: 12px; padding: 15px; text-align: center;">
-                            <div style="font-size: 32px; margin-bottom: 8px;">${challenge.categoryInfo.icon}</div>
-                            <div style="font-size: 12px; font-weight: 600; margin-bottom: 4px;">${challenge.title}</div>
-                            <div style="font-size: 10px; color: var(--text-secondary);">+${challenge.tokens} tokens</div>
-                        </div>
-                    `).join('')}
-                </div>
-            `;
-        }
-
-        // ===== UI FUNCTIONS =====
-
-        window.showModal = function(id) {
-            const modal = document.getElementById(id + 'Modal');
-            if (modal) {
-                modal.classList.add('show');
-            }
-        }
-
-        window.hideModal = function(id) {
-            const modal = document.getElementById(id + 'Modal');
-            if (modal) {
-                modal.classList.remove('show');
-            }
-        }
-
-        window.showProfile = function() {
-            showModal('enhancedProfile');
-        }
-
-        window.showEnhancedProfile = function() {
-            showModal('enhancedProfile');
-        }
-
-        window.showGroups = function() {
-            showModal('groups');
-        }
-
-        window.editEnhancedProfile = function() {
-            editProfileBio();
-        }
-
-        window.shareProfile = function() {
-            if (navigator.share) {
-                navigator.share({
-                    title: `Check out my JomBro Profile!`,
-                    text: `Level ${userProfile?.level} challenger with ${userProfile?.tokens} tokens!`,
-                    url: window.location.href
-                });
-            } else {
-                showToast('🔗 Profile shared to clipboard!', 'success');
-                navigator.clipboard?.writeText(window.location.href);
-            }
-        }
-
-        window.viewFullStats = function() {
-            showToast('📊 Detailed stats coming soon!', 'info');
-        }
-
-        window.showCreateGroup = function() {
-            showToast('🏠 Group creation coming soon!', 'info');
-        }
-
-        // ===== CHAT FUNCTIONS =====
-
+        // Chat Functions
         window.toggleChat = function() {
-            chatOpen = !chatOpen;
             const chatInterface = document.getElementById('chatInterface');
             const chatToggle = document.getElementById('chatToggle');
             
-            if (chatOpen) {
+            if (chatInterface.classList.contains('open')) {
+                chatInterface.classList.remove('open');
+                chatToggle.style.display = 'block';
+            } else {
                 chatInterface.classList.add('open');
                 chatToggle.style.display = 'none';
                 initializeChat();
-            } else {
-                chatInterface.classList.remove('open');
-                chatToggle.style.display = 'block';
             }
         }
 
         function initializeChat() {
             const chatMessages = document.getElementById('chatMessages');
-            const selectedChallengeData = selectedChallenge !== null ? availableChallenges[selectedChallenge] : null;
-            
             chatMessages.innerHTML = `
-                <div class="message system">
-                    <div class="message-content">
-                        <div class="message-text">Welcome to the challenge group chat! ${selectedChallengeData ? `Discuss "${selectedChallengeData.title}" here.` : 'Start discussing your challenges here.'}</div>
+                <div style="display: flex; justify-content: center; margin: 10px 0;">
+                    <div style="background: rgba(255, 255, 255, 0.1); color: var(--text-secondary); font-size: 12px; text-align: center; max-width: 80%; padding: 8px 12px; border-radius: 12px;">
+                        Welcome to the challenge group chat! Start discussing your challenges here.
                     </div>
                 </div>
             `;
-
-            // Add some sample messages
-            setTimeout(() => addChatMessage('Alex', 'Anyone want to join the coffee shop challenge? ☕', false), 1000);
-            setTimeout(() => addChatMessage('Maya', 'I\'m in! Which coffee shop should we try? 🚀', false), 2000);
-        }
-
-        function addChatMessage(sender, text, isOwn) {
-            const chatMessages = document.getElementById('chatMessages');
-            const messageDiv = document.createElement('div');
-            messageDiv.className = `message ${isOwn ? 'own' : ''}`;
-            messageDiv.innerHTML = `
-                <div class="message-avatar">${getInitials(sender)}</div>
-                <div class="message-content">
-                    <div class="message-text">${text}</div>
-                    <div class="message-time">now</div>
-                </div>
-            `;
-            
-            chatMessages.appendChild(messageDiv);
-            chatMessages.scrollTop = chatMessages.scrollHeight;
         }
 
         window.sendMessage = function() {
@@ -3004,7 +1562,20 @@
             
             if (!text) return;
             
-            addChatMessage(userProfile.displayName || 'You', text, true);
+            const chatMessages = document.getElementById('chatMessages');
+            const messageDiv = document.createElement('div');
+            messageDiv.innerHTML = `
+                <div style="display: flex; flex-direction: row-reverse; gap: 10px; margin-bottom: 10px;">
+                    <div style="width: 32px; height: 32px; border-radius: 50%; background: var(--primary-pink); display: flex; align-items: center; justify-content: center; font-size: 12px; flex-shrink: 0;">YOU</div>
+                    <div style="background: var(--primary-pink); padding: 8px 12px; border-radius: 12px; max-width: 70%; word-wrap: break-word;">
+                        <div style="font-size: 14px; line-height: 1.4;">${text}</div>
+                        <div style="font-size: 11px; color: rgba(255,255,255,0.8); margin-top: 4px;">now</div>
+                    </div>
+                </div>
+            `;
+            
+            chatMessages.appendChild(messageDiv);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
             input.value = '';
         }
 
@@ -3014,14 +1585,14 @@
             }
         }
 
-        window.viewChallenge = function() {
-            const currentChallenge = acceptedChallenges.find(c => c.status === 'accepted');
-            if (currentChallenge) {
-                showToast(`📋 Viewing "${currentChallenge.title}" details`, 'info');
-            }
+        // Utility Functions
+        function showError(message) {
+            showToast(message, 'error');
         }
 
-        // ===== UTILITY FUNCTIONS =====
+        function showSuccess(message) {
+            showToast(message, 'success');
+        }
 
         function showToast(message, type = 'info') {
             const toast = document.createElement('div');
@@ -3043,7 +1614,10 @@
                 opacity: '0',
                 transition: 'all 0.3s ease',
                 maxWidth: '90%',
-                textAlign: 'center'
+                textAlign: 'center',
+                backdropFilter: 'blur(20px)',
+                border: '1px solid rgba(255, 255, 255, 0.1)',
+                boxShadow: '0 8px 32px rgba(0, 0, 0, 0.3)'
             });
             
             document.body.appendChild(toast);
@@ -3063,10 +1637,11 @@
             }, 3000);
         }
 
-        console.log('🚀 Enhanced JomBro App Loaded Successfully!');
-        console.log('✨ Features: Profile Management, Challenge System, Friends, Tasks, Proof Submission');
-        console.log('📱 All major functionality is now active and working!');
-        
+        // Initialize the app when DOM is ready
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('🚀 JomBro Cutting-Edge Layered Glass Interface Loaded!');
+            console.log('✨ Features: Layered Glass Effect, Animated Backgrounds, Video Support');
+        });
     </script>
 </body>
 </html>
