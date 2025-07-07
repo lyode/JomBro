@@ -1160,17 +1160,14 @@
             transition: all 0.3s ease;
             position: relative;
             overflow: hidden;
+            display: flex;
+            flex-direction: column;
         }
 
         .challenge-card:hover {
             background: rgba(255, 255, 255, 0.1);
             transform: translateY(-5px);
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
-        }
-
-        .challenge-card.selected {
-            border-color: var(--primary-pink);
-            background: rgba(255, 107, 157, 0.1);
         }
 
         .challenge-category-badge {
@@ -1490,7 +1487,7 @@
                         </button>
                     </div>
                     <button class="btn-primary" id="mainActionBtn" onclick="acceptSelectedChallenge()">
-                        🚀 ACCEPT CHALLENGE & INVITE FRIENDS
+                        💬 OPEN CHAT & INVITE FRIENDS
                     </button>
                 </div>
             </div>
@@ -1955,11 +1952,9 @@
                 document.getElementById('otpInput').value = '';
                 confirmationResult = null;
                 
-                // Clear timers
-                if (challengeTimer) {
-                    clearInterval(challengeTimer);
-                    challengeTimer = null;
-                }
+                // Clear all timers
+                Object.values(challengeTimers).forEach(timer => clearInterval(timer));
+                challengeTimers = {};
                 
                 showMainAuth();
             } catch (error) {
@@ -2055,6 +2050,7 @@
             initializeProfile(user);
             initializeOnlineUsers();
             updateLivePlayersDisplay();
+            updateCurrentChallengeStatus(); // Initialize challenge status display
             
             console.log('📱 App initialized for:', displayName);
         }
@@ -2290,8 +2286,7 @@
 
             availableChallenges.forEach((challenge, index) => {
                 const challengeCard = document.createElement('div');
-                challengeCard.className = `challenge-card ${selectedChallenge === index ? 'selected' : ''}`;
-                challengeCard.onclick = () => selectChallenge(index);
+                challengeCard.className = 'challenge-card';
                 
                 challengeCard.innerHTML = `
                     <div class="challenge-category-badge" style="background: ${challenge.categoryInfo.color}">
@@ -2304,7 +2299,7 @@
                         <div style="font-size: 13px; line-height: 1.4; margin-bottom: 15px; opacity: 0.9;">
                             ${challenge.description}
                         </div>
-                        <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 10px;">
+                        <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 15px;">
                             <div style="text-align: center; background: rgba(255, 255, 255, 0.1); padding: 8px; border-radius: 8px;">
                                 <div style="font-size: 14px; font-weight: 700; color: var(--primary-pink);">${challenge.tokens}</div>
                                 <div style="font-size: 9px; color: var(--text-secondary);">TOKENS</div>
@@ -2318,58 +2313,43 @@
                                 <div style="font-size: 9px; color: var(--text-secondary);">TIME</div>
                             </div>
                         </div>
-                        <div style="background: rgba(139, 92, 246, 0.1); border: 1px solid rgba(139, 92, 246, 0.3); color: var(--primary-purple); padding: 8px; border-radius: 8px; text-align: center;">
+                        <div style="background: rgba(139, 92, 246, 0.1); border: 1px solid rgba(139, 92, 246, 0.3); color: var(--primary-purple); padding: 8px; border-radius: 8px; text-align: center; margin-bottom: 15px;">
                             <div style="font-size: 10px; font-weight: 600; margin-bottom: 2px;">🤖 AI Recommendation</div>
                             <div style="font-size: 9px;">${challenge.aiReason}</div>
                         </div>
+                        <button class="btn-primary" onclick="takeChallengeById(${index})" style="width: 100%; padding: 12px; font-size: 13px;">
+                            🚀 TAKE CHALLENGE
+                        </button>
                     </div>
                 `;
 
                 container.appendChild(challengeCard);
             });
-
-            // Auto-select first challenge if none selected
-            if (selectedChallenge === null && availableChallenges.length > 0) {
-                selectChallenge(0);
-            }
-        }
-
-        function selectChallenge(index) {
-            selectedChallenge = index;
-            
-            // Update visual selection
-            document.querySelectorAll('.challenge-card').forEach((card, i) => {
-                if (i === index) {
-                    card.classList.add('selected');
-                } else {
-                    card.classList.remove('selected');
-                }
-            });
-
-            // Update action button
-            const actionBtn = document.getElementById('mainActionBtn');
-            if (actionBtn) {
-                actionBtn.textContent = `🚀 ACCEPT: ${availableChallenges[index].title}`;
-            }
         }
 
         window.refreshChallenges = function() {
             availableChallenges = generateRandomChallenges(3);
-            selectedChallenge = null;
             displayChallengeSelection();
             showToast('✨ New AI challenges generated!', 'success');
         }
 
-        window.acceptSelectedChallenge = function() {
-            if (selectedChallenge === null) {
-                showToast('⚠️ Please select a challenge first!', 'error');
+        window.takeChallengeById = function(challengeIndex) {
+            const challenge = availableChallenges[challengeIndex];
+            if (!challenge) {
+                showToast('⚠️ Challenge not found!', 'error');
                 return;
             }
 
-            const challenge = availableChallenges[selectedChallenge];
+            // Check if user already has this challenge
+            const alreadyAccepted = acceptedChallenges.find(c => c.title === challenge.title && c.status === 'accepted');
+            if (alreadyAccepted) {
+                showToast('⚠️ You already have this challenge active!', 'error');
+                return;
+            }
+
             const acceptedChallenge = {
                 ...challenge,
-                id: Date.now().toString(),
+                id: Date.now().toString() + '_' + challengeIndex,
                 status: 'accepted',
                 acceptedAt: new Date(),
                 timeLimit: parseDuration(challenge.duration),
@@ -2382,15 +2362,23 @@
             updateCurrentChallengeStatus(acceptedChallenge);
             updateMyTasksNotification();
             
-            // Start timer
+            // Start timer for this specific challenge
             startChallengeTimer(acceptedChallenge);
             
-            showToast(`🎯 Challenge "${challenge.title}" accepted!`, 'success');
+            showToast(`🎯 Challenge "${challenge.title}" added to your tasks!`, 'success');
             
             // Open chat to invite friends
             if (!chatOpen) {
                 toggleChat();
             }
+        }
+
+        window.acceptSelectedChallenge = function() {
+            // Open chat for inviting friends
+            if (!chatOpen) {
+                toggleChat();
+            }
+            showToast('💬 Chat opened! Invite your friends to join challenges!', 'success');
         }
 
         function parseDuration(durationStr) {
@@ -2408,55 +2396,93 @@
             }
         }
 
-        function updateCurrentChallengeStatus(challenge) {
+        function updateCurrentChallengeStatus(challenge = null) {
             const statusSection = document.getElementById('currentChallengeStatus');
             const titleEl = document.getElementById('currentChallengeTitle');
             const timerEl = document.getElementById('challengeTimer');
             const progressEl = document.getElementById('challengeProgress');
 
-            if (challenge) {
+            // If no specific challenge provided, show the most recent active one
+            if (!challenge) {
+                const activeChallenges = acceptedChallenges.filter(c => c.status === 'accepted');
+                if (activeChallenges.length > 0) {
+                    challenge = activeChallenges.sort((a, b) => b.acceptedAt.getTime() - a.acceptedAt.getTime())[0];
+                }
+            }
+
+            if (challenge && challenge.status === 'accepted') {
                 statusSection.style.display = 'block';
                 titleEl.textContent = challenge.title;
                 progressEl.textContent = challenge.submittedProof ? 'Proof submitted - awaiting review' : 'Ready to submit proof';
+                
+                // Calculate initial time display
+                const timeLeft = (challenge.acceptedAt.getTime() + challenge.timeLimit) - Date.now();
+                if (timeLeft > 0) {
+                    const hours = Math.floor(timeLeft / (1000 * 60 * 60));
+                    const minutes = Math.floor((timeLeft % (1000 * 60 * 60)) / (1000 * 60));
+                    timerEl.textContent = hours > 0 ? `${hours}h ${minutes}m left` : `${minutes}m left`;
+                } else {
+                    timerEl.textContent = 'Time expired';
+                }
             } else {
                 statusSection.style.display = 'none';
             }
         }
 
+        let challengeTimers = {}; // Store multiple timers by challenge ID
+
         function startChallengeTimer(challenge) {
-            if (challengeTimer) {
-                clearInterval(challengeTimer);
+            // Clear existing timer if any
+            if (challengeTimers[challenge.id]) {
+                clearInterval(challengeTimers[challenge.id]);
             }
 
-            challengeTimer = setInterval(() => {
+            challengeTimers[challenge.id] = setInterval(() => {
                 const timeLeft = (challenge.acceptedAt.getTime() + challenge.timeLimit) - Date.now();
                 
                 if (timeLeft <= 0) {
-                    clearInterval(challengeTimer);
-                    challengeTimer = null;
-                    document.getElementById('challengeTimer').textContent = 'Time expired';
+                    clearInterval(challengeTimers[challenge.id]);
+                    delete challengeTimers[challenge.id];
                     challenge.status = 'expired';
+                    updateMyTasksNotification();
+                    showToast(`⏰ Challenge "${challenge.title}" has expired!`, 'error');
                     return;
                 }
 
-                const hours = Math.floor(timeLeft / (1000 * 60 * 60));
-                const minutes = Math.floor((timeLeft % (1000 * 60 * 60)) / (1000 * 60));
+                // Update current challenge status if this is the most recent one
+                const mostRecentChallenge = acceptedChallenges
+                    .filter(c => c.status === 'accepted')
+                    .sort((a, b) => b.acceptedAt.getTime() - a.acceptedAt.getTime())[0];
                 
-                document.getElementById('challengeTimer').textContent = 
-                    hours > 0 ? `${hours}h ${minutes}m left` : `${minutes}m left`;
+                if (mostRecentChallenge && mostRecentChallenge.id === challenge.id) {
+                    const hours = Math.floor(timeLeft / (1000 * 60 * 60));
+                    const minutes = Math.floor((timeLeft % (1000 * 60 * 60)) / (1000 * 60));
+                    
+                    const timerElement = document.getElementById('challengeTimer');
+                    if (timerElement) {
+                        timerElement.textContent = hours > 0 ? `${hours}h ${minutes}m left` : `${minutes}m left`;
+                    }
+                }
             }, 1000);
         }
 
         // ===== PROOF SUBMISSION SYSTEM =====
 
         window.submitProof = function() {
-            const currentChallenge = acceptedChallenges.find(c => c.status === 'accepted');
-            if (!currentChallenge) {
-                showToast('⚠️ No active challenge to submit proof for!', 'error');
+            const activeChallenges = acceptedChallenges.filter(c => c.status === 'accepted');
+            if (activeChallenges.length === 0) {
+                showToast('⚠️ No active challenges to submit proof for!', 'error');
                 return;
             }
 
+            // If multiple challenges, show the most recent one or let user choose
+            const currentChallenge = activeChallenges.sort((a, b) => b.acceptedAt.getTime() - a.acceptedAt.getTime())[0];
+            
             document.getElementById('submissionChallengeTitle').textContent = currentChallenge.title;
+            
+            // Store reference to which challenge we're submitting for
+            window.currentSubmissionChallenge = currentChallenge;
+            
             showModal('proofSubmission');
         }
 
