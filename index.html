@@ -662,6 +662,29 @@
             box-shadow: 0 0 8px var(--success-green);
         }
 
+        .avatar-status.offline {
+            background: var(--text-secondary);
+            box-shadow: 0 0 8px var(--text-secondary);
+            animation: none;
+        }
+
+        .player-level {
+            position: absolute;
+            bottom: -8px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--primary-purple);
+            color: white;
+            font-size: 8px;
+            font-weight: 700;
+            padding: 2px 6px;
+            border-radius: 8px;
+            border: 1px solid rgba(0, 0, 0, 0.3);
+            box-shadow: 0 2px 8px rgba(139, 92, 246, 0.4);
+            min-width: 20px;
+            text-align: center;
+        }
+
         /* Enhanced Modal System */
         .modal {
             position: fixed;
@@ -1376,9 +1399,9 @@
                 <!-- Profile Header Section -->
                 <div style="background: linear-gradient(135deg, var(--primary-pink), var(--primary-purple)); padding: 25px; border-radius: 20px; margin-bottom: 25px; color: white; position: relative; overflow: hidden;">
                     <div style="position: relative; width: 80px; height: 80px; margin: 0 auto 15px; cursor: pointer;" onclick="uploadProfilePicture()">
-                        <div style="width: 80px; height: 80px; border-radius: 50%; background: rgba(255, 255, 255, 0.2); display: flex; align-items: center; justify-content: center; font-size: 28px; border: 3px solid rgba(255, 255, 255, 0.3); transition: all 0.3s ease; overflow: hidden;">
+                        <div style="width: 80px; height: 80px; border-radius: 50%; background: rgba(255, 255, 255, 0.2); display: flex; align-items: center; justify-content: center; font-size: 32px; border: 3px solid rgba(255, 255, 255, 0.3); transition: all 0.3s ease; overflow: hidden;">
                             <img id="profileImage" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%; display: none;">
-                            <span id="profileInitials">USER</span>
+                            <span id="profileInitials">🤗</span>
                         </div>
                         <div style="position: absolute; bottom: 0; left: 0; right: 0; background: rgba(0, 0, 0, 0.7); color: white; text-align: center; padding: 4px; font-size: 9px; transform: translateY(100%); transition: transform 0.3s ease;">
                             📷 Upload Photo
@@ -1827,8 +1850,8 @@
         // App Initialization
         function initializeApp() {
             initializeChallenges();
-            initializeOnlineUsers();
-            updateLivePlayersDisplay();
+            initializeOnlineUsers(); // This now includes proper avatar management
+            console.log('📱 App fully loaded with avatar system!');
         }
 
         // Challenge System
@@ -1919,20 +1942,51 @@
 
         // Online Users System
         function initializeOnlineUsers() {
-            const names = ['Alex Chen', 'Maya Patel', 'Jordan Kim', 'Sam Wilson', 'Rio Martinez'];
+            const players = [
+                { name: 'Alex Chen', avatar: '😎', activity: 'Coffee Shop Challenge', level: 5, status: 'online' },
+                { name: 'Maya Patel', avatar: '🌟', activity: 'Sunrise Workout', level: 3, status: 'online' },
+                { name: 'Jordan Kim', avatar: '🚀', activity: 'Street Art Hunt', level: 7, status: 'online' },
+                { name: 'Sam Wilson', avatar: '🎨', activity: 'Reading in park', level: 2, status: 'online' },
+                { name: 'Rio Martinez', avatar: '⚡', activity: 'Coding challenge', level: 6, status: 'online' },
+                { name: 'Casey Wong', avatar: '🦋', activity: 'Food art creating', level: 4, status: 'online' },
+                { name: 'Robin Lee', avatar: '🔥', activity: 'Mystery exploration', level: 8, status: 'online' },
+                { name: 'Taylor Swift', avatar: '💫', activity: 'Photo scavenger hunt', level: 3, status: 'online' }
+            ];
+            
+            // Add some offline users too
+            const offlineUsers = [
+                { name: 'Emma Stone', avatar: '🌙', activity: 'Last seen 2h ago', level: 4, status: 'offline' },
+                { name: 'Chris Evans', avatar: '⭐', activity: 'Last seen 5h ago', level: 6, status: 'offline' },
+                { name: 'Zoe Clark', avatar: '🎯', activity: 'Last seen 1d ago', level: 2, status: 'offline' }
+            ];
+            
+            window.allUsers = [...players, ...offlineUsers];
+            window.onlineUsers = players;
+            
+            // Update online count
+            updateOnlineCount();
             updateLivePlayersDisplay();
+        }
+
+        function updateOnlineCount() {
+            const onlineCount = window.onlineUsers?.length || 0;
+            document.getElementById('onlineCount').textContent = `${onlineCount} online`;
+            document.getElementById('onlineUsersNotifications').textContent = onlineCount;
         }
 
         function updateLivePlayersDisplay() {
             const container = document.getElementById('livePlayersContainer');
-            const avatars = ['AC', 'MP', 'JK', 'SW', 'RM'];
+            const onlineNow = window.onlineUsers?.slice(0, 8) || [];
             
-            container.innerHTML = avatars.map(avatar => `
-                <div class="player-avatar">
+            container.innerHTML = onlineNow.map(user => `
+                <div class="player-avatar" onclick="viewUserProfile('${user.name}')" title="${user.name} - ${user.activity}">
                     <div class="avatar-ring">
-                        <div class="avatar-inner">${avatar}</div>
+                        <div class="avatar-inner">
+                            <span style="font-size: 18px;">${user.avatar}</span>
+                        </div>
                     </div>
-                    <div class="avatar-status"></div>
+                    <div class="avatar-status ${user.status}"></div>
+                    <div class="player-level">L${user.level}</div>
                 </div>
             `).join('');
         }
@@ -1963,7 +2017,123 @@
         }
 
         window.showOnlineUsers = function() {
-            showToast('👥 Online users feature coming soon!', 'info');
+            updateOnlineUsersList('online');
+            showModal('onlineUsers');
+        }
+
+        window.switchOnlineTab = function(tab) {
+            // Update tab styling
+            document.querySelectorAll('.friends-tab').forEach(t => {
+                t.classList.remove('active');
+                t.style.background = 'transparent';
+                t.style.color = 'var(--text-secondary)';
+            });
+            event.target.classList.add('active');
+            event.target.style.background = 'var(--primary-pink)';
+            event.target.style.color = 'white';
+            
+            updateOnlineUsersList(tab);
+        }
+
+        function updateOnlineUsersList(filter = 'online') {
+            const container = document.getElementById('onlineUsersList');
+            let usersToShow = [];
+
+            switch (filter) {
+                case 'online':
+                    usersToShow = window.onlineUsers || [];
+                    break;
+                case 'all':
+                    usersToShow = window.allUsers || [];
+                    break;
+                case 'friends':
+                    usersToShow = (window.allUsers || []).filter(user => Math.random() > 0.7); // Mock friends
+                    break;
+            }
+
+            if (usersToShow.length === 0) {
+                container.innerHTML = `
+                    <div style="text-align: center; padding: 40px 20px; color: var(--text-secondary);">
+                        <div style="font-size: 48px; margin-bottom: 15px;">👥</div>
+                        <div style="font-size: 16px; margin-bottom: 8px;">No ${filter} users</div>
+                        <div style="font-size: 12px;">Check back later or add some friends!</div>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = usersToShow.map(user => `
+                <div style="display: flex; align-items: center; gap: 12px; padding: 12px; background: rgba(255, 255, 255, 0.05); border-radius: 12px; margin-bottom: 8px; cursor: pointer; transition: all 0.3s ease;" onclick="viewUserProfile('${user.name}')" onmouseover="this.style.background='rgba(255, 255, 255, 0.1)'; this.style.transform='translateX(5px)'" onmouseout="this.style.background='rgba(255, 255, 255, 0.05)'; this.style.transform='translateX(0)'">
+                    <div style="position: relative; width: 40px; height: 40px; border-radius: 50%; background: linear-gradient(45deg, var(--primary-blue), var(--primary-purple)); display: flex; align-items: center; justify-content: center; font-size: 16px;">
+                        ${user.avatar}
+                        <div style="position: absolute; bottom: -2px; right: -2px; width: 12px; height: 12px; border-radius: 50%; border: 2px solid var(--dark-bg); background: ${user.status === 'online' ? 'var(--success-green)' : 'var(--text-secondary)'};"></div>
+                    </div>
+                    <div style="flex: 1;">
+                        <div style="font-size: 14px; font-weight: 600; margin-bottom: 2px; color: var(--text-primary);">${user.name}</div>
+                        <div style="font-size: 11px; color: var(--text-secondary);">${user.activity}</div>
+                    </div>
+                    <div style="display: flex; gap: 8px; align-items: center;">
+                        <div style="background: var(--primary-purple); color: white; padding: 2px 6px; border-radius: 8px; font-size: 9px; font-weight: 600;">L${user.level}</div>
+                        ${user.status === 'online' ? 
+                            `<button style="padding: 6px 12px; border: none; border-radius: 8px; font-size: 11px; font-weight: 600; cursor: pointer; transition: all 0.3s ease; background: var(--primary-pink); color: white;" onclick="event.stopPropagation(); inviteToChallenge('${user.name}')">Invite</button>` :
+                            `<button style="padding: 6px 12px; border: none; border-radius: 8px; font-size: 11px; font-weight: 600; cursor: pointer; transition: all 0.3s ease; background: rgba(255, 255, 255, 0.1); color: var(--text-primary);" onclick="event.stopPropagation(); viewUserProfile('${user.name}')">View</button>`
+                        }
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        window.filterOnlineUsers = function(searchTerm) {
+            const filtered = (window.allUsers || []).filter(user => 
+                user.name.toLowerCase().includes(searchTerm.toLowerCase())
+            );
+            
+            const container = document.getElementById('onlineUsersList');
+            if (filtered.length === 0) {
+                container.innerHTML = `
+                    <div style="text-align: center; padding: 40px 20px; color: var(--text-secondary);">
+                        <div style="font-size: 48px; margin-bottom: 15px;">🔍</div>
+                        <div style="font-size: 16px; margin-bottom: 8px;">No users found</div>
+                        <div style="font-size: 12px;">Try searching with different keywords</div>
+                    </div>
+                `;
+                return;
+            }
+            
+            // Use the same display logic as updateOnlineUsersList but with filtered results
+            container.innerHTML = filtered.map(user => `
+                <div style="display: flex; align-items: center; gap: 12px; padding: 12px; background: rgba(255, 255, 255, 0.05); border-radius: 12px; margin-bottom: 8px; cursor: pointer; transition: all 0.3s ease;" onclick="viewUserProfile('${user.name}')" onmouseover="this.style.background='rgba(255, 255, 255, 0.1)'; this.style.transform='translateX(5px)'" onmouseout="this.style.background='rgba(255, 255, 255, 0.05)'; this.style.transform='translateX(0)'">
+                    <div style="position: relative; width: 40px; height: 40px; border-radius: 50%; background: linear-gradient(45deg, var(--primary-blue), var(--primary-purple)); display: flex; align-items: center; justify-content: center; font-size: 16px;">
+                        ${user.avatar}
+                        <div style="position: absolute; bottom: -2px; right: -2px; width: 12px; height: 12px; border-radius: 50%; border: 2px solid var(--dark-bg); background: ${user.status === 'online' ? 'var(--success-green)' : 'var(--text-secondary)'};"></div>
+                    </div>
+                    <div style="flex: 1;">
+                        <div style="font-size: 14px; font-weight: 600; margin-bottom: 2px; color: var(--text-primary);">${user.name}</div>
+                        <div style="font-size: 11px; color: var(--text-secondary);">${user.activity}</div>
+                    </div>
+                    <div style="display: flex; gap: 8px; align-items: center;">
+                        <div style="background: var(--primary-purple); color: white; padding: 2px 6px; border-radius: 8px; font-size: 9px; font-weight: 600;">L${user.level}</div>
+                        ${user.status === 'online' ? 
+                            `<button style="padding: 6px 12px; border: none; border-radius: 8px; font-size: 11px; font-weight: 600; cursor: pointer; transition: all 0.3s ease; background: var(--primary-pink); color: white;" onclick="event.stopPropagation(); inviteToChallenge('${user.name}')">Invite</button>` :
+                            `<button style="padding: 6px 12px; border: none; border-radius: 8px; font-size: 11px; font-weight: 600; cursor: pointer; transition: all 0.3s ease; background: rgba(255, 255, 255, 0.1); color: var(--text-primary);" onclick="event.stopPropagation(); viewUserProfile('${user.name}')">View</button>`
+                        }
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        window.viewUserProfile = function(userName) {
+            const user = (window.allUsers || []).find(u => u.name === userName);
+            if (user) {
+                showToast(`👤 Viewing ${user.name}'s profile (Level ${user.level}) - Coming soon!`, 'info');
+            }
+        }
+
+        window.inviteToChallenge = function(userName) {
+            const user = (window.allUsers || []).find(u => u.name === userName);
+            if (user) {
+                showToast(`📨 Challenge invitation sent to ${user.name}! ${user.avatar}`, 'success');
+            }
         }
 
         // Enhanced Profile Functions
@@ -1983,6 +2153,11 @@
                 };
                 reader.readAsDataURL(file);
             }
+        }
+
+        function getRandomAvatar() {
+            const avatars = ['😀', '😎', '🤗', '🚀', '🌟', '⚡', '🎨', '🦋', '🔥', '💫', '🌙', '⭐', '🎯', '💎', '🎭', '🎪', '🎨', '🚁', '🎸', '🎹'];
+            return avatars[Math.floor(Math.random() * avatars.length)];
         }
 
         window.editProfileName = function() {
@@ -2005,7 +2180,33 @@
         }
 
         window.editEnhancedProfile = function() {
-            editProfileBio();
+            const options = [
+                'Edit Name',
+                'Edit Bio', 
+                'Change Avatar Face',
+                'Cancel'
+            ];
+            
+            const choice = prompt(`Choose what to edit:\n1. ${options[0]}\n2. ${options[1]}\n3. ${options[2]}\n4. ${options[3]}\n\nEnter number (1-4):`);
+            
+            switch(choice) {
+                case '1':
+                    editProfileName();
+                    break;
+                case '2':
+                    editProfileBio();
+                    break;
+                case '3':
+                    const newAvatar = getRandomAvatar();
+                    document.getElementById('profileInitials').textContent = newAvatar;
+                    document.getElementById('profileImage').style.display = 'none';
+                    document.getElementById('profileInitials').style.display = 'block';
+                    showToast(`✅ Avatar changed to ${newAvatar}!`, 'success');
+                    break;
+                case '4':
+                default:
+                    return;
+            }
         }
 
         window.shareProfile = function() {
@@ -2070,6 +2271,28 @@
                     </div>
                 </div>
             `;
+            
+            // Add some sample messages with avatars
+            setTimeout(() => addChatMessage('Alex Chen', '😎', 'Anyone want to join the coffee shop challenge? ☕', false), 1000);
+            setTimeout(() => addChatMessage('Maya Patel', '🌟', 'I\'m in! Which coffee shop should we try? 🚀', false), 2000);
+            setTimeout(() => addChatMessage('Jordan Kim', '🚀', 'There\'s a great one downtown with amazing poetry vibes!', false), 3000);
+        }
+
+        function addChatMessage(sender, avatar, text, isOwn) {
+            const chatMessages = document.getElementById('chatMessages');
+            const messageDiv = document.createElement('div');
+            messageDiv.innerHTML = `
+                <div style="display: flex; ${isOwn ? 'flex-direction: row-reverse;' : ''} gap: 10px; margin-bottom: 10px;">
+                    <div style="width: 32px; height: 32px; border-radius: 50%; background: ${isOwn ? 'var(--primary-pink)' : 'linear-gradient(45deg, var(--primary-blue), var(--primary-purple))'}; display: flex; align-items: center; justify-content: center; font-size: 14px; flex-shrink: 0;">${avatar}</div>
+                    <div style="background: ${isOwn ? 'var(--primary-pink)' : 'rgba(255,255,255,0.1)'}; padding: 8px 12px; border-radius: 12px; max-width: 70%; word-wrap: break-word;">
+                        <div style="font-size: 14px; line-height: 1.4;">${text}</div>
+                        <div style="font-size: 11px; color: ${isOwn ? 'rgba(255,255,255,0.8)' : 'var(--text-secondary)'}; margin-top: 4px;">now</div>
+                    </div>
+                </div>
+            `;
+            
+            chatMessages.appendChild(messageDiv);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
         }
 
         window.sendMessage = function() {
@@ -2078,21 +2301,20 @@
             
             if (!text) return;
             
-            const chatMessages = document.getElementById('chatMessages');
-            const messageDiv = document.createElement('div');
-            messageDiv.innerHTML = `
-                <div style="display: flex; flex-direction: row-reverse; gap: 10px; margin-bottom: 10px;">
-                    <div style="width: 32px; height: 32px; border-radius: 50%; background: var(--primary-pink); display: flex; align-items: center; justify-content: center; font-size: 12px; flex-shrink: 0;">YOU</div>
-                    <div style="background: var(--primary-pink); padding: 8px 12px; border-radius: 12px; max-width: 70%; word-wrap: break-word;">
-                        <div style="font-size: 14px; line-height: 1.4;">${text}</div>
-                        <div style="font-size: 11px; color: rgba(255,255,255,0.8); margin-top: 4px;">now</div>
-                    </div>
-                </div>
-            `;
-            
-            chatMessages.appendChild(messageDiv);
-            chatMessages.scrollTop = chatMessages.scrollHeight;
+            // Use the current user's avatar (you can customize this)
+            addChatMessage('You', '🤗', text, true);
             input.value = '';
+            
+            // Simulate a response after a short delay
+            setTimeout(() => {
+                const responses = [
+                    { sender: 'Maya Patel', avatar: '🌟', text: 'That sounds awesome! 🎉' },
+                    { sender: 'Alex Chen', avatar: '😎', text: 'Count me in! When do we start?' },
+                    { sender: 'Jordan Kim', avatar: '🚀', text: 'Great idea! Let\'s do this together!' }
+                ];
+                const response = responses[Math.floor(Math.random() * responses.length)];
+                addChatMessage(response.sender, response.avatar, response.text, false);
+            }, 1500);
         }
 
         window.handleChatKeyPress = function(event) {
