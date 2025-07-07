@@ -907,6 +907,138 @@
                 0 0 40px rgba(255, 107, 157, 0.4);
         }
 
+        /* Settings Modal Styles */
+        .settings-group {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .setting-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(15px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 12px;
+            transition: all 0.3s ease;
+        }
+
+        .setting-item:hover {
+            background: rgba(255, 255, 255, 0.06);
+            border-color: rgba(255, 255, 255, 0.15);
+        }
+
+        .setting-info {
+            flex: 1;
+        }
+
+        .setting-label {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 3px;
+        }
+
+        .setting-desc {
+            font-size: 11px;
+            color: var(--text-secondary);
+            line-height: 1.3;
+        }
+
+        .toggle-switch {
+            width: 50px;
+            height: 26px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 13px;
+            position: relative;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .toggle-switch:hover {
+            background: rgba(255, 255, 255, 0.15);
+        }
+
+        .toggle-slider {
+            width: 20px;
+            height: 20px;
+            background: rgba(255, 255, 255, 0.8);
+            border-radius: 50%;
+            position: absolute;
+            top: 2px;
+            left: 3px;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+        }
+
+        .toggle-slider.active {
+            left: 26px;
+            background: var(--primary-pink);
+            box-shadow: 
+                0 2px 8px rgba(255, 107, 157, 0.4),
+                0 0 15px rgba(255, 107, 157, 0.3);
+        }
+
+        .toggle-switch.active {
+            background: rgba(255, 107, 157, 0.2);
+            border-color: rgba(255, 107, 157, 0.4);
+        }
+
+        /* Feature Hide/Show Classes */
+        .feature-hidden {
+            display: none !important;
+        }
+
+        .glass-reduced {
+            backdrop-filter: blur(5px) !important;
+        }
+
+        .animations-disabled * {
+            animation: none !important;
+            transition: none !important;
+        }
+
+        .hover-disabled:hover {
+            transform: none !important;
+            box-shadow: none !important;
+        }
+
+        /* Performance Mode Styles */
+        .performance-mode .glass-interface,
+        .performance-mode .modal-content,
+        .performance-mode .auth-container {
+            backdrop-filter: blur(10px) !important;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3) !important;
+        }
+
+        .performance-mode .background-content {
+            opacity: 0.3 !important;
+        }
+
+        .performance-mode * {
+            animation-duration: 0.1s !important;
+            transition-duration: 0.1s !important;
+        }
+
+        /* Battery Saver Mode */
+        .battery-saver .background-content {
+            opacity: 0.1 !important;
+        }
+
+        .battery-saver * {
+            animation: none !important;
+            transition: none !important;
+        }
+
+        .battery-saver .glass-interface,
+        .battery-saver .modal-content {
+            backdrop-filter: blur(5px) !important;
+        }
+
         /* Utility Classes */
         .loading {
             position: fixed;
@@ -1011,7 +1143,7 @@
     </div>
 
     <!-- Background Controls -->
-    <div class="background-controls">
+    <div class="background-controls" id="backgroundControlsPanel">
         <button class="bg-control-btn active" onclick="switchBackground('space')" title="Space with Stars">
             ✨
         </button>
@@ -1107,6 +1239,7 @@
                         </div>
                         <div class="header-btn" onclick="showGroups()" title="Groups">🏠</div>
                         <div class="header-btn" onclick="showEnhancedProfile()" title="Enhanced Profile">👤</div>
+                        <div class="header-btn" onclick="showSettings()" title="Settings">⚙️</div>
                         <div class="header-btn" onclick="signOut()" title="Sign Out">🚪</div>
                     </div>
                 </div>
@@ -1230,6 +1363,179 @@
                 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
                     <button class="btn-secondary" onclick="hideModal('challengeAgreement')">Maybe Later</button>
                     <button class="btn-primary" onclick="agreeToChallenge()">🎯 I'M READY!</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Settings Modal -->
+        <div id="settingsModal" class="modal">
+            <div class="modal-content" style="max-width: 450px;">
+                <div class="modal-header">
+                    <div class="modal-title">⚙️ Settings & Customization</div>
+                    <button class="modal-close" onclick="hideModal('settings')">&times;</button>
+                </div>
+
+                <!-- UI Features Section -->
+                <div style="margin-bottom: 25px;">
+                    <h3 style="font-size: 16px; font-weight: 600; margin-bottom: 15px; color: var(--primary-pink); display: flex; align-items: center; gap: 8px;">
+                        🎨 Interface Features
+                    </h3>
+                    
+                    <div class="settings-group">
+                        <div class="setting-item">
+                            <div class="setting-info">
+                                <div class="setting-label">Background Controls</div>
+                                <div class="setting-desc">Show/hide background switcher buttons</div>
+                            </div>
+                            <div class="toggle-switch" onclick="toggleSetting('backgroundControls')">
+                                <div class="toggle-slider active" id="backgroundControlsToggle"></div>
+                            </div>
+                        </div>
+
+                        <div class="setting-item">
+                            <div class="setting-info">
+                                <div class="setting-label">Live Players Section</div>
+                                <div class="setting-desc">Show online users and live activity</div>
+                            </div>
+                            <div class="toggle-switch" onclick="toggleSetting('livePlayersSection')">
+                                <div class="toggle-slider active" id="livePlayersSectionToggle"></div>
+                            </div>
+                        </div>
+
+                        <div class="setting-item">
+                            <div class="setting-info">
+                                <div class="setting-label">Challenge Status Bar</div>
+                                <div class="setting-desc">Display current challenge progress</div>
+                            </div>
+                            <div class="toggle-switch" onclick="toggleSetting('challengeStatus')">
+                                <div class="toggle-slider active" id="challengeStatusToggle"></div>
+                            </div>
+                        </div>
+
+                        <div class="setting-item">
+                            <div class="setting-info">
+                                <div class="setting-label">Chat Features</div>
+                                <div class="setting-desc">Enable group chat and messaging</div>
+                            </div>
+                            <div class="toggle-switch" onclick="toggleSetting('chatFeatures')">
+                                <div class="toggle-slider active" id="chatFeaturesToggle"></div>
+                            </div>
+                        </div>
+
+                        <div class="setting-item">
+                            <div class="setting-info">
+                                <div class="setting-label">Notification Badges</div>
+                                <div class="setting-desc">Show red notification dots on buttons</div>
+                            </div>
+                            <div class="toggle-switch" onclick="toggleSetting('notifications')">
+                                <div class="toggle-slider active" id="notificationsToggle"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Visual Effects Section -->
+                <div style="margin-bottom: 25px;">
+                    <h3 style="font-size: 16px; font-weight: 600; margin-bottom: 15px; color: var(--primary-purple); display: flex; align-items: center; gap: 8px;">
+                        ✨ Visual Effects
+                    </h3>
+                    
+                    <div class="settings-group">
+                        <div class="setting-item">
+                            <div class="setting-info">
+                                <div class="setting-label">Glass Blur Effect</div>
+                                <div class="setting-desc">Enhanced glassmorphism with blur</div>
+                            </div>
+                            <div class="toggle-switch" onclick="toggleSetting('glassBlur')">
+                                <div class="toggle-slider active" id="glassBlurToggle"></div>
+                            </div>
+                        </div>
+
+                        <div class="setting-item">
+                            <div class="setting-info">
+                                <div class="setting-label">Background Animations</div>
+                                <div class="setting-desc">Animated stars, planets, and shapes</div>
+                            </div>
+                            <div class="toggle-switch" onclick="toggleSetting('backgroundAnimations')">
+                                <div class="toggle-slider active" id="backgroundAnimationsToggle"></div>
+                            </div>
+                        </div>
+
+                        <div class="setting-item">
+                            <div class="setting-info">
+                                <div class="setting-label">Button Hover Effects</div>
+                                <div class="setting-desc">Glowing and scaling animations</div>
+                            </div>
+                            <div class="toggle-switch" onclick="toggleSetting('hoverEffects')">
+                                <div class="toggle-slider active" id="hoverEffectsToggle"></div>
+                            </div>
+                        </div>
+
+                        <div class="setting-item">
+                            <div class="setting-info">
+                                <div class="setting-label">Particle Effects</div>
+                                <div class="setting-desc">Shooting stars and floating particles</div>
+                            </div>
+                            <div class="toggle-switch" onclick="toggleSetting('particleEffects')">
+                                <div class="toggle-slider active" id="particleEffectsToggle"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Performance Section -->
+                <div style="margin-bottom: 25px;">
+                    <h3 style="font-size: 16px; font-weight: 600; margin-bottom: 15px; color: var(--primary-blue); display: flex; align-items: center; gap: 8px;">
+                        ⚡ Performance
+                    </h3>
+                    
+                    <div class="settings-group">
+                        <div class="setting-item">
+                            <div class="setting-info">
+                                <div class="setting-label">High Performance Mode</div>
+                                <div class="setting-desc">Reduce effects for better performance</div>
+                            </div>
+                            <div class="toggle-switch" onclick="toggleSetting('performanceMode')">
+                                <div class="toggle-slider" id="performanceModeToggle"></div>
+                            </div>
+                        </div>
+
+                        <div class="setting-item">
+                            <div class="setting-info">
+                                <div class="setting-label">Battery Saver</div>
+                                <div class="setting-desc">Minimal animations to save battery</div>
+                            </div>
+                            <div class="toggle-switch" onclick="toggleSetting('batterySaver')">
+                                <div class="toggle-slider" id="batterySaverToggle"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Quick Actions -->
+                <div style="margin-bottom: 20px;">
+                    <h3 style="font-size: 16px; font-weight: 600; margin-bottom: 15px; color: var(--warning-orange); display: flex; align-items: center; gap: 8px;">
+                        🚀 Quick Actions
+                    </h3>
+                    
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                        <button class="btn-secondary" onclick="resetToDefaults()" style="font-size: 12px;">
+                            🔄 Reset All
+                        </button>
+                        <button class="btn-secondary" onclick="exportSettings()" style="font-size: 12px;">
+                            📤 Export Settings
+                        </button>
+                    </div>
+                </div>
+
+                <!-- App Info -->
+                <div style="text-align: center; padding-top: 15px; border-top: 1px solid rgba(255, 255, 255, 0.1);">
+                    <div style="font-size: 12px; color: var(--text-secondary); margin-bottom: 5px;">
+                        JomBro v2.0 - Cutting-Edge Interface
+                    </div>
+                    <div style="font-size: 10px; color: var(--text-secondary); opacity: 0.7;">
+                        Layered Glass Architecture & AI Challenges
+                    </div>
                 </div>
             </div>
         </div>
@@ -1585,6 +1891,213 @@
             }
         }
 
+        // Settings Management System
+        const appSettings = {
+            backgroundControls: true,
+            livePlayersSection: true,
+            challengeStatus: true,
+            chatFeatures: true,
+            notifications: true,
+            glassBlur: true,
+            backgroundAnimations: true,
+            hoverEffects: true,
+            particleEffects: true,
+            performanceMode: false,
+            batterySaver: false
+        };
+
+        window.showSettings = function() {
+            showModal('settings');
+            updateSettingsUI();
+        }
+
+        function updateSettingsUI() {
+            Object.keys(appSettings).forEach(setting => {
+                const toggle = document.getElementById(setting + 'Toggle');
+                const switchElement = toggle?.parentElement;
+                
+                if (toggle) {
+                    if (appSettings[setting]) {
+                        toggle.classList.add('active');
+                        switchElement?.classList.add('active');
+                    } else {
+                        toggle.classList.remove('active');
+                        switchElement?.classList.remove('active');
+                    }
+                }
+            });
+        }
+
+        window.toggleSetting = function(settingName) {
+            appSettings[settingName] = !appSettings[settingName];
+            updateSettingsUI();
+            applySettings();
+            
+            const settingLabels = {
+                backgroundControls: 'Background Controls',
+                livePlayersSection: 'Live Players',
+                challengeStatus: 'Challenge Status',
+                chatFeatures: 'Chat Features',
+                notifications: 'Notifications',
+                glassBlur: 'Glass Blur',
+                backgroundAnimations: 'Background Animations',
+                hoverEffects: 'Hover Effects',
+                particleEffects: 'Particle Effects',
+                performanceMode: 'Performance Mode',
+                batterySaver: 'Battery Saver'
+            };
+            
+            const status = appSettings[settingName] ? 'enabled' : 'disabled';
+            showToast(`${settingLabels[settingName]} ${status}!`, 'success');
+        }
+
+        function applySettings() {
+            const body = document.body;
+            
+            // Background Controls
+            const backgroundControls = document.getElementById('backgroundControlsPanel');
+            if (backgroundControls) {
+                backgroundControls.style.display = appSettings.backgroundControls ? 'flex' : 'none';
+            }
+            
+            // Live Players Section
+            const livePlayersSection = document.querySelector('.glass-section');
+            if (livePlayersSection) {
+                livePlayersSection.style.display = appSettings.livePlayersSection ? 'block' : 'none';
+            }
+            
+            // Challenge Status
+            const challengeStatus = document.getElementById('currentChallengeStatus');
+            if (challengeStatus && !appSettings.challengeStatus) {
+                challengeStatus.style.display = 'none';
+            }
+            
+            // Chat Features
+            const chatToggle = document.getElementById('chatToggle');
+            const chatBtn = document.querySelector('[title="Group Chat"]');
+            if (!appSettings.chatFeatures) {
+                if (chatToggle) chatToggle.style.display = 'none';
+                if (chatBtn) chatBtn.style.display = 'none';
+            } else {
+                if (chatToggle) chatToggle.style.display = 'block';
+                if (chatBtn) chatBtn.style.display = 'flex';
+            }
+            
+            // Notifications
+            const badges = document.querySelectorAll('.notification-badge');
+            badges.forEach(badge => {
+                badge.style.display = appSettings.notifications ? 'flex' : 'none';
+            });
+            
+            // Glass Blur Effect
+            if (!appSettings.glassBlur) {
+                body.classList.add('glass-reduced');
+            } else {
+                body.classList.remove('glass-reduced');
+            }
+            
+            // Background Animations
+            if (!appSettings.backgroundAnimations) {
+                body.classList.add('animations-disabled');
+            } else {
+                body.classList.remove('animations-disabled');
+            }
+            
+            // Hover Effects
+            if (!appSettings.hoverEffects) {
+                body.classList.add('hover-disabled');
+            } else {
+                body.classList.remove('hover-disabled');
+            }
+            
+            // Particle Effects
+            const shootingStars = document.querySelectorAll('.shooting-star');
+            shootingStars.forEach(star => {
+                star.style.display = appSettings.particleEffects ? 'block' : 'none';
+            });
+            
+            // Performance Mode
+            if (appSettings.performanceMode) {
+                body.classList.add('performance-mode');
+                // Auto-disable heavy features
+                if (appSettings.backgroundAnimations) toggleSetting('backgroundAnimations');
+                if (appSettings.particleEffects) toggleSetting('particleEffects');
+            } else {
+                body.classList.remove('performance-mode');
+            }
+            
+            // Battery Saver
+            if (appSettings.batterySaver) {
+                body.classList.add('battery-saver');
+                // Auto-disable all effects
+                if (appSettings.backgroundAnimations) toggleSetting('backgroundAnimations');
+                if (appSettings.particleEffects) toggleSetting('particleEffects');
+                if (appSettings.hoverEffects) toggleSetting('hoverEffects');
+                if (appSettings.glassBlur) toggleSetting('glassBlur');
+            } else {
+                body.classList.remove('battery-saver');
+            }
+            
+            // Save settings to localStorage (if available)
+            try {
+                localStorage.setItem('jombroSettings', JSON.stringify(appSettings));
+            } catch (e) {
+                console.log('LocalStorage not available');
+            }
+        }
+
+        window.resetToDefaults = function() {
+            if (confirm('🔄 Reset all settings to default? This cannot be undone.')) {
+                Object.keys(appSettings).forEach(key => {
+                    if (key === 'performanceMode' || key === 'batterySaver') {
+                        appSettings[key] = false;
+                    } else {
+                        appSettings[key] = true;
+                    }
+                });
+                
+                updateSettingsUI();
+                applySettings();
+                showToast('🔄 All settings reset to default!', 'success');
+            }
+        }
+
+        window.exportSettings = function() {
+            const settingsData = {
+                settings: appSettings,
+                timestamp: new Date().toISOString(),
+                version: '2.0'
+            };
+            
+            const dataStr = JSON.stringify(settingsData, null, 2);
+            const blob = new Blob([dataStr], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'jombro-settings.json';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            
+            showToast('📤 Settings exported successfully!', 'success');
+        }
+
+        // Load settings on startup
+        function loadSettings() {
+            try {
+                const saved = localStorage.getItem('jombroSettings');
+                if (saved) {
+                    const savedSettings = JSON.parse(saved);
+                    Object.assign(appSettings, savedSettings);
+                    applySettings();
+                }
+            } catch (e) {
+                console.log('Error loading settings:', e);
+            }
+        }
+
         // Utility Functions
         function showError(message) {
             showToast(message, 'error');
@@ -1641,6 +2154,12 @@
         document.addEventListener('DOMContentLoaded', function() {
             console.log('🚀 JomBro Cutting-Edge Layered Glass Interface Loaded!');
             console.log('✨ Features: Layered Glass Effect, Animated Backgrounds, Video Support');
+            
+            // Load saved settings
+            loadSettings();
+            
+            // Initialize default UI state
+            updateSettingsUI();
         });
     </script>
 </body>
