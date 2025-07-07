@@ -898,8 +898,8 @@
         }
 
         @keyframes pulse {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.5; }
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.8; transform: scale(1.02); }
         }
 
         .user-status {
@@ -1478,6 +1478,10 @@
 
                 <!-- Action Section -->
                 <div class="action-section">
+                    <div style="text-align: center; margin-bottom: 15px;">
+                        <div style="font-size: 14px; font-weight: 600; margin-bottom: 5px; color: var(--text-primary);">Ready to start your challenge journey?</div>
+                        <div style="font-size: 11px; color: var(--text-secondary);">Click the button below to begin, then choose your challenge!</div>
+                    </div>
                     <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 15px;">
                         <button class="btn-secondary" onclick="showSubmissionGallery()" style="display: flex; align-items: center; justify-content: center; gap: 6px;">
                             🏆 My Gallery
@@ -1486,8 +1490,8 @@
                             📋 My Tasks
                         </button>
                     </div>
-                    <button class="btn-primary" id="mainActionBtn" onclick="acceptSelectedChallenge()">
-                        💬 OPEN CHAT & INVITE FRIENDS
+                    <button class="btn-primary" id="mainActionBtn" onclick="showChallengeAgreement()">
+                        🎯 CHALLENGE
                     </button>
                 </div>
             </div>
@@ -1638,6 +1642,57 @@
             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
                 <button class="btn-secondary" onclick="hideModal('proofSubmission')">Cancel</button>
                 <button class="btn-primary" id="submitProofBtn" onclick="submitChallengeProof()" disabled>Submit Proof</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Challenge Agreement Modal -->
+    <div id="challengeAgreementModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-title">🎯 Ready for a Challenge?</div>
+                <button class="modal-close" onclick="hideModal('challengeAgreement')">&times;</button>
+            </div>
+
+            <div style="text-align: center; margin-bottom: 20px;">
+                <div style="font-size: 48px; margin-bottom: 10px;">🚀</div>
+                <div style="font-size: 18px; font-weight: 600; margin-bottom: 8px; color: var(--primary-pink);">Take on a New Challenge!</div>
+                <div style="font-size: 14px; color: var(--text-secondary); margin-bottom: 20px;">Choose from our AI-generated challenges and start your adventure!</div>
+            </div>
+
+            <div style="background: rgba(255, 107, 157, 0.1); border: 1px solid rgba(255, 107, 157, 0.3); border-radius: 12px; padding: 15px; margin-bottom: 20px;">
+                <div style="font-size: 12px; font-weight: 600; margin-bottom: 8px; color: var(--primary-pink);">🏆 Challenge Benefits:</div>
+                <div style="font-size: 11px; color: var(--text-secondary); line-height: 1.4;">
+                    • Earn tokens and level up<br>
+                    • Build your challenge gallery<br>
+                    • Connect with friends<br>
+                    • Step out of your comfort zone
+                </div>
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                <button class="btn-secondary" onclick="hideModal('challengeAgreement')">Maybe Later</button>
+                <button class="btn-primary" onclick="agreeToChallenge()">🎯 I'M READY!</button>
+            </div>
+        </div>
+    </div>
+    <div id="groupsModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-title">🏠 My Groups</div>
+                <button class="modal-close" onclick="hideModal('groups')">&times;</button>
+            </div>
+
+            <div id="groupsList">
+                <div class="text-center" style="padding: 40px 20px; color: var(--text-secondary);">
+                    <div style="font-size: 48px; margin-bottom: 15px;">🏠</div>
+                    <div style="font-size: 16px; margin-bottom: 8px;">No groups yet</div>
+                    <div style="font-size: 12px;">Create your first group to start challenging with friends!</div>
+                </div>
+            </div>
+
+            <div style="margin-top: 20px;">
+                <button class="btn-primary" onclick="showCreateGroup()">➕ Create New Group</button>
             </div>
         </div>
     </div>
@@ -2347,30 +2402,59 @@
                 return;
             }
 
-            const acceptedChallenge = {
-                ...challenge,
-                id: Date.now().toString() + '_' + challengeIndex,
-                status: 'accepted',
-                acceptedAt: new Date(),
-                timeLimit: parseDuration(challenge.duration),
-                submittedProof: null
-            };
+            // Show confirmation dialog
+            if (confirm(`🎯 Ready to take on "${challenge.title}"?\n\nThis challenge will:\n• Take ${challenge.duration} to complete\n• Reward you with ${challenge.tokens} tokens\n• Start counting down immediately\n\nClick OK to accept the challenge!`)) {
+                
+                const acceptedChallenge = {
+                    ...challenge,
+                    id: Date.now().toString() + '_' + challengeIndex,
+                    status: 'accepted',
+                    acceptedAt: new Date(),
+                    timeLimit: parseDuration(challenge.duration),
+                    submittedProof: null
+                };
 
-            acceptedChallenges.push(acceptedChallenge);
-            
-            // Update UI
-            updateCurrentChallengeStatus(acceptedChallenge);
-            updateMyTasksNotification();
-            
-            // Start timer for this specific challenge
-            startChallengeTimer(acceptedChallenge);
-            
-            showToast(`🎯 Challenge "${challenge.title}" added to your tasks!`, 'success');
-            
-            // Open chat to invite friends
-            if (!chatOpen) {
-                toggleChat();
+                acceptedChallenges.push(acceptedChallenge);
+                
+                // Update UI
+                updateCurrentChallengeStatus(acceptedChallenge);
+                updateMyTasksNotification();
+                
+                // Start timer for this specific challenge
+                startChallengeTimer(acceptedChallenge);
+                
+                showToast(`🎯 Challenge "${challenge.title}" accepted! Timer started!`, 'success');
+                
+                // Open chat to invite friends
+                setTimeout(() => {
+                    if (!chatOpen) {
+                        toggleChat();
+                    }
+                }, 1000);
             }
+        }
+
+        window.showChallengeAgreement = function() {
+            showModal('challengeAgreement');
+        }
+
+        window.agreeToChallenge = function() {
+            hideModal('challengeAgreement');
+            
+            // Scroll to challenge selection area
+            const challengeSection = document.querySelector('.challenge-main');
+            if (challengeSection) {
+                challengeSection.scrollIntoView({ behavior: 'smooth' });
+            }
+            
+            showToast('🎯 Great! Choose any challenge below and click "TAKE CHALLENGE"!', 'success');
+            
+            // Add highlight effect to challenge cards
+            setTimeout(() => {
+                document.querySelectorAll('.challenge-card').forEach(card => {
+                    card.style.animation = 'pulse 1s ease-in-out 3';
+                });
+            }, 500);
         }
 
         window.acceptSelectedChallenge = function() {
