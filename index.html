@@ -62,10 +62,11 @@
             color: var(--text-primary);
             user-select: none;
             overflow: hidden;
-            perspective: 1000px;
+            perspective: 2000px;
+            perspective-origin: center center;
         }
 
-        /* ===== BOTTOM LAYER: ANIMATED BACKGROUNDS ===== */
+        /* ===== BOTTOM LAYER: NIGHT SKY BACKGROUND (3mm Behind) ===== */
         
         .background-layer {
             position: fixed;
@@ -75,7 +76,8 @@
             bottom: 0;
             z-index: 1;
             overflow: hidden;
-            transform: translateZ(-var(--glass-distance));
+            transform: translateZ(-3mm);
+            transform-style: preserve-3d;
         }
 
         .background-content {
@@ -496,7 +498,7 @@
             }
         }
 
-        /* ===== TOP LAYER: GLASS UI INTERFACE ===== */
+        /* ===== TOP LAYER: FLOATING GLASS UI INTERFACE (3mm Above) ===== */
         
         .glass-layer {
             position: fixed;
@@ -505,10 +507,17 @@
             right: 0;
             bottom: 0;
             z-index: 1000;
-            transform: translateZ(var(--glass-distance));
+            transform: translateZ(3mm);
             transform-style: preserve-3d;
             will-change: transform;
             pointer-events: auto;
+            
+            /* Enhanced Glass Floating Effect */
+            box-shadow: 
+                0 0 0 1px rgba(255, 255, 255, 0.02),
+                0 3mm 6mm rgba(0, 0, 0, 0.15),
+                0 1mm 3mm rgba(0, 0, 0, 0.1),
+                inset 0 1px 0 rgba(255, 255, 255, 0.1);
         }
 
         /* Custom Background Upload */
@@ -571,7 +580,7 @@
             opacity: 0.6;
         }
 
-        /* Auth Screen with Glass Effect */
+        /* Auth Screen with Enhanced Floating Glass Effect */
         .auth-screen {
             position: fixed;
             top: 0;
@@ -583,23 +592,47 @@
             justify-content: center;
             z-index: 5000;
             padding: 20px;
-            backdrop-filter: blur(var(--glass-blur));
-            background: rgba(0, 0, 0, 0.4);
+            backdrop-filter: blur(8px);
+            background: rgba(0, 0, 0, 0.3);
+            transform: translateZ(2mm);
         }
 
         .auth-container {
-            background: rgba(15, 15, 15, 0.3);
-            backdrop-filter: blur(40px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            background: rgba(15, 15, 15, 0.15);
+            backdrop-filter: blur(25px) saturate(180%);
+            border: 1px solid rgba(255, 255, 255, 0.18);
             border-radius: 25px;
             padding: 40px 30px;
             text-align: center;
             box-shadow: 
-                0 25px 50px rgba(0, 0, 0, 0.5),
-                inset 0 1px 0 rgba(255, 255, 255, 0.1);
+                0 6mm 12mm rgba(0, 0, 0, 0.25),
+                0 2mm 6mm rgba(0, 0, 0, 0.15),
+                inset 0 1px 0 rgba(255, 255, 255, 0.2),
+                inset 0 0 20px rgba(255, 255, 255, 0.05);
             max-width: 350px;
             width: 100%;
-            transform: translateZ(5px);
+            transform: translateZ(1mm);
+            position: relative;
+        }
+
+        .auth-container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(
+                135deg,
+                rgba(255, 255, 255, 0.1) 0%,
+                rgba(255, 255, 255, 0.05) 25%,
+                rgba(255, 255, 255, 0.02) 50%,
+                rgba(255, 255, 255, 0.05) 75%,
+                rgba(255, 255, 255, 0.1) 100%
+            );
+            border-radius: 25px;
+            pointer-events: none;
+            z-index: -1;
         }
 
         .auth-logo {
@@ -687,19 +720,41 @@
             width: 100%;
             max-width: 400px;
             height: calc(100vh - 20px);
-            background: rgba(15, 15, 15, 0.25);
-            backdrop-filter: blur(30px);
-            border: 1px solid rgba(255, 255, 255, 0.08);
+            background: rgba(15, 15, 15, 0.12);
+            backdrop-filter: blur(20px) saturate(180%);
+            border: 1px solid rgba(255, 255, 255, 0.18);
             border-radius: 25px;
             box-shadow: 
-                0 25px 50px rgba(0, 0, 0, 0.6),
-                inset 0 1px 0 rgba(255, 255, 255, 0.1),
-                0 0 60px rgba(255, 107, 157, 0.1);
+                0 8mm 16mm rgba(0, 0, 0, 0.25),
+                0 2mm 8mm rgba(0, 0, 0, 0.15),
+                inset 0 1px 0 rgba(255, 255, 255, 0.2),
+                inset 0 0 20px rgba(255, 255, 255, 0.05),
+                0 0 80px rgba(255, 107, 157, 0.15);
             display: flex;
             flex-direction: column;
             overflow: hidden;
             position: relative;
-            transform: translateZ(3px);
+            transform: translateZ(0.5mm);
+        }
+
+        .glass-interface::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(
+                135deg,
+                rgba(255, 255, 255, 0.1) 0%,
+                rgba(255, 255, 255, 0.05) 25%,
+                rgba(255, 255, 255, 0.02) 50%,
+                rgba(255, 255, 255, 0.05) 75%,
+                rgba(255, 255, 255, 0.1) 100%
+            );
+            border-radius: 25px;
+            pointer-events: none;
+            z-index: 1;
         }
 
         .glass-header {
@@ -710,9 +765,13 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.06);
-            background: rgba(15, 15, 15, 0.4);
-            backdrop-filter: blur(40px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+            background: rgba(15, 15, 15, 0.08);
+            backdrop-filter: blur(25px) saturate(180%);
+            transform: translateZ(0.2mm);
+            box-shadow: 
+                0 1mm 3mm rgba(0, 0, 0, 0.1),
+                inset 0 1px 0 rgba(255, 255, 255, 0.15);
         }
 
         .logo-section {
@@ -801,13 +860,35 @@
             overflow-x: hidden;
             -webkit-overflow-scrolling: touch;
             scroll-behavior: smooth;
+            position: relative;
+            z-index: 2;
         }
 
         .glass-section {
             padding: 15px 25px;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.04);
-            background: rgba(255, 255, 255, 0.02);
-            backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(15px) saturate(180%);
+            position: relative;
+            transform: translateZ(0.1mm);
+            z-index: 2;
+        }
+
+        .glass-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(
+                90deg,
+                rgba(255, 255, 255, 0.02) 0%,
+                rgba(255, 255, 255, 0.05) 50%,
+                rgba(255, 255, 255, 0.02) 100%
+            );
+            pointer-events: none;
+            z-index: -1;
         }
 
         /* ===== RIGHT OVERLAY - INSTAGRAM/TIKTOK STYLE ===== */
@@ -911,20 +992,21 @@
             min-width: 50px;
         }
 
-        /* Enhanced Modal System */
+        /* Enhanced Modal System with Floating Glass Effect */
         .modal {
             position: fixed;
             top: 0;
             left: 0;
             right: 0;
             bottom: 0;
-            background: rgba(0, 0, 0, 0.6);
-            backdrop-filter: blur(15px);
+            background: rgba(0, 0, 0, 0.4);
+            backdrop-filter: blur(8px);
             display: none;
             align-items: center;
             justify-content: center;
             z-index: 3000;
             padding: 20px;
+            transform: translateZ(1mm);
         }
 
         .modal.show {
@@ -932,9 +1014,9 @@
         }
 
         .modal-content {
-            background: rgba(15, 15, 15, 0.3);
-            backdrop-filter: blur(40px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            background: rgba(15, 15, 15, 0.15);
+            backdrop-filter: blur(25px) saturate(180%);
+            border: 1px solid rgba(255, 255, 255, 0.18);
             border-radius: 20px;
             padding: 25px;
             max-width: 90%;
@@ -943,9 +1025,30 @@
             width: 100%;
             max-width: 400px;
             box-shadow: 
-                0 25px 50px rgba(0, 0, 0, 0.7),
-                inset 0 1px 0 rgba(255, 255, 255, 0.1);
-            transform: translateZ(5px);
+                0 6mm 12mm rgba(0, 0, 0, 0.3),
+                0 2mm 6mm rgba(0, 0, 0, 0.2),
+                inset 0 1px 0 rgba(255, 255, 255, 0.2),
+                inset 0 0 15px rgba(255, 255, 255, 0.05);
+            transform: translateZ(1mm);
+            position: relative;
+        }
+
+        .modal-content::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(
+                135deg,
+                rgba(255, 255, 255, 0.08) 0%,
+                rgba(255, 255, 255, 0.03) 50%,
+                rgba(255, 255, 255, 0.08) 100%
+            );
+            border-radius: 20px;
+            pointer-events: none;
+            z-index: -1;
         }
 
         .modal-header {
@@ -4002,8 +4105,21 @@
             
             console.log('🚀 JomBro Enhanced Full-Featured Platform Loaded!');
             console.log('✨ All features activated and organized!');
-            console.log('🌌 Beautiful Night Sky Background with Blinking Stars');
-            console.log('📸 Custom Background Upload (100MB max, optimized sizes)');
+            console.log('🌌 ENHANCED Cosmic Night Sky: Ultra-dense stars, nebula clouds, aurora effects');
+            console.log('🌟 12 Shooting Stars: Enhanced meteor shower with gradient trails');
+            console.log('⭐ Multi-layered Star System: Supernova, major, medium, micro stars');
+            console.log('🎆 Constellation Patterns: Big Dipper and custom star formations');
+            console.log('🌈 Aurora Effects: Northern lights with dynamic wave animation');
+            console.log('🎬 Professional Background Studio: 3 slots, AI enhancement, filters');
+            console.log('🛠️ Advanced Tools: Blur, opacity, brightness, contrast controls');
+            console.log('🎨 Smart Filters: B&W, vintage, colorshift, vibrant presets');
+            console.log('🤖 AI Enhancement: Upscale, denoise, colorize, stylize (BETA)');
+            console.log('📊 Quality Analysis: Auto size detection, aspect ratio validation');
+            console.log('🎭 Quick Templates: Sunset, ocean, forest, desert gradients');
+            console.log('⚡ Performance Options: Auto-optimization, high quality mode');
+            console.log('📱 Responsive Preview: Mobile/desktop preview modes');
+            console.log('📂 Multi-slot System: 3 background slots with smart management');
+            console.log('✅ Professional Upload: 100MB max, 4K support, drag & drop');
             console.log('📱 Complete modal system with real functionality');
             console.log('🎯 Smart challenge management');
             console.log('👥 Live user interaction system');
@@ -4020,7 +4136,7 @@
         document.addEventListener('DOMContentLoaded', function() {
             console.log('🚀 JomBro Enhanced Challenge Platform Initializing...');
             
-            // Initialize with night sky background
+            // Initialize with enhanced cosmic night sky background
             switchBackground('space');
             
             // Set up drag and drop for proof upload
@@ -4091,9 +4207,20 @@
             });
             
             console.log('✅ JomBro Enhanced Platform Ready!');
-            console.log('🌌 Default Night Sky Background Active');
-            console.log('📸 Custom Background Upload Available in Profile');
-            console.log('📱 Optimized for Mobile (480x800px) and Desktop (1920x1080px)');
+            console.log('🌌 Enhanced Cosmic Night Sky: Multi-layered stars with aurora effects');
+            console.log('🔍 FLOATING GLASS INTERFACE: All UI elements float 3mm above background');
+            console.log('✨ Depth Perception: Clear separation between night sky and interface');
+            console.log('🎨 Enhanced Transparency: Night sky clearly visible through glass elements');
+            console.log('💎 Premium Glass Effects: Backdrop blur, saturation, gradient overlays');
+            console.log('🌟 Layered Shadows: 3D depth with multiple shadow layers');
+            console.log('📱 Floating Components: Header, sections, modals, overlays all elevated');
+            console.log('🎬 Professional Background Studio: 3-slot system with AI tools');
+            console.log('🛠️ Advanced Editing: Filters, effects, performance optimization');
+            console.log('📱 Smart Upload: 4K support, quality analysis, drag & drop');
+            console.log('🤖 AI Enhancement: Upscale, denoise, colorize, stylize features');
+            console.log('🎭 Quick Templates: Professional gradient backgrounds included');
+            console.log('⚡ Performance Modes: Auto-optimization vs High Quality options');
+            console.log('📊 Quality Ratings: Auto-analysis with size recommendations');
         });
 
     </script>
