@@ -11,12 +11,6 @@
     <meta name="apple-mobile-web-app-title" content="JomBro">
     <meta name="theme-color" content="#ff6b9d">
     <meta name="description" content="AI-Powered Social Challenge Platform - Connect, Challenge, Conquer!">
-    
-    <!-- Firebase v9 SDK -->
-    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-storage-compat.js"></script>
        
     <title>JomBro - Enhanced Social Challenge Platform</title>
 
@@ -597,32 +591,6 @@
             margin: 0;
         }
 
-        .members-selector {
-            max-height: 200px;
-            overflow-y: auto;
-            border: 1px solid var(--glass-border);
-            border-radius: 10px;
-            padding: 10px;
-        }
-
-        .member-option {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            padding: 8px;
-            border-radius: 8px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-        .member-option:hover {
-            background: rgba(255, 255, 255, 0.1);
-        }
-
-        .member-checkbox {
-            margin: 0;
-        }
-
         /* Enhanced Chat Interface */
         .chat-interface {
             position: fixed;
@@ -1145,70 +1113,6 @@
             transform: scale(1.05);
         }
 
-        /* Upload Area Styles */
-        .upload-area {
-            border: 2px dashed var(--glass-border);
-            border-radius: 12px;
-            padding: 30px 20px;
-            text-align: center;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            background: rgba(255, 255, 255, 0.02);
-        }
-
-        .upload-area:hover {
-            border-color: var(--primary-pink);
-            background: rgba(255, 107, 157, 0.05);
-            transform: translateY(-2px);
-        }
-
-        .upload-area.has-file {
-            border-color: var(--success-green);
-            background: rgba(16, 185, 129, 0.1);
-        }
-
-        .score-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 6px 0;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-        }
-
-        .score-item:last-child {
-            border-bottom: none;
-        }
-
-        .gallery-item {
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 12px;
-            padding: 15px;
-            margin-bottom: 12px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-        .gallery-item:hover {
-            background: rgba(255, 255, 255, 0.1);
-            transform: translateY(-2px);
-        }
-
-        .challenge-progress-bar {
-            width: 100%;
-            height: 4px;
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 2px;
-            overflow: hidden;
-            margin: 8px 0;
-        }
-
-        .challenge-progress-fill {
-            height: 100%;
-            background: linear-gradient(90deg, var(--primary-pink), var(--primary-purple));
-            transition: width 0.3s ease;
-        }
-
         .group-icon-option {
             width: 40px;
             height: 40px;
@@ -1228,34 +1132,61 @@
             transform: scale(1.1);
         }
 
-        /* Toast Notification Styles */
-        .toast {
-            position: fixed;
-            top: 20px;
-            left: 50%;
-            transform: translateX(-50%);
-            background: var(--primary-pink);
+        /* Form Styles for Phone Auth */
+        .form-input {
+            width: 100%;
+            padding: 12px;
+            margin: 10px 0;
+            border: 1px solid var(--glass-border);
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.1);
+            color: var(--text-primary);
+            font-size: 16px;
+        }
+
+        .form-input::placeholder {
+            color: var(--text-secondary);
+        }
+
+        .error-message {
+            background: #fed7d7;
+            color: #c53030;
+            padding: 10px;
+            border-radius: 8px;
+            margin: 10px 0;
+            display: none;
+        }
+
+        .success-message {
+            background: #c6f6d5;
+            color: #2f855a;
+            padding: 10px;
+            border-radius: 8px;
+            margin: 10px 0;
+            display: none;
+        }
+
+        #recaptcha-container {
+            margin: 10px 0;
+        }
+
+        .user-info {
+            display: none;
+            background: #1a1a2e;
+            padding: 20px;
+            border-radius: 12px;
+            margin-top: 20px;
             color: white;
-            padding: 12px 20px;
-            border-radius: 10px;
-            z-index: 4000;
-            font-size: 14px;
-            font-weight: 600;
-            opacity: 0;
-            transition: all 0.3s ease;
         }
-        
-        .toast.success {
-            background: var(--success-green);
-        }
-        
-        .toast.error {
-            background: var(--error-red);
-        }
-        
-        .toast.show {
-            opacity: 1;
-            transform: translateX(-50%) translateY(10px);
+
+        .logout-btn {
+            background: #e53e3e;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            margin-top: 15px;
         }
     </style>
 </head>
@@ -1267,25 +1198,45 @@
             <div class="auth-title">Welcome to JomBro</div>
             <div class="auth-subtitle">Connect with friends and tackle challenges together!</div>
             
-            <button class="auth-btn google" onclick="signInWithGoogle()">
-                <span>🔍</span>
-                Continue with Google
-            </button>
+            <div id="errorMessage" class="error-message"></div>
+            <div id="successMessage" class="success-message"></div>
             
-            <button class="auth-btn facebook" onclick="signInWithFacebook()">
-                <span>📘</span>
-                Continue with Facebook
-            </button>
-            
-            <button class="auth-btn phone" onclick="signInWithPhone()">
-                <span>📱</span>
-                Continue with Phone
-            </button>
-            
-            <button class="auth-btn test" onclick="signInAnonymously()">
-                <span>🧪</span>
-                Test Mode (Skip Login)
-            </button>
+            <!-- Main Auth Screen -->
+            <div id="mainAuth">
+                <button class="auth-btn google" onclick="signInWithGoogle()">
+                    🔍 Continue with Google
+                </button>
+                
+                <button class="auth-btn facebook" onclick="signInWithFacebook()">
+                    📘 Continue with Facebook
+                </button>
+                
+                <button class="auth-btn phone" onclick="showPhoneForm()">
+                    📱 Continue with Phone
+                </button>
+                
+                <button class="auth-btn test" onclick="signInAnonymously()">
+                    🧪 Test Mode (Skip Login)
+                </button>
+            </div>
+
+            <!-- Phone Form -->
+            <div id="phoneForm" style="display: none; margin-top: 20px;">
+                <input type="tel" id="phoneInput" class="form-input" placeholder="+60123456789" required>
+                <div id="recaptcha-container"></div>
+                <input type="text" id="otpInput" class="form-input" placeholder="Enter OTP" style="display:none;">
+                <div>
+                    <button class="btn-secondary" onclick="showMainAuth()">Back</button>
+                    <button class="btn-primary" id="phoneSubmitBtn" onclick="signInWithPhone()">Send OTP</button>
+                </div>
+            </div>
+
+            <!-- User Info (After Login) -->
+            <div id="userInfo" class="user-info">
+                <h3>Welcome!</h3>
+                <p id="userDetails"></p>
+                <button class="logout-btn" onclick="signOut()">Sign Out</button>
+            </div>
             
             <div style="margin-top: 20px; font-size: 12px; color: var(--text-secondary);">
                 By continuing, you agree to our Terms & Privacy Policy
@@ -1346,7 +1297,6 @@
                         <div style="display: flex; gap: 8px;">
                             <button onclick="nextChallenge()" style="background: rgba(255, 255, 255, 0.1); border: none; color: var(--text-primary); padding: 6px 8px; border-radius: 8px; cursor: pointer; font-size: 12px;" title="Next Challenge">🔄</button>
                             <button onclick="refreshChallenges()" style="background: rgba(255, 255, 255, 0.1); border: none; color: var(--text-primary); padding: 6px 8px; border-radius: 8px; cursor: pointer; font-size: 12px;" title="Generate New">✨</button>
-                            <button onclick="showChallengeLibrary()" style="background: rgba(255, 255, 255, 0.1); border: none; color: var(--text-primary); padding: 6px 8px; border-radius: 8px; cursor: pointer; font-size: 12px;" title="Challenge Library">📚</button>
                         </div>
                     </div>
                     
@@ -1386,10 +1336,10 @@
                 <!-- Action Section -->
                 <div class="action-section">
                     <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 15px;">
-                        <button class="btn-secondary" onclick="submitChallengeProof()" style="display: flex; align-items: center; justify-content: center; gap: 6px;">
+                        <button class="btn-secondary" onclick="alert('📸 Challenge submission coming soon!')" style="display: flex; align-items: center; justify-content: center; gap: 6px;">
                             📸 Submit Proof
                         </button>
-                        <button class="btn-secondary" onclick="showChallengeGallery()" style="display: flex; align-items: center; justify-content: center; gap: 6px;">
+                        <button class="btn-secondary" onclick="alert('🏆 Gallery coming soon!')" style="display: flex; align-items: center; justify-content: center; gap: 6px;">
                             🏆 My Gallery
                         </button>
                     </div>
@@ -1421,12 +1371,12 @@
                 </div>
                 
                 <div style="text-align: center;">
-                    <div style="font-size: 22px; font-weight: 700; margin-bottom: 5px;" id="enhancedProfileName">Lyode</div>
-                    <div style="font-size: 12px; opacity: 0.9; margin-bottom: 10px;" id="enhancedProfileBio">Challenge enthusiast • Coffee lover</div>
+                    <div style="font-size: 22px; font-weight: 700; margin-bottom: 5px;" id="enhancedProfileName">User</div>
+                    <div style="font-size: 12px; opacity: 0.9; margin-bottom: 10px;" id="enhancedProfileBio">Challenge enthusiast</div>
                     <div style="display: flex; justify-content: center; gap: 15px; font-size: 12px;">
-                        <div><strong id="profileTokensDisplay">1,250</strong> Tokens</div>
-                        <div><strong id="profileLevelDisplay">Level 5</strong></div>
-                        <div><strong id="profileStreakDisplay">12</strong> Day Streak</div>
+                        <div><strong id="profileTokensDisplay">0</strong> Tokens</div>
+                        <div><strong id="profileLevelDisplay">Level 1</strong></div>
+                        <div><strong id="profileStreakDisplay">0</strong> Day Streak</div>
                     </div>
                 </div>
             </div>
@@ -1435,39 +1385,17 @@
             <div style="margin-bottom: 20px;">
                 <div style="font-size: 14px; font-weight: 600; margin-bottom: 12px; display: flex; align-items: center; gap: 8px;">
                     🏆 Recent Achievements
-                    <span style="background: var(--primary-pink); color: white; padding: 2px 8px; border-radius: 8px; font-size: 10px;">3 New!</span>
+                    <span style="background: var(--primary-pink); color: white; padding: 2px 8px; border-radius: 8px; font-size: 10px;">New!</span>
                 </div>
                 <div class="profile-achievements">
-                    <div class="achievement-badge" title="Completed 5 challenges">
+                    <div class="achievement-badge" title="Welcome to JomBro!">
                         <div class="achievement-icon">🌟</div>
-                        <div class="achievement-name">Rising Star</div>
+                        <div class="achievement-name">New Member</div>
                     </div>
-                    <div class="achievement-badge" title="Helped 10 friends">
-                        <div class="achievement-icon">🤝</div>
-                        <div class="achievement-name">Team Player</div>
+                    <div class="achievement-badge" title="First login">
+                        <div class="achievement-icon">🚀</div>
+                        <div class="achievement-name">Ready to Go</div>
                     </div>
-                    <div class="achievement-badge" title="7-day streak">
-                        <div class="achievement-icon">🔥</div>
-                        <div class="achievement-name">On Fire</div>
-                    </div>
-                    <div class="achievement-badge" title="Coffee shop master">
-                        <div class="achievement-icon">☕</div>
-                        <div class="achievement-name">Barista Friend</div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Enhanced Stats -->
-            <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; margin-bottom: 20px;">
-                <div style="background: rgba(255, 255, 255, 0.05); padding: 15px; border-radius: 12px; text-align: center;">
-                    <div style="font-size: 18px; font-weight: 700; color: var(--primary-pink);">47</div>
-                    <div style="font-size: 11px; color: var(--text-secondary);">Challenges Completed</div>
-                    <div style="font-size: 9px; color: var(--success-green); margin-top: 2px;">+3 this week</div>
-                </div>
-                <div style="background: rgba(255, 255, 255, 0.05); padding: 15px; border-radius: 12px; text-align: center;">
-                    <div style="font-size: 18px; font-weight: 700; color: var(--primary-pink);">23</div>
-                    <div style="font-size: 11px; color: var(--text-secondary);">Friends Connected</div>
-                    <div style="font-size: 9px; color: var(--success-green); margin-top: 2px;">+2 new friends</div>
                 </div>
             </div>
 
@@ -1480,47 +1408,7 @@
         </div>
     </div>
 
-    <!-- Standard Profile Modal -->
-    <div id="profileModal" class="modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <div class="modal-title">👤 My Profile</div>
-                <button class="modal-close" onclick="hideModal('profile')">&times;</button>
-            </div>
-            
-            <div class="profile-header">
-                <div class="profile-avatar-large" id="profileAvatar" onclick="changeProfilePicture()">
-                    LY
-                    <div class="profile-avatar-edit">📷</div>
-                </div>
-                <div class="profile-name" id="profileName">Lyode</div>
-                <div class="profile-bio" id="profileBio">Challenge enthusiast • Coffee lover • Always up for adventures!</div>
-                <div class="profile-level" id="profileLevel">Level 5 Explorer</div>
-            </div>
-
-            <div class="profile-stats">
-                <div class="profile-stat" onclick="showAchievements()">
-                    <div class="profile-stat-value" id="profileChallenges">47</div>
-                    <div class="profile-stat-label">Challenges</div>
-                </div>
-                <div class="profile-stat" onclick="showFriends()">
-                    <div class="profile-stat-value" id="profileFriends">23</div>
-                    <div class="profile-stat-label">Friends</div>
-                </div>
-                <div class="profile-stat" onclick="showStats()">
-                    <div class="profile-stat-value" id="profileStreak">12</div>
-                    <div class="profile-stat-label">Day Streak</div>
-                </div>
-            </div>
-
-            <div class="profile-actions">
-                <button class="btn-secondary" onclick="editProfile()">Edit Profile</button>
-                <button class="btn-secondary" onclick="showSettings()">Settings</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Enhanced Friends Modal -->
+    <!-- Friends Modal -->
     <div id="friendsModal" class="modal">
         <div class="modal-content">
             <div class="modal-header">
@@ -1530,18 +1418,21 @@
 
             <div class="friends-search">
                 <div class="friends-search-icon">🔍</div>
-                <input type="text" class="friends-search-input" placeholder="Search friends..." 
-                       oninput="searchFriends(this.value)">
+                <input type="text" class="friends-search-input" placeholder="Search friends...">
             </div>
 
             <div class="friends-tabs">
-                <div class="friends-tab active" onclick="switchFriendsTab('all')">All Friends</div>
-                <div class="friends-tab" onclick="switchFriendsTab('online')">Online</div>
-                <div class="friends-tab" onclick="switchFriendsTab('requests')">Requests</div>
+                <div class="friends-tab active">All Friends</div>
+                <div class="friends-tab">Online</div>
+                <div class="friends-tab">Requests</div>
             </div>
 
             <div id="friendsList">
-                <!-- Friends will be populated here -->
+                <div class="text-center" style="padding: 40px 20px; color: var(--text-secondary);">
+                    <div style="font-size: 48px; margin-bottom: 15px;">👥</div>
+                    <div style="font-size: 16px; margin-bottom: 8px;">No friends yet</div>
+                    <div style="font-size: 12px;">Start connecting with other challengers!</div>
+                </div>
             </div>
 
             <div style="margin-top: 20px;">
@@ -1559,79 +1450,16 @@
             </div>
 
             <div id="groupsList">
-                <!-- Groups will be populated here -->
+                <div class="text-center" style="padding: 40px 20px; color: var(--text-secondary);">
+                    <div style="font-size: 48px; margin-bottom: 15px;">🏠</div>
+                    <div style="font-size: 16px; margin-bottom: 8px;">No groups yet</div>
+                    <div style="font-size: 12px;">Create your first group to start challenging with friends!</div>
+                </div>
             </div>
 
             <div style="margin-top: 20px;">
-                <button class="btn-primary" onclick="showCreateGroup()">➕ Create New Group</button>
+                <button class="btn-primary" onclick="alert('Group creation coming soon!')">➕ Create New Group</button>
             </div>
-        </div>
-    </div>
-
-    <!-- Enhanced Create Group Modal -->
-    <div id="groupModal" class="modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <div class="modal-title">🏠 Create Group</div>
-                <button class="modal-close" onclick="hideModal('group')">&times;</button>
-            </div>
-
-            <form class="group-form" onsubmit="createGroup(event)">
-                <div class="form-group">
-                    <label class="form-label">Group Name</label>
-                    <input type="text" class="form-input" id="groupName" placeholder="My Adventure Squad" required>
-                </div>
-
-                <div class="form-group">
-                    <label class="form-label">Description</label>
-                    <textarea class="form-input form-textarea" id="groupDescription" 
-                              placeholder="What's your group about? What challenges will you tackle together?"></textarea>
-                </div>
-
-                <div class="form-group">
-                    <label class="form-label">Group Icon</label>
-                    <div style="display: flex; gap: 10px; flex-wrap: wrap;">
-                        <div class="group-icon-option" onclick="selectGroupIcon('🏔️')">🏔️</div>
-                        <div class="group-icon-option" onclick="selectGroupIcon('🚀')">🚀</div>
-                        <div class="group-icon-option" onclick="selectGroupIcon('⚡')">⚡</div>
-                        <div class="group-icon-option" onclick="selectGroupIcon('🔥')">🔥</div>
-                        <div class="group-icon-option" onclick="selectGroupIcon('🌟')">🌟</div>
-                        <div class="group-icon-option" onclick="selectGroupIcon('💪')">💪</div>
-                    </div>
-                </div>
-
-                <div class="form-group">
-                    <label class="form-label">Privacy Settings</label>
-                    <div class="group-privacy-options">
-                        <label class="privacy-option">
-                            <input type="radio" name="privacy" value="public" checked>
-                            <div>
-                                <div style="font-weight: 600;">🌍 Public</div>
-                                <div style="font-size: 12px; color: var(--text-secondary);">Anyone can find and join</div>
-                            </div>
-                        </label>
-                        <label class="privacy-option">
-                            <input type="radio" name="privacy" value="private">
-                            <div>
-                                <div style="font-weight: 600;">🔒 Private</div>
-                                <div style="font-size: 12px; color: var(--text-secondary);">Invite only</div>
-                            </div>
-                        </label>
-                        <label class="privacy-option">
-                            <input type="radio" name="privacy" value="friends">
-                            <div>
-                                <div style="font-weight: 600;">👥 Friends Only</div>
-                                <div style="font-size: 12px; color: var(--text-secondary);">Only friends can join</div>
-                            </div>
-                        </label>
-                    </div>
-                </div>
-
-                <div style="display: flex; gap: 10px; margin-top: 20px;">
-                    <button type="button" class="btn-secondary" onclick="hideModal('group')" style="flex: 1;">Cancel</button>
-                    <button type="submit" class="btn-primary" style="flex: 1;">Create Group</button>
-                </div>
-            </form>
         </div>
     </div>
 
@@ -1654,105 +1482,46 @@
         </div>
     </div>
 
-    <!-- Challenge Submission Modal -->
-    <div id="challengeSubmissionModal" class="modal">
-        <div class="modal-content" style="max-width: 450px;">
-            <div class="modal-header">
-                <div class="modal-title">📸 Submit Challenge Proof</div>
-                <button class="modal-close" onclick="hideModal('challengeSubmission')">&times;</button>
-            </div>
-
-            <div id="submissionContent">
-                <div style="text-align: center; margin-bottom: 20px;">
-                    <div style="font-size: 18px; font-weight: 600; margin-bottom: 8px;" id="submissionChallengeTitle">Coffee Shop Poetry Challenge</div>
-                    <div style="font-size: 12px; color: var(--text-secondary);">Upload photo or video proof of your completed challenge</div>
-                </div>
-
-                <!-- Upload Area -->
-                <div class="upload-area" onclick="triggerFileUpload()" id="uploadArea">
-                    <div class="upload-content">
-                        <div style="font-size: 48px; margin-bottom: 15px; color: var(--primary-pink);">📷</div>
-                        <div style="font-size: 16px; font-weight: 600; margin-bottom: 8px;">Upload Media</div>
-                        <div style="font-size: 12px; color: var(--text-secondary); margin-bottom: 15px;">Photos, videos, or screenshots</div>
-                        <div style="background: var(--primary-pink); color: white; padding: 8px 16px; border-radius: 8px; font-size: 12px; font-weight: 600;">Choose File</div>
-                    </div>
-                </div>
-
-                <input type="file" id="mediaUpload" accept="image/*,video/*" style="display: none;" onchange="handleFileUpload(event)">
-
-                <!-- Preview Area -->
-                <div id="mediaPreview" style="display: none; margin: 20px 0;">
-                    <div style="font-size: 14px; font-weight: 600; margin-bottom: 10px;">Preview:</div>
-                    <div id="previewContent" style="border-radius: 12px; overflow: hidden; max-height: 200px; display: flex; justify-content: center;"></div>
-                </div>
-
-                <!-- Challenge Description -->
-                <div style="margin: 20px 0;">
-                    <label style="font-size: 12px; font-weight: 600; color: var(--text-primary); margin-bottom: 8px; display: block;">Tell us about your experience:</label>
-                    <textarea id="challengeStory" placeholder="Describe what happened, how you felt, what you learned..." 
-                              style="width: 100%; min-height: 80px; padding: 12px; background: rgba(255,255,255,0.1); border: 1px solid var(--glass-border); border-radius: 10px; color: var(--text-primary); font-size: 14px; resize: vertical; outline: none;"></textarea>
-                </div>
-
-                <!-- Action Buttons -->
-                <div style="display: flex; gap: 10px; margin-top: 20px;">
-                    <button class="btn-secondary" onclick="hideModal('challengeSubmission')" style="flex: 1;">Cancel</button>
-                    <button class="btn-primary" onclick="submitChallenge()" id="submitBtn" style="flex: 2;">
-                        🤖 Submit for AI Verification
-                    </button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Challenge Gallery Modal -->
-    <div id="challengeGalleryModal" class="modal">
-        <div class="modal-content" style="max-width: 500px;">
-            <div class="modal-header">
-                <div class="modal-title">🏆 My Challenge Gallery</div>
-                <button class="modal-close" onclick="hideModal('challengeGallery')">&times;</button>
-            </div>
-
-            <div style="margin-bottom: 15px;">
-                <div style="display: flex; justify-content: space-between; align-items: center;">
-                    <div style="font-size: 12px; color: var(--text-secondary);">Your completed challenges with AI scores</div>
-                    <div style="font-size: 11px; background: var(--primary-pink); color: white; padding: 4px 8px; border-radius: 6px;" id="avgScore">Avg: 87.5</div>
-                </div>
-            </div>
-
-            <div id="challengeGalleryContent" style="max-height: 400px; overflow-y: auto;">
-                <!-- Gallery items will be populated here -->
-            </div>
-        </div>
-    </div>
-
-    <!-- Challenge Library Modal -->
-    <div id="challengeLibraryModal" class="modal">
-        <div class="modal-content" style="max-width: 500px;">
-            <div class="modal-header">
-                <div class="modal-title">📚 Challenge Library</div>
-                <button class="modal-close" onclick="hideModal('challengeLibrary')">&times;</button>
-            </div>
-
-            <div style="margin-bottom: 20px;">
-                <div style="font-size: 12px; color: var(--text-secondary); margin-bottom: 10px;">Choose from AI-curated challenge categories:</div>
-                <div id="challengeCategories" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px;">
-                    <!-- Categories will be populated here -->
-                </div>
-            </div>
-
-            <div id="categorychallenges" style="max-height: 300px; overflow-y: auto;">
-                <!-- Challenges will be populated here -->
-            </div>
-        </div>
-    </div>
-
     <!-- Floating Chat Toggle -->
     <button id="chatToggle" class="chat-toggle" onclick="toggleChat()" style="display: none;">
         💬
     </button>
 
-    <script>
-        // ✅ CORRECTED FIREBASE CONFIGURATION
+    <!-- Firebase v9 SDK via modules -->
+    <script type="module">
+        // ✅ CORRECTED FIREBASE CONFIGURATION - This is the WORKING config!
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
+        import { 
+            getAuth, 
+            signInWithRedirect, 
+            getRedirectResult,
+            signInWithPopup,
+            signInWithEmailAndPassword,
+            createUserWithEmailAndPassword,
+            signInWithPhoneNumber,
+            signInAnonymously as firebaseSignInAnonymously,
+            signOut as firebaseSignOut,
+            onAuthStateChanged,
+            GoogleAuthProvider,
+            FacebookAuthProvider,
+            RecaptchaVerifier
+        } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
+        import { 
+            getFirestore, 
+            collection, 
+            addDoc, 
+            doc, 
+            getDoc, 
+            setDoc, 
+            updateDoc, 
+            onSnapshot,
+            query,
+            orderBy,
+            where,
+            serverTimestamp 
+        } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
+
+        // ✅ CORRECT Firebase Configuration (the one that works!)
         const firebaseConfig = {
             apiKey: "AIzaSyC_orriRUuf1ynDiFaJAPrO6-Gu3GeURxQ",
             authDomain: "jombro-9d129.firebaseapp.com",
@@ -1764,238 +1533,301 @@
         };
 
         // Initialize Firebase
-        firebase.initializeApp(firebaseConfig);
-        const auth = firebase.auth();
-        const db = firebase.firestore();
-        const storage = firebase.storage();
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
 
-        // Global state
+        // Providers
+        const googleProvider = new GoogleAuthProvider();
+        const facebookProvider = new FacebookAuthProvider();
+
+        // Global variables
         let currentUser = null;
         let chatOpen = false;
         let unsubscribeChat = null;
-        let currentFriendsTab = 'all';
         let userProfile = {};
-        let friendsList = [];
-        let groupsList = [];
-        let currentChallengeIndex = 0;
-        let availableChallenges = [];
-        let completedChallenges = []; 
-        let userCreatedChallenges = [];   
-        let challengeCreationUnlocked = false; 
-        let currentUploadedFile = null;
-        let selectedGroupIcon = '🚀';
+        let recaptchaVerifier = null;
+        let confirmationResult = null;
 
-        // ✅ FIXED AUTHENTICATION FUNCTIONS
+        // Make functions global for HTML onclick handlers
+        window.auth = auth;
 
-        // Enhanced Google Sign-In with Mobile Support
-        async function signInWithGoogle() {
+        // ===== UTILITY FUNCTIONS =====
+        
+        function showError(message) {
+            const errorEl = document.getElementById('errorMessage');
+            errorEl.textContent = message;
+            errorEl.style.display = 'block';
+            setTimeout(() => {
+                errorEl.style.display = 'none';
+            }, 5000);
+        }
+        
+        function showSuccess(message) {
+            const successEl = document.getElementById('successMessage');
+            successEl.textContent = message;
+            successEl.style.display = 'block';
+            setTimeout(() => {
+                successEl.style.display = 'none';
+            }, 3000);
+        }
+        
+        function hideAllForms() {
+            document.getElementById('mainAuth').style.display = 'none';
+            document.getElementById('phoneForm').style.display = 'none';
+            document.getElementById('userInfo').style.display = 'none';
+        }
+        
+        // ===== NAVIGATION FUNCTIONS =====
+        
+        window.showMainAuth = function() {
+            hideAllForms();
+            document.getElementById('mainAuth').style.display = 'block';
+        }
+        
+        window.showPhoneForm = function() {
+            hideAllForms();
+            document.getElementById('phoneForm').style.display = 'block';
+            setupRecaptcha();
+        }
+        
+        // ===== ENHANCED AUTHENTICATION FUNCTIONS =====
+        
+        window.signInWithGoogle = async function() {
             try {
                 console.log('🔍 Starting Google sign-in...');
-                const provider = new firebase.auth.GoogleAuthProvider();
-                provider.addScope('email');
-                provider.addScope('profile');
                 
-                // Detect mobile device
-                const isMobile = /Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-                
-                if (isMobile) {
-                    console.log('📱 Mobile detected - using redirect');
-                    await auth.signInWithRedirect(provider);
-                } else {
-                    console.log('💻 Desktop detected - trying popup');
-                    try {
-                        const result = await auth.signInWithPopup(provider);
-                        console.log('✅ Google popup sign-in successful:', result.user.displayName);
-                        showToast('✅ Google sign-in successful!', 'success');
-                    } catch (popupError) {
-                        console.log('🚫 Popup blocked, falling back to redirect');
-                        await auth.signInWithRedirect(provider);
-                    }
+                // Try popup first, fallback to redirect if blocked
+                try {
+                    const result = await signInWithPopup(auth, googleProvider);
+                    console.log('Google popup sign-in successful:', result.user);
+                    showSuccess('Google sign-in successful!');
+                } catch (popupError) {
+                    console.log('Popup blocked, trying redirect...', popupError);
+                    // If popup is blocked, use redirect
+                    await signInWithRedirect(auth, googleProvider);
                 }
             } catch (error) {
-                console.error('❌ Google sign-in error:', error);
-                if (error.code === 'auth/account-exists-with-different-credential') {
-                    showToast('Account exists with different method. Try another sign-in option.', 'error');
-                } else {
-                    showToast('Google sign-in failed. Please try again.', 'error');
-                }
+                console.error('Google sign-in error:', error);
+                showError('Google Sign-in Error: ' + error.message);
             }
         }
-
-        // Enhanced Facebook Sign-In with Mobile Support
-        async function signInWithFacebook() {
+        
+        window.signInWithFacebook = async function() {
             try {
                 console.log('📘 Starting Facebook sign-in...');
-                const provider = new firebase.auth.FacebookAuthProvider();
-                provider.addScope('email');
-                provider.addScope('public_profile');
                 
-                const isMobile = /Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+                // Try popup first, fallback to redirect if blocked
+                try {
+                    const result = await signInWithPopup(auth, facebookProvider);
+                    console.log('Facebook popup sign-in successful:', result.user);
+                    showSuccess('Facebook sign-in successful!');
+                } catch (popupError) {
+                    console.log('Popup blocked, trying redirect...', popupError);
+                    await signInWithRedirect(auth, facebookProvider);
+                }
+            } catch (error) {
+                console.error('Facebook sign-in error:', error);
+                showError('Facebook Sign-in Error: ' + error.message);
+            }
+        }
+        
+        // ===== PHONE AUTHENTICATION =====
+        
+        function setupRecaptcha() {
+            try {
+                if (window.recaptchaVerifier) {
+                    window.recaptchaVerifier.clear();
+                }
                 
-                if (isMobile) {
-                    console.log('📱 Mobile detected - using redirect');
-                    await auth.signInWithRedirect(provider);
-                } else {
-                    console.log('💻 Desktop detected - trying popup');
-                    try {
-                        const result = await auth.signInWithPopup(provider);
-                        console.log('✅ Facebook popup sign-in successful:', result.user.displayName);
-                        showToast('✅ Facebook sign-in successful!', 'success');
-                    } catch (popupError) {
-                        console.log('🚫 Popup blocked, falling back to redirect');
-                        await auth.signInWithRedirect(provider);
+                window.recaptchaVerifier = new RecaptchaVerifier(auth, 'recaptcha-container', {
+                    'size': 'normal',
+                    'callback': (response) => {
+                        console.log('reCAPTCHA solved');
+                    },
+                    'expired-callback': () => {
+                        console.log('reCAPTCHA expired');
+                        showError('reCAPTCHA expired. Please try again.');
                     }
-                }
+                });
+                
+                window.recaptchaVerifier.render().then(() => {
+                    console.log('reCAPTCHA rendered successfully');
+                }).catch(error => {
+                    console.error('reCAPTCHA render error:', error);
+                    showError('reCAPTCHA setup failed: ' + error.message);
+                });
             } catch (error) {
-                console.error('❌ Facebook sign-in error:', error);
-                if (error.code === 'auth/account-exists-with-different-credential') {
-                    showToast('Account exists with different method. Try another sign-in option.', 'error');
+                console.error('reCAPTCHA setup error:', error);
+                showError('reCAPTCHA setup failed: ' + error.message);
+            }
+        }
+        
+        window.signInWithPhone = async function() {
+            try {
+                const phoneNumber = document.getElementById('phoneInput').value;
+                const otpInput = document.getElementById('otpInput');
+                const submitBtn = document.getElementById('phoneSubmitBtn');
+                
+                if (!confirmationResult) {
+                    // Send OTP
+                    if (!phoneNumber) {
+                        showError('Please enter your phone number');
+                        return;
+                    }
+                    
+                    console.log('Sending OTP to:', phoneNumber);
+                    
+                    confirmationResult = await signInWithPhoneNumber(auth, phoneNumber, window.recaptchaVerifier);
+                    
+                    showSuccess('OTP sent successfully!');
+                    otpInput.style.display = 'block';
+                    submitBtn.textContent = 'Verify OTP';
+                    submitBtn.onclick = verifyOTP;
                 } else {
-                    showToast('Facebook sign-in failed. Please try again.', 'error');
-                }
-            }
-        }
-
-        // Enhanced Anonymous Sign-In with Test Mode Tracking
-        async function signInAnonymously() {
-            try {
-                console.log('🧪 Starting test mode sign-in...');
-                
-                // Mark test mode as intentional
-                sessionStorage.setItem('testModeClicked', 'true');
-                
-                const result = await auth.signInAnonymously();
-                console.log('✅ Test mode sign-in successful:', result.user.uid);
-                showToast('🧪 Test mode activated!', 'success');
-            } catch (error) {
-                console.error('❌ Test mode sign-in error:', error);
-                showToast('Test mode failed. Please try again.', 'error');
-            }
-        }
-
-        // Phone Authentication (Simplified)
-        async function signInWithPhone() {
-            const phoneNumber = prompt('Enter your phone number (with country code, e.g., +60123456789):');
-            if (!phoneNumber) return;
-
-            try {
-                console.log('📱 Setting up phone authentication...');
-                
-                // Create reCAPTCHA verifier
-                if (!window.recaptchaVerifier) {
-                    window.recaptchaVerifier = new firebase.auth.RecaptchaVerifier('authScreen', {
-                        size: 'invisible',
-                        callback: function(response) {
-                            console.log('✅ reCAPTCHA solved');
-                        }
-                    });
-                }
-
-                const confirmationResult = await auth.signInWithPhoneNumber(phoneNumber, window.recaptchaVerifier);
-                
-                const verificationCode = prompt('Enter the verification code sent to your phone:');
-                if (verificationCode) {
-                    await confirmationResult.confirm(verificationCode);
-                    console.log('✅ Phone verification successful');
-                    showToast('✅ Phone verification successful!', 'success');
+                    // This case is handled by verifyOTP function
+                    await verifyOTP();
                 }
             } catch (error) {
-                console.error('❌ Phone sign-in error:', error);
-                showToast('Phone sign-in failed. Please check your number and try again.', 'error');
+                console.error('Phone sign-in error:', error);
+                showError('Phone Sign-in Error: ' + error.message);
                 
                 // Reset reCAPTCHA on error
                 if (window.recaptchaVerifier) {
                     window.recaptchaVerifier.clear();
-                    window.recaptchaVerifier = null;
+                    setupRecaptcha();
                 }
             }
         }
-
-        // Enhanced Sign Out
-        async function signOut() {
+        
+        async function verifyOTP() {
             try {
-                console.log('🚪 Signing out...');
-                await updateOnlineStatus(false);
-                await auth.signOut();
+                const otpCode = document.getElementById('otpInput').value;
                 
-                // Clear session storage
-                sessionStorage.removeItem('testModeClicked');
-                
-                showToast('👋 Signed out successfully!', 'success');
-                setTimeout(() => {
-                    window.location.reload();
-                }, 1000);
-            } catch (error) {
-                console.error('❌ Sign-out error:', error);
-                showToast('Sign-out failed. Please try again.', 'error');
-            }
-        }
-
-        // ✅ ENHANCED AUTH STATE OBSERVER - Mobile-First
-        auth.onAuthStateChanged(async (user) => {
-            console.log('📱 Auth state changed:', user?.uid || 'No user');
-            
-            if (user) {
-                const isAnonymous = user.isAnonymous;
-                const testModeClicked = sessionStorage.getItem('testModeClicked');
-                
-                console.log('📱 User info:', { 
-                    anonymous: isAnonymous, 
-                    testMode: testModeClicked,
-                    displayName: user.displayName 
-                });
-                
-                // 🚫 Block unwanted anonymous sessions (mobile-focused)
-                if (isAnonymous && !testModeClicked) {
-                    console.log('📱 Unwanted anonymous session - forcing logout');
-                    await auth.signOut();
-                    showAuthScreen();
+                if (!otpCode) {
+                    showError('Please enter the OTP code');
                     return;
                 }
                 
-                // ✅ Valid user - proceed to app
-                currentUser = user;
+                console.log('Verifying OTP:', otpCode);
                 
-                try {
-                    await createUserProfile(user);
-                } catch (error) {
-                    console.error('❌ Profile creation error:', error);
+                const result = await confirmationResult.confirm(otpCode);
+                console.log('Phone verification successful:', result.user);
+                showSuccess('Phone verification successful!');
+                
+                // Reset form
+                confirmationResult = null;
+                document.getElementById('otpInput').style.display = 'none';
+                document.getElementById('phoneSubmitBtn').textContent = 'Send OTP';
+                document.getElementById('phoneSubmitBtn').onclick = window.signInWithPhone;
+            } catch (error) {
+                console.error('OTP verification error:', error);
+                showError('OTP Verification Error: ' + error.message);
+            }
+        }
+        
+        // ===== ANONYMOUS AUTHENTICATION =====
+        
+        window.signInAnonymously = async function() {
+            try {
+                console.log('Starting anonymous sign-in...');
+                
+                const result = await firebaseSignInAnonymously(auth);
+                console.log('Anonymous sign-in successful:', result.user);
+                showSuccess('Test mode activated!');
+            } catch (error) {
+                console.error('Anonymous sign-in error:', error);
+                showError('Test Mode Error: ' + error.message);
+            }
+        }
+        
+        // ===== SIGN OUT =====
+        
+        window.signOut = async function() {
+            try {
+                await firebaseSignOut(auth);
+                console.log('Sign out successful');
+                showSuccess('Signed out successfully!');
+                
+                // Reset forms
+                document.getElementById('phoneInput').value = '';
+                document.getElementById('otpInput').value = '';
+                confirmationResult = null;
+                
+                showMainAuth();
+            } catch (error) {
+                console.error('Sign out error:', error);
+                showError('Sign Out Error: ' + error.message);
+            }
+        }
+        
+        // ===== AUTH STATE OBSERVER =====
+        
+        onAuthStateChanged(auth, (user) => {
+            console.log('Auth state changed:', user);
+            
+            if (user) {
+                // User is signed in
+                hideAllForms();
+                document.getElementById('userInfo').style.display = 'block';
+                
+                const userDetails = document.getElementById('userDetails');
+                let userInfo = '';
+                
+                if (user.displayName) {
+                    userInfo += `Name: ${user.displayName}<br>`;
+                }
+                if (user.email) {
+                    userInfo += `Email: ${user.email}<br>`;
+                }
+                if (user.phoneNumber) {
+                    userInfo += `Phone: ${user.phoneNumber}<br>`;
+                }
+                if (user.isAnonymous) {
+                    userInfo += `Mode: Test User<br>`;
                 }
                 
-                showMainApp(user);
+                userInfo += `User ID: ${user.uid}`;
+                userDetails.innerHTML = userInfo;
                 
+                console.log('User successfully authenticated:', {
+                    uid: user.uid,
+                    email: user.email,
+                    displayName: user.displayName,
+                    phoneNumber: user.phoneNumber,
+                    isAnonymous: user.isAnonymous
+                });
+
+                // Initialize main app
+                currentUser = user;
+                showMainApp(user);
             } else {
-                console.log('📱 User signed out');
+                // User is signed out
                 showAuthScreen();
             }
         });
-
-        // Handle redirect result for mobile sign-ins
-        auth.getRedirectResult().then((result) => {
-            if (result.user) {
-                console.log('📱 Redirect sign-in successful:', result.user.displayName);
+        
+        // ===== CHECK REDIRECT RESULT ON PAGE LOAD =====
+        
+        window.addEventListener('load', async () => {
+            try {
+                console.log('Checking for redirect result...');
+                const result = await getRedirectResult(auth);
                 
-                if (result.credential) {
-                    if (result.credential.providerId === 'facebook.com') {
-                        console.log('📘 Facebook redirect completed');
-                        showToast('✅ Facebook sign-in successful!', 'success');
-                    } else if (result.credential.providerId === 'google.com') {
-                        console.log('🔍 Google redirect completed');
-                        showToast('✅ Google sign-in successful!', 'success');
-                    }
+                if (result) {
+                    console.log('Redirect sign-in successful:', result.user);
+                    showSuccess('Sign-in successful!');
+                } else {
+                    console.log('No redirect result found');
                 }
-            }
-        }).catch((error) => {
-            console.error('❌ Redirect error:', error);
-            
-            if (error.code === 'auth/account-exists-with-different-credential') {
-                showToast('Account exists with different method. Try another sign-in option.', 'error');
-            } else {
-                showToast('Sign-in failed. Please try again.', 'error');
+            } catch (error) {
+                console.error('Redirect result error:', error);
+                showError('Authentication Error: ' + error.message);
             }
         });
 
-        // 📱 Mobile-optimized screen management
+        // ===== SCREEN MANAGEMENT =====
+
         function showAuthScreen() {
             document.getElementById('authScreen').style.display = 'flex';
             document.getElementById('mainApp').style.display = 'none';
@@ -2012,65 +1844,49 @@
             document.getElementById('mainApp').style.display = 'block';
             document.getElementById('chatToggle').style.display = 'block';
             
-            // Mobile-friendly display names
-            const displayName = user.displayName || 
-                               (user.isAnonymous ? 'Test User' : 'User');
+            // Update display name
+            const displayName = user.displayName || (user.isAnonymous ? 'Test User' : 'User');
             document.getElementById('userDisplayName').textContent = displayName;
             
             // Initialize app features
-            initializeLiveUsers();
-            loadFriends();
-            loadGroups();
             initializeChallenges();
+            initializeProfile(user);
             
             console.log('📱 App initialized for:', displayName);
         }
 
-        // Toast notification system
-        function showToast(message, type = 'info') {
-            const toast = document.createElement('div');
-            toast.className = `toast ${type}`;
-            toast.textContent = message;
+        // ===== APP FUNCTIONS =====
+
+        function initializeProfile(user) {
+            userProfile = {
+                displayName: user.displayName || (user.isAnonymous ? 'Test User' : 'User'),
+                level: 1,
+                tokens: 0,
+                streak: 0,
+                bio: 'New to JomBro! Ready for challenges! 🚀'
+            };
             
-            // Apply styles
-            Object.assign(toast.style, {
-                position: 'fixed',
-                top: '20px',
-                left: '50%',
-                transform: 'translateX(-50%)',
-                background: type === 'success' ? 'var(--success-green)' : 
-                           type === 'error' ? 'var(--error-red)' : 'var(--primary-pink)',
-                color: 'white',
-                padding: '12px 20px',
-                borderRadius: '10px',
-                zIndex: '4000',
-                fontSize: '14px',
-                fontWeight: '600',
-                opacity: '0',
-                transition: 'all 0.3s ease'
-            });
-            
-            document.body.appendChild(toast);
-            
-            // Animate in
-            setTimeout(() => {
-                toast.style.opacity = '1';
-                toast.style.transform = 'translateX(-50%) translateY(10px)';
-            }, 100);
-            
-            // Remove after 3 seconds
-            setTimeout(() => {
-                toast.style.opacity = '0';
-                toast.style.transform = 'translateX(-50%) translateY(-10px)';
-                setTimeout(() => {
-                    if (toast.parentNode) {
-                        toast.parentNode.removeChild(toast);
-                    }
-                }, 300);
-            }, 3000);
+            updateProfileDisplay();
         }
 
-        // AI Challenge Generation System
+        function updateProfileDisplay() {
+            if (userProfile) {
+                document.getElementById('enhancedProfileName').textContent = userProfile.displayName;
+                document.getElementById('enhancedProfileBio').textContent = userProfile.bio;
+                document.getElementById('profileTokensDisplay').textContent = userProfile.tokens;
+                document.getElementById('profileLevelDisplay').textContent = `Level ${userProfile.level}`;
+                document.getElementById('profileStreakDisplay').textContent = userProfile.streak;
+                document.getElementById('profileInitials').textContent = getInitials(userProfile.displayName);
+                document.getElementById('userLevel').textContent = `Level ${userProfile.level}`;
+            }
+        }
+
+        function getInitials(name) {
+            if (!name) return 'U';
+            return name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
+        }
+
+        // Challenge System
         const challengeCategories = {
             SOCIAL: {
                 name: 'Social Connection',
@@ -2084,139 +1900,14 @@
                         duration: '30m',
                         tokens: 500,
                         hashtags: ['#CoffeePoetry', '#Connection', '#JomBro']
-                    },
-                    {
-                        title: 'Compliment Stranger Challenge',
-                        description: 'Give genuine compliments to 5 strangers today. Notice their reactions and spread positivity wherever you go!',
-                        difficulty: 'Medium',
-                        duration: '45m',
-                        tokens: 750,
-                        hashtags: ['#Kindness', '#Positivity', '#Social']
-                    },
-                    {
-                        title: 'Random Acts of Kindness',
-                        description: 'Perform 3 random acts of kindness for strangers. Pay for someone\'s coffee, help carry groceries, or leave encouraging notes!',
-                        difficulty: 'Easy',
-                        duration: '60m',
-                        tokens: 600,
-                        hashtags: ['#Kindness', '#RandomActs', '#Helping']
-                    }
-                ]
-            },
-            ADVENTURE: {
-                name: 'Adventure & Exploration',
-                icon: '🗺️',
-                color: '#8b5cf6',
-                challenges: [
-                    {
-                        title: 'Hidden Gem Discovery',
-                        description: 'Find and explore a place in your city you\'ve never been to before. Take photos and share what makes it special!',
-                        difficulty: 'Easy',
-                        duration: '120m',
-                        tokens: 800,
-                        hashtags: ['#Exploration', '#Discovery', '#Hidden']
-                    },
-                    {
-                        title: 'Public Transport Adventure',
-                        description: 'Take public transport to a random stop and explore the area for 1 hour. Document your unexpected discoveries!',
-                        difficulty: 'Medium',
-                        duration: '90m',
-                        tokens: 700,
-                        hashtags: ['#Adventure', '#Random', '#Transport']
-                    }
-                ]
-            },
-            CREATIVE: {
-                name: 'Creative Expression',
-                icon: '🎨',
-                color: '#00d4ff',
-                challenges: [
-                    {
-                        title: 'Street Art Photography',
-                        description: 'Find and photograph 10 pieces of street art, murals, or creative displays in your area. Create a mini photo story!',
-                        difficulty: 'Easy',
-                        duration: '75m',
-                        tokens: 550,
-                        hashtags: ['#StreetArt', '#Photography', '#Creative']
                     }
                 ]
             }
         };
 
-        // ===== ALL OTHER FUNCTIONS FROM ORIGINAL APP =====
+        let availableChallenges = [];
+        let currentChallengeIndex = 0;
 
-        // Enhanced User Management
-        async function createUserProfile(user) {
-            const userRef = db.collection('users').doc(user.uid);
-            const userDoc = await userRef.get();
-            
-            if (!userDoc.exists) {
-                const newProfile = {
-                    uid: user.uid,
-                    displayName: user.displayName || (user.isAnonymous ? 'Test User' : 'Anonymous'),
-                    email: user.email,
-                    photoURL: user.photoURL,
-                    bio: 'New to JomBro! Ready to tackle challenges! 🚀',
-                    level: 1,
-                    tokens: 0,
-                    challenges: 0,
-                    streak: 0,
-                    xp: 0,
-                    friends: [],
-                    groups: [],
-                    achievements: [],
-                    createdAt: firebase.firestore.FieldValue.serverTimestamp(),
-                    lastActive: firebase.firestore.FieldValue.serverTimestamp(),
-                    online: true
-                };
-                await userRef.set(newProfile);
-                userProfile = newProfile;
-            } else {
-                userProfile = userDoc.data();
-                await userRef.update({
-                    lastActive: firebase.firestore.FieldValue.serverTimestamp(),
-                    online: true
-                });
-            }
-            
-            updateProfileDisplay();
-        }
-
-        function updateProfileDisplay() {
-            if (userProfile) {
-                document.getElementById('profileName').textContent = userProfile.displayName;
-                document.getElementById('profileBio').textContent = userProfile.bio || 'No bio yet';
-                document.getElementById('profileLevel').textContent = `Level ${userProfile.level} Explorer`;
-                document.getElementById('profileChallenges').textContent = userProfile.challenges || completedChallenges.length;
-                document.getElementById('profileFriends').textContent = userProfile.friends?.length || 0;
-                document.getElementById('profileStreak').textContent = userProfile.streak || 0;
-                document.getElementById('profileAvatar').textContent = getInitials(userProfile.displayName);
-                document.getElementById('userLevel').textContent = `Level ${userProfile.level}`;
-                
-                // Enhanced profile elements
-                document.getElementById('enhancedProfileName').textContent = userProfile.displayName;
-                document.getElementById('enhancedProfileBio').textContent = userProfile.bio || 'Challenge enthusiast';
-                document.getElementById('profileTokensDisplay').textContent = userProfile.tokens || '0';
-                document.getElementById('profileLevelDisplay').textContent = `Level ${userProfile.level || 1}`;
-                document.getElementById('profileStreakDisplay').textContent = userProfile.streak || '0';
-                document.getElementById('profileInitials').textContent = getInitials(userProfile.displayName);
-            }
-        }
-
-        async function updateOnlineStatus(online) {
-            if (currentUser) {
-                try {
-                    await db.collection('users').doc(currentUser.uid).update({
-                        online: online,
-                        lastActive: firebase.firestore.FieldValue.serverTimestamp()
-                    });
-                } catch (error) {
-                    console.error('Error updating online status:', error);
-                }
-            }
-        }
-
-        // Challenge System Functions
         function generateAIChallenge() {
             const categories = Object.keys(challengeCategories);
             const selectedCategory = categories[Math.floor(Math.random() * categories.length)];
@@ -2232,12 +1923,7 @@
         }
 
         function initializeChallenges() {
-            availableChallenges = [
-                generateAIChallenge(),
-                generateAIChallenge(),
-                generateAIChallenge()
-            ];
-            
+            availableChallenges = [generateAIChallenge()];
             displayCurrentChallenge();
         }
 
@@ -2252,24 +1938,9 @@
             document.getElementById('challengeDuration').textContent = challenge.duration;
             document.getElementById('challengeTokens').textContent = challenge.tokens;
             document.getElementById('aiReason').textContent = challenge.aiReason;
-            
-            // Update category badge color
-            const categoryBadge = document.getElementById('challengeCategory');
-            if (categoryBadge) {
-                categoryBadge.style.background = challenge.categoryInfo.color;
-                categoryBadge.style.color = 'white';
-            }
-            
-            // Update hashtags
-            const hashtagsContainer = document.getElementById('challengeHashtags');
-            if (hashtagsContainer) {
-                hashtagsContainer.innerHTML = challenge.hashtags.map(tag => 
-                    `<span class="hashtag" style="border-color: ${challenge.categoryInfo.color};">${tag}</span>`
-                ).join('');
-            }
         }
 
-        function nextChallenge() {
+        window.nextChallenge = function() {
             currentChallengeIndex = (currentChallengeIndex + 1) % availableChallenges.length;
             
             if (currentChallengeIndex === 0) {
@@ -2280,214 +1951,86 @@
             showToast('🎯 New AI-generated challenge loaded!', 'success');
         }
 
-        function refreshChallenges() {
-            availableChallenges = [
-                generateAIChallenge(),
-                generateAIChallenge(),
-                generateAIChallenge()
-            ];
+        window.refreshChallenges = function() {
+            availableChallenges = [generateAIChallenge()];
             currentChallengeIndex = 0;
             displayCurrentChallenge();
-            
             showToast('✨ Fresh challenges generated by AI!', 'success');
         }
 
-        function submitChallengeProof() {
-            showModal('challengeSubmission');
-        }
-
-        function showChallengeGallery() {
-            showModal('challengeGallery');
-            populateChallengeGallery();
-        }
-
-        function populateChallengeGallery() {
-            const container = document.getElementById('challengeGalleryContent');
-            
-            if (completedChallenges.length === 0) {
-                container.innerHTML = `
-                    <div style="text-align: center; padding: 40px 20px; color: var(--text-secondary);">
-                        <div style="font-size: 48px; margin-bottom: 15px;">📸</div>
-                        <div style="font-size: 16px; margin-bottom: 8px;">No completed challenges yet</div>
-                        <div style="font-size: 12px;">Complete challenges and submit proof to build your gallery!</div>
-                    </div>
-                `;
-                return;
+        // UI Functions
+        window.showModal = function(id) {
+            const modal = document.getElementById(id + 'Modal');
+            if (modal) {
+                modal.classList.add('show');
             }
         }
 
-        function showChallengeLibrary() {
-            showModal('challengeLibrary');
-        }
-
-        function triggerFileUpload() {
-            document.getElementById('mediaUpload').click();
-        }
-
-        function handleFileUpload(event) {
-            const file = event.target.files[0];
-            if (!file) return;
-            
-            currentUploadedFile = file;
-            
-            const uploadArea = document.getElementById('uploadArea');
-            uploadArea.classList.add('has-file');
-            uploadArea.querySelector('.upload-content').innerHTML = `
-                <div style="font-size: 32px; margin-bottom: 10px; color: var(--success-green);">✅</div>
-                <div style="font-size: 14px; font-weight: 600; margin-bottom: 5px;">File Selected</div>
-                <div style="font-size: 11px; color: var(--text-secondary);">${file.name}</div>
-            `;
-            
-            showToast('📎 Media uploaded successfully!', 'success');
-        }
-
-        function submitChallenge() {
-            const story = document.getElementById('challengeStory').value.trim();
-            
-            if (!currentUploadedFile) {
-                showToast('Please upload a photo or video first!', 'error');
-                return;
+        window.hideModal = function(id) {
+            const modal = document.getElementById(id + 'Modal');
+            if (modal) {
+                modal.classList.remove('show');
             }
-            
-            if (!story) {
-                showToast('Please describe your experience!', 'error');
-                return;
-            }
-            
-            showToast('🎉 Challenge submitted successfully!', 'success');
-            hideModal('challengeSubmission');
-            nextChallenge();
         }
 
-        // Friends System
-        async function loadFriends() {
-            if (!currentUser) return;
-            
-            try {
-                const usersSnapshot = await db.collection('users').get();
-                const allUsers = [];
-                
-                usersSnapshot.forEach(doc => {
-                    const userData = doc.data();
-                    if (userData.uid !== currentUser.uid) {
-                        allUsers.push(userData);
-                    }
+        window.showProfile = function() {
+            showModal('enhancedProfile');
+        }
+
+        window.showEnhancedProfile = function() {
+            showModal('enhancedProfile');
+        }
+
+        window.showFriends = function() {
+            showModal('friends');
+        }
+
+        window.showGroups = function() {
+            showModal('groups');
+        }
+
+        window.editEnhancedProfile = function() {
+            const newBio = prompt('Update your bio:', userProfile?.bio || '');
+            if (newBio !== null && userProfile) {
+                userProfile.bio = newBio;
+                updateProfileDisplay();
+                showToast('✅ Profile updated!', 'success');
+            }
+        }
+
+        window.uploadProfilePicture = function() {
+            showToast('📷 Profile picture upload coming soon!', 'info');
+        }
+
+        window.shareProfile = function() {
+            if (navigator.share) {
+                navigator.share({
+                    title: `Check out my JomBro Profile!`,
+                    text: `Level ${userProfile?.level} challenger!`,
+                    url: window.location.href
                 });
-                
-                friendsList = allUsers;
-                displayFriends();
-            } catch (error) {
-                console.error('Error loading friends:', error);
+            } else {
+                showToast('🔗 Profile sharing coming soon!', 'info');
             }
         }
 
-        function displayFriends() {
-            const friendsList_elem = document.getElementById('friendsList');
-            if (!friendsList_elem) return;
-            
-            let filteredFriends = friendsList;
-            
-            if (currentFriendsTab === 'online') {
-                filteredFriends = friendsList.filter(friend => friend.online);
+        window.viewFullStats = function() {
+            showToast('📊 Detailed stats coming soon!', 'info');
+        }
+
+        window.findFriends = function() {
+            showToast('🔍 Friend discovery coming soon!', 'info');
+        }
+
+        window.startChallenge = function() {
+            if (!chatOpen) {
+                toggleChat();
             }
-            
-            if (filteredFriends.length === 0) {
-                friendsList_elem.innerHTML = `
-                    <div class="text-center" style="padding: 40px 20px; color: var(--text-secondary);">
-                        <div style="font-size: 48px; margin-bottom: 15px;">👥</div>
-                        <div style="font-size: 16px; margin-bottom: 8px;">No friends yet</div>
-                        <div style="font-size: 12px;">Start connecting with other challengers!</div>
-                    </div>
-                `;
-                return;
-            }
-            
-            friendsList_elem.innerHTML = filteredFriends.map(friend => `
-                <div class="friend-item">
-                    <div class="friend-avatar">
-                        ${getInitials(friend.displayName)}
-                        <div class="friend-status ${friend.online ? 'online' : 'offline'}"></div>
-                    </div>
-                    <div class="friend-info">
-                        <div class="friend-name">${friend.displayName}</div>
-                        <div class="friend-activity">
-                            ${friend.online ? 'Online now' : 'Last seen recently'}
-                        </div>
-                    </div>
-                    <div class="friend-actions">
-                        <button class="friend-action-btn primary">💬</button>
-                        <button class="friend-action-btn secondary">🎯</button>
-                    </div>
-                </div>
-            `).join('');
-        }
-
-        function switchFriendsTab(tab) {
-            currentFriendsTab = tab;
-            
-            document.querySelectorAll('.friends-tab').forEach(tabEl => {
-                tabEl.classList.remove('active');
-            });
-            document.querySelector(`[onclick="switchFriendsTab('${tab}')"]`).classList.add('active');
-            
-            displayFriends();
-        }
-
-        function searchFriends(query) {
-            // Implementation for friend search
-        }
-
-        // Group System
-        function selectGroupIcon(icon) {
-            selectedGroupIcon = icon;
-            
-            document.querySelectorAll('.group-icon-option').forEach(el => {
-                el.style.background = 'rgba(255, 255, 255, 0.1)';
-                el.style.border = '2px solid transparent';
-            });
-            
-            event.target.style.background = 'rgba(255, 107, 157, 0.2)';
-            event.target.style.border = '2px solid var(--primary-pink)';
-        }
-
-        async function createGroup(event) {
-            event.preventDefault();
-            
-            const groupName = document.getElementById('groupName').value.trim();
-            const groupDescription = document.getElementById('groupDescription').value.trim();
-            
-            if (!groupName) {
-                showToast('Please enter a group name', 'error');
-                return;
-            }
-            
-            showToast(`🎉 Group "${groupName}" created successfully!`, 'success');
-            hideModal('group');
-            
-            // Reset form
-            document.getElementById('groupName').value = '';
-            document.getElementById('groupDescription').value = '';
-        }
-
-        async function loadGroups() {
-            // Implementation for loading groups
-        }
-
-        function displayGroups() {
-            const groupsList_elem = document.getElementById('groupsList');
-            if (!groupsList_elem) return;
-            
-            groupsList_elem.innerHTML = `
-                <div class="text-center" style="padding: 40px 20px; color: var(--text-secondary);">
-                    <div style="font-size: 48px; margin-bottom: 15px;">🏠</div>
-                    <div style="font-size: 16px; margin-bottom: 8px;">No groups yet</div>
-                    <div style="font-size: 12px;">Create your first group to start challenging with friends!</div>
-                </div>
-            `;
+            showToast('🚀 Challenge started! Invite your friends!', 'success');
         }
 
         // Chat Functions
-        function toggleChat() {
+        window.toggleChat = function() {
             chatOpen = !chatOpen;
             const chatInterface = document.getElementById('chatInterface');
             const chatToggle = document.getElementById('chatToggle');
@@ -2503,7 +2046,6 @@
         }
 
         function initializeChat() {
-            // Add demo message
             const chatMessages = document.getElementById('chatMessages');
             chatMessages.innerHTML = `
                 <div class="message system">
@@ -2514,7 +2056,7 @@
             `;
         }
 
-        function sendMessage() {
+        window.sendMessage = function() {
             const input = document.getElementById('chatInput');
             const text = input.value.trim();
             
@@ -2537,143 +2079,55 @@
             input.value = '';
         }
 
-        function handleChatKeyPress(event) {
+        window.handleChatKeyPress = function(event) {
             if (event.key === 'Enter') {
                 sendMessage();
             }
         }
 
-        // Live Users Functions
-        function initializeLiveUsers() {
-            // Demo implementation
-            document.getElementById('onlineCount').textContent = '3 online';
-        }
-
-        // UI Functions
-        function showModal(id) {
-            const modal = document.getElementById(id + 'Modal');
-            if (modal) {
-                modal.classList.add('show');
-                
-                if (id === 'friends') {
-                    loadFriends();
-                } else if (id === 'groups') {
-                    loadGroups();
-                }
-            }
-        }
-
-        function hideModal(id) {
-            const modal = document.getElementById(id + 'Modal');
-            if (modal) {
-                modal.classList.remove('show');
-            }
-        }
-
-        function showProfile() {
-            showModal('profile');
-            updateProfileDisplay();
-        }
-
-        function showEnhancedProfile() {
-            showModal('enhancedProfile');
-            updateProfileDisplay();
-        }
-
-        function showFriends() {
-            showModal('friends');
-        }
-
-        function showGroups() {
-            showModal('groups');
-        }
-
-        function showCreateGroup() {
-            hideModal('groups');
-            showModal('group');
-        }
-
-        function startChallenge() {
-            if (!chatOpen) {
-                toggleChat();
-            }
+        // Toast notification system
+        function showToast(message, type = 'info') {
+            const toast = document.createElement('div');
+            toast.textContent = message;
             
-            showToast('🚀 Challenge started! Invite your friends to join!', 'success');
+            Object.assign(toast.style, {
+                position: 'fixed',
+                top: '20px',
+                left: '50%',
+                transform: 'translateX(-50%)',
+                background: type === 'success' ? 'var(--success-green)' : 
+                           type === 'error' ? 'var(--error-red)' : 'var(--primary-pink)',
+                color: 'white',
+                padding: '12px 20px',
+                borderRadius: '10px',
+                zIndex: '4000',
+                fontSize: '14px',
+                fontWeight: '600',
+                opacity: '0',
+                transition: 'all 0.3s ease'
+            });
+            
+            document.body.appendChild(toast);
+            
+            setTimeout(() => {
+                toast.style.opacity = '1';
+                toast.style.transform = 'translateX(-50%) translateY(10px)';
+            }, 100);
+            
+            setTimeout(() => {
+                toast.style.opacity = '0';
+                setTimeout(() => {
+                    if (toast.parentNode) {
+                        toast.parentNode.removeChild(toast);
+                    }
+                }, 300);
+            }, 3000);
         }
 
-        function findFriends() {
-            showToast('🔍 Friend discovery feature coming soon!', 'info');
-        }
-
-        function editProfile() {
-            const newBio = prompt('Enter your new bio:', userProfile?.bio || '');
-            if (newBio !== null && userProfile) {
-                userProfile.bio = newBio;
-                updateProfileDisplay();
-                showToast('✅ Profile updated!', 'success');
-            }
-        }
-
-        function editEnhancedProfile() {
-            editProfile();
-        }
-
-        function uploadProfilePicture() {
-            showToast('📷 Profile picture upload coming soon!', 'info');
-        }
-
-        function shareProfile() {
-            if (navigator.share) {
-                navigator.share({
-                    title: `Check out my JomBro Profile!`,
-                    text: `Level ${userProfile?.level} challenger!`,
-                    url: window.location.href
-                });
-            } else {
-                showToast('🔗 Profile sharing coming soon!', 'info');
-            }
-        }
-
-        function viewFullStats() {
-            showToast('📊 Detailed stats coming soon!', 'info');
-        }
-
-        function changeProfilePicture() {
-            showToast('📷 Profile picture change coming soon!', 'info');
-        }
-
-        function showSettings() {
-            showToast('⚙️ Settings coming soon!', 'info');
-        }
-
-        function showAchievements() {
-            showToast('🏆 Achievements coming soon!', 'info');
-        }
-
-        function showStats() {
-            showToast('📊 Stats coming soon!', 'info');
-        }
-
-        // Utility Functions
-        function getInitials(name) {
-            if (!name) return 'A';
-            return name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
-        }
-
-        // Event Listeners
-        window.addEventListener('beforeunload', () => {
-            updateOnlineStatus(false);
-        });
-
-        document.addEventListener('visibilitychange', () => {
-            if (document.visibilityState === 'visible') {
-                updateOnlineStatus(true);
-            } else {
-                updateOnlineStatus(false);
-            }
-        });
-
-        console.log('🚀 JomBro Enhanced Social Platform Loaded!');
+        console.log('🚀 JomBro Authentication System Loaded Successfully!');
+        console.log('🔧 All authentication methods are now properly configured');
+        console.log('📱 Mobile-optimized with proper error handling');
+        
     </script>
 </body>
 </html>
