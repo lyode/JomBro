@@ -92,10 +92,11 @@
             opacity: 1;
         }
 
-        /* Space Background with Blinking Stars */
+        /* Enhanced Dark Sky with Dense Blinking Stars */
         .space-background {
-            background: radial-gradient(ellipse at bottom, #1b2735 0%, #090a0f 100%);
+            background: linear-gradient(180deg, #0c0c1d 0%, #161b33 30%, #1a1a2e 60%, #16213e 100%);
             position: relative;
+            overflow: hidden;
         }
 
         .stars {
@@ -105,14 +106,70 @@
             right: 0;
             bottom: 0;
             background-image: 
-                radial-gradient(2px 2px at 20px 30px, #eee, transparent),
-                radial-gradient(2px 2px at 40px 70px, rgba(255,255,255,0.8), transparent),
-                radial-gradient(1px 1px at 90px 40px, #fff, transparent),
-                radial-gradient(1px 1px at 130px 80px, rgba(255,255,255,0.6), transparent),
-                radial-gradient(2px 2px at 160px 30px, #eee, transparent);
+                /* Large bright stars */
+                radial-gradient(3px 3px at 15px 25px, #fff, transparent),
+                radial-gradient(2px 2px at 45px 15px, rgba(255,255,255,0.9), transparent),
+                radial-gradient(2px 2px at 85px 35px, #fff, transparent),
+                radial-gradient(3px 3px at 125px 55px, rgba(255,255,255,0.8), transparent),
+                radial-gradient(2px 2px at 165px 25px, #fff, transparent),
+                radial-gradient(3px 3px at 195px 65px, rgba(255,255,255,0.9), transparent),
+                
+                /* Medium stars */
+                radial-gradient(1.5px 1.5px at 30px 50px, rgba(255,255,255,0.7), transparent),
+                radial-gradient(1.5px 1.5px at 70px 80px, rgba(255,255,255,0.8), transparent),
+                radial-gradient(1.5px 1.5px at 110px 20px, rgba(255,255,255,0.6), transparent),
+                radial-gradient(1.5px 1.5px at 150px 75px, rgba(255,255,255,0.7), transparent),
+                radial-gradient(1.5px 1.5px at 180px 45px, rgba(255,255,255,0.8), transparent),
+                
+                /* Small twinkling stars */
+                radial-gradient(1px 1px at 25px 70px, rgba(255,255,255,0.5), transparent),
+                radial-gradient(1px 1px at 60px 30px, rgba(255,255,255,0.6), transparent),
+                radial-gradient(1px 1px at 95px 60px, rgba(255,255,255,0.4), transparent),
+                radial-gradient(1px 1px at 135px 40px, rgba(255,255,255,0.5), transparent),
+                radial-gradient(1px 1px at 175px 80px, rgba(255,255,255,0.6), transparent),
+                radial-gradient(1px 1px at 200px 20px, rgba(255,255,255,0.4), transparent),
+                
+                /* Distant stars layer */
+                radial-gradient(0.5px 0.5px at 10px 40px, rgba(255,255,255,0.3), transparent),
+                radial-gradient(0.5px 0.5px at 50px 65px, rgba(255,255,255,0.4), transparent),
+                radial-gradient(0.5px 0.5px at 90px 10px, rgba(255,255,255,0.2), transparent),
+                radial-gradient(0.5px 0.5px at 130px 85px, rgba(255,255,255,0.3), transparent),
+                radial-gradient(0.5px 0.5px at 170px 55px, rgba(255,255,255,0.3), transparent),
+                radial-gradient(0.5px 0.5px at 190px 30px, rgba(255,255,255,0.2), transparent);
             background-repeat: repeat;
-            background-size: 200px 100px;
-            animation: sparkle 3s linear infinite;
+            background-size: 220px 90px, 180px 120px, 240px 80px, 200px 100px;
+            animation: deepSparkle 4s ease-in-out infinite;
+        }
+
+        .stars::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-image: 
+                /* Extra scattered stars */
+                radial-gradient(1px 1px at 35px 15px, rgba(173, 216, 230, 0.6), transparent),
+                radial-gradient(1px 1px at 75px 45px, rgba(255, 182, 193, 0.5), transparent),
+                radial-gradient(1px 1px at 115px 75px, rgba(221, 160, 221, 0.4), transparent),
+                radial-gradient(1px 1px at 155px 25px, rgba(255, 255, 224, 0.6), transparent),
+                radial-gradient(1px 1px at 185px 65px, rgba(176, 196, 222, 0.5), transparent);
+            background-repeat: repeat;
+            background-size: 250px 110px;
+            animation: slowTwinkle 6s ease-in-out infinite;
+        }
+
+        @keyframes deepSparkle {
+            0%, 100% { opacity: 1; }
+            25% { opacity: 0.6; }
+            50% { opacity: 0.8; }
+            75% { opacity: 0.4; }
+        }
+
+        @keyframes slowTwinkle {
+            0%, 100% { opacity: 0.3; }
+            50% { opacity: 0.8; }
         }
 
         @keyframes sparkle {
@@ -882,81 +939,290 @@
         }
 
         .showcase-gallery {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            display: flex;
             gap: 12px;
-            max-height: 300px;
-            overflow-y: auto;
+            overflow-x: auto;
+            padding-bottom: 5px;
+            -webkit-overflow-scrolling: touch;
+            scrollbar-width: none;
+            -ms-overflow-style: none;
+        }
+
+        .showcase-gallery::-webkit-scrollbar {
+            display: none;
+        }
+
+        /* Compact Hall of Champions - Similar to Live Players */
+        .showcase-gallery {
+            display: flex;
+            gap: 12px;
+            overflow-x: auto;
+            padding-bottom: 5px;
+            max-height: none;
         }
 
         .showcase-item {
             position: relative;
-            aspect-ratio: 1;
+            flex-shrink: 0;
+            width: 60px;
+            height: auto;
             border-radius: 12px;
-            overflow: hidden;
+            overflow: visible;
             background: rgba(255, 255, 255, 0.05);
             backdrop-filter: blur(15px);
             border: 1px solid rgba(255, 255, 255, 0.1);
             cursor: pointer;
             transition: all 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+            padding: 8px 6px 12px 6px;
         }
 
         .showcase-item:hover {
             transform: scale(1.05) translateZ(2px);
             box-shadow: 0 8px 25px rgba(255, 107, 157, 0.3);
+            border-color: rgba(255, 107, 157, 0.4);
         }
 
-        .showcase-media {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
+        .showcase-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(45deg, var(--primary-pink), var(--primary-purple));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            margin-bottom: 6px;
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            animation: avatarPulse 2s ease-in-out infinite;
+            position: relative;
         }
 
-        .showcase-overlay {
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            background: linear-gradient(transparent, rgba(0, 0, 0, 0.8));
-            padding: 8px;
-            color: white;
-            font-size: 10px;
+        @keyframes avatarPulse {
+            0%, 100% { 
+                transform: scale(1);
+                box-shadow: 0 0 8px rgba(255, 107, 157, 0.3);
+            }
+            50% { 
+                transform: scale(1.05);
+                box-shadow: 0 0 15px rgba(255, 107, 157, 0.6);
+            }
+        }
+
+        .showcase-avatar.champion {
+            background: linear-gradient(45deg, #ffd700, #ffed4e);
+            box-shadow: 0 0 12px rgba(255, 215, 0, 0.5);
+        }
+
+        .showcase-avatar.winner {
+            background: linear-gradient(45deg, #c0c0c0, #e5e5e5);
+            box-shadow: 0 0 12px rgba(192, 192, 192, 0.5);
+        }
+
+        .showcase-avatar.achiever {
+            background: linear-gradient(45deg, #cd7f32, #e6a85c);
+            box-shadow: 0 0 12px rgba(205, 127, 50, 0.5);
+        }
+
+        .showcase-name {
+            font-size: 9px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 2px;
             text-align: center;
+            line-height: 1.2;
+            max-width: 50px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
         }
 
-        .success-badge {
+        .showcase-challenge {
+            font-size: 7px;
+            color: var(--text-secondary);
+            text-align: center;
+            margin-bottom: 3px;
+            opacity: 0.8;
+            max-width: 50px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .showcase-time {
+            font-size: 6px;
+            color: var(--success-green);
+            text-align: center;
+            background: rgba(16, 185, 129, 0.1);
+            padding: 1px 4px;
+            border-radius: 4px;
+        }
+
+        /* Success Badge - Smaller for compact view */
+        .success-badge-small {
             position: absolute;
-            top: 5px;
-            right: 5px;
-            width: 20px;
-            height: 20px;
+            top: 2px;
+            right: 2px;
+            width: 14px;
+            height: 14px;
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 10px;
+            font-size: 8px;
             font-weight: 700;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
         }
 
-        .success-badge.genius {
+        .success-badge-small.genius {
             background: linear-gradient(45deg, #ffd700, #ffed4e);
             color: #000;
         }
 
-        .success-badge.winner {
+        .success-badge-small.winner {
             background: linear-gradient(45deg, #c0c0c0, #e5e5e5);
             color: #000;
         }
 
-        .success-badge.achiever {
+        .success-badge-small.achiever {
             background: linear-gradient(45deg, #cd7f32, #e6a85c);
             color: #fff;
         }
 
-        .success-badge.excellence {
+        .success-badge-small.excellence {
             background: linear-gradient(45deg, #ff6b9d, #8b5cf6);
             color: #fff;
+        }
+
+        /* Compact Failure Gallery - Also smaller */
+        .failure-gallery {
+            display: flex;
+            gap: 10px;
+            overflow-x: auto;
+            padding-bottom: 5px;
+            -webkit-overflow-scrolling: touch;
+            scrollbar-width: none;
+            -ms-overflow-style: none;
+        }
+
+        .failure-gallery::-webkit-scrollbar {
+            display: none;
+        }
+
+        .failure-item {
+            background: rgba(239, 68, 68, 0.1);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            border-radius: 12px;
+            padding: 8px 6px 12px 6px;
+            text-align: center;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+            position: relative;
+            flex-shrink: 0;
+            width: 55px;
+            height: auto;
+        }
+
+        .failure-item:hover {
+            background: rgba(239, 68, 68, 0.15);
+            transform: translateY(-3px);
+            box-shadow: 0 5px 20px rgba(239, 68, 68, 0.3);
+        }
+
+        .failure-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: linear-gradient(45deg, var(--error-red), #dc2626);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            margin-bottom: 6px;
+            border: 2px solid rgba(239, 68, 68, 0.5);
+            animation: shameShake 3s ease-in-out infinite;
+        }
+
+        .failure-name {
+            font-size: 8px;
+            font-weight: 600;
+            color: var(--error-red);
+            margin-bottom: 2px;
+            max-width: 45px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .failure-consequence {
+            font-size: 7px;
+            color: var(--text-secondary);
+            text-align: center;
+            max-width: 45px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .failure-consequence-badge {
+            position: absolute;
+            top: 2px;
+            right: 2px;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: var(--error-red);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 6px;
+            animation: warningBlink 2s infinite;
+        }
+
+        /* Live Update Indicators - Smaller */
+        .live-update-indicator {
+            position: absolute;
+            top: -3px;
+            right: -3px;
+            width: 8px;
+            height: 8px;
+            background: var(--success-green);
+            border-radius: 50%;
+            animation: livePulse 1.5s ease-in-out infinite;
+            border: 1px solid rgba(15, 15, 15, 0.8);
+        }
+
+        @keyframes livePulse {
+            0%, 100% { 
+                transform: scale(1);
+                box-shadow: 0 0 3px rgba(16, 185, 129, 0.5);
+            }
+            50% { 
+                transform: scale(1.2);
+                box-shadow: 0 0 8px rgba(16, 185, 129, 0.8);
+            }
+        }
+
+        .new-entry {
+            animation: newEntryGlow 3s ease-out;
+        }
+
+        @keyframes newEntryGlow {
+            0% {
+                box-shadow: 0 0 30px rgba(255, 107, 157, 0.8);
+                transform: scale(1.1);
+            }
+            100% {
+                box-shadow: 0 0 0px rgba(255, 107, 157, 0);
+                transform: scale(1);
+            }
         }
 
         /* Challenge Proof Submission Modal */
@@ -2385,7 +2651,7 @@
             }
         }
 
-        // Initialize the proof system
+        // Initialize the proof system with live updates
         function initializeProofSystem() {
             updateSuccessShowcase();
             updateFailureShowcase();
@@ -2394,8 +2660,8 @@
             document.getElementById('galleryNotifications').textContent = successSubmissions.length;
             document.getElementById('failureNotifications').textContent = failureConsequences.length;
             
-            // Simulate random failures for demo
-            setInterval(simulateRandomFailures, 10000); // Every 10 seconds
+            // Initialize live update system
+            initializeLiveUpdates();
             
             // Add drag and drop support for proof upload
             const uploadArea = document.getElementById('proofUploadArea');
@@ -2419,6 +2685,11 @@
                     handleProofUpload(event);
                 }
             });
+            
+            console.log('🏆 Live Avatar Display System Activated!');
+            console.log('⭐ Hall of Champions: Real-time avatar updates');
+            console.log('🚨 Hall of Shame: Live failure tracking');
+            console.log('🌟 Dark Sky Background: Enhanced starfield activated');
         }
 
         // ===== EXISTING SYSTEM INTEGRATION =====
@@ -3215,10 +3486,12 @@
         // Initialize the app when DOM is ready
         document.addEventListener('DOMContentLoaded', function() {
             console.log('🚀 JomBro Enhanced Challenge Proof System Loaded!');
-            console.log('✨ New Features: Success Showcase, Failure Consequences, Title Awards');
-            console.log('🏆 Success Titles: Genius, Winner, Excellence, Achiever, Champion, Legend, Master, Innovator');
-            console.log('🚨 Failure Consequences: Wanted, Jailed, On Trial, Suspect, Banned, Walk of Shame');
-            console.log('📸 Upload proof photos/videos to earn prestigious titles!');
+            console.log('✨ New Features: Live Avatar Display, Real-time Updates');
+            console.log('🏆 Hall of Champions: Live avatar showcase with pulsing effects');
+            console.log('🚨 Hall of Shame: Real-time failure tracking with shaking avatars');
+            console.log('🌟 Enhanced Dark Sky: Dense starfield with multiple blinking layers');
+            console.log('⚡ Live Updates: Real-time notifications and gallery refreshes');
+            console.log('📸 Avatar System: Prominent user display with success/failure states');
         });
     </script>
 </body>
