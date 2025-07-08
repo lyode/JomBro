@@ -959,10 +959,6 @@
                     <button class="auth-btn facebook" id="facebookBtn">
                         📘 Continue with Facebook
                     </button>
-                    
-                    <button class="auth-btn test" id="testBtn">
-                        🧪 Test Mode (Skip Login)
-                    </button>
                 </div>
 
                 <!-- Email & Password Form -->
@@ -982,6 +978,15 @@
                 
                 <div style="margin-top: 20px; font-size: 12px; color: var(--text-secondary);">
                     By continuing, you agree to our Terms & Privacy Policy
+                </div>
+                
+                <div style="margin-top: 15px; padding: 15px; background: rgba(255, 255, 255, 0.05); border-radius: 12px; border: 1px solid rgba(255, 255, 255, 0.1);">
+                    <div style="font-size: 12px; font-weight: 600; color: var(--primary-pink); margin-bottom: 8px;">🧪 Demo Accounts Available:</div>
+                    <div style="font-size: 11px; color: var(--text-secondary); line-height: 1.4;">
+                        <strong>Email:</strong> demo@jombro.com / demo123<br>
+                        <strong>Email:</strong> admin@jombro.com / admin123<br>
+                        <strong>Google & Facebook:</strong> Random demo accounts
+                    </div>
                 </div>
             </div>
         </div>
@@ -1575,11 +1580,27 @@
         
         let isSignUpMode = false;
         
+        // Valid test accounts database - no auto-creation
         const testAccounts = {
             'admin@jombro.com': { password: 'admin123', name: 'Admin User', level: 10, tokens: 50000, isCreator: true },
-            'user@jombro.com': { password: 'user123', name: 'Demo User', level: 5, tokens: 2450 },
-            'test@jombro.com': { password: 'test123', name: 'Test User', level: 3, tokens: 1200 },
-            'creator@jombro.com': { password: 'creator123', name: 'Creator Pro', level: 15, tokens: 1000000, isCreator: true }
+            'demo@jombro.com': { password: 'demo123', name: 'Demo User', level: 5, tokens: 2450, isCreator: false },
+            'creator@jombro.com': { password: 'creator123', name: 'Creator Pro', level: 15, tokens: 1000000, isCreator: true },
+            'john@gmail.com': { password: 'john123', name: 'John Smith', level: 8, tokens: 12500, isCreator: false },
+            'sarah@outlook.com': { password: 'sarah123', name: 'Sarah Johnson', level: 6, tokens: 7800, isCreator: false }
+        };
+        
+        // Valid Google accounts
+        const googleAccounts = {
+            'user@gmail.com': { name: 'Google User', level: 4, tokens: 3200, isCreator: false },
+            'test.user@gmail.com': { name: 'Test User', level: 2, tokens: 850, isCreator: false },
+            'demo.account@gmail.com': { name: 'Demo Account', level: 7, tokens: 9600, isCreator: true }
+        };
+        
+        // Valid Facebook accounts
+        const facebookAccounts = {
+            'user@facebook.com': { name: 'Facebook User', level: 3, tokens: 1900, isCreator: false },
+            'fb.user@facebook.com': { name: 'FB User', level: 5, tokens: 4700, isCreator: false },
+            'social.user@facebook.com': { name: 'Social User', level: 6, tokens: 6300, isCreator: false }
         };
         
         function showEmailForm() {
@@ -1650,59 +1671,66 @@
             const btn = document.getElementById('submitBtn');
             const originalText = btn.innerHTML;
             btn.classList.add('loading');
-            btn.innerHTML = '<span>Signing in...</span>';
+            btn.innerHTML = '<span>Authenticating...</span>';
             btn.disabled = true;
             
             setTimeout(() => {
                 try {
                     if (isSignUpMode) {
-                        // Sign up mode
+                        // Sign up mode - check if email already exists
+                        if (testAccounts[email]) {
+                            throw new Error('An account with this email already exists! Please sign in instead.');
+                        }
+                        
+                        // Create new account (only for sign up)
                         const userName = email.split('@')[0].replace(/[^a-zA-Z0-9]/g, '');
-                        appState.updateUser({
+                        const newAccount = {
+                            password: password,
                             name: userName.charAt(0).toUpperCase() + userName.slice(1),
-                            email: email,
                             level: 1,
                             tokens: 500,
+                            isCreator: false
+                        };
+                        
+                        // Add to test accounts
+                        testAccounts[email] = newAccount;
+                        
+                        appState.updateUser({
+                            name: newAccount.name,
+                            email: email,
+                            level: newAccount.level,
+                            tokens: newAccount.tokens,
                             completedChallenges: 0,
                             xp: 0,
-                            isCreator: false
+                            isCreator: newAccount.isCreator
                         });
+                        
                         showMessage('✅ Account created successfully! Welcome bonus: 500 tokens!', 'success');
                         completeAuthentication();
                     } else {
-                        // Sign in mode
-                        if (testAccounts[email]) {
-                            const account = testAccounts[email];
-                            if (account.password === password) {
-                                appState.updateUser({
-                                    name: account.name,
-                                    email: email,
-                                    level: account.level,
-                                    tokens: account.tokens,
-                                    completedChallenges: Math.floor(account.level * 2.5),
-                                    xp: account.level * 1000 - 500,
-                                    isCreator: account.isCreator || false
-                                });
-                                showMessage('✅ Welcome back! Login successful!', 'success');
-                                completeAuthentication();
-                            } else {
-                                throw new Error('Incorrect password');
-                            }
-                        } else {
-                            // Auto-create account
-                            const userName = email.split('@')[0].replace(/[^a-zA-Z0-9]/g, '');
-                            appState.updateUser({
-                                name: userName.charAt(0).toUpperCase() + userName.slice(1),
-                                email: email,
-                                level: 1,
-                                tokens: 500,
-                                completedChallenges: 0,
-                                xp: 0,
-                                isCreator: false
-                            });
-                            showMessage('✅ New account created! Welcome bonus: 500 tokens!', 'success');
-                            completeAuthentication();
+                        // Sign in mode - must be existing account
+                        if (!testAccounts[email]) {
+                            throw new Error('Account not found! Please check your email or create a new account.');
                         }
+                        
+                        const account = testAccounts[email];
+                        if (account.password !== password) {
+                            throw new Error('Incorrect password! Please try again.');
+                        }
+                        
+                        // Successful login
+                        appState.updateUser({
+                            name: account.name,
+                            email: email,
+                            level: account.level,
+                            tokens: account.tokens,
+                            completedChallenges: Math.floor(account.level * 2.5),
+                            xp: account.level * 1000 - 500,
+                            isCreator: account.isCreator || false
+                        });
+                        
+                        showMessage('✅ Welcome back! Login successful!', 'success');
+                        completeAuthentication();
                     }
                 } catch (error) {
                     showMessage('❌ ' + error.message, 'error');
@@ -1714,45 +1742,61 @@
         }
 
         function signInWithGoogle() {
+            // Simulate Google OAuth flow
             showMessage('🔍 Connecting with Google...', 'info');
+            
             setTimeout(() => {
-                appState.updateUser({
-                    name: 'Google User',
-                    email: 'user@gmail.com',
-                    level: 3,
-                    tokens: 1500,
-                    isCreator: false
-                });
-                completeAuthentication();
-            }, 1500);
+                // Simulate selecting a Google account
+                const accountEmails = Object.keys(googleAccounts);
+                const randomEmail = accountEmails[Math.floor(Math.random() * accountEmails.length)];
+                const account = googleAccounts[randomEmail];
+                
+                if (account) {
+                    appState.updateUser({
+                        name: account.name,
+                        email: randomEmail,
+                        level: account.level,
+                        tokens: account.tokens,
+                        completedChallenges: Math.floor(account.level * 2.5),
+                        xp: account.level * 1000 - 500,
+                        isCreator: account.isCreator
+                    });
+                    
+                    showMessage(`✅ Welcome ${account.name}! Google sign-in successful!`, 'success');
+                    completeAuthentication();
+                } else {
+                    showMessage('❌ Google authentication failed. Please try again.', 'error');
+                }
+            }, 2000);
         }
 
         function signInWithFacebook() {
+            // Simulate Facebook OAuth flow
             showMessage('📘 Connecting with Facebook...', 'info');
+            
             setTimeout(() => {
-                appState.updateUser({
-                    name: 'Facebook User',
-                    email: 'user@facebook.com',
-                    level: 2,
-                    tokens: 800,
-                    isCreator: false
-                });
-                completeAuthentication();
-            }, 1500);
-        }
-
-        function signInAnonymously() {
-            showMessage('🧪 Entering test mode...', 'info');
-            setTimeout(() => {
-                appState.updateUser({
-                    name: 'Test User',
-                    email: 'test@jombro.com',
-                    level: 1,
-                    tokens: 100,
-                    isCreator: false
-                });
-                completeAuthentication();
-            }, 1000);
+                // Simulate selecting a Facebook account
+                const accountEmails = Object.keys(facebookAccounts);
+                const randomEmail = accountEmails[Math.floor(Math.random() * accountEmails.length)];
+                const account = facebookAccounts[randomEmail];
+                
+                if (account) {
+                    appState.updateUser({
+                        name: account.name,
+                        email: randomEmail,
+                        level: account.level,
+                        tokens: account.tokens,
+                        completedChallenges: Math.floor(account.level * 2.5),
+                        xp: account.level * 1000 - 500,
+                        isCreator: account.isCreator
+                    });
+                    
+                    showMessage(`✅ Welcome ${account.name}! Facebook sign-in successful!`, 'success');
+                    completeAuthentication();
+                } else {
+                    showMessage('❌ Facebook authentication failed. Please try again.', 'error');
+                }
+            }, 2000);
         }
 
         function completeAuthentication() {
@@ -3009,7 +3053,6 @@
             const emailBtn = document.getElementById('emailBtn');
             const googleBtn = document.getElementById('googleBtn');
             const facebookBtn = document.getElementById('facebookBtn');
-            const testBtn = document.getElementById('testBtn');
             const backBtn = document.getElementById('backBtn');
             const toggleBtn = document.getElementById('toggleBtn');
             const submitBtn = document.getElementById('submitBtn');
@@ -3018,7 +3061,6 @@
             if (emailBtn) emailBtn.addEventListener('click', showEmailForm);
             if (googleBtn) googleBtn.addEventListener('click', signInWithGoogle);
             if (facebookBtn) facebookBtn.addEventListener('click', signInWithFacebook);
-            if (testBtn) testBtn.addEventListener('click', signInAnonymously);
             if (backBtn) backBtn.addEventListener('click', showMainAuth);
             if (toggleBtn) toggleBtn.addEventListener('click', toggleEmailMode);
             if (submitBtn) submitBtn.addEventListener('click', signInWithEmail);
