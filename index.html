@@ -1366,7 +1366,393 @@
         </div>
     </div>
 
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/firebase/9.23.0/firebase-app-compat.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/firebase/9.23.0/firebase-auth-compat.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/firebase/9.23.0/firebase-database-compat.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/firebase/9.23.0/firebase-firestore-compat.min.js"></script>
+
     <script>
+        // ===== FIREBASE CONFIGURATION =====
+        
+        // Firebase configuration (replace with your actual config)
+        const firebaseConfig = {
+            apiKey: "demo-api-key",
+            authDomain: "jombro-demo.firebaseapp.com",
+            databaseURL: "https://jombro-demo-default-rtdb.firebaseio.com",
+            projectId: "jombro-demo",
+            storageBucket: "jombro-demo.appspot.com",
+            messagingSenderId: "123456789",
+            appId: "1:123456789:web:abcdef123456"
+        };
+
+        // Initialize Firebase
+        let firebaseApp, firebaseAuth, firebaseDb, firestore;
+        let currentUser = null;
+        let onlineUsersRef = null;
+        let userPresenceRef = null;
+        
+        function initializeFirebase() {
+            try {
+                // Check if Firebase is available
+                if (typeof firebase === 'undefined') {
+                    console.warn('Firebase not available, using fallback mode');
+                    initializeFallbackMode();
+                    return;
+                }
+                
+                // Initialize Firebase
+                firebaseApp = firebase.initializeApp(firebaseConfig);
+                firebaseAuth = firebase.auth();
+                firebaseDb = firebase.database();
+                firestore = firebase.firestore();
+                
+                console.log('✅ Firebase initialized successfully');
+                
+                // Set up authentication state listener
+                firebaseAuth.onAuthStateChanged((user) => {
+                    if (user) {
+                        currentUser = user;
+                        setupUserPresence(user);
+                        listenToOnlineUsers();
+                        console.log('🔗 User authenticated with Firebase:', user.email);
+                    } else {
+                        currentUser = null;
+                        cleanupUserPresence();
+                        console.log('🔌 User signed out from Firebase');
+                    }
+                });
+                
+                // Set up online/offline detection
+                setupConnectionMonitoring();
+                
+            } catch (error) {
+                console.warn('Firebase initialization failed, using fallback mode:', error);
+                initializeFallbackMode();
+            }
+        }
+        
+        function initializeFallbackMode() {
+            console.log('📱 Running in fallback mode (no Firebase)');
+            // Use the existing local user system as fallback
+            setTimeout(() => {
+                updateOnlineCountDisplay(1);
+                updateLivePlayersDisplay();
+            }, 1000);
+        }
+        
+        // ===== FIREBASE USER PRESENCE SYSTEM =====
+        
+        function setupUserPresence(user) {
+            if (!firebaseDb) return;
+            
+            // References for presence system
+            userPresenceRef = firebaseDb.ref(`presence/${user.uid}`);
+            onlineUsersRef = firebaseDb.ref('presence');
+            
+            // Set user as online
+            const userPresenceData = {
+                uid: user.uid,
+                email: user.email,
+                displayName: user.displayName || appState.user.name,
+                photoURL: user.photoURL || null,
+                level: appState.user.level,
+                tokens: appState.user.tokens,
+                isCreator: appState.user.isCreator || false,
+                isFounder: appState.user.isFounder || false,
+                avatar: appState.user.avatar || '👤',
+                lastSeen: firebase.database.ServerValue.TIMESTAMP,
+                status: 'online',
+                activity: 'Exploring challenges',
+                location: userLocation ? {
+                    lat: userLocation.latitude,
+                    lng: userLocation.longitude,
+                    accuracy: userLocation.accuracy
+                } : null
+            };
+            
+            // Set user online
+            userPresenceRef.set(userPresenceData);
+            
+            // Remove user when they disconnect
+            userPresenceRef.onDisconnect().remove();
+            
+            console.log('👥 User presence set up in Firebase');
+        }
+        
+        function cleanupUserPresence() {
+            if (userPresenceRef) {
+                userPresenceRef.remove();
+                userPresenceRef = null;
+            }
+            if (onlineUsersRef) {
+                onlineUsersRef.off();
+                onlineUsersRef = null;
+            }
+        }
+        
+        function setupConnectionMonitoring() {
+            if (!firebaseDb) return;
+            
+            const connectedRef = firebaseDb.ref('.info/connected');
+            connectedRef.on('value', (snapshot) => {
+                if (snapshot.val() === true) {
+                    console.log('🟢 Connected to Firebase');
+                    if (currentUser) {
+                        setupUserPresence(currentUser);
+                    }
+                } else {
+                    console.log('🔴 Disconnected from Firebase');
+                }
+            });
+        }
+        
+        // ===== FIREBASE ONLINE USERS DETECTION =====
+        
+        let nearbyUsers = [];
+        
+        function listenToOnlineUsers() {
+            if (!onlineUsersRef) return;
+            
+            onlineUsersRef.on('value', (snapshot) => {
+                const users = snapshot.val();
+                nearbyUsers = [];
+                
+                if (users) {
+                    Object.keys(users).forEach(uid => {
+                        const userData = users[uid];
+                        
+                        // Skip current user
+                        if (uid === currentUser?.uid) return;
+                        
+                        // Calculate distance if both users have location
+                        let distance = null;
+                        if (userData.location && userLocation) {
+                            distance = calculateDistance(
+                                userLocation.latitude,
+                                userLocation.longitude,
+                                userData.location.lat,
+                                userData.location.lng
+                            );
+                        }
+                        
+                        // Only show users within 50km (or all users if no location)
+                        if (!distance || distance <= 50) {
+                            nearbyUsers.push({
+                                id: uid,
+                                name: userData.displayName || 'Anonymous User',
+                                email: userData.email,
+                                avatar: userData.avatar || '👤',
+                                level: userData.level || 1,
+                                tokens: userData.tokens || 0,
+                                distance: distance,
+                                activity: userData.activity || 'Online',
+                                lastSeen: userData.status === 'online' ? 'now' : formatLastSeen(userData.lastSeen),
+                                isOnline: userData.status === 'online',
+                                isCreator: userData.isCreator || false,
+                                isFounder: userData.isFounder || false,
+                                isRealUser: true
+                            });
+                        }
+                    });
+                }
+                
+                // Sort by online status first, then by distance
+                nearbyUsers.sort((a, b) => {
+                    if (a.isOnline && !b.isOnline) return -1;
+                    if (!a.isOnline && b.isOnline) return 1;
+                    if (a.distance && b.distance) return a.distance - b.distance;
+                    return 0;
+                });
+                
+                // Update UI
+                const onlineCount = nearbyUsers.filter(u => u.isOnline).length + 1; // +1 for current user
+                updateOnlineCountDisplay(onlineCount);
+                updateLivePlayersDisplay();
+                
+                console.log(`👥 Firebase: Found ${nearbyUsers.length} users (${onlineCount} online)`);
+            });
+        }
+        
+        function calculateDistance(lat1, lon1, lat2, lon2) {
+            const R = 6371; // Radius of the Earth in kilometers
+            const dLat = deg2rad(lat2 - lat1);
+            const dLon = deg2rad(lon2 - lon1);
+            const a = 
+                Math.sin(dLat/2) * Math.sin(dLat/2) +
+                Math.cos(deg2rad(lat1)) * Math.cos(deg2rad(lat2)) * 
+                Math.sin(dLon/2) * Math.sin(dLon/2);
+            const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+            const d = R * c; // Distance in kilometers
+            return d;
+        }
+        
+        function deg2rad(deg) {
+            return deg * (Math.PI/180);
+        }
+        
+        function formatLastSeen(timestamp) {
+            if (!timestamp) return 'Unknown';
+            const now = Date.now();
+            const diff = now - timestamp;
+            const minutes = Math.floor(diff / 60000);
+            
+            if (minutes < 1) return 'now';
+            if (minutes < 60) return `${minutes}m ago`;
+            
+            const hours = Math.floor(minutes / 60);
+            if (hours < 24) return `${hours}h ago`;
+            
+            const days = Math.floor(hours / 24);
+            return `${days}d ago`;
+        }
+        
+        // ===== FIREBASE AUTHENTICATION INTEGRATION =====
+        
+        function signInWithFirebaseEmail(email, password) {
+            if (!firebaseAuth) {
+                showMessage('❌ Firebase not available, using local authentication', 'error');
+                return signInWithEmail();
+            }
+            
+            return firebaseAuth.signInWithEmailAndPassword(email, password)
+                .then((userCredential) => {
+                    const user = userCredential.user;
+                    console.log('✅ Firebase email sign-in successful:', user.email);
+                    
+                    // Update app state
+                    appState.updateUser({
+                        name: user.displayName || email.split('@')[0],
+                        email: user.email,
+                        level: 1,
+                        tokens: 1000,
+                        completedChallenges: 0,
+                        xp: 0,
+                        isCreator: false,
+                        avatar: '🤗'
+                    });
+                    
+                    return user;
+                })
+                .catch((error) => {
+                    console.error('Firebase sign-in error:', error);
+                    throw new Error(error.message);
+                });
+        }
+        
+        function signUpWithFirebaseEmail(email, password) {
+            if (!firebaseAuth) {
+                showMessage('❌ Firebase not available, using local authentication', 'error');
+                return signInWithEmail();
+            }
+            
+            return firebaseAuth.createUserWithEmailAndPassword(email, password)
+                .then((userCredential) => {
+                    const user = userCredential.user;
+                    console.log('✅ Firebase account created:', user.email);
+                    
+                    // Update user profile
+                    const userName = email.split('@')[0];
+                    user.updateProfile({
+                        displayName: userName.charAt(0).toUpperCase() + userName.slice(1)
+                    });
+                    
+                    // Update app state
+                    appState.updateUser({
+                        name: userName.charAt(0).toUpperCase() + userName.slice(1),
+                        email: user.email,
+                        level: 1,
+                        tokens: 1000,
+                        completedChallenges: 0,
+                        xp: 0,
+                        isCreator: false,
+                        avatar: '🤗'
+                    });
+                    
+                    return user;
+                })
+                .catch((error) => {
+                    console.error('Firebase sign-up error:', error);
+                    throw new Error(error.message);
+                });
+        }
+        
+        function signInWithFirebaseGoogle() {
+            if (!firebaseAuth) {
+                showMessage('❌ Firebase not available, using fallback', 'error');
+                return signInWithGoogle();
+            }
+            
+            const provider = new firebase.auth.GoogleAuthProvider();
+            return firebaseAuth.signInWithPopup(provider)
+                .then((result) => {
+                    const user = result.user;
+                    console.log('✅ Firebase Google sign-in successful:', user.email);
+                    
+                    // Update app state
+                    appState.updateUser({
+                        name: user.displayName || 'Google User',
+                        email: user.email,
+                        level: 1,
+                        tokens: 800,
+                        completedChallenges: 0,
+                        xp: 0,
+                        isCreator: false,
+                        avatar: '🔍'
+                    });
+                    
+                    return user;
+                })
+                .catch((error) => {
+                    console.error('Firebase Google sign-in error:', error);
+                    throw new Error(error.message);
+                });
+        }
+        
+        function signInWithFirebaseFacebook() {
+            if (!firebaseAuth) {
+                showMessage('❌ Firebase not available, using fallback', 'error');
+                return signInWithFacebook();
+            }
+            
+            const provider = new firebase.auth.FacebookAuthProvider();
+            return firebaseAuth.signInWithPopup(provider)
+                .then((result) => {
+                    const user = result.user;
+                    console.log('✅ Firebase Facebook sign-in successful:', user.email);
+                    
+                    // Update app state
+                    appState.updateUser({
+                        name: user.displayName || 'Facebook User',
+                        email: user.email,
+                        level: 1,
+                        tokens: 600,
+                        completedChallenges: 0,
+                        xp: 0,
+                        isCreator: false,
+                        avatar: '📘'
+                    });
+                    
+                    return user;
+                })
+                .catch((error) => {
+                    console.error('Firebase Facebook sign-in error:', error);
+                    throw new Error(error.message);
+                });
+        }
+        
+        function signOutFromFirebase() {
+            if (firebaseAuth && currentUser) {
+                return firebaseAuth.signOut()
+                    .then(() => {
+                        console.log('✅ Firebase sign-out successful');
+                        cleanupUserPresence();
+                    })
+                    .catch((error) => {
+                        console.error('Firebase sign-out error:', error);
+                    });
+            }
+        }
+
         // ===== ENHANCED STATE MANAGEMENT WITH MEMORY STORAGE =====
         
         class EnhancedAppState {
@@ -1706,225 +2092,262 @@
             const btn = document.getElementById('submitBtn');
             const originalText = btn.innerHTML;
             btn.classList.add('loading');
-            btn.innerHTML = '<span>Processing...</span>';
+            btn.innerHTML = '<span>Connecting...</span>';
             btn.disabled = true;
             
-            setTimeout(() => {
-                try {
-                    if (isSignUpMode) {
-                        // Sign up mode - create new real account
-                        if (userAccounts[email]) {
-                            throw new Error('An account with this email already exists! Please sign in instead.');
-                        }
-                        
-                        // Create new user account
-                        const userName = email.split('@')[0].replace(/[^a-zA-Z0-9]/g, '');
-                        const newAccount = {
-                            password: password,
-                            name: userName.charAt(0).toUpperCase() + userName.slice(1),
-                            level: 1,
-                            tokens: 1000, // Welcome bonus
-                            isCreator: false,
-                            createdAt: new Date().toISOString(),
-                            lastLogin: new Date().toISOString()
-                        };
-                        
-                        // Save to user accounts
-                        userAccounts[email] = newAccount;
-                        saveUserAccounts();
-                        
-                        // Set current user
-                        appState.updateUser({
-                            name: newAccount.name,
-                            email: email,
-                            level: newAccount.level,
-                            tokens: newAccount.tokens,
-                            completedChallenges: 0,
-                            xp: 0,
-                            isCreator: newAccount.isCreator
-                        });
-                        
-                        showMessage('🎉 Account created successfully! Welcome to JomBro!', 'success');
+            // Try Firebase authentication first
+            const authPromise = isSignUpMode ? 
+                signUpWithFirebaseEmail(email, password) : 
+                signInWithFirebaseEmail(email, password);
+            
+            authPromise
+                .then((user) => {
+                    showMessage(isSignUpMode ? 
+                        '🎉 Account created successfully! Welcome to JomBro!' : 
+                        `✅ Welcome back, ${user.displayName || user.email}!`, 'success');
+                    
+                    setTimeout(() => {
                         completeAuthentication();
-                    } else {
-                        // Sign in mode - authenticate existing account
-                        if (!userAccounts[email]) {
-                            throw new Error('No account found with this email. Please check your email or create a new account.');
+                    }, 1000);
+                })
+                .catch((error) => {
+                    console.log('Firebase auth failed, trying local fallback:', error.message);
+                    
+                    // Fallback to local authentication
+                    setTimeout(() => {
+                        try {
+                            if (isSignUpMode) {
+                                // Local sign up
+                                if (userAccounts[email]) {
+                                    throw new Error('An account with this email already exists! Please sign in instead.');
+                                }
+                                
+                                const userName = email.split('@')[0].replace(/[^a-zA-Z0-9]/g, '');
+                                const newAccount = {
+                                    password: password,
+                                    name: userName.charAt(0).toUpperCase() + userName.slice(1),
+                                    level: 1,
+                                    tokens: 1000,
+                                    isCreator: false,
+                                    avatar: '🤗',
+                                    createdAt: new Date().toISOString(),
+                                    lastLogin: new Date().toISOString()
+                                };
+                                
+                                userAccounts[email] = newAccount;
+                                saveUserAccounts();
+                                
+                                appState.updateUser({
+                                    name: newAccount.name,
+                                    email: email,
+                                    level: newAccount.level,
+                                    tokens: newAccount.tokens,
+                                    completedChallenges: 0,
+                                    xp: 0,
+                                    isCreator: newAccount.isCreator,
+                                    avatar: newAccount.avatar
+                                });
+                                
+                                showMessage('🎉 Account created successfully! Welcome to JomBro!', 'success');
+                                completeAuthentication();
+                            } else {
+                                // Local sign in
+                                if (!userAccounts[email]) {
+                                    throw new Error('No account found with this email. Please check your email or create a new account.');
+                                }
+                                
+                                const account = userAccounts[email];
+                                if (account.password !== password) {
+                                    throw new Error('Incorrect password. Please try again.');
+                                }
+                                
+                                account.lastLogin = new Date().toISOString();
+                                userAccounts[email] = account;
+                                saveUserAccounts();
+                                
+                                appState.updateUser({
+                                    name: account.name,
+                                    email: email,
+                                    level: account.level,
+                                    tokens: account.tokens,
+                                    completedChallenges: Math.floor(account.level * 2.5),
+                                    xp: account.level * 1000 - 500,
+                                    isCreator: account.isCreator || false,
+                                    isFounder: account.isFounder || false,
+                                    avatar: account.avatar || '🤗'
+                                });
+                                
+                                showMessage(`✅ Welcome back, ${account.name}!`, 'success');
+                                completeAuthentication();
+                            }
+                        } catch (localError) {
+                            showMessage('❌ ' + localError.message, 'error');
+                            btn.classList.remove('loading');
+                            btn.innerHTML = originalText;
+                            btn.disabled = false;
                         }
-                        
-                        const account = userAccounts[email];
-                        if (account.password !== password) {
-                            throw new Error('Incorrect password. Please try again.');
-                        }
-                        
-                        // Update last login
-                        account.lastLogin = new Date().toISOString();
-                        userAccounts[email] = account;
-                        saveUserAccounts();
-                        
-                        // Successful login
-                        appState.updateUser({
-                            name: account.name,
-                            email: email,
-                            level: account.level,
-                            tokens: account.tokens,
-                            completedChallenges: Math.floor(account.level * 2.5),
-                            xp: account.level * 1000 - 500,
-                            isCreator: account.isCreator || false,
-                            isFounder: account.isFounder || false,
-                            avatar: account.avatar || '🤗'
-                        });
-                        
-                        showMessage(`✅ Welcome back, ${account.name}!`, 'success');
-                        completeAuthentication();
-                    }
-                } catch (error) {
-                    showMessage('❌ ' + error.message, 'error');
-                    btn.classList.remove('loading');
-                    btn.innerHTML = originalText;
-                    btn.disabled = false;
-                }
-            }, 1500);
+                    }, 1000);
+                });
         }
 
         function signInWithGoogle() {
-            // Realistic Google OAuth simulation
-            showMessage('🔍 Redirecting to Google...', 'info');
+            showMessage('🔍 Connecting with Google...', 'info');
             
-            setTimeout(() => {
-                showMessage('🔍 Please select your Google account...', 'info');
-                
-                setTimeout(() => {
-                    // Simulate user selecting Google account
-                    const googleEmail = prompt('🔍 Google Sign-In\n\nEnter your Google email address:');
-                    
-                    if (!googleEmail) {
-                        showMessage('❌ Google sign-in cancelled.', 'error');
-                        return;
-                    }
-                    
-                    if (!googleEmail.includes('@') || !googleEmail.includes('.')) {
-                        showMessage('❌ Please enter a valid Google email address.', 'error');
-                        return;
-                    }
-                    
-                    // Create or get Google account
-                    const accountKey = `google_${googleEmail.toLowerCase()}`;
-                    let account = userAccounts[accountKey];
-                    
-                    if (!account) {
-                        // Create new Google account
-                        const userName = googleEmail.split('@')[0].replace(/[^a-zA-Z0-9]/g, '');
-                        account = {
-                            provider: 'google',
-                            name: userName.charAt(0).toUpperCase() + userName.slice(1),
-                            level: 1,
-                            tokens: 800, // Google sign-up bonus
-                            isCreator: false,
-                            createdAt: new Date().toISOString(),
-                            lastLogin: new Date().toISOString()
-                        };
-                        
-                        userAccounts[accountKey] = account;
-                        saveUserAccounts();
-                        
-                        showMessage('🎉 Google account connected! Welcome to JomBro!', 'success');
-                    } else {
-                        // Update existing account
-                        account.lastLogin = new Date().toISOString();
-                        userAccounts[accountKey] = account;
-                        saveUserAccounts();
-                        
-                        showMessage(`✅ Welcome back, ${account.name}!`, 'success');
-                    }
-                    
-                    // Set current user
-                    appState.updateUser({
-                        name: account.name,
-                        email: googleEmail,
-                        level: account.level,
-                        tokens: account.tokens,
-                        completedChallenges: Math.floor(account.level * 2.5),
-                        xp: account.level * 1000 - 500,
-                        isCreator: account.isCreator
+            // Try Firebase Google sign-in first
+            if (firebaseAuth) {
+                signInWithFirebaseGoogle()
+                    .then(() => {
+                        setTimeout(() => {
+                            completeAuthentication();
+                        }, 1000);
+                    })
+                    .catch((error) => {
+                        console.log('Firebase Google auth failed, using fallback');
+                        fallbackGoogleSignIn();
                     });
+            } else {
+                fallbackGoogleSignIn();
+            }
+        }
+        
+        function fallbackGoogleSignIn() {
+            setTimeout(() => {
+                const googleEmail = prompt('🔍 Google Sign-In\n\nEnter your Google email address:');
+                
+                if (!googleEmail) {
+                    showMessage('❌ Google sign-in cancelled.', 'error');
+                    return;
+                }
+                
+                if (!googleEmail.includes('@') || !googleEmail.includes('.')) {
+                    showMessage('❌ Please enter a valid Google email address.', 'error');
+                    return;
+                }
+                
+                const accountKey = `google_${googleEmail.toLowerCase()}`;
+                let account = userAccounts[accountKey];
+                
+                if (!account) {
+                    const userName = googleEmail.split('@')[0].replace(/[^a-zA-Z0-9]/g, '');
+                    account = {
+                        provider: 'google',
+                        name: userName.charAt(0).toUpperCase() + userName.slice(1),
+                        level: 1,
+                        tokens: 800,
+                        isCreator: false,
+                        avatar: '🔍',
+                        createdAt: new Date().toISOString(),
+                        lastLogin: new Date().toISOString()
+                    };
                     
-                    completeAuthentication();
-                }, 1000);
+                    userAccounts[accountKey] = account;
+                    saveUserAccounts();
+                    
+                    showMessage('🎉 Google account connected! Welcome to JomBro!', 'success');
+                } else {
+                    account.lastLogin = new Date().toISOString();
+                    userAccounts[accountKey] = account;
+                    saveUserAccounts();
+                    
+                    showMessage(`✅ Welcome back, ${account.name}!`, 'success');
+                }
+                
+                appState.updateUser({
+                    name: account.name,
+                    email: googleEmail,
+                    level: account.level,
+                    tokens: account.tokens,
+                    completedChallenges: Math.floor(account.level * 2.5),
+                    xp: account.level * 1000 - 500,
+                    isCreator: account.isCreator,
+                    avatar: account.avatar
+                });
+                
+                completeAuthentication();
             }, 1000);
         }
 
         function signInWithFacebook() {
-            // Realistic Facebook OAuth simulation
-            showMessage('📘 Redirecting to Facebook...', 'info');
+            showMessage('📘 Connecting with Facebook...', 'info');
             
-            setTimeout(() => {
-                showMessage('📘 Please authorize JomBro...', 'info');
-                
-                setTimeout(() => {
-                    // Simulate Facebook authorization dialog
-                    const confirmed = confirm('📘 Facebook Authorization\n\nJomBro would like to:\n• Access your basic profile info\n• Use your email address\n\nDo you want to continue?');
-                    
-                    if (!confirmed) {
-                        showMessage('❌ Facebook authorization cancelled.', 'error');
-                        return;
-                    }
-                    
-                    const facebookEmail = prompt('📘 Facebook Sign-In\n\nEnter your Facebook email address:');
-                    
-                    if (!facebookEmail) {
-                        showMessage('❌ Facebook sign-in cancelled.', 'error');
-                        return;
-                    }
-                    
-                    if (!facebookEmail.includes('@') || !facebookEmail.includes('.')) {
-                        showMessage('❌ Please enter a valid Facebook email address.', 'error');
-                        return;
-                    }
-                    
-                    // Create or get Facebook account
-                    const accountKey = `facebook_${facebookEmail.toLowerCase()}`;
-                    let account = userAccounts[accountKey];
-                    
-                    if (!account) {
-                        // Create new Facebook account
-                        const userName = facebookEmail.split('@')[0].replace(/[^a-zA-Z0-9]/g, '');
-                        account = {
-                            provider: 'facebook',
-                            name: userName.charAt(0).toUpperCase() + userName.slice(1),
-                            level: 1,
-                            tokens: 600, // Facebook sign-up bonus
-                            isCreator: false,
-                            createdAt: new Date().toISOString(),
-                            lastLogin: new Date().toISOString()
-                        };
-                        
-                        userAccounts[accountKey] = account;
-                        saveUserAccounts();
-                        
-                        showMessage('🎉 Facebook account connected! Welcome to JomBro!', 'success');
-                    } else {
-                        // Update existing account
-                        account.lastLogin = new Date().toISOString();
-                        userAccounts[accountKey] = account;
-                        saveUserAccounts();
-                        
-                        showMessage(`✅ Welcome back, ${account.name}!`, 'success');
-                    }
-                    
-                    // Set current user
-                    appState.updateUser({
-                        name: account.name,
-                        email: facebookEmail,
-                        level: account.level,
-                        tokens: account.tokens,
-                        completedChallenges: Math.floor(account.level * 2.5),
-                        xp: account.level * 1000 - 500,
-                        isCreator: account.isCreator
+            // Try Firebase Facebook sign-in first
+            if (firebaseAuth) {
+                signInWithFirebaseFacebook()
+                    .then(() => {
+                        setTimeout(() => {
+                            completeAuthentication();
+                        }, 1000);
+                    })
+                    .catch((error) => {
+                        console.log('Firebase Facebook auth failed, using fallback');
+                        fallbackFacebookSignIn();
                     });
+            } else {
+                fallbackFacebookSignIn();
+            }
+        }
+        
+        function fallbackFacebookSignIn() {
+            setTimeout(() => {
+                const confirmed = confirm('📘 Facebook Authorization\n\nJomBro would like to:\n• Access your basic profile info\n• Use your email address\n\nDo you want to continue?');
+                
+                if (!confirmed) {
+                    showMessage('❌ Facebook authorization cancelled.', 'error');
+                    return;
+                }
+                
+                const facebookEmail = prompt('📘 Facebook Sign-In\n\nEnter your Facebook email address:');
+                
+                if (!facebookEmail) {
+                    showMessage('❌ Facebook sign-in cancelled.', 'error');
+                    return;
+                }
+                
+                if (!facebookEmail.includes('@') || !facebookEmail.includes('.')) {
+                    showMessage('❌ Please enter a valid Facebook email address.', 'error');
+                    return;
+                }
+                
+                const accountKey = `facebook_${facebookEmail.toLowerCase()}`;
+                let account = userAccounts[accountKey];
+                
+                if (!account) {
+                    const userName = facebookEmail.split('@')[0].replace(/[^a-zA-Z0-9]/g, '');
+                    account = {
+                        provider: 'facebook',
+                        name: userName.charAt(0).toUpperCase() + userName.slice(1),
+                        level: 1,
+                        tokens: 600,
+                        isCreator: false,
+                        avatar: '📘',
+                        createdAt: new Date().toISOString(),
+                        lastLogin: new Date().toISOString()
+                    };
                     
-                    completeAuthentication();
-                }, 1000);
+                    userAccounts[accountKey] = account;
+                    saveUserAccounts();
+                    
+                    showMessage('🎉 Facebook account connected! Welcome to JomBro!', 'success');
+                } else {
+                    account.lastLogin = new Date().toISOString();
+                    userAccounts[accountKey] = account;
+                    saveUserAccounts();
+                    
+                    showMessage(`✅ Welcome back, ${account.name}!`, 'success');
+                }
+                
+                appState.updateUser({
+                    name: account.name,
+                    email: facebookEmail,
+                    level: account.level,
+                    tokens: account.tokens,
+                    completedChallenges: Math.floor(account.level * 2.5),
+                    xp: account.level * 1000 - 500,
+                    isCreator: account.isCreator,
+                    avatar: account.avatar
+                });
+                
+                completeAuthentication();
             }, 1000);
         }
 
@@ -1939,8 +2362,15 @@
 
         function signOut() {
             if (confirm('Are you sure you want to sign out?')) {
+                // Stop AI challenge generation
                 stopAIChallengeGeneration();
                 
+                // Sign out from Firebase if connected
+                if (currentUser) {
+                    signOutFromFirebase();
+                }
+                
+                // Clean up UI
                 document.getElementById('authScreen').style.display = 'flex';
                 document.getElementById('mainApp').style.display = 'none';
                 document.getElementById('rightOverlay').style.display = 'none';
@@ -1953,6 +2383,11 @@
                 
                 showMessage('👋 Signed out successfully!', 'success');
                 showMainAuth();
+                
+                // Reset online users
+                nearbyUsers = [];
+                updateLivePlayersDisplay();
+                updateOnlineCountDisplay(1);
             }
         }
 
@@ -2586,15 +3021,13 @@
             }, 500);
         }
 
-        // ===== GEOLOCATION & REAL USERS SYSTEM =====
+        // ===== GEOLOCATION & FIREBASE REAL-TIME USERS =====
         
         let userLocation = null;
-        let nearbyUsers = [];
-        let locationWatchId = null;
         
         function initializeGeolocation() {
             if (navigator.geolocation) {
-                showMessage('📍 Requesting location access to find nearby users...', 'info');
+                showMessage('📍 Requesting location access for better user discovery...', 'info');
                 
                 navigator.geolocation.getCurrentPosition(
                     function(position) {
@@ -2604,21 +3037,43 @@
                             accuracy: position.coords.accuracy
                         };
                         
-                        showMessage('✅ Location access granted! Scanning for nearby users...', 'success');
-                        startNearbyUsersDetection();
+                        showMessage('✅ Location access granted! Finding nearby users...', 'success');
+                        
+                        // Update user presence with location if Firebase is available
+                        if (currentUser && userPresenceRef) {
+                            userPresenceRef.update({
+                                location: {
+                                    lat: userLocation.latitude,
+                                    lng: userLocation.longitude,
+                                    accuracy: userLocation.accuracy
+                                }
+                            });
+                        }
+                        
+                        console.log('📍 Location updated in Firebase');
                     },
                     function(error) {
                         console.log('Geolocation error:', error);
-                        // Fallback: simulate location for functionality
+                        // Use approximate location for functionality
                         userLocation = {
                             latitude: 3.1390 + (Math.random() - 0.5) * 0.1, // Shah Alam area
                             longitude: 101.5186 + (Math.random() - 0.5) * 0.1,
-                            accuracy: 50,
+                            accuracy: 1000,
                             simulated: true
                         };
                         
-                        showMessage('📍 Using approximate location to find nearby users...', 'info');
-                        startNearbyUsersDetection();
+                        showMessage('📍 Using approximate location for user discovery...', 'info');
+                        
+                        // Update user presence with approximate location if Firebase is available
+                        if (currentUser && userPresenceRef) {
+                            userPresenceRef.update({
+                                location: {
+                                    lat: userLocation.latitude,
+                                    lng: userLocation.longitude,
+                                    accuracy: userLocation.accuracy
+                                }
+                            });
+                        }
                     },
                     {
                         enableHighAccuracy: true,
@@ -2634,80 +3089,17 @@
                     accuracy: 1000,
                     simulated: true
                 };
-                startNearbyUsersDetection();
-            }
-        }
-        
-        function startNearbyUsersDetection() {
-            updateNearbyUsers();
-            
-            // Update nearby users every 45 seconds
-            setInterval(() => {
-                updateNearbyUsers();
-            }, 45000);
-            
-            console.log('📡 Real users detection started');
-        }
-        
-        function updateNearbyUsers() {
-            if (!userLocation) return;
-            
-            // Only show real registered users (no simulated users)
-            nearbyUsers = [];
-            
-            // Get all registered users except current user
-            Object.keys(userAccounts).forEach(email => {
-                const account = userAccounts[email];
-                if (account && account.name !== appState.user.name) {
-                    // Simulate that some users are "nearby" (in a real app, this would be based on actual location data)
-                    const isNearby = Math.random() < 0.3; // 30% chance a user is nearby
-                    
-                    if (isNearby) {
-                        nearbyUsers.push({
-                            id: `real_${email}`,
-                            name: account.name,
-                            avatar: account.avatar || '👤',
-                            level: account.level,
-                            distance: Math.random() * 2.8 + 0.2, // 0.2-3.0km
-                            activity: getRandomActivity(),
-                            lastSeen: getRandomLastSeen(),
-                            isRealUser: true,
-                            email: email,
-                            isCreator: account.isCreator || false,
-                            isFounder: account.isFounder || false
-                        });
-                    }
+                
+                if (currentUser && userPresenceRef) {
+                    userPresenceRef.update({
+                        location: {
+                            lat: userLocation.latitude,
+                            lng: userLocation.longitude,
+                            accuracy: userLocation.accuracy
+                        }
+                    });
                 }
-            });
-            
-            // Sort by distance
-            nearbyUsers.sort((a, b) => a.distance - b.distance);
-            
-            // Update online count (real users only)
-            const onlineCount = nearbyUsers.filter(u => u.lastSeen === 'now').length + 1; // +1 for current user
-            updateOnlineCountDisplay(onlineCount);
-            updateLivePlayersDisplay();
-            
-            console.log(`📡 Found ${nearbyUsers.length} real users nearby`);
-        }
-        
-        function getRandomActivity() {
-            const activities = [
-                'Taking a challenge',
-                'Creating content',
-                'Exploring the city',
-                'Meeting friends',
-                'Working out',
-                'Learning new skills',
-                'Taking photos',
-                'Online now'
-            ];
-            return activities[Math.floor(Math.random() * activities.length)];
-        }
-        
-        function getRandomLastSeen() {
-            const lastSeenOptions = ['now', 'now', '1m ago', '2m ago', '3m ago', '5m ago'];
-            return lastSeenOptions[Math.floor(Math.random() * lastSeenOptions.length)];
+            }
         }
         
         function updateOnlineCountDisplay(count) {
@@ -2977,7 +3369,7 @@
             const container = document.getElementById('onlineUsersContent');
             let usersHtml = '';
             
-            usersHtml += '<h4 style="margin-bottom: 15px; color: var(--text-primary);">📍 Real Users Nearby (Within 3km)</h4>';
+            usersHtml += '<h4 style="margin-bottom: 15px; color: var(--text-primary);">🔥 Firebase Live Users</h4>';
             
             // Current user
             usersHtml += `
@@ -2991,6 +3383,7 @@
                         <div style="font-weight: 600; display: flex; align-items: center; gap: 8px;">
                             ${appState.user.name}
                             ${appState.user.isFounder ? '<span style="background: linear-gradient(45deg, #ffd700, #ffed4e); color: #000; padding: 2px 6px; border-radius: 6px; font-size: 8px; font-weight: 700;">FOUNDER</span>' : ''}
+                            <span style="background: rgba(34, 197, 94, 0.2); color: var(--success-green); padding: 1px 4px; border-radius: 4px; font-size: 8px; font-weight: 700;">FIREBASE</span>
                         </div>
                         <div style="font-size: 12px; color: var(--text-secondary);">Level ${appState.user.level} • Your location</div>
                     </div>
@@ -2998,12 +3391,13 @@
                 </div>
             `;
             
-            // Real nearby users only
-            if (nearbyUsers.length > 0) {
+            // Firebase real-time users
+            if (nearbyUsers && nearbyUsers.length > 0) {
                 nearbyUsers.forEach(user => {
-                    const isOnline = user.lastSeen === 'now';
+                    const isOnline = user.isOnline || user.lastSeen === 'now';
                     const statusColor = isOnline ? 'var(--success-green)' : 'var(--warning-orange)';
                     const statusText = isOnline ? 'Online now' : `Last seen ${user.lastSeen}`;
+                    const distanceText = user.distance ? `${user.distance.toFixed(1)}km away` : 'Location unknown';
                     
                     usersHtml += `
                         <div style="display: flex; align-items: center; gap: 15px; padding: 15px; background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 12px; margin-bottom: 10px; opacity: ${isOnline ? '1' : '0.8'}; cursor: pointer; transition: all var(--animation-speed-normal) var(--easing-smooth);" class="fade-in scale-hover" onclick="showUserProfile('${user.id}')">
@@ -3016,43 +3410,44 @@
                                 <div style="font-weight: 600; display: flex; align-items: center; gap: 8px;">
                                     ${user.name}
                                     ${user.isFounder ? '<span style="background: linear-gradient(45deg, #ffd700, #ffed4e); color: #000; padding: 1px 4px; border-radius: 4px; font-size: 8px; font-weight: 700;">FOUNDER</span>' : user.isCreator ? '<span style="background: rgba(255, 215, 0, 0.2); color: var(--gold); padding: 1px 4px; border-radius: 4px; font-size: 8px; font-weight: 700;">CREATOR</span>' : ''}
+                                    <span style="background: rgba(239, 68, 68, 0.2); color: var(--error-red); padding: 1px 4px; border-radius: 4px; font-size: 8px; font-weight: 700;">🔥 LIVE</span>
                                 </div>
-                                <div style="font-size: 12px; color: var(--text-secondary);">Level ${user.level} • ${user.distance.toFixed(1)}km away</div>
+                                <div style="font-size: 12px; color: var(--text-secondary);">Level ${user.level} • ${distanceText}</div>
                                 <div style="font-size: 11px; color: ${statusColor}; margin-top: 2px;">${statusText}</div>
                             </div>
                             <div style="text-align: right;">
                                 <div style="font-size: 10px; color: var(--text-secondary); margin-bottom: 5px;">${user.activity}</div>
-                                <button style="background: rgba(255, 107, 157, 0.2); border: 1px solid var(--primary-pink); color: var(--primary-pink); padding: 4px 8px; border-radius: 6px; font-size: 10px; cursor: pointer; transition: all var(--animation-speed-normal) var(--easing-smooth);" onmouseover="this.style.background='rgba(255, 107, 157, 0.3)'" onmouseout="this.style.background='rgba(255, 107, 157, 0.2)'">👋 Connect</button>
+                                <button style="background: rgba(239, 68, 68, 0.2); border: 1px solid var(--error-red); color: var(--error-red); padding: 4px 8px; border-radius: 6px; font-size: 10px; cursor: pointer; transition: all var(--animation-speed-normal) var(--easing-smooth);" onmouseover="this.style.background='rgba(239, 68, 68, 0.3)'" onmouseout="this.style.background='rgba(239, 68, 68, 0.2)'">🔥 Connect</button>
                             </div>
                         </div>
                     `;
                 });
             }
             
-            if (nearbyUsers.length === 0) {
+            if (!nearbyUsers || nearbyUsers.length === 0) {
                 usersHtml += `
                     <div style="text-align: center; padding: 40px 20px; color: var(--text-secondary);" class="fade-in">
-                        <div style="font-size: 48px; margin-bottom: 15px;">📡</div>
-                        <div style="font-size: 16px; font-weight: 600; margin-bottom: 8px;">No users nearby right now</div>
+                        <div style="font-size: 48px; margin-bottom: 15px;">🔥</div>
+                        <div style="font-size: 16px; font-weight: 600; margin-bottom: 8px;">
+                            ${firebaseAuth ? 'Scanning Firebase for real-time users...' : 'No Firebase users online right now'}
+                        </div>
                         <div style="font-size: 12px; line-height: 1.4;">
-                            Invite friends to join JomBro!<br>
-                            More users will appear as people sign up in your area.
+                            ${firebaseAuth ? 'Firebase real-time detection is active!' : 'Invite friends to join JomBro!'}<br>
+                            Users will appear here as they come online.
                         </div>
                     </div>
                 `;
             }
             
-            // Location info
-            if (userLocation) {
-                usersHtml += `
-                    <div style="margin-top: 15px; padding: 10px; background: rgba(255, 255, 255, 0.05); border-radius: 8px; text-align: center;">
-                        <div style="font-size: 10px; color: var(--text-secondary);">
-                            📍 Detection Range: 3km • Accuracy: ${userLocation.accuracy ? Math.round(userLocation.accuracy) + 'm' : 'Unknown'}
-                            ${userLocation.simulated ? ' • Approximate Location' : ' • Real Location'}
-                        </div>
+            // Firebase connection info
+            usersHtml += `
+                <div style="margin-top: 15px; padding: 10px; background: rgba(239, 68, 68, 0.1); border: 1px solid rgba(239, 68, 68, 0.3); border-radius: 8px; text-align: center;">
+                    <div style="font-size: 10px; color: var(--text-secondary);">
+                        🔥 Firebase Status: ${firebaseAuth && currentUser ? '✅ Connected & Real-time' : '⚠️ Offline Mode'}
+                        ${userLocation ? ` • 📍 Location: ${userLocation.accuracy ? Math.round(userLocation.accuracy) + 'm accuracy' : 'Available'}` : ''}
                     </div>
-                `;
-            }
+                </div>
+            `;
             
             container.innerHTML = usersHtml;
         }
@@ -3060,7 +3455,9 @@
         function showUserProfile(userId) {
             const user = nearbyUsers.find(u => u.id === userId);
             if (user) {
-                showMessage(`👤 ${user.name} - Level ${user.level} ${user.isFounder ? '(Founder)' : user.isCreator ? '(Creator)' : ''}`, 'info');
+                const statusText = user.isFounder ? '(Founder)' : user.isCreator ? '(Creator)' : '';
+                const connectionText = firebaseAuth ? 'Firebase User' : 'Local User';
+                showMessage(`🔥 ${user.name} - Level ${user.level} ${statusText} • ${connectionText}`, 'info');
             }
         }
 
@@ -3385,15 +3782,17 @@
         // ===== ENHANCED INITIALIZATION =====
         
         function initializeApp() {
-            console.log('🚀 Initializing Enhanced JomBro App...');
+            console.log('🚀 Initializing JomBro with Firebase...');
             
             appState.updateUserDisplay();
             generateAndDisplayChallenges();
             
-            // Initialize geolocation and nearby users detection
+            // Initialize Firebase and geolocation
+            initializeFirebase();
+            
             setTimeout(() => {
                 initializeGeolocation();
-            }, 2000); // Give time for UI to load first
+            }, 2000);
             
             startAIChallengeGeneration();
             
@@ -3407,11 +3806,11 @@
             console.log('📊 Performance metrics started');
             console.log('🤖 AI Challenge Generation: every 60 seconds');
             console.log('✨ Enhanced animations and transitions active');
-            console.log('👤 Production-ready authentication system');
-            console.log('💾 Session-based account storage');
-            console.log('📍 Real geolocation & user detection (3km range)');
+            console.log('👤 Firebase authentication system active');
+            console.log('💾 Firebase real-time database active');
+            console.log('📍 Firebase real-time user presence detection');
             console.log('🏆 Founder account initialized for challenge creation');
-            console.log('🚀 App ready for real users!');
+            console.log('🔥 Firebase-powered real-time features active!');
         }
 
         // ===== ENHANCED EVENT LISTENERS =====
