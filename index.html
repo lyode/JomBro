@@ -1156,7 +1156,7 @@
                         <div id="creatorBadge" style="display: none; background: linear-gradient(45deg, #ffd700, #ffed4e); color: #000; padding: 2px 8px; border-radius: 10px; font-size: 8px; font-weight: 700; margin-top: 2px; text-transform: uppercase; letter-spacing: 0.5px; box-shadow: 0 0 10px rgba(255, 215, 0, 0.5);">👑 CREATOR</div>
                     </div>
                     <div class="header-actions">
-                        <div class="header-btn" id="createChallengeBtn" onclick="showChallengeCreator()" title="Create Challenge" style="display: none; background: linear-gradient(45deg, #ffd700, #ffed4e); color: #000; border: 1px solid #ffd700;">
+                        <div class="header-btn" id="createChallengeBtn" onclick="showChallengeCreator()" title="Create Challenge" style="background: linear-gradient(45deg, #ffd700, #ffed4e); color: #000; border: 1px solid #ffd700;">
                             ✨
                         </div>
                         <div class="header-btn" onclick="showMyTasks()" title="My Tasks">
@@ -1391,6 +1391,126 @@
                 </div>
             </div>
 
+            <!-- Challenge Creator Modal -->
+            <div id="challengeCreatorModal" class="modal">
+                <div class="modal-content" style="max-width: 550px;">
+                    <div class="modal-header">
+                        <div class="modal-title">✨ Challenge Creator Studio</div>
+                        <button class="modal-close" onclick="hideModal('challengeCreator')">&times;</button>
+                    </div>
+
+                    <div style="background: linear-gradient(135deg, rgba(255, 215, 0, 0.1), rgba(255, 193, 7, 0.1)); border: 1px solid rgba(255, 215, 0, 0.3); border-radius: 15px; padding: 15px; margin-bottom: 25px;">
+                        <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 10px;">
+                            <div style="font-size: 24px;">⚡</div>
+                            <div>
+                                <div style="font-size: 16px; font-weight: 600; color: var(--gold);">Create Your Challenge</div>
+                                <div style="font-size: 12px; color: var(--text-secondary);">Design challenges that will inspire the community!</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div style="margin-bottom: 20px;">
+                        <label style="display: block; font-size: 14px; font-weight: 600; margin-bottom: 8px; color: var(--text-primary);">🎯 Challenge Title</label>
+                        <input type="text" id="newChallengeTitle" class="form-input" placeholder="e.g., Midnight City Adventure Challenge" maxlength="60">
+                        <div style="font-size: 10px; color: var(--text-secondary); text-align: right; margin-top: 2px;">
+                            <span id="titleCounter">0</span>/60 characters
+                        </div>
+                    </div>
+
+                    <div style="margin-bottom: 20px;">
+                        <label style="display: block; font-size: 14px; font-weight: 600; margin-bottom: 8px; color: var(--text-primary);">📝 Challenge Description</label>
+                        <textarea id="newChallengeDescription" class="form-input" placeholder="Describe what users need to do to complete this challenge. Be creative and inspiring!" rows="4" maxlength="250"></textarea>
+                        <div style="font-size: 10px; color: var(--text-secondary); text-align: right; margin-top: 2px;">
+                            <span id="descCounter">0</span>/250 characters
+                        </div>
+                    </div>
+
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 20px;">
+                        <div>
+                            <label style="display: block; font-size: 14px; font-weight: 600; margin-bottom: 8px; color: var(--text-primary);">🏷️ Category</label>
+                            <select id="newChallengeCategory" class="form-input">
+                                <option value="SOCIAL">👥 Social Connection</option>
+                                <option value="FITNESS">💪 Fitness & Health</option>
+                                <option value="CREATIVE">🎨 Creative Expression</option>
+                                <option value="ADVENTURE">🗺️ Adventure & Exploration</option>
+                                <option value="MINDFULNESS">🧠 Mindfulness & Growth</option>
+                                <option value="LEARNING">📚 Learning & Skills</option>
+                                <option value="COMMUNITY">🌍 Community Service</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label style="display: block; font-size: 14px; font-weight: 600; margin-bottom: 8px; color: var(--text-primary);">⚡ Difficulty</label>
+                            <select id="newChallengeDifficulty" class="form-input">
+                                <option value="Easy">😊 Easy</option>
+                                <option value="Medium">🔥 Medium</option>
+                                <option value="Hard">💪 Hard</option>
+                                <option value="Expert">🚀 Expert</option>
+                                <option value="Legend">👑 Legend</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 20px;">
+                        <div>
+                            <label style="display: block; font-size: 14px; font-weight: 600; margin-bottom: 8px; color: var(--text-primary);">💰 Token Reward</label>
+                            <input type="number" id="newChallengeTokens" class="form-input" placeholder="500" min="100" max="10000" step="50">
+                            <div style="font-size: 10px; color: var(--text-secondary); margin-top: 2px;">Recommended: 300-800 tokens</div>
+                        </div>
+                        <div>
+                            <label style="display: block; font-size: 14px; font-weight: 600; margin-bottom: 8px; color: var(--text-primary);">⏱️ Duration</label>
+                            <select id="newChallengeDuration" class="form-input">
+                                <option value="15m">15 minutes</option>
+                                <option value="30m">30 minutes</option>
+                                <option value="1h">1 hour</option>
+                                <option value="2h">2 hours</option>
+                                <option value="1 day">1 day</option>
+                                <option value="3 days">3 days</option>
+                                <option value="1 week">1 week</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div style="margin-bottom: 20px;">
+                        <label style="display: block; font-size: 14px; font-weight: 600; margin-bottom: 8px; color: var(--text-primary);">🏷️ Hashtags</label>
+                        <input type="text" id="newChallengeHashtags" class="form-input" placeholder="#Adventure #Social #JomBro (separate with spaces)">
+                        <div style="font-size: 10px; color: var(--text-secondary); margin-top: 2px;">Add 2-5 hashtags to help users discover your challenge</div>
+                    </div>
+
+                    <!-- Challenge Preview -->
+                    <div style="background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 15px; padding: 15px; margin-bottom: 20px;">
+                        <div style="font-size: 14px; font-weight: 600; margin-bottom: 10px; color: var(--primary-pink);">👀 Live Preview</div>
+                        <div id="challengePreview" style="opacity: 0.7;">
+                            <div style="font-size: 16px; font-weight: 600; margin-bottom: 8px; color: var(--primary-pink);">Your Challenge Title</div>
+                            <div style="font-size: 12px; line-height: 1.4; margin-bottom: 10px; color: var(--text-secondary);">Your challenge description will appear here...</div>
+                            <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; margin-bottom: 10px;">
+                                <div style="text-align: center; background: rgba(255, 255, 255, 0.1); padding: 6px; border-radius: 6px;">
+                                    <div style="font-size: 12px; font-weight: 700; color: var(--primary-pink);" id="previewTokens">500</div>
+                                    <div style="font-size: 8px; color: var(--text-secondary);">TOKENS</div>
+                                </div>
+                                <div style="text-align: center; background: rgba(255, 255, 255, 0.1); padding: 6px; border-radius: 6px;">
+                                    <div style="font-size: 12px; font-weight: 700; color: var(--primary-pink);" id="previewDifficulty">Easy</div>
+                                    <div style="font-size: 8px; color: var(--text-secondary);">LEVEL</div>
+                                </div>
+                                <div style="text-align: center; background: rgba(255, 255, 255, 0.1); padding: 6px; border-radius: 6px;">
+                                    <div style="font-size: 12px; font-weight: 700; color: var(--primary-pink);" id="previewDuration">30m</div>
+                                    <div style="font-size: 8px; color: var(--text-secondary);">TIME</div>
+                                </div>
+                            </div>
+                            <div id="previewHashtags" style="display: flex; flex-wrap: wrap; gap: 3px;">
+                                <span style="font-size: 8px; padding: 2px 4px; background: rgba(255, 107, 157, 0.1); color: var(--primary-pink); border-radius: 4px;">#JomBro</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                        <button class="btn-secondary" onclick="hideModal('challengeCreator')">Cancel</button>
+                        <button class="btn-primary" onclick="createNewChallenge()" id="createChallengeSubmitBtn">
+                            ✨ Create Challenge
+                        </button>
+                    </div>
+                </div>
+            </div>
+
             <!-- Groups Modal -->
             <div id="groupsModal" class="modal">
                 <div class="modal-content">
@@ -1445,9 +1565,8 @@
                     suggested: []
                 };
                 
-                this.onlineUsers = [];
-                this.recentUsers = [];
-                this.chatMessages = [];
+                this.challengeHistory = [];
+                this.aiChallengeTimer = null;
                 
                 this.loadState();
             }
@@ -1495,24 +1614,6 @@
                         progress: 75,
                         category: 'Social',
                         status: 'in-progress'
-                    },
-                    {
-                        id: 2,
-                        title: 'Morning Workout',
-                        description: 'Complete 30-minute workout before 9 AM',
-                        deadline: new Date(Date.now() + 3600000 * 18), // 18 hours from now
-                        progress: 0,
-                        category: 'Fitness',
-                        status: 'pending'
-                    },
-                    {
-                        id: 3,
-                        title: 'Learn New Recipe',
-                        description: 'Cook something you\'ve never made before',
-                        deadline: new Date(Date.now() + 3600000 * 48), // 2 days from now
-                        progress: 25,
-                        category: 'Creative',
-                        status: 'in-progress'
                     }
                 ];
                 
@@ -1525,14 +1626,6 @@
                         completedAt: new Date(Date.now() - 86400000), // 1 day ago
                         tokens: 500,
                         category: 'Adventure'
-                    },
-                    {
-                        id: 5,
-                        title: 'Random Acts of Kindness',
-                        description: 'Perform 3 random acts of kindness',
-                        completedAt: new Date(Date.now() - 172800000), // 2 days ago
-                        tokens: 750,
-                        category: 'Social'
                     }
                 ];
                 
@@ -1545,14 +1638,6 @@
                         members: 147,
                         avatar: '☕',
                         isActive: true
-                    },
-                    {
-                        id: 2,
-                        name: 'Fitness Warriors',
-                        description: 'Workout challenges and motivation',
-                        members: 89,
-                        avatar: '💪',
-                        isActive: true
                     }
                 ];
                 
@@ -1564,31 +1649,7 @@
                         members: 203,
                         avatar: '🎨',
                         category: 'Creative'
-                    },
-                    {
-                        id: 4,
-                        name: 'Adventure Seekers',
-                        description: 'Explore your city with us',
-                        members: 156,
-                        avatar: '🗺️',
-                        category: 'Adventure'
                     }
-                ];
-                
-                // Initialize online users
-                this.onlineUsers = [
-                    { id: 1, name: 'Alex Chen', avatar: '😎', activity: 'Coffee Shop Challenge', level: 5, status: 'online' },
-                    { id: 2, name: 'Maya Patel', avatar: '🌟', activity: 'Sunrise Workout', level: 3, status: 'online' },
-                    { id: 3, name: 'Jordan Kim', avatar: '🚀', activity: 'Street Art Hunt', level: 7, status: 'online' },
-                    { id: 4, name: 'Sam Wilson', avatar: '🎨', activity: 'Reading in park', level: 2, status: 'online' },
-                    { id: 5, name: 'Rio Martinez', avatar: '⚡', activity: 'Coding challenge', level: 6, status: 'online' }
-                ];
-                
-                // Initialize chat messages
-                this.chatMessages = [
-                    { id: 1, user: 'Alex Chen', avatar: '😎', message: 'Just completed the coffee challenge! ☕', time: new Date(Date.now() - 300000) },
-                    { id: 2, user: 'Maya Patel', avatar: '🌟', message: 'Amazing! What poem did you get?', time: new Date(Date.now() - 240000) },
-                    { id: 3, user: 'Jordan Kim', avatar: '🚀', message: 'Starting the street art hunt now 🎨', time: new Date(Date.now() - 120000) }
                 ];
             }
             
@@ -1620,17 +1681,6 @@
                         element.textContent = value;
                     }
                 });
-                
-                // Show creator badge if user is a creator
-                const creatorBadge = document.getElementById('creatorBadge');
-                const createBtn = document.getElementById('createChallengeBtn');
-                if (this.user.isCreator) {
-                    if (creatorBadge) creatorBadge.style.display = 'block';
-                    if (createBtn) createBtn.style.display = 'flex';
-                } else {
-                    if (creatorBadge) creatorBadge.style.display = 'none';
-                    if (createBtn) createBtn.style.display = 'none';
-                }
                 
                 // Update level progress
                 const nextLevelXP = (this.user.level + 1) * 1000;
@@ -1827,6 +1877,9 @@
 
         function signOut() {
             if (confirm('Are you sure you want to sign out?')) {
+                // Stop AI challenge generation
+                stopAIChallengeGeneration();
+                
                 document.getElementById('authScreen').style.display = 'flex';
                 document.getElementById('mainApp').style.display = 'none';
                 document.getElementById('rightOverlay').style.display = 'none';
@@ -1838,6 +1891,495 @@
                 showMessage('👋 Signed out successfully!', 'success');
                 showMainAuth();
             }
+        }
+
+        // ===== AI CHALLENGE GENERATION SYSTEM =====
+        
+        const AI_CHALLENGE_TEMPLATES = {
+            SOCIAL: [
+                {
+                    title: "Street Musician Appreciation Challenge",
+                    description: "Find a street musician and genuinely listen to their performance for at least 5 minutes. Leave a tip and ask about their story!",
+                    difficulty: "Easy",
+                    duration: "30m",
+                    tokens: 400,
+                    hashtags: ["#StreetMusic", "#Appreciation", "#Community"]
+                },
+                {
+                    title: "Compliment Chain Challenge",
+                    description: "Give 3 strangers genuine compliments and ask them to pass it forward. Track the chain of kindness!",
+                    difficulty: "Medium",
+                    duration: "1h",
+                    tokens: 600,
+                    hashtags: ["#Kindness", "#PayItForward", "#Community"]
+                },
+                {
+                    title: "Language Exchange Café Challenge",
+                    description: "Visit a café and strike up a conversation with someone from a different culture. Learn 5 words in their language!",
+                    difficulty: "Medium",
+                    duration: "45m",
+                    tokens: 550,
+                    hashtags: ["#Culture", "#Language", "#Connection"]
+                }
+            ],
+            FITNESS: [
+                {
+                    title: "Sunrise Yoga in Public Challenge",
+                    description: "Do a 15-minute yoga session in a public park during sunrise. Invite others to join if they're interested!",
+                    difficulty: "Medium",
+                    duration: "45m",
+                    tokens: 650,
+                    hashtags: ["#Yoga", "#Sunrise", "#PublicFitness"]
+                },
+                {
+                    title: "Stair Master Challenge",
+                    description: "Find the tallest building accessible to public and climb all stairs. Count floors and celebrate at the top!",
+                    difficulty: "Hard",
+                    duration: "1h",
+                    tokens: 800,
+                    hashtags: ["#Stairs", "#Endurance", "#Challenge"]
+                },
+                {
+                    title: "Dance Flash Mob Solo Challenge",
+                    description: "Learn a 1-minute dance routine and perform it in a public space. Encourage others to join in!",
+                    difficulty: "Hard",
+                    duration: "2h",
+                    tokens: 750,
+                    hashtags: ["#Dance", "#Performance", "#PublicArt"]
+                }
+            ],
+            CREATIVE: [
+                {
+                    title: "Trash to Treasure Art Challenge",
+                    description: "Create a piece of art using only items you find in recycling bins. Display it publicly with a message about sustainability!",
+                    difficulty: "Medium",
+                    duration: "2h",
+                    tokens: 700,
+                    hashtags: ["#Recycle", "#Art", "#Sustainability"]
+                },
+                {
+                    title: "60-Second Life Story Challenge",
+                    description: "Interview a stranger and create a 60-second video telling their most interesting life story. Get their permission to share!",
+                    difficulty: "Hard",
+                    duration: "1h",
+                    tokens: 900,
+                    hashtags: ["#Stories", "#Documentary", "#Human"]
+                },
+                {
+                    title: "Chalk Art Inspiration Challenge",
+                    description: "Create inspiring chalk art on a public sidewalk with positive messages. Take photos of people's reactions!",
+                    difficulty: "Easy",
+                    duration: "1h",
+                    tokens: 450,
+                    hashtags: ["#ChalkArt", "#Inspiration", "#StreetArt"]
+                }
+            ],
+            ADVENTURE: [
+                {
+                    title: "Mystery Transport Challenge",
+                    description: "Take a random bus/train for 5 stops, get off, and discover something interesting in that area. Document your findings!",
+                    difficulty: "Medium",
+                    duration: "3h",
+                    tokens: 800,
+                    hashtags: ["#Adventure", "#Discovery", "#Transport"]
+                },
+                {
+                    title: "Hidden Gem Photography Challenge",
+                    description: "Find and photograph 3 hidden gems in your city that most tourists don't know about. Create a mini photo story!",
+                    difficulty: "Hard",
+                    duration: "4h",
+                    tokens: 950,
+                    hashtags: ["#Photography", "#HiddenGems", "#Exploration"]
+                },
+                {
+                    title: "Rooftop Sunset Challenge",
+                    description: "Find a safe, accessible rooftop or high viewpoint to watch the sunset. Document the experience and view!",
+                    difficulty: "Medium",
+                    duration: "2h",
+                    tokens: 600,
+                    hashtags: ["#Sunset", "#Views", "#Rooftop"]
+                }
+            ],
+            MINDFULNESS: [
+                {
+                    title: "Digital Detox Walk Challenge",
+                    description: "Take a 2-hour walk without any digital devices. Focus on mindful observation and return with 10 detailed observations!",
+                    difficulty: "Hard",
+                    duration: "2h",
+                    tokens: 700,
+                    hashtags: ["#DigitalDetox", "#Mindfulness", "#Nature"]
+                },
+                {
+                    title: "Gratitude Photo Journal Challenge",
+                    description: "Take photos of 5 things you're grateful for today and write a short reflection about each one!",
+                    difficulty: "Easy",
+                    duration: "1h",
+                    tokens: 400,
+                    hashtags: ["#Gratitude", "#Photography", "#Mindfulness"]
+                },
+                {
+                    title: "Meditation in Motion Challenge",
+                    description: "Practice walking meditation in a busy area for 20 minutes. Focus on breath and movement despite distractions!",
+                    difficulty: "Medium",
+                    duration: "30m",
+                    tokens: 500,
+                    hashtags: ["#Meditation", "#Mindfulness", "#Focus"]
+                }
+            ],
+            LEARNING: [
+                {
+                    title: "Expert Interview Challenge",
+                    description: "Find a local expert in any field and conduct a 15-minute interview about their expertise. Learn something completely new!",
+                    difficulty: "Medium",
+                    duration: "1h",
+                    tokens: 650,
+                    hashtags: ["#Learning", "#Expert", "#Knowledge"]
+                },
+                {
+                    title: "Skill Swap Challenge",
+                    description: "Teach someone a skill you know and learn a skill from them in return. Document the exchange!",
+                    difficulty: "Medium",
+                    duration: "2h",
+                    tokens: 750,
+                    hashtags: ["#SkillSwap", "#Teaching", "#Learning"]
+                },
+                {
+                    title: "Historical Discovery Challenge",
+                    description: "Research and visit a historical site in your area. Learn 5 interesting facts and share them creatively!",
+                    difficulty: "Easy",
+                    duration: "2h",
+                    tokens: 500,
+                    hashtags: ["#History", "#Discovery", "#Education"]
+                }
+            ],
+            COMMUNITY: [
+                {
+                    title: "Community Garden Helper Challenge",
+                    description: "Find a community garden and volunteer for 2 hours. Help with planting, watering, or maintenance!",
+                    difficulty: "Easy",
+                    duration: "2h",
+                    tokens: 600,
+                    hashtags: ["#Community", "#Garden", "#Volunteer"]
+                },
+                {
+                    title: "Local Business Support Challenge",
+                    description: "Visit 3 small local businesses you've never been to. Make a small purchase and write positive reviews!",
+                    difficulty: "Easy",
+                    duration: "2h",
+                    tokens: 550,
+                    hashtags: ["#LocalBusiness", "#Community", "#Support"]
+                },
+                {
+                    title: "Neighborhood Clean-up Challenge",
+                    description: "Spend 1 hour cleaning up litter in your neighborhood. Invite others to join and document the impact!",
+                    difficulty: "Easy",
+                    duration: "1h",
+                    tokens: 450,
+                    hashtags: ["#CleanUp", "#Environment", "#Community"]
+                }
+            ]
+        };
+
+        function generateAIChallenge() {
+            const categories = Object.keys(AI_CHALLENGE_TEMPLATES);
+            let availableTemplates = [];
+            
+            // Collect all templates that haven't been used in last 50 challenges
+            categories.forEach(category => {
+                AI_CHALLENGE_TEMPLATES[category].forEach(template => {
+                    const challengeId = `ai_${category.toLowerCase()}_${template.title.replace(/\s+/g, '_').toLowerCase()}`;
+                    
+                    // Check if this challenge was used in last 50 challenges
+                    const recentIndex = appState.challengeHistory.indexOf(challengeId);
+                    if (recentIndex === -1 || recentIndex < appState.challengeHistory.length - 50) {
+                        availableTemplates.push({
+                            ...template,
+                            id: challengeId,
+                            category: category,
+                            categoryInfo: MASTER_CHALLENGE_DATABASE[category]
+                        });
+                    }
+                });
+            });
+            
+            if (availableTemplates.length === 0) {
+                // If all challenges used recently, clear history and start fresh
+                appState.challengeHistory = [];
+                availableTemplates = [];
+                categories.forEach(category => {
+                    AI_CHALLENGE_TEMPLATES[category].forEach(template => {
+                        availableTemplates.push({
+                            ...template,
+                            id: `ai_${category.toLowerCase()}_${template.title.replace(/\s+/g, '_').toLowerCase()}`,
+                            category: category,
+                            categoryInfo: MASTER_CHALLENGE_DATABASE[category]
+                        });
+                    });
+                });
+            }
+            
+            // Pick random challenge
+            const randomChallenge = availableTemplates[Math.floor(Math.random() * availableTemplates.length)];
+            
+            // Add to history
+            appState.challengeHistory.push(randomChallenge.id);
+            
+            // Keep only last 50 in history
+            if (appState.challengeHistory.length > 50) {
+                appState.challengeHistory = appState.challengeHistory.slice(-50);
+            }
+            
+            return randomChallenge;
+        }
+
+        function startAIChallengeGeneration() {
+            // Generate first AI challenge immediately
+            setTimeout(() => {
+                const aiChallenge = generateAIChallenge();
+                
+                // Add to current challenge set
+                currentChallengeSet.unshift(aiChallenge);
+                
+                // Keep only 8 challenges
+                if (currentChallengeSet.length > 8) {
+                    currentChallengeSet.pop();
+                }
+                
+                displayChallengeSelection();
+                showMessage(`🤖 AI Generated: "${aiChallenge.title}"`, 'info');
+            }, 5000); // First AI challenge after 5 seconds
+            
+            // Then generate every 1 minute
+            appState.aiChallengeTimer = setInterval(() => {
+                const aiChallenge = generateAIChallenge();
+                
+                // Add to current challenge set
+                currentChallengeSet.unshift(aiChallenge);
+                
+                // Keep only 8 challenges
+                if (currentChallengeSet.length > 8) {
+                    currentChallengeSet.pop();
+                }
+                
+                displayChallengeSelection();
+                showMessage(`🤖 New AI Challenge: "${aiChallenge.title}"`, 'info');
+            }, 60000); // Every 1 minute
+        }
+
+        function stopAIChallengeGeneration() {
+            if (appState.aiChallengeTimer) {
+                clearInterval(appState.aiChallengeTimer);
+                appState.aiChallengeTimer = null;
+            }
+        }
+
+        // ===== CHALLENGE CREATOR SYSTEM =====
+        
+        function showChallengeCreator() {
+            showModal('challengeCreator');
+            initializeChallengeCreator();
+        }
+        
+        function initializeChallengeCreator() {
+            // Add real-time preview updates
+            const inputs = ['newChallengeTitle', 'newChallengeDescription', 'newChallengeTokens', 'newChallengeDifficulty', 'newChallengeDuration', 'newChallengeHashtags'];
+            
+            inputs.forEach(inputId => {
+                const element = document.getElementById(inputId);
+                if (element) {
+                    element.addEventListener('input', updateChallengePreview);
+                    element.addEventListener('change', updateChallengePreview);
+                }
+            });
+            
+            // Add character counters
+            const titleInput = document.getElementById('newChallengeTitle');
+            const descInput = document.getElementById('newChallengeDescription');
+            
+            if (titleInput) {
+                titleInput.addEventListener('input', function() {
+                    const counter = document.getElementById('titleCounter');
+                    if (counter) counter.textContent = this.value.length;
+                });
+            }
+            
+            if (descInput) {
+                descInput.addEventListener('input', function() {
+                    const counter = document.getElementById('descCounter');
+                    if (counter) counter.textContent = this.value.length;
+                });
+            }
+            
+            updateChallengePreview();
+        }
+        
+        function updateChallengePreview() {
+            const title = document.getElementById('newChallengeTitle')?.value || 'Your Challenge Title';
+            const description = document.getElementById('newChallengeDescription')?.value || 'Your challenge description will appear here...';
+            const tokens = document.getElementById('newChallengeTokens')?.value || '500';
+            const difficulty = document.getElementById('newChallengeDifficulty')?.value || 'Easy';
+            const duration = document.getElementById('newChallengeDuration')?.value || '30m';
+            const hashtags = document.getElementById('newChallengeHashtags')?.value || '#JomBro';
+            
+            // Update preview
+            const preview = document.getElementById('challengePreview');
+            if (preview) {
+                const titleEl = preview.querySelector('div:first-child');
+                const descEl = preview.querySelector('div:nth-child(2)');
+                
+                if (titleEl) titleEl.textContent = title;
+                if (descEl) descEl.textContent = description;
+            }
+            
+            const previewTokens = document.getElementById('previewTokens');
+            const previewDifficulty = document.getElementById('previewDifficulty');
+            const previewDuration = document.getElementById('previewDuration');
+            
+            if (previewTokens) previewTokens.textContent = tokens;
+            if (previewDifficulty) previewDifficulty.textContent = difficulty;
+            if (previewDuration) previewDuration.textContent = duration;
+            
+            // Update hashtags
+            const hashtagContainer = document.getElementById('previewHashtags');
+            if (hashtagContainer) {
+                const hashtagArray = hashtags.split(' ').filter(tag => tag.trim().startsWith('#'));
+                hashtagContainer.innerHTML = hashtagArray.map(tag => 
+                    `<span style="font-size: 8px; padding: 2px 4px; background: rgba(255, 107, 157, 0.1); color: var(--primary-pink); border-radius: 4px;">${tag}</span>`
+                ).join('');
+            }
+        }
+        
+        function createNewChallenge() {
+            // Validate inputs
+            const title = document.getElementById('newChallengeTitle')?.value.trim();
+            const description = document.getElementById('newChallengeDescription')?.value.trim();
+            const category = document.getElementById('newChallengeCategory')?.value;
+            const difficulty = document.getElementById('newChallengeDifficulty')?.value;
+            const tokens = parseInt(document.getElementById('newChallengeTokens')?.value);
+            const duration = document.getElementById('newChallengeDuration')?.value;
+            const hashtags = document.getElementById('newChallengeHashtags')?.value.trim();
+            
+            // Validation
+            if (!title) {
+                showMessage('❌ Please enter a challenge title!', 'error');
+                return;
+            }
+            
+            if (title.length < 10) {
+                showMessage('❌ Challenge title must be at least 10 characters!', 'error');
+                return;
+            }
+            
+            if (!description) {
+                showMessage('❌ Please enter a challenge description!', 'error');
+                return;
+            }
+            
+            if (description.length < 20) {
+                showMessage('❌ Challenge description must be at least 20 characters!', 'error');
+                return;
+            }
+            
+            if (!tokens || tokens < 100 || tokens > 10000) {
+                showMessage('❌ Token reward must be between 100-10,000!', 'error');
+                return;
+            }
+            
+            if (!hashtags || !hashtags.includes('#')) {
+                showMessage('❌ Please add at least one hashtag starting with #!', 'error');
+                return;
+            }
+            
+            // Show creating animation
+            const btn = document.getElementById('createChallengeSubmitBtn');
+            if (btn) {
+                btn.disabled = true;
+                btn.textContent = '✨ Creating...';
+            }
+            
+            setTimeout(() => {
+                // Create new challenge object
+                const newChallenge = {
+                    id: `user_${Date.now()}`,
+                    title: title,
+                    description: description,
+                    difficulty: difficulty,
+                    duration: duration,
+                    tokens: tokens,
+                    hashtags: hashtags.split(' ').filter(tag => tag.trim().startsWith('#')),
+                    category: category,
+                    createdBy: appState.user.name,
+                    createdAt: new Date(),
+                    isCustom: true,
+                    categoryInfo: MASTER_CHALLENGE_DATABASE[category] || {
+                        name: 'Custom',
+                        icon: '✨',
+                        color: '#ff6b9d'
+                    }
+                };
+                
+                // Add challenge to front of current set
+                currentChallengeSet.unshift(newChallenge);
+                
+                // Keep only 8 challenges
+                if (currentChallengeSet.length > 8) {
+                    currentChallengeSet.pop();
+                }
+                
+                // Reset form
+                resetChallengeCreatorForm();
+                
+                // Hide modal
+                hideModal('challengeCreator');
+                
+                // Refresh challenges display
+                displayChallengeSelection();
+                
+                // Show success message
+                showMessage(`🎉 Challenge "${title}" created successfully!`, 'success');
+                
+                // Creator gets bonus tokens for creating challenges
+                appState.updateUser({
+                    tokens: appState.user.tokens + 200
+                });
+                
+                showMessage('💰 Creator bonus: +200 tokens for creating a challenge!', 'success');
+            }, 2000);
+        }
+        
+        function resetChallengeCreatorForm() {
+            const inputs = {
+                'newChallengeTitle': '',
+                'newChallengeDescription': '',
+                'newChallengeTokens': '',
+                'newChallengeHashtags': '',
+                'newChallengeCategory': 'SOCIAL',
+                'newChallengeDifficulty': 'Easy',
+                'newChallengeDuration': '30m'
+            };
+            
+            Object.entries(inputs).forEach(([id, value]) => {
+                const element = document.getElementById(id);
+                if (element) element.value = value;
+            });
+            
+            const counters = {
+                'titleCounter': '0',
+                'descCounter': '0'
+            };
+            
+            Object.entries(counters).forEach(([id, value]) => {
+                const element = document.getElementById(id);
+                if (element) element.textContent = value;
+            });
+            
+            const btn = document.getElementById('createChallengeSubmitBtn');
+            if (btn) {
+                btn.disabled = false;
+                btn.textContent = '✨ Create Challenge';
+            }
+            
+            updateChallengePreview();
         }
 
         // ===== CHALLENGE SYSTEM =====
@@ -2068,26 +2610,15 @@
 
         // ===== SOCIAL FEATURES =====
         
-        function initializeOnlineUsers() {
-            updateOnlineCount();
-            updateLivePlayersDisplay();
-            
-            // Simulate real-time updates
-            setInterval(() => {
-                simulateUserActivity();
-            }, 15000); // Update every 15 seconds
-        }
-
         function updateOnlineCount() {
-            const count = appState.onlineUsers.length;
             const onlineCountEl = document.getElementById('onlineCount');
             if (onlineCountEl) {
-                onlineCountEl.textContent = `${count} online`;
+                onlineCountEl.textContent = `1 online`; // Just the current user
             }
             
             const overlayNotificationEl = document.getElementById('overlayOnlineNotifications');
             if (overlayNotificationEl) {
-                overlayNotificationEl.textContent = count;
+                overlayNotificationEl.textContent = '1';
             }
         }
 
@@ -2095,54 +2626,16 @@
             const container = document.getElementById('livePlayersContainer');
             if (!container) return;
             
-            container.innerHTML = '';
-            
-            appState.onlineUsers.forEach(user => {
-                const userElement = document.createElement('div');
-                userElement.style.cssText = `
-                    display: flex;
-                    flex-direction: column;
-                    align-items: center;
-                    min-width: 60px;
-                    cursor: pointer;
-                    transition: all 0.3s ease;
-                `;
-                
-                userElement.innerHTML = `
+            container.innerHTML = `
+                <div style="display: flex; flex-direction: column; align-items: center; min-width: 60px; cursor: pointer; transition: all 0.3s ease;">
                     <div style="width: 40px; height: 40px; border-radius: 50%; background: linear-gradient(45deg, var(--primary-pink), var(--primary-purple)); display: flex; align-items: center; justify-content: center; font-size: 18px; margin-bottom: 5px; position: relative;">
-                        ${user.avatar}
+                        ${appState.user.avatar}
                         <div style="position: absolute; bottom: -2px; right: -2px; width: 12px; height: 12px; background: var(--success-green); border-radius: 50%; border: 2px solid rgba(15, 15, 15, 0.8);"></div>
                     </div>
-                    <div style="font-size: 10px; font-weight: 600; text-align: center; margin-bottom: 2px;">${user.name}</div>
-                    <div style="font-size: 8px; color: var(--text-secondary); text-align: center;">${user.activity}</div>
-                `;
-                
-                userElement.addEventListener('click', () => {
-                    showUserProfile(user);
-                });
-                
-                container.appendChild(userElement);
-            });
-        }
-
-        function simulateUserActivity() {
-            // Randomly update user activities
-            const activities = [
-                'Coffee Shop Challenge', 'Sunrise Workout', 'Street Art Hunt', 'Reading in park',
-                'Coding challenge', 'Food art creating', 'Mystery exploration', 'Photo scavenger hunt'
-            ];
-            
-            appState.onlineUsers.forEach(user => {
-                if (Math.random() < 0.3) { // 30% chance to update activity
-                    user.activity = activities[Math.floor(Math.random() * activities.length)];
-                }
-            });
-            
-            updateLivePlayersDisplay();
-        }
-
-        function showUserProfile(user) {
-            showMessage(`👤 ${user.name} - Level ${user.level} - ${user.activity}`, 'info');
+                    <div style="font-size: 10px; font-weight: 600; text-align: center; margin-bottom: 2px;">${appState.user.name}</div>
+                    <div style="font-size: 8px; color: var(--text-secondary); text-align: center;">Online now</div>
+                </div>
+            `;
         }
 
         // ===== MODAL SYSTEM =====
@@ -2307,29 +2800,27 @@
                 <div style="text-align: center; margin-bottom: 20px;">
                     <div style="font-size: 48px; margin-bottom: 10px;">🏆</div>
                     <div style="font-size: 18px; font-weight: 600; margin-bottom: 5px;">Hall of Champions</div>
-                    <div style="color: var(--text-secondary);">Top challenge completers this week</div>
+                    <div style="color: var(--text-secondary);">Challenge completion leaderboard</div>
                 </div>
                 
                 <div style="margin-bottom: 20px;">
-                    ${[
-                        { name: 'Alex Chen', avatar: '😎', challenges: 47, tokens: 12500, rank: 1 },
-                        { name: 'Maya Patel', avatar: '🌟', challenges: 42, tokens: 11200, rank: 2 },
-                        { name: 'Jordan Kim', avatar: '🚀', challenges: 38, tokens: 9800, rank: 3 },
-                        { name: appState.user.name, avatar: appState.user.avatar, challenges: appState.user.completedChallenges, tokens: appState.user.tokens, rank: 'You' }
-                    ].map(user => `
-                        <div style="display: flex; align-items: center; gap: 15px; padding: 10px; background: rgba(255, 255, 255, 0.05); border-radius: 10px; margin-bottom: 10px;">
-                            <div style="font-size: 24px; font-weight: 700; color: ${user.rank === 1 ? 'var(--gold)' : user.rank === 2 ? 'var(--silver)' : user.rank === 3 ? 'var(--bronze)' : 'var(--text-secondary)'}; min-width: 30px;">
-                                ${user.rank === 'You' ? '👤' : `#${user.rank}`}
-                            </div>
-                            <div style="width: 40px; height: 40px; border-radius: 50%; background: linear-gradient(45deg, var(--primary-pink), var(--primary-purple)); display: flex; align-items: center; justify-content: center; font-size: 18px;">
-                                ${user.avatar}
-                            </div>
-                            <div style="flex: 1;">
-                                <div style="font-weight: 600;">${user.name}</div>
-                                <div style="font-size: 12px; color: var(--text-secondary);">${user.challenges} challenges • ${user.tokens.toLocaleString()} tokens</div>
-                            </div>
+                    <div style="display: flex; align-items: center; gap: 15px; padding: 10px; background: rgba(255, 255, 255, 0.05); border-radius: 10px; margin-bottom: 10px;">
+                        <div style="font-size: 24px; font-weight: 700; color: var(--gold); min-width: 30px;">
+                            👤
                         </div>
-                    `).join('')}
+                        <div style="width: 40px; height: 40px; border-radius: 50%; background: linear-gradient(45deg, var(--primary-pink), var(--primary-purple)); display: flex; align-items: center; justify-content: center; font-size: 18px;">
+                            ${appState.user.avatar}
+                        </div>
+                        <div style="flex: 1;">
+                            <div style="font-weight: 600;">${appState.user.name}</div>
+                            <div style="font-size: 12px; color: var(--text-secondary);">${appState.user.completedChallenges} challenges • ${appState.user.tokens.toLocaleString()} tokens</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div style="text-align: center; padding: 20px; color: var(--text-secondary); font-size: 14px;">
+                    🎯 Complete more challenges to climb the leaderboard!<br>
+                    Invite friends to compete with you!
                 </div>
                 
                 <button class="btn-primary" onclick="shareAchievement()">📤 Share Your Achievement</button>
@@ -2338,26 +2829,23 @@
 
         function populateOnlineUsersModal() {
             const container = document.getElementById('onlineUsersContent');
-            let usersHtml = '';
-            
-            usersHtml += '<h4 style="margin-bottom: 15px;">🟢 Online Now</h4>';
-            appState.onlineUsers.forEach(user => {
-                usersHtml += `
-                    <div style="display: flex; align-items: center; gap: 15px; padding: 10px; background: rgba(255, 255, 255, 0.05); border-radius: 10px; margin-bottom: 10px; cursor: pointer;" onclick="showUserProfile(${JSON.stringify(user).replace(/"/g, '&quot;')})">
-                        <div style="width: 40px; height: 40px; border-radius: 50%; background: linear-gradient(45deg, var(--primary-pink), var(--primary-purple)); display: flex; align-items: center; justify-content: center; font-size: 18px; position: relative;">
-                            ${user.avatar}
-                            <div style="position: absolute; bottom: -2px; right: -2px; width: 12px; height: 12px; background: var(--success-green); border-radius: 50%; border: 2px solid rgba(15, 15, 15, 0.8);"></div>
-                        </div>
-                        <div style="flex: 1;">
-                            <div style="font-weight: 600;">${user.name}</div>
-                            <div style="font-size: 12px; color: var(--text-secondary);">Level ${user.level} • ${user.activity}</div>
-                        </div>
-                        <button class="btn-secondary" style="padding: 5px 10px; font-size: 12px;">💬 Chat</button>
+            container.innerHTML = `
+                <h4 style="margin-bottom: 15px;">🟢 Online Now</h4>
+                <div style="display: flex; align-items: center; gap: 15px; padding: 10px; background: rgba(255, 255, 255, 0.05); border-radius: 10px; margin-bottom: 10px;">
+                    <div style="width: 40px; height: 40px; border-radius: 50%; background: linear-gradient(45deg, var(--primary-pink), var(--primary-purple)); display: flex; align-items: center; justify-content: center; font-size: 18px; position: relative;">
+                        ${appState.user.avatar}
+                        <div style="position: absolute; bottom: -2px; right: -2px; width: 12px; height: 12px; background: var(--success-green); border-radius: 50%; border: 2px solid rgba(15, 15, 15, 0.8);"></div>
                     </div>
-                `;
-            });
-            
-            container.innerHTML = usersHtml;
+                    <div style="flex: 1;">
+                        <div style="font-weight: 600;">${appState.user.name}</div>
+                        <div style="font-size: 12px; color: var(--text-secondary);">Level ${appState.user.level} • Online now</div>
+                    </div>
+                    <div style="font-size: 12px; color: var(--success-green); font-weight: 600;">You</div>
+                </div>
+                <div style="text-align: center; padding: 20px; color: var(--text-secondary); font-size: 14px;">
+                    🚀 You're the first one online! Invite friends to join JomBro!
+                </div>
+            `;
         }
 
         function populateGroupsModal() {
@@ -2421,9 +2909,35 @@
 
         function loadChatMessages() {
             const container = document.getElementById('chatMessages');
-            container.innerHTML = '';
+            if (!container) return;
             
-            appState.chatMessages.forEach(message => {
+            container.innerHTML = `
+                <div style="text-align: center; padding: 40px 20px; color: var(--text-secondary);">
+                    <div style="font-size: 48px; margin-bottom: 15px;">💬</div>
+                    <div style="font-size: 16px; font-weight: 600; margin-bottom: 8px;">Welcome to Chat!</div>
+                    <div style="font-size: 14px; line-height: 1.4;">
+                        You're the first one here!<br>
+                        Start a conversation and others will join.
+                    </div>
+                </div>
+            `;
+        }
+
+        function sendMessage() {
+            const input = document.getElementById('chatInput');
+            if (!input) return;
+            
+            const message = input.value.trim();
+            
+            if (message) {
+                const container = document.getElementById('chatMessages');
+                if (!container) return;
+                
+                // Clear welcome message if it exists
+                if (container.innerHTML.includes('Welcome to Chat!')) {
+                    container.innerHTML = '';
+                }
+                
                 const messageElement = document.createElement('div');
                 messageElement.style.cssText = `
                     display: flex;
@@ -2434,61 +2948,24 @@
                 
                 messageElement.innerHTML = `
                     <div style="width: 30px; height: 30px; border-radius: 50%; background: linear-gradient(45deg, var(--primary-pink), var(--primary-purple)); display: flex; align-items: center; justify-content: center; font-size: 14px; flex-shrink: 0;">
-                        ${message.avatar}
+                        ${appState.user.avatar}
                     </div>
                     <div style="flex: 1;">
                         <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 5px;">
-                            <span style="font-weight: 600; font-size: 12px;">${message.user}</span>
-                            <span style="font-size: 10px; color: var(--text-secondary);">${formatTime(message.time)}</span>
+                            <span style="font-weight: 600; font-size: 12px;">${appState.user.name}</span>
+                            <span style="font-size: 10px; color: var(--text-secondary);">now</span>
                         </div>
                         <div style="background: rgba(255, 255, 255, 0.1); padding: 8px 12px; border-radius: 12px; font-size: 14px;">
-                            ${message.message}
+                            ${message}
                         </div>
                     </div>
                 `;
                 
                 container.appendChild(messageElement);
-            });
-            
-            container.scrollTop = container.scrollHeight;
-        }
-
-        function sendMessage() {
-            const input = document.getElementById('chatInput');
-            const message = input.value.trim();
-            
-            if (message) {
-                appState.chatMessages.push({
-                    id: Date.now(),
-                    user: appState.user.name,
-                    avatar: appState.user.avatar,
-                    message: message,
-                    time: new Date()
-                });
-                
                 input.value = '';
-                loadChatMessages();
+                container.scrollTop = container.scrollHeight;
                 
-                // Simulate a response
-                setTimeout(() => {
-                    const responses = [
-                        'Great job! 🎉',
-                        'That sounds amazing!',
-                        'Can you share a photo?',
-                        'I want to try that too!',
-                        'Awesome work! 💪'
-                    ];
-                    
-                    appState.chatMessages.push({
-                        id: Date.now(),
-                        user: 'Alex Chen',
-                        avatar: '😎',
-                        message: responses[Math.floor(Math.random() * responses.length)],
-                        time: new Date()
-                    });
-                    
-                    loadChatMessages();
-                }, 1000);
+                showMessage('💬 Message sent! Others will see it when they join.', 'info');
             }
         }
 
@@ -2690,16 +3167,12 @@
             }
         }
 
-        function editProfile() {
-            showMessage('✏️ Profile editing feature coming soon!', 'info');
+        function showUserProfile(user) {
+            showMessage(`👤 Viewing profile feature coming soon!`, 'info');
         }
 
-        function showChallengeCreator() {
-            if (!appState.user.isCreator) {
-                showMessage('❌ Only creators can access this feature!', 'error');
-                return;
-            }
-            showMessage('✨ Challenge creator feature coming soon!', 'info');
+        function editProfile() {
+            showMessage('✏️ Profile editing feature coming soon!', 'info');
         }
 
         // ===== INITIALIZATION =====
@@ -2707,7 +3180,11 @@
         function initializeApp() {
             appState.updateUserDisplay();
             generateAndDisplayChallenges();
-            initializeOnlineUsers();
+            updateOnlineCount();
+            updateLivePlayersDisplay();
+            
+            // Start AI challenge generation
+            startAIChallengeGeneration();
             
             // Show tasks notification if there are active tasks
             const tasksNotificationEl = document.getElementById('tasksNotifications');
@@ -2715,6 +3192,10 @@
                 tasksNotificationEl.style.display = 'flex';
                 tasksNotificationEl.textContent = appState.tasks.active.length;
             }
+            
+            console.log('🤖 AI Challenge Generation started - new challenge every 1 minute');
+            console.log('✨ Challenge Creator activated for all users');
+            console.log('🚫 Fake users removed - real users only');
         }
 
         // ===== EVENT LISTENERS AND INITIALIZATION =====
