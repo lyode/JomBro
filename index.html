@@ -779,16 +779,25 @@
                     throw new Error('Firebase SDK not loaded. Please check your internet connection.');
                 }
                 
+                console.log('✅ Firebase SDK loaded successfully');
+                
                 // Initialize Firebase
                 firebaseApp = firebase.initializeApp(firebaseConfig);
                 firebaseAuth = firebase.auth();
                 firebaseDb = firebase.database();
                 
+                console.log('✅ Firebase services initialized');
+                
                 // Configure Auth settings
                 firebaseAuth.useDeviceLanguage();
                 
                 // Set up auth state persistence
-                await firebaseAuth.setPersistence(firebase.auth.Auth.Persistence.LOCAL);
+                try {
+                    await firebaseAuth.setPersistence(firebase.auth.Auth.Persistence.LOCAL);
+                    console.log('✅ Auth persistence set');
+                } catch (persistenceError) {
+                    console.warn('⚠️ Auth persistence failed, continuing:', persistenceError);
+                }
                 
                 // Set up auth state listener with detailed logging
                 firebaseAuth.onAuthStateChanged((user) => {
@@ -814,8 +823,20 @@
                     }
                 });
                 
-                // Test Firebase connection
-                await firebaseDb.ref('.info/connected').once('value');
+                console.log('✅ Auth state listener configured');
+                
+                // Test Firebase connection with timeout
+                try {
+                    const connectionTest = await Promise.race([
+                        firebaseDb.ref('.info/connected').once('value'),
+                        new Promise((_, reject) => 
+                            setTimeout(() => reject(new Error('Connection timeout')), 10000)
+                        )
+                    ]);
+                    console.log('✅ Firebase database connection test passed');
+                } catch (connectionError) {
+                    console.warn('⚠️ Database connection test failed, but auth may still work:', connectionError);
+                }
                 
                 isInitialized = true;
                 updateConnectionStatus('connected', 'Firebase Connected');
@@ -826,7 +847,18 @@
             } catch (error) {
                 console.error('❌ Firebase initialization failed:', error);
                 updateConnectionStatus('disconnected', 'Connection Failed');
-                showMessage(`❌ Firebase initialization failed: ${error.message}`, 'error');
+                
+                // More specific error messages
+                let errorMessage = 'Firebase connection failed';
+                if (error.message.includes('SDK not loaded')) {
+                    errorMessage = 'Firebase SDK failed to load. Please check your internet connection.';
+                } else if (error.message.includes('network')) {
+                    errorMessage = 'Network error. Please check your internet connection.';
+                } else if (error.message.includes('timeout')) {
+                    errorMessage = 'Connection timeout. Please try again.';
+                }
+                
+                showMessage(`❌ ${errorMessage}`, 'error');
                 return false;
             }
         }
@@ -838,7 +870,14 @@
             
             if (!isInitialized) {
                 console.log('❌ Firebase not initialized yet');
-                showMessage('❌ Firebase not initialized. Please wait...', 'error');
+                showMessage('❌ Firebase not ready. Please wait for connection...', 'error');
+                updateConnectionStatus('connecting', 'Please wait...');
+                return;
+            }
+            
+            if (!firebaseAuth) {
+                console.log('❌ Firebase Auth not available');
+                showMessage('❌ Authentication service not available. Please refresh the page.', 'error');
                 return;
             }
             
@@ -1388,14 +1427,33 @@
                 console.error('❌ Auth form not found');
             }
             
-            // Initialize Firebase
+            // Initialize Firebase with retry logic
             setTimeout(async () => {
-                const success = await initializeFirebase();
+                console.log('🔥 Starting Firebase initialization...');
+                
+                let success = false;
+                let attempts = 0;
+                const maxAttempts = 3;
+                
+                while (!success && attempts < maxAttempts) {
+                    attempts++;
+                    console.log(`🔄 Firebase initialization attempt ${attempts}/${maxAttempts}`);
+                    
+                    success = await initializeFirebase();
+                    
+                    if (!success && attempts < maxAttempts) {
+                        console.log(`⚠️ Attempt ${attempts} failed, retrying in 2 seconds...`);
+                        updateConnectionStatus('connecting', `Retrying... (${attempts}/${maxAttempts})`);
+                        await new Promise(resolve => setTimeout(resolve, 2000));
+                    }
+                }
+                
                 if (success) {
-                    console.log('✅ Application ready for authentic Firebase testing');
+                    console.log('✅ Application ready for Firebase testing');
                     showMessage('🔥 Firebase authentication ready!', 'success', 3000);
                 } else {
-                    console.error('❌ Firebase initialization failed');
+                    console.error('❌ Firebase initialization failed after all attempts');
+                    showMessage('❌ Unable to connect to Firebase. Please check your internet connection and try refreshing the page.', 'error');
                 }
             }, 1000);
             
