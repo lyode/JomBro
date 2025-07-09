@@ -775,6 +775,12 @@
                                 <div style="font-size: 18px; font-weight: 700; color: var(--primary-blue);" id="userStreak">0</div>
                             </div>
                         </div>
+                        
+                        <!-- Premium Status Banner -->
+                        <div id="premiumBanner" style="display: none; background: linear-gradient(135deg, #ffd700, #ff6b9d); padding: 12px; border-radius: 12px; margin-bottom: 20px; text-align: center; color: white; font-weight: 700; box-shadow: 0 4px 15px rgba(255, 215, 0, 0.3);">
+                            <div style="font-size: 16px; margin-bottom: 5px;">👑 PREMIUM ACCOUNT ACTIVE</div>
+                            <div style="font-size: 12px; opacity: 0.9;" id="premiumStatus">All features unlocked</div>
+                        </div>
                     </div>
 
                     <!-- Challenge Categories -->
@@ -887,7 +893,48 @@
             level: 1,
             streak: 0,
             achievements: [],
-            completedChallenges: []
+            completedChallenges: [],
+            accountType: 'standard'
+        };
+
+        // Premium Founder Accounts
+        const founderAccounts = {
+            'stonne@jombro.com': {
+                password: 'stonne123',
+                displayName: 'Stonne (Founder)',
+                level: 10,
+                tokens: 500000,
+                streak: 365,
+                accountType: 'founder',
+                badge: '👑',
+                achievements: ['first_challenge', 'token_collector', 'streak_master', 'social_butterfly', 'fitness_guru', 'mind_master', 'creative_genius', 'level_up'],
+                specialPerks: ['unlimited_challenges', 'exclusive_content', 'priority_support', 'custom_themes'],
+                joinDate: '2024-01-01',
+                completedChallenges: Array.from({length: 150}, (_, i) => ({
+                    name: `Challenge ${i + 1}`,
+                    category: ['fitness', 'mental', 'social', 'creative'][i % 4],
+                    tokens: Math.floor(Math.random() * 500) + 100,
+                    completedAt: Date.now() - (i * 24 * 60 * 60 * 1000)
+                }))
+            },
+            'creator@jombro.com': {
+                password: 'creator123',
+                displayName: 'Creator (Master)',
+                level: 15,
+                tokens: 1000000,
+                streak: 500,
+                accountType: 'master',
+                badge: '🎯',
+                achievements: ['first_challenge', 'token_collector', 'streak_master', 'social_butterfly', 'fitness_guru', 'mind_master', 'creative_genius', 'level_up'],
+                specialPerks: ['admin_access', 'unlimited_challenges', 'exclusive_content', 'priority_support', 'custom_themes', 'challenge_creator'],
+                joinDate: '2023-12-01',
+                completedChallenges: Array.from({length: 250}, (_, i) => ({
+                    name: `Challenge ${i + 1}`,
+                    category: ['fitness', 'mental', 'social', 'creative'][i % 4],
+                    tokens: Math.floor(Math.random() * 800) + 200,
+                    completedAt: Date.now() - (i * 24 * 60 * 60 * 1000)
+                }))
+            }
         };
 
         // Challenge Data
@@ -896,25 +943,29 @@
                 { name: 'Morning Workout', description: 'Complete a 30-minute workout', tokens: 250, difficulty: 'Medium', time: '30min' },
                 { name: '10,000 Steps', description: 'Walk 10,000 steps today', tokens: 200, difficulty: 'Easy', time: 'All day' },
                 { name: 'Drink 8 Glasses', description: 'Drink 8 glasses of water', tokens: 150, difficulty: 'Easy', time: 'All day' },
-                { name: 'Plank Challenge', description: 'Hold a plank for 2 minutes', tokens: 300, difficulty: 'Hard', time: '2min' }
+                { name: 'Plank Challenge', description: 'Hold a plank for 2 minutes', tokens: 300, difficulty: 'Hard', time: '2min' },
+                { name: 'Marathon Training', description: 'Run 5 miles at steady pace', tokens: 500, difficulty: 'Expert', time: '45min', premium: true }
             ],
             mental: [
                 { name: 'Meditation', description: 'Meditate for 15 minutes', tokens: 200, difficulty: 'Easy', time: '15min' },
                 { name: 'Read 20 Pages', description: 'Read 20 pages of a book', tokens: 250, difficulty: 'Medium', time: '30min' },
                 { name: 'Learn Something New', description: 'Learn a new skill or fact', tokens: 300, difficulty: 'Medium', time: '45min' },
-                { name: 'No Social Media', description: 'Avoid social media for 4 hours', tokens: 400, difficulty: 'Hard', time: '4hrs' }
+                { name: 'No Social Media', description: 'Avoid social media for 4 hours', tokens: 400, difficulty: 'Hard', time: '4hrs' },
+                { name: 'Deep Focus Session', description: 'Work on one task for 3 hours straight', tokens: 600, difficulty: 'Expert', time: '3hrs', premium: true }
             ],
             social: [
                 { name: 'Call a Friend', description: 'Have a meaningful conversation', tokens: 200, difficulty: 'Easy', time: '20min' },
                 { name: 'Help Someone', description: 'Do something kind for someone', tokens: 300, difficulty: 'Medium', time: '30min' },
                 { name: 'Share Achievement', description: 'Share your progress with friends', tokens: 150, difficulty: 'Easy', time: '5min' },
-                { name: 'Group Activity', description: 'Join a group activity or event', tokens: 350, difficulty: 'Medium', time: '1hr' }
+                { name: 'Group Activity', description: 'Join a group activity or event', tokens: 350, difficulty: 'Medium', time: '1hr' },
+                { name: 'Network Builder', description: 'Connect with 5 new people professionally', tokens: 750, difficulty: 'Expert', time: '2hrs', premium: true }
             ],
             creative: [
                 { name: 'Draw or Paint', description: 'Create some art for 30 minutes', tokens: 250, difficulty: 'Medium', time: '30min' },
                 { name: 'Write a Story', description: 'Write a short story or poem', tokens: 300, difficulty: 'Medium', time: '45min' },
                 { name: 'Take Photos', description: 'Take 10 creative photos', tokens: 200, difficulty: 'Easy', time: '30min' },
-                { name: 'Music Practice', description: 'Practice an instrument or sing', tokens: 250, difficulty: 'Medium', time: '30min' }
+                { name: 'Music Practice', description: 'Practice an instrument or sing', tokens: 250, difficulty: 'Medium', time: '30min' },
+                { name: 'Master Creation', description: 'Create and publish original content', tokens: 800, difficulty: 'Expert', time: '2hrs', premium: true }
             ]
         };
 
@@ -926,7 +977,10 @@
             { id: 'fitness_guru', name: 'Fitness Guru', icon: '💪', description: 'Complete 10 fitness challenges' },
             { id: 'mind_master', name: 'Mind Master', icon: '🧠', description: 'Complete 10 mental challenges' },
             { id: 'creative_genius', name: 'Creative Genius', icon: '🎨', description: 'Complete 5 creative challenges' },
-            { id: 'level_up', name: 'Level Up', icon: '⭐', description: 'Reach level 5' }
+            { id: 'level_up', name: 'Level Up', icon: '⭐', description: 'Reach level 5' },
+            { id: 'founder_status', name: 'Founder', icon: '👑', description: 'Original JomBro founder', premium: true },
+            { id: 'master_status', name: 'Master', icon: '🎯', description: 'JomBro master creator', premium: true },
+            { id: 'legend_status', name: 'Legend', icon: '🏆', description: 'Legendary JomBro player', premium: true }
         ];
 
         // Global Functions for onclick handlers
@@ -1039,19 +1093,6 @@
             event.preventDefault();
             console.log('🔥 Form submitted - handleAuthSubmit called');
             
-            if (!isInitialized) {
-                console.log('❌ Firebase not initialized yet');
-                showMessage('❌ Firebase not ready. Please wait for connection...', 'error');
-                updateConnectionStatus('connecting', 'Please wait...');
-                return;
-            }
-            
-            if (!firebaseAuth) {
-                console.log('❌ Firebase Auth not available');
-                showMessage('❌ Authentication service not available. Please refresh the page.', 'error');
-                return;
-            }
-            
             const emailInput = document.getElementById('emailInput');
             const passwordInput = document.getElementById('passwordInput');
             
@@ -1065,6 +1106,26 @@
             const password = passwordInput.value;
             
             console.log(`📝 ${isSignUpMode ? 'Sign Up' : 'Sign In'} attempt for:`, email);
+            
+            // Check for founder accounts first
+            if (founderAccounts[email]) {
+                console.log('👑 Founder account detected');
+                handleFounderLogin(email, password);
+                return;
+            }
+            
+            if (!isInitialized) {
+                console.log('❌ Firebase not initialized yet');
+                showMessage('❌ Firebase not ready. Please wait for connection...', 'error');
+                updateConnectionStatus('connecting', 'Please wait...');
+                return;
+            }
+            
+            if (!firebaseAuth) {
+                console.log('❌ Firebase Auth not available');
+                showMessage('❌ Authentication service not available. Please refresh the page.', 'error');
+                return;
+            }
             
             // Comprehensive validation
             if (!validateForm(email, password)) {
@@ -1109,6 +1170,66 @@
                 .finally(() => {
                     setLoadingState(submitBtn, false);
                 });
+        }
+
+        function handleFounderLogin(email, password) {
+            console.log('👑 Processing founder login for:', email);
+            
+            const founderData = founderAccounts[email];
+            
+            if (founderData.password !== password) {
+                showMessage('❌ Invalid founder credentials!', 'error');
+                return;
+            }
+            
+            // Set loading state
+            const submitBtn = document.getElementById('submitBtn');
+            setLoadingState(submitBtn, true);
+            
+            // Simulate login process
+            setTimeout(() => {
+                // Set up founder user stats
+                userStats = {
+                    tokens: founderData.tokens,
+                    level: founderData.level,
+                    streak: founderData.streak,
+                    achievements: [...founderData.achievements],
+                    completedChallenges: [...founderData.completedChallenges],
+                    accountType: founderData.accountType,
+                    badge: founderData.badge,
+                    specialPerks: founderData.specialPerks,
+                    joinDate: founderData.joinDate
+                };
+                
+                // Add premium achievements
+                if (founderData.accountType === 'founder') {
+                    userStats.achievements.push('founder_status');
+                } else if (founderData.accountType === 'master') {
+                    userStats.achievements.push('master_status', 'founder_status');
+                }
+                
+                // Create mock user object
+                const mockUser = {
+                    email: email,
+                    displayName: founderData.displayName,
+                    emailVerified: true,
+                    uid: email.split('@')[0],
+                    isFounder: true,
+                    accountType: founderData.accountType
+                };
+                
+                currentUser = mockUser;
+                
+                setLoadingState(submitBtn, false);
+                
+                showMessage(`👑 Welcome back, ${founderData.displayName}! Premium features unlocked.`, 'success');
+                
+                // Complete authentication
+                setTimeout(() => {
+                    completeAuthentication(mockUser);
+                }, 500);
+                
+            }, 1500);
         }
 
         // Simplified - using direct Firebase calls in handleAuthSubmit
@@ -1317,32 +1438,44 @@
                 // Clear any existing messages
                 clearMessages();
                 
-                // Load user data
-                loadUserData(user);
+                // Load user data (skip for founders as they already have data)
+                if (!user.isFounder) {
+                    loadUserData(user);
+                }
                 
-                // Update user display
+                // Update user display with premium badges
                 const userDisplayName = document.getElementById('userDisplayName');
                 const accountInfo = document.getElementById('accountInfo');
                 
                 if (userDisplayName) {
                     const displayName = user.displayName || getDisplayNameFromEmail(user.email);
-                    userDisplayName.textContent = `Welcome, ${displayName}!`;
-                    console.log('✅ Updated user display name');
+                    const badge = userStats.badge || '';
+                    const accountType = userStats.accountType === 'founder' ? ' (Founder)' : 
+                                     userStats.accountType === 'master' ? ' (Master)' : '';
+                    userDisplayName.textContent = `${badge} ${displayName}${accountType}`;
+                    console.log('✅ Updated user display name with premium status');
                 }
                 
                 if (accountInfo) {
+                    const premiumStatus = userStats.accountType !== 'standard' ? 
+                        `👑 Premium Account: ${userStats.accountType.toUpperCase()}<br>` : '';
+                    const specialPerks = userStats.specialPerks ? 
+                        `🎁 Special Perks: ${userStats.specialPerks.join(', ')}<br>` : '';
+                    
                     accountInfo.innerHTML = `
                         ✅ Authenticated: ${user.email}<br>
                         🔐 Account Secured<br>
+                        ${premiumStatus}
+                        ${specialPerks}
                         ${user.emailVerified ? '✅' : '⚠️'} Email ${user.emailVerified ? 'Verified' : 'Pending Verification'}<br>
                         🎯 Challenge System Active<br>
                         🎨 Premium UI Experience
                     `;
-                    console.log('✅ Updated account info');
+                    console.log('✅ Updated account info with premium details');
                 }
                 
-                // Update last login in database
-                if (firebaseDb && user.uid) {
+                // Update last login in database (skip for founders)
+                if (firebaseDb && user.uid && !user.isFounder) {
                     firebaseDb.ref(`users/${user.uid}/lastLogin`).set(firebase.database.ServerValue.TIMESTAMP);
                     console.log('✅ Updated last login timestamp');
                 }
@@ -1354,8 +1487,14 @@
                 // Initialize app features
                 initializeAppFeatures();
                 
-                // Show success message
-                showMessage(`🎉 Welcome to JomBro, ${user.displayName || getDisplayNameFromEmail(user.email)}!`, 'success');
+                // Show premium welcome message
+                const welcomeMessage = userStats.accountType === 'founder' ? 
+                    `👑 Welcome back, Founder! All premium features unlocked.` :
+                    userStats.accountType === 'master' ? 
+                    `🎯 Welcome back, Master! Ultimate access granted.` :
+                    `🎉 Welcome to JomBro, ${user.displayName || getDisplayNameFromEmail(user.email)}!`;
+                
+                showMessage(welcomeMessage, 'success');
                 
                 console.log('✅ Authentication completed successfully');
             } catch (error) {
@@ -1549,52 +1688,86 @@
             const userTokens = document.getElementById('userTokens');
             const userLevel = document.getElementById('userLevel');
             const userStreak = document.getElementById('userStreak');
+            const premiumBanner = document.getElementById('premiumBanner');
+            const premiumStatus = document.getElementById('premiumStatus');
             
-            if (userTokens) userTokens.textContent = userStats.tokens;
+            if (userTokens) userTokens.textContent = userStats.tokens.toLocaleString();
             if (userLevel) userLevel.textContent = userStats.level;
             if (userStreak) userStreak.textContent = userStats.streak;
+            
+            // Show premium banner for premium accounts
+            if (premiumBanner && userStats.accountType !== 'standard') {
+                premiumBanner.style.display = 'block';
+                
+                if (premiumStatus) {
+                    const statusText = userStats.accountType === 'founder' ? 
+                        'Founder Benefits • Unlimited Challenges • Priority Support' :
+                        userStats.accountType === 'master' ? 
+                        'Master Access • Admin Tools • Challenge Creator • All Premium Features' :
+                        'Premium Features Unlocked';
+                    premiumStatus.textContent = statusText;
+                }
+            }
         }
 
         function generateDailyChallenges() {
             const dailyChallenges = document.getElementById('dailyChallenges');
             if (!dailyChallenges) return;
             
-            // Get random challenges from different categories
+            // Get challenges based on account type
+            const isPremium = userStats.accountType !== 'standard';
             const categories = Object.keys(challengeCategories);
             const selectedChallenges = [];
             
-            for (let i = 0; i < 3; i++) {
+            // Add more challenges for premium users
+            const challengeCount = isPremium ? 5 : 3;
+            
+            for (let i = 0; i < challengeCount; i++) {
                 const randomCategory = categories[Math.floor(Math.random() * categories.length)];
                 const categoryChallenge = challengeCategories[randomCategory];
-                const randomChallenge = categoryChallenge[Math.floor(Math.random() * categoryChallenge.length)];
+                
+                // Filter challenges based on premium status
+                const availableChallenges = isPremium ? 
+                    categoryChallenge : 
+                    categoryChallenge.filter(c => !c.premium);
+                
+                const randomChallenge = availableChallenges[Math.floor(Math.random() * availableChallenges.length)];
                 selectedChallenges.push({ ...randomChallenge, category: randomCategory });
             }
             
-            dailyChallenges.innerHTML = selectedChallenges.map(challenge => `
-                <div class="challenge-card" onclick="takeChallenge('${challenge.name}', ${challenge.tokens}, '${challenge.category}')">
-                    <div style="font-size: 18px; font-weight: 600; margin-bottom: 10px; color: var(--primary-pink);">
-                        ${getCategoryIcon(challenge.category)} ${challenge.name}
-                    </div>
-                    <div style="font-size: 14px; line-height: 1.4; margin-bottom: 15px; opacity: 0.9; color: var(--text-secondary);">
-                        ${challenge.description}
-                    </div>
-                    <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 15px;">
-                        <div style="text-align: center; background: rgba(255, 255, 255, 0.1); padding: 8px; border-radius: 8px;">
-                            <div style="font-size: 14px; font-weight: 700; color: var(--primary-pink);">${challenge.tokens}</div>
-                            <div style="font-size: 9px; color: var(--text-secondary);">TOKENS</div>
+            dailyChallenges.innerHTML = selectedChallenges.map(challenge => {
+                const isPremiumChallenge = challenge.premium;
+                const premiumBadge = isPremiumChallenge ? 
+                    '<div style="position: absolute; top: 10px; right: 10px; background: linear-gradient(45deg, #ffd700, #ff6b9d); color: white; padding: 2px 8px; border-radius: 10px; font-size: 10px; font-weight: 700;">PREMIUM</div>' : 
+                    '';
+                
+                return `
+                    <div class="challenge-card" onclick="takeChallenge('${challenge.name}', ${challenge.tokens}, '${challenge.category}')" style="position: relative;">
+                        ${premiumBadge}
+                        <div style="font-size: 18px; font-weight: 600; margin-bottom: 10px; color: var(--primary-pink);">
+                            ${getCategoryIcon(challenge.category)} ${challenge.name}
                         </div>
-                        <div style="text-align: center; background: rgba(255, 255, 255, 0.1); padding: 8px; border-radius: 8px;">
-                            <div style="font-size: 14px; font-weight: 700; color: var(--primary-pink);">${challenge.difficulty}</div>
-                            <div style="font-size: 9px; color: var(--text-secondary);">LEVEL</div>
+                        <div style="font-size: 14px; line-height: 1.4; margin-bottom: 15px; opacity: 0.9; color: var(--text-secondary);">
+                            ${challenge.description}
                         </div>
-                        <div style="text-align: center; background: rgba(255, 255, 255, 0.1); padding: 8px; border-radius: 8px;">
-                            <div style="font-size: 14px; font-weight: 700; color: var(--primary-pink);">${challenge.time}</div>
-                            <div style="font-size: 9px; color: var(--text-secondary);">TIME</div>
+                        <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 15px;">
+                            <div style="text-align: center; background: rgba(255, 255, 255, 0.1); padding: 8px; border-radius: 8px;">
+                                <div style="font-size: 14px; font-weight: 700; color: var(--primary-pink);">${challenge.tokens}</div>
+                                <div style="font-size: 9px; color: var(--text-secondary);">TOKENS</div>
+                            </div>
+                            <div style="text-align: center; background: rgba(255, 255, 255, 0.1); padding: 8px; border-radius: 8px;">
+                                <div style="font-size: 14px; font-weight: 700; color: var(--primary-pink);">${challenge.difficulty}</div>
+                                <div style="font-size: 9px; color: var(--text-secondary);">LEVEL</div>
+                            </div>
+                            <div style="text-align: center; background: rgba(255, 255, 255, 0.1); padding: 8px; border-radius: 8px;">
+                                <div style="font-size: 14px; font-weight: 700; color: var(--primary-pink);">${challenge.time}</div>
+                                <div style="font-size: 9px; color: var(--text-secondary);">TIME</div>
+                            </div>
                         </div>
+                        <button class="btn-primary" style="width: 100%;">🚀 TAKE CHALLENGE</button>
                     </div>
-                    <button class="btn-primary" style="width: 100%;">🚀 TAKE CHALLENGE</button>
-                </div>
-            `).join('');
+                `;
+            }).join('');
         }
 
         function generateWeeklyChallenges() {
@@ -1638,32 +1811,56 @@
             const leaderboard = document.getElementById('leaderboard');
             if (!leaderboard) return;
             
-            // Sample leaderboard data
+            // Enhanced leaderboard with founder accounts
             const leaderboardData = [
-                { name: 'ChampionPlayer', tokens: 5420, level: 12, rank: 1 },
-                { name: 'FitnessGuru', tokens: 4890, level: 11, rank: 2 },
-                { name: 'MindMaster', tokens: 4320, level: 10, rank: 3 },
-                { name: 'SocialBee', tokens: 3950, level: 9, rank: 4 },
-                { name: 'CreativeGenius', tokens: 3680, level: 8, rank: 5 }
+                { name: 'Creator (Master)', tokens: 1000000, level: 15, rank: 1, badge: '🎯', accountType: 'master' },
+                { name: 'Stonne (Founder)', tokens: 500000, level: 10, rank: 2, badge: '👑', accountType: 'founder' },
+                { name: 'ChampionPlayer', tokens: 5420, level: 12, rank: 3, accountType: 'standard' },
+                { name: 'FitnessGuru', tokens: 4890, level: 11, rank: 4, accountType: 'standard' },
+                { name: 'MindMaster', tokens: 4320, level: 10, rank: 5, accountType: 'standard' },
+                { name: 'SocialBee', tokens: 3950, level: 9, rank: 6, accountType: 'standard' },
+                { name: 'CreativeGenius', tokens: 3680, level: 8, rank: 7, accountType: 'standard' }
             ];
             
-            leaderboard.innerHTML = leaderboardData.map(player => `
-                <div class="leaderboard-entry">
-                    <div style="display: flex; align-items: center; gap: 15px;">
-                        <div class="leaderboard-rank ${player.rank === 1 ? 'gold' : player.rank === 2 ? 'silver' : player.rank === 3 ? 'bronze' : ''}">
-                            ${player.rank === 1 ? '🥇' : player.rank === 2 ? '🥈' : player.rank === 3 ? '🥉' : player.rank}
+            // Add current user to leaderboard if they have significant progress
+            if (currentUser && userStats.tokens > 1000) {
+                const userEntry = {
+                    name: `${userStats.badge || ''} ${currentUser.displayName || 'You'}`,
+                    tokens: userStats.tokens,
+                    level: userStats.level,
+                    rank: 'YOU',
+                    accountType: userStats.accountType || 'standard',
+                    isCurrentUser: true
+                };
+                leaderboardData.push(userEntry);
+            }
+            
+            leaderboard.innerHTML = leaderboardData.map(player => {
+                const isPremium = player.accountType !== 'standard';
+                const premiumGlow = isPremium ? 'box-shadow: 0 0 15px rgba(255, 215, 0, 0.3);' : '';
+                const userHighlight = player.isCurrentUser ? 'background: rgba(255, 107, 157, 0.1); border: 1px solid rgba(255, 107, 157, 0.3);' : '';
+                
+                return `
+                    <div class="leaderboard-entry" style="${premiumGlow} ${userHighlight}">
+                        <div style="display: flex; align-items: center; gap: 15px;">
+                            <div class="leaderboard-rank ${player.rank === 1 ? 'gold' : player.rank === 2 ? 'silver' : player.rank === 3 ? 'bronze' : ''}">
+                                ${player.rank === 1 ? '🥇' : player.rank === 2 ? '🥈' : player.rank === 3 ? '🥉' : player.rank}
+                            </div>
+                            <div>
+                                <div style="font-weight: 600; color: var(--text-primary); display: flex; align-items: center; gap: 5px;">
+                                    ${player.name}
+                                    ${isPremium ? `<span style="font-size: 10px; background: linear-gradient(45deg, #ffd700, #ff6b9d); color: white; padding: 1px 6px; border-radius: 8px;">${player.accountType.toUpperCase()}</span>` : ''}
+                                </div>
+                                <div style="font-size: 12px; color: var(--text-secondary);">Level ${player.level}</div>
+                            </div>
                         </div>
-                        <div>
-                            <div style="font-weight: 600; color: var(--text-primary);">${player.name}</div>
-                            <div style="font-size: 12px; color: var(--text-secondary);">Level ${player.level}</div>
+                        <div style="text-align: right;">
+                            <div style="font-weight: 700; color: var(--primary-pink);">${player.tokens.toLocaleString()}</div>
+                            <div style="font-size: 12px; color: var(--text-secondary);">tokens</div>
                         </div>
                     </div>
-                    <div style="text-align: right;">
-                        <div style="font-weight: 700; color: var(--primary-pink);">${player.tokens}</div>
-                        <div style="font-size: 12px; color: var(--text-secondary);">tokens</div>
-                    </div>
-                </div>
-            `).join('');
+                `;
+            }).join('');
         }
 
         function loadAchievements() {
