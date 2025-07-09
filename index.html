@@ -5195,7 +5195,7 @@
             }, 1000);
         }
 
-        // Enhanced initialization with retry logic and stability improvements
+        // Enhanced initialization with stable retry logic
         document.addEventListener('DOMContentLoaded', function() {
             console.log('🚀 JomBro Enhanced - Initializing...');
             
@@ -5211,13 +5211,13 @@
                 console.error('❌ Auth form not found');
             }
             
-            // Initialize Firebase with enhanced retry logic
+            // Initialize Firebase with stable retry logic
             setTimeout(async () => {
                 console.log('🔥 Starting Firebase initialization...');
                 
                 let success = false;
                 let attempts = 0;
-                const maxAttempts = 5; // Increased attempts
+                const maxAttempts = 3;
                 
                 while (!success && attempts < maxAttempts) {
                     attempts++;
@@ -5227,9 +5227,9 @@
                     success = await initializeFirebase();
                     
                     if (!success && attempts < maxAttempts) {
-                        console.log(`⚠️ Attempt ${attempts} failed, retrying in ${attempts * 2} seconds...`);
-                        updateConnectionStatus('connecting', `Retrying in ${attempts * 2}s... (${attempts}/${maxAttempts})`);
-                        await new Promise(resolve => setTimeout(resolve, attempts * 2000)); // Increasing delay
+                        console.log(`⚠️ Attempt ${attempts} failed, retrying in 2 seconds...`);
+                        updateConnectionStatus('connecting', `Retrying in 2s... (${attempts}/${maxAttempts})`);
+                        await new Promise(resolve => setTimeout(resolve, 2000));
                     }
                 }
                 
@@ -5240,13 +5240,8 @@
                     console.error('❌ Firebase initialization failed after all attempts');
                     updateConnectionStatus('disconnected', 'Connection Failed');
                     showMessage('❌ Unable to connect to Firebase. Please check your internet connection and refresh the page.', 'error', 10000);
-                    
-                    // Offer manual retry
-                    setTimeout(() => {
-                        showMessage('🔄 You can try refreshing the page or check your internet connection.', 'info', 8000);
-                    }, 5000);
                 }
-            }, 500); // Reduced initial delay
+            }, 500);
             
             // Enhanced keyboard shortcuts
             document.addEventListener('keydown', function(e) {
@@ -5318,56 +5313,8 @@
                 });
             }
             
-            // Enhanced connection monitoring
-            let connectionCheckInterval;
-            
-            function startConnectionMonitoring() {
-                if (connectionCheckInterval) {
-                    clearInterval(connectionCheckInterval);
-                }
-                
-                connectionCheckInterval = setInterval(() => {
-                    if (navigator.onLine) {
-                        if (!isInitialized) {
-                            console.log('🔄 Network back online, attempting to reconnect...');
-                            initializeFirebase();
-                        }
-                    } else {
-                        console.log('📵 Network offline detected');
-                        updateConnectionStatus('disconnected', 'No Internet Connection');
-                        showMessage('📵 No internet connection. Please check your network.', 'warning');
-                    }
-                }, 10000); // Check every 10 seconds
-            }
-            
-            // Network event listeners
-            window.addEventListener('online', () => {
-                console.log('🌐 Network connection restored');
-                if (!isInitialized) {
-                    showMessage('🌐 Network restored. Reconnecting...', 'info');
-                    initializeFirebase();
-                }
-            });
-            
-            window.addEventListener('offline', () => {
-                console.log('📵 Network connection lost');
-                updateConnectionStatus('disconnected', 'Offline');
-                showMessage('📵 Network connection lost. Please check your internet.', 'warning');
-            });
-            
-            // Start connection monitoring
-            startConnectionMonitoring();
-            
-            // Page visibility handling
-            document.addEventListener('visibilitychange', function() {
-                if (document.visibilityState === 'visible' && !isInitialized) {
-                    console.log('👁️ Page became visible, checking Firebase connection...');
-                    initializeFirebase();
-                }
-            });
-            
             console.log('✅ JomBro Enhanced initialization complete');
-            console.log('🎯 Features: Enhanced Stability, Live Players, AI Challenges, Better Error Handling');
+            console.log('🎯 Features: Enhanced Stability, Live Players, AI Challenges, Friends & Groups');
         });
     </script>
 </body>
