@@ -1,12 +1,4 @@
-// Enhanced App Features Functions
-        function initializeAppFeatures() {
-            console.log('🎮 Initializing full app features...');
-            
-            // Generate daily challenges
-            generateDailyChallenges();
-            
-            // Generate weekly challenges  
-            generateWeeklyChallenges();<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -1441,53 +1433,99 @@
         window.toggleOnlinePlayers = toggleOnlinePlayers;
         window.claimDailyReward = claimDailyReward;
 
-        // Initialize Firebase
+        // Initialize Firebase with enhanced stability
         async function initializeFirebase() {
             try {
                 console.log('🔥 Initializing Firebase Authentication...');
-                updateConnectionStatus('connecting', 'Initializing Firebase...');
+                updateConnectionStatus('connecting', 'Connecting to Firebase...');
                 
+                // Check if Firebase SDK is loaded
                 if (typeof firebase === 'undefined') {
+                    console.error('❌ Firebase SDK not loaded');
                     throw new Error('Firebase SDK not loaded. Please check your internet connection.');
                 }
                 
-                firebaseApp = firebase.initializeApp(firebaseConfig);
+                console.log('✅ Firebase SDK loaded successfully');
+                
+                // Initialize Firebase only if not already initialized
+                if (!firebaseApp) {
+                    try {
+                        firebaseApp = firebase.initializeApp(firebaseConfig);
+                        console.log('✅ Firebase app initialized');
+                    } catch (error) {
+                        if (error.code === 'app/duplicate-app') {
+                            firebaseApp = firebase.app();
+                            console.log('✅ Using existing Firebase app');
+                        } else {
+                            throw error;
+                        }
+                    }
+                }
+                
                 firebaseAuth = firebase.auth();
                 firebaseDb = firebase.database();
                 
+                console.log('✅ Firebase services connected');
+                
+                // Configure Auth settings
                 firebaseAuth.useDeviceLanguage();
                 
+                // Set up auth state persistence with error handling
                 try {
                     await firebaseAuth.setPersistence(firebase.auth.Auth.Persistence.LOCAL);
+                    console.log('✅ Auth persistence configured');
                 } catch (persistenceError) {
-                    console.warn('⚠️ Auth persistence failed, continuing:', persistenceError);
+                    console.warn('⚠️ Auth persistence failed, continuing without it:', persistenceError);
                 }
                 
+                // Set up auth state listener with better error handling
                 firebaseAuth.onAuthStateChanged((user) => {
+                    console.log('🔄 Auth state changed:', user ? `User: ${user.email}` : 'No user');
+                    
                     if (user) {
                         currentUser = user;
+                        console.log('✅ User authenticated:', {
+                            email: user.email,
+                            emailVerified: user.emailVerified,
+                            uid: user.uid,
+                            displayName: user.displayName
+                        });
+                        
+                        // Delay to ensure UI is ready
                         setTimeout(() => {
                             completeAuthentication(user);
                         }, 500);
                     } else {
                         currentUser = null;
+                        console.log('🔌 User signed out');
                         showAuthScreen();
                     }
+                }, (error) => {
+                    console.error('❌ Auth state listener error:', error);
+                    updateConnectionStatus('disconnected', 'Auth Error');
+                    showMessage('❌ Authentication error occurred', 'error');
                 });
                 
+                console.log('✅ Auth state listener configured');
+                
+                // Test Firebase connection with proper timeout
                 try {
-                    await Promise.race([
-                        firebaseDb.ref('.info/connected').once('value'),
-                        new Promise((_, reject) => 
-                            setTimeout(() => reject(new Error('Connection timeout')), 10000)
-                        )
-                    ]);
+                    const connectionPromise = firebaseDb.ref('.info/connected').once('value');
+                    const timeoutPromise = new Promise((_, reject) => 
+                        setTimeout(() => reject(new Error('Connection timeout')), 8000)
+                    );
+                    
+                    await Promise.race([connectionPromise, timeoutPromise]);
+                    console.log('✅ Firebase database connection verified');
                 } catch (connectionError) {
                     console.warn('⚠️ Database connection test failed, but auth may still work:', connectionError);
+                    // Don't fail initialization for database connection issues
                 }
                 
+                // Mark as initialized
                 isInitialized = true;
-                updateConnectionStatus('connected', 'Firebase Connected');
+                updateConnectionStatus('connected', 'Firebase Ready');
+                console.log('✅ Firebase initialization completed successfully');
                 
                 return true;
                 
@@ -1495,13 +1533,18 @@
                 console.error('❌ Firebase initialization failed:', error);
                 updateConnectionStatus('disconnected', 'Connection Failed');
                 
-                let errorMessage = 'Firebase connection failed';
+                // More specific error messages
+                let errorMessage = 'Firebase connection failed. ';
                 if (error.message.includes('SDK not loaded')) {
-                    errorMessage = 'Firebase SDK failed to load. Please check your internet connection.';
+                    errorMessage += 'Please check your internet connection and refresh the page.';
                 } else if (error.message.includes('network')) {
-                    errorMessage = 'Network error. Please check your internet connection.';
+                    errorMessage += 'Network error. Please check your connection.';
                 } else if (error.message.includes('timeout')) {
-                    errorMessage = 'Connection timeout. Please try again.';
+                    errorMessage += 'Connection timeout. Please try again.';
+                } else if (error.code === 'auth/network-request-failed') {
+                    errorMessage += 'Network request failed. Please check your internet connection.';
+                } else {
+                    errorMessage += error.message;
                 }
                 
                 showMessage(`❌ ${errorMessage}`, 'error');
@@ -1512,11 +1555,13 @@
         // Authentication Functions
         function handleAuthSubmit(event) {
             event.preventDefault();
+            console.log('🔥 Auth form submitted');
             
             const emailInput = document.getElementById('emailInput');
             const passwordInput = document.getElementById('passwordInput');
             
             if (!emailInput || !passwordInput) {
+                console.error('❌ Form inputs not found');
                 showMessage('❌ Form error - please refresh the page', 'error');
                 return;
             }
@@ -1524,29 +1569,47 @@
             const email = emailInput.value.trim().toLowerCase();
             const password = passwordInput.value;
             
+            console.log(`📧 Email: ${email}, Mode: ${isSignUpMode ? 'Sign Up' : 'Sign In'}`);
+            
             // Check for founder accounts first
             if (founderAccounts[email]) {
+                console.log('👑 Founder account detected');
                 handleFounderLogin(email, password);
                 return;
             }
             
-            if (!isInitialized) {
-                showMessage('❌ Firebase not ready. Please wait for connection...', 'error');
-                updateConnectionStatus('connecting', 'Please wait...');
-                return;
-            }
-            
-            if (!firebaseAuth) {
-                showMessage('❌ Authentication service not available. Please refresh the page.', 'error');
-                return;
-            }
-            
+            // Basic validation first
             if (!validateForm(email, password)) {
+                console.log('❌ Form validation failed');
+                return;
+            }
+            
+            // Check Firebase initialization
+            if (!isInitialized || !firebaseAuth) {
+                console.log('❌ Firebase not ready');
+                showMessage('❌ Please wait for Firebase to connect...', 'error');
+                // Retry initialization
+                setTimeout(() => {
+                    initializeFirebase().then(success => {
+                        if (success) {
+                            showMessage('✅ Firebase connected! Please try again.', 'success');
+                        }
+                    });
+                }, 1000);
                 return;
             }
             
             const submitBtn = document.getElementById('submitBtn');
             setLoadingState(submitBtn, true);
+            
+            console.log('🚀 Starting Firebase authentication...');
+            
+            // Add timeout to prevent hanging
+            const authTimeout = setTimeout(() => {
+                console.log('⏰ Auth timeout - resetting');
+                setLoadingState(submitBtn, false);
+                showMessage('❌ Authentication timed out. Please try again.', 'error');
+            }, 15000);
             
             const authPromise = isSignUpMode ? 
                 firebaseAuth.createUserWithEmailAndPassword(email, password) : 
@@ -1554,7 +1617,9 @@
             
             authPromise
                 .then((userCredential) => {
+                    clearTimeout(authTimeout);
                     const user = userCredential.user;
+                    console.log(`✅ ${isSignUpMode ? 'Sign up' : 'Sign in'} successful:`, user.email);
                     
                     if (isSignUpMode) {
                         setupNewUser(user, email);
@@ -1567,9 +1632,12 @@
                     );
                 })
                 .catch((error) => {
+                    clearTimeout(authTimeout);
+                    console.error(`❌ ${isSignUpMode ? 'Sign up' : 'Sign in'} failed:`, error);
                     handleAuthError(error);
                 })
                 .finally(() => {
+                    clearTimeout(authTimeout);
                     setLoadingState(submitBtn, false);
                 });
         }
@@ -1669,8 +1737,13 @@
             }
         }
 
+        // Enhanced form validation with better error handling
         function validateForm(email, password) {
-            if (!email) {
+            // Clear any existing messages first
+            clearMessages();
+            
+            // Email validation
+            if (!email || email.length === 0) {
                 showMessage('❌ Please enter your email address!', 'error');
                 focusField('emailInput');
                 return false;
@@ -1683,7 +1756,8 @@
                 return false;
             }
             
-            if (!password) {
+            // Password validation
+            if (!password || password.length === 0) {
                 showMessage('❌ Please enter your password!', 'error');
                 focusField('passwordInput');
                 return false;
@@ -1695,42 +1769,60 @@
                 return false;
             }
             
-            if (isSignUpMode && password.length < 8) {
-                showMessage('💡 For better security, consider using 8+ characters', 'info');
+            // Additional validation for sign up
+            if (isSignUpMode) {
+                if (password.length < 8) {
+                    showMessage('💡 For better security, consider using 8+ characters with numbers and symbols', 'info');
+                }
+                
+                // Check for common weak passwords
+                const weakPasswords = ['password', '123456', 'password123', 'admin', 'user'];
+                if (weakPasswords.includes(password.toLowerCase())) {
+                    showMessage('❌ Please choose a stronger password!', 'error');
+                    focusField('passwordInput');
+                    return false;
+                }
             }
             
+            console.log('✅ Form validation passed');
             return true;
         }
 
+        // Enhanced error handling for authentication
         function handleAuthError(error) {
+            console.error('🔥 Auth error:', error.code, error.message);
+            
             let message = '';
             let shouldSwitchMode = false;
+            let shouldFocusField = '';
             
             switch (error.code) {
                 case 'auth/user-not-found':
-                    message = '❌ No account found with this email.';
+                    message = '❌ No account found with this email address.';
                     if (!isSignUpMode) {
-                        message += ' Creating account instead...';
+                        message += ' Would you like to create an account instead?';
                         shouldSwitchMode = true;
                     }
+                    shouldFocusField = 'emailInput';
                     break;
                     
                 case 'auth/wrong-password':
-                    message = '❌ Incorrect password. Please try again.';
-                    focusField('passwordInput');
+                    message = '❌ Incorrect password. Please check your password and try again.';
+                    shouldFocusField = 'passwordInput';
                     break;
                     
                 case 'auth/email-already-in-use':
-                    message = '❌ Account already exists with this email.';
+                    message = '❌ An account already exists with this email address.';
                     if (isSignUpMode) {
-                        message += ' Switching to sign in...';
+                        message += ' Would you like to sign in instead?';
                         shouldSwitchMode = true;
                     }
+                    shouldFocusField = 'emailInput';
                     break;
                     
                 case 'auth/weak-password':
-                    message = '❌ Password is too weak. Use at least 6 characters with letters and numbers.';
-                    focusField('passwordInput');
+                    message = '❌ Password is too weak. Please use at least 6 characters with letters, numbers, and symbols.';
+                    shouldFocusField = 'passwordInput';
                     break;
                     
                 case 'auth/network-request-failed':
@@ -1742,16 +1834,24 @@
                     break;
                     
                 case 'auth/invalid-email':
-                    message = '❌ Invalid email format. Please check your email address.';
-                    focusField('emailInput');
+                    message = '❌ Invalid email format. Please enter a valid email address.';
+                    shouldFocusField = 'emailInput';
                     break;
                     
                 case 'auth/user-disabled':
-                    message = '❌ This account has been disabled. Please contact support.';
+                    message = '❌ This account has been disabled. Please contact support for assistance.';
                     break;
                     
                 case 'auth/operation-not-allowed':
                     message = '❌ Email/password authentication is not enabled. Please contact support.';
+                    break;
+                    
+                case 'auth/internal-error':
+                    message = '❌ Internal error occurred. Please try again in a few moments.';
+                    break;
+                    
+                case 'auth/invalid-credential':
+                    message = '❌ Invalid credentials. Please check your email and password.';
                     break;
                     
                 default:
@@ -1761,11 +1861,17 @@
             
             showMessage(message, 'error');
             
+            // Focus the appropriate field
+            if (shouldFocusField) {
+                focusField(shouldFocusField);
+            }
+            
+            // Auto-switch mode if appropriate
             if (shouldSwitchMode) {
                 setTimeout(() => {
                     toggleMode();
-                    showMessage('💡 Switched modes automatically', 'info');
-                }, 2500);
+                    showMessage('🔄 Switched modes automatically', 'info');
+                }, 3000);
             }
         }
 
@@ -2948,48 +3054,74 @@
             }, 1000);
         }
 
-        // Event Listeners and Initialization
+        // Enhanced initialization with retry logic and stability improvements
         document.addEventListener('DOMContentLoaded', function() {
             console.log('🚀 JomBro Enhanced - Initializing...');
             
+            // Set up form submission with enhanced error handling
             const authForm = document.getElementById('authForm');
             if (authForm) {
                 authForm.addEventListener('submit', function(e) {
+                    console.log('📝 Form submit event triggered');
                     handleAuthSubmit(e);
                 });
+                console.log('✅ Form event listener added');
+            } else {
+                console.error('❌ Auth form not found');
             }
             
-            // Initialize Firebase with retry logic
+            // Initialize Firebase with enhanced retry logic
             setTimeout(async () => {
+                console.log('🔥 Starting Firebase initialization...');
+                
                 let success = false;
                 let attempts = 0;
-                const maxAttempts = 3;
+                const maxAttempts = 5; // Increased attempts
                 
                 while (!success && attempts < maxAttempts) {
                     attempts++;
+                    console.log(`🔄 Firebase initialization attempt ${attempts}/${maxAttempts}`);
+                    updateConnectionStatus('connecting', `Connecting... (${attempts}/${maxAttempts})`);
+                    
                     success = await initializeFirebase();
                     
                     if (!success && attempts < maxAttempts) {
-                        updateConnectionStatus('connecting', `Retrying... (${attempts}/${maxAttempts})`);
-                        await new Promise(resolve => setTimeout(resolve, 2000));
+                        console.log(`⚠️ Attempt ${attempts} failed, retrying in ${attempts * 2} seconds...`);
+                        updateConnectionStatus('connecting', `Retrying in ${attempts * 2}s... (${attempts}/${maxAttempts})`);
+                        await new Promise(resolve => setTimeout(resolve, attempts * 2000)); // Increasing delay
                     }
                 }
                 
                 if (success) {
+                    console.log('✅ Firebase initialization successful');
                     showMessage('🔥 Firebase authentication ready!', 'success', 3000);
                 } else {
-                    showMessage('❌ Unable to connect to Firebase. Please check your internet connection and try refreshing the page.', 'error');
+                    console.error('❌ Firebase initialization failed after all attempts');
+                    updateConnectionStatus('disconnected', 'Connection Failed');
+                    showMessage('❌ Unable to connect to Firebase. Please check your internet connection and refresh the page.', 'error', 10000);
+                    
+                    // Offer manual retry
+                    setTimeout(() => {
+                        showMessage('🔄 You can try refreshing the page or check your internet connection.', 'info', 8000);
+                    }, 5000);
                 }
-            }, 1000);
+            }, 500); // Reduced initial delay
             
-            // Add keyboard shortcuts
+            // Enhanced keyboard shortcuts
             document.addEventListener('keydown', function(e) {
+                // Ctrl/Cmd + Enter to submit form
                 if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
                     const submitBtn = document.getElementById('submitBtn');
                     if (submitBtn && !submitBtn.disabled) {
                         e.preventDefault();
+                        console.log('⌨️ Keyboard shortcut triggered');
                         submitBtn.click();
                     }
+                }
+                
+                // Escape to clear messages
+                if (e.key === 'Escape') {
+                    clearMessages();
                 }
             });
             
@@ -3004,3036 +3136,97 @@
                 }
             });
             
-            console.log('✅ JomBro Enhanced Ready!');
-            console.log('🎯 Features: Live Players, AI Challenges, Enhanced UI');
-        });
-    </script>
-</body>
-</html>
-            
-            // Load leaderboard
-            loadLeaderboard();
-            
-            // Load achievements
-            loadAchievements();
-            
-            // Update user stats display
-            updateUserStatsDisplay();
-            
-            // Initialize daily rewards
-            initializeDailyRewards();
-            
-            // Check for special events
-            checkSpecialEvents();
-            
-            // Initialize power-ups
-            initializePowerUps();
-            
-            // Update user rank
-            updateUserRank();
-            
-            console.log('✅ Full app features initialized');
-        }
-
-        function updateUserStatsDisplay() {
-            const userTokens = document.getElementById('userTokens');
-            const userLevel = document.getElementById('userLevel');
-            const userStreak = document.getElementById('userStreak');
-            const userRank = document.getElementById('userRank');
-            const userEnergy = document.getElementById('userEnergy');
-            const userGems = document.getElementById('userGems');
-            const xpProgress = document.getElementById('xpProgress');
-            const xpFill = document.getElementById('xpFill');
-            const premiumBanner = document.getElementById('premiumBanner');
-            const premiumStatus = document.getElementById('premiumStatus');
-            
-            if (userTokens) userTokens.textContent = userStats.tokens.toLocaleString();
-            if (userLevel) userLevel.textContent = userStats.level;
-            if (userStreak) userStreak.textContent = userStats.streak;
-            if (userRank) userRank.textContent = userStats.rank;
-            if (userEnergy) userEnergy.textContent = userStats.energy;
-            if (userGems) userGems.textContent = userStats.gems;
-            
-            // Update XP progress
-            const xpNeeded = userStats.level * 1000;
-            const xpPercent = Math.min((userStats.xp / xpNeeded) * 100, 100);
-            if (xpProgress) xpProgress.textContent = `${userStats.xp} / ${xpNeeded}`;
-            if (xpFill) xpFill.style.width = `${xpPercent}%`;
-            
-            // Show premium banner for premium accounts
-            if (premiumBanner && userStats.accountType !== 'standard') {
-                premiumBanner.style.display = 'block';
-                
-                if (premiumStatus) {
-                    const statusText = userStats.accountType === 'founder' ? 
-                        'Founder Benefits • Unlimited Challenges • Priority Support' :
-                        userStats.accountType === 'master' ? 
-                        'Master Access • Admin Tools • Challenge Creator • All Premium Features' :
-                        'Premium Features Unlocked';
-                    premiumStatus.textContent = statusText;
-                }
-            }
-        }
-
-        function updateUserRank() {
-            const currentRank = gameFeatures.ranks.find(rank => 
-                userStats.tokens >= rank.minTokens && 
-                userStats.tokens < (gameFeatures.ranks[gameFeatures.ranks.indexOf(rank) + 1]?.minTokens || Infinity)
-            );
-            
-            if (currentRank) {
-                userStats.rank = currentRank.name;
-                const userRankElement = document.getElementById('userRank');
-                if (userRankElement) {
-                    userRankElement.textContent = currentRank.name;
-                    userRankElement.style.color = currentRank.color;
-                }
-            }
-        }
-
-        function initializeDailyRewards() {
-            const dailyRewardsGrid = document.getElementById('dailyRewardsGrid');
-            const dailyRewardBtn = document.getElementById('dailyRewardBtn');
-            
-            if (!dailyRewardsGrid) return;
-            
-            const today = new Date().getDate();
-            const currentDay = userStats.dailyRewards || 1;
-            
-            dailyRewardsGrid.innerHTML = gameFeatures.dailyRewards.map((reward, index) => {
-                const day = index + 1;
-                const isToday = day === currentDay;
-                const isClaimed = day < currentDay;
-                const isAvailable = day === currentDay;
-                
-                return `
-                    <div style="background: ${isClaimed ? 'rgba(16, 185, 129, 0.2)' : isToday ? 'rgba(255, 107, 157, 0.2)' : 'rgba(255, 255, 255, 0.05)'}; 
-                                border: 1px solid ${isClaimed ? '#10b981' : isToday ? '#ff6b9d' : 'rgba(255, 255, 255, 0.1)'}; 
-                                border-radius: 8px; padding: 8px; text-align: center; font-size: 12px;">
-                        <div style="font-weight: 700; margin-bottom: 5px;">Day ${day}</div>
-                        <div style="font-size: 10px; opacity: 0.8;">
-                            ${reward.reward.type === 'tokens' ? `${reward.reward.tokens} tokens` : 
-                              reward.reward.type === 'gems' ? `${reward.reward.gems} gems` : 
-                              reward.reward.type === 'powerup' ? 'Power-up' : 'Mega Reward'}
-                        </div>
-                        ${isClaimed ? '<div style="color: #10b981; font-size: 14px; margin-top: 5px;">✅</div>' : ''}
-                        ${isToday ? '<div style="color: #ff6b9d; font-size: 14px; margin-top: 5px;">🎁</div>' : ''}
-                    </div>
-                `;
-            }).join('');
-            
-            if (dailyRewardBtn) {
-                dailyRewardBtn.style.display = currentDay <= 7 ? 'block' : 'none';
-                dailyRewardBtn.disabled = currentDay > 7;
-            }
-        }
-
-        function checkSpecialEvents() {
-            const specialEventBanner = document.getElementById('specialEventBanner');
-            if (!specialEventBanner) return;
-            
-            const activeEvents = gameFeatures.specialEvents.filter(event => event.active);
-            
-            if (activeEvents.length > 0) {
-                specialEventBanner.style.display = 'block';
-                specialEventBanner.innerHTML = activeEvents.map(event => `
-                    <div class="special-event" style="padding: 10px; border-radius: 10px; margin-bottom: 5px; text-align: center;">
-                        <div style="font-size: 14px; font-weight: 600; color: white; margin-bottom: 5px;">
-                            🎉 ${event.name}
-                        </div>
-                        <div style="font-size: 12px; color: white; opacity: 0.9;">
-                            ${event.description}
-                        </div>
-                        <div style="font-size: 10px; color: white; opacity: 0.7; margin-top: 5px;">
-                            Expires: ${new Date(event.expires).toLocaleDateString()}
-                        </div>
-                    </div>
-                `).join('');
-            }
-        }
-
-        function initializePowerUps() {
-            const activePowerUps = document.getElementById('activePowerUps');
-            if (!activePowerUps) return;
-            
-            const active = userStats.powerUps.filter(p => p.active);
-            
-            if (active.length === 0) {
-                activePowerUps.innerHTML = '<div style="text-align: center; color: var(--text-secondary); font-size: 12px; grid-column: 1 / -1;">No active power-ups</div>';
-                return;
-            }
-            
-            activePowerUps.innerHTML = active.map(powerUp => `
-                <div class="power-up-active" style="padding: 8px; border-radius: 8px; text-align: center; font-size: 12px;">
-                    <div style="font-size: 16px; margin-bottom: 5px;">${powerUp.icon}</div>
-                    <div style="font-weight: 600; margin-bottom: 3px;">${powerUp.name}</div>
-                    <div style="font-size: 10px; opacity: 0.8;">
-                        ${powerUp.timeLeft ? `${Math.ceil(powerUp.timeLeft / 60)}m left` : `${powerUp.usesLeft} uses left`}
-                    </div>
-                </div>
-            `).join('');
-        }
-
-        // Enhanced Game Functions
-        function claimDailyReward() {
-            const currentDay = userStats.dailyRewards || 1;
-            
-            if (currentDay > 7) {
-                showMessage('🎁 Daily rewards cycle completed! Come back tomorrow for a new cycle.', 'info');
-                return;
-            }
-            
-            const reward = gameFeatures.dailyRewards[currentDay - 1].reward;
-            
-            if (reward.type === 'tokens') {
-                userStats.tokens += reward.tokens;
-                showMessage(`🎁 Daily reward claimed! +${reward.tokens} tokens!`, 'success');
-            } else if (reward.type === 'gems') {
-                userStats.gems += reward.gems;
-                showMessage(`🎁 Daily reward claimed! +${reward.gems} gems!`, 'success');
-            } else if (reward.type === 'powerup') {
-                userStats.powerUps.push({
-                    ...gameFeatures.powerUps.find(p => p.id === reward.powerUp),
-                    active: false
-                });
-                showMessage(`🎁 Daily reward claimed! Power-up unlocked!`, 'success');
-            } else if (reward.type === 'mega') {
-                userStats.tokens += reward.tokens;
-                userStats.gems += reward.gems;
-                showMessage(`🎁 MEGA REWARD! +${reward.tokens} tokens & +${reward.gems} gems!`, 'success');
-            }
-            
-            userStats.dailyRewards = currentDay + 1;
-            updateUserStatsDisplay();
-            initializeDailyRewards();
-            createCelebrationEffect();
-        }
-
-        function startTournament(tournamentId) {
-            const tournament = gameFeatures.tournaments.find(t => t.name.toLowerCase().replace(' ', '_') === tournamentId);
-            if (!tournament) return;
-            
-            showModal(`
-                <div style="text-align: center;">
-                    <div style="font-size: 48px; margin-bottom: 20px;">🏆</div>
-                    <div style="font-size: 24px; font-weight: 700; margin-bottom: 15px; color: var(--primary-pink);">
-                        ${tournament.name}
-                    </div>
-                    <div style="font-size: 16px; margin-bottom: 20px; color: var(--text-secondary);">
-                        ${tournament.description}
-                    </div>
-                    <div style="font-size: 18px; font-weight: 600; margin-bottom: 25px; color: var(--success-green);">
-                        🏆 Reward: ${tournament.reward} tokens
-                    </div>
-                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
-                        <button onclick="closeModal()" class="btn-secondary">Cancel</button>
-                        <button onclick="joinTournament('${tournamentId}')" class="btn-primary">Join Tournament</button>
-                    </div>
-                </div>
-            `);
-        }
-
-        function joinTournament(tournamentId) {
-            closeModal();
-            showMessage('🏆 Tournament joined! Check your challenges for tournament tasks.', 'success');
-            
-            // Add tournament challenge to daily challenges
-            setTimeout(() => {
-                generateDailyChallenges();
-                showMessage('📝 Tournament challenges added to your daily tasks!', 'info');
-            }, 1000);
-        }
-
-        function activatePowerUp(powerUpId) {
-            const powerUp = userStats.powerUps.find(p => p.id === powerUpId && !p.active);
-            if (!powerUp) return;
-            
-            powerUp.active = true;
-            powerUp.activatedAt = Date.now();
-            
-            if (powerUp.duration) {
-                powerUp.timeLeft = powerUp.duration;
-            } else if (powerUp.uses) {
-                powerUp.usesLeft = powerUp.uses;
-            }
-            
-            showMessage(`⚡ ${powerUp.name} activated!`, 'success');
-            initializePowerUps();
-            
-            // Set expiration timer
-            if (powerUp.duration) {
-                setTimeout(() => {
-                    powerUp.active = false;
-                    showMessage(`⏰ ${powerUp.name} expired!`, 'info');
-                    initializePowerUps();
-                }, powerUp.duration * 1000);
-            }
-        }
-
-        function showShop() {
-            const shopItems = gameFeatures.powerUps.map(item => `
-                <div style="background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 12px; padding: 15px; margin-bottom: 15px;">
-                    <div style="display: flex; align-items: center; gap: 15px;">
-                        <div style="font-size: 32px;">${item.icon}</div>
-                        <div style="flex: 1;">
-                            <div style="font-size: 16px; font-weight: 600; margin-bottom: 5px;">${item.name}</div>
-                            <div style="font-size: 12px; color: var(--text-secondary); margin-bottom: 10px;">${item.description}</div>
-                            <div style="font-size: 14px; color: var(--success-green); font-weight: 600;">${item.cost} gems</div>
-                        </div>
-                        <button onclick="buyItem('${item.id}')" class="btn-primary" style="padding: 8px 16px; font-size: 12px;">Buy</button>
-                    </div>
-                </div>
-            `).join('');
-            
-            showModal(`
-                <div>
-                    <div style="text-align: center; margin-bottom: 20px;">
-                        <div style="font-size: 32px; margin-bottom: 10px;">🛒</div>
-                        <div style="font-size: 24px; font-weight: 700; color: var(--primary-pink);">Shop</div>
-                        <div style="font-size: 14px; color: var(--text-secondary); margin-top: 5px;">
-                            Your gems: ${userStats.gems} 💎
-                        </div>
-                    </div>
-                    <div style="max-height: 400px; overflow-y: auto;">
-                        ${shopItems}
-                    </div>
-                    <div style="text-align: center; margin-top: 20px;">
-                        <button onclick="closeModal()" class="btn-secondary">Close</button>
-                    </div>
-                </div>
-            `);
-        }
-
-        function buyItem(itemId) {
-            const item = gameFeatures.powerUps.find(p => p.id === itemId);
-            if (!item) return;
-            
-            if (userStats.gems < item.cost) {
-                showMessage('💎 Not enough gems!', 'error');
-                return;
-            }
-            
-            userStats.gems -= item.cost;
-            userStats.powerUps.push({
-                ...item,
-                active: false,
-                purchasedAt: Date.now()
-            });
-            
-            updateUserStatsDisplay();
-            showMessage(`✅ ${item.name} purchased!`, 'success');
-            closeModal();
-        }
-
-        function showFriends() {
-            showModal(`
-                <div style="text-align: center;">
-                    <div style="font-size: 32px; margin-bottom: 15px;">👥</div>
-                    <div style="font-size: 24px; font-weight: 700; margin-bottom: 20px; color: var(--primary-pink);">Friends</div>
-                    <div style="font-size: 16px; color: var(--text-secondary); margin-bottom: 20px;">
-                        Connect with friends to compete and share achievements!
-                    </div>
-                    <div style="background: rgba(255, 255, 255, 0.05); border-radius: 12px; padding: 20px; margin-bottom: 20px;">
-                        <div style="font-size: 18px; margin-bottom: 10px;">🎯 Friend Challenges</div>
-                        <div style="font-size: 14px; color: var(--text-secondary);">Challenge friends to beat your scores and earn bonus rewards!</div>
-                    </div>
-                    <button onclick="closeModal()" class="btn-primary">Close</button>
-                </div>
-            `);
-        }
-
-        function showStats() {
-            showModal(`
-                <div>
-                    <div style="text-align: center; margin-bottom: 20px;">
-                        <div style="font-size: 32px; margin-bottom: 10px;">📊</div>
-                        <div style="font-size: 24px; font-weight: 700; color: var(--primary-pink);">Your Stats</div>
-                    </div>
-                    <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; margin-bottom: 20px;">
-                        <div style="background: rgba(255, 107, 157, 0.1); padding: 15px; border-radius: 12px; text-align: center;">
-                            <div style="font-size: 24px; font-weight: 700; color: var(--primary-pink);">${userStats.tokens.toLocaleString()}</div>
-                            <div style="font-size: 12px; color: var(--text-secondary);">Total Tokens</div>
-                        </div>
-                        <div style="background: rgba(139, 92, 246, 0.1); padding: 15px; border-radius: 12px; text-align: center;">
-                            <div style="font-size: 24px; font-weight: 700; color: var(--primary-purple);">${userStats.completedChallenges.length}</div>
-                            <div style="font-size: 12px; color: var(--text-secondary);">Completed Challenges</div>
-                        </div>
-                        <div style="background: rgba(0, 212, 255, 0.1); padding: 15px; border-radius: 12px; text-align: center;">
-                            <div style="font-size: 24px; font-weight: 700; color: var(--primary-blue);">${userStats.streak}</div>
-                            <div style="font-size: 12px; color: var(--text-secondary);">Current Streak</div>
-                        </div>
-                        <div style="background: rgba(16, 185, 129, 0.1); padding: 15px; border-radius: 12px; text-align: center;">
-                            <div style="font-size: 24px; font-weight: 700; color: var(--success-green);">${userStats.level}</div>
-                            <div style="font-size: 12px; color: var(--text-secondary);">Current Level</div>
-                        </div>
-                    </div>
-                    <div style="text-align: center;">
-                        <button onclick="closeModal()" class="btn-primary">Close</button>
-                    </div>
-                </div>
-            `);
-        }
-
-        function showInventory() {
-            const inventoryItems = userStats.powerUps.filter(p => !p.active).map(item => `
-                <div style="background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 12px; padding: 15px; margin-bottom: 10px;">
-                    <div style="display: flex; align-items: center; gap: 15px;">
-                        <div style="font-size: 24px;">${item.icon}</div>
-                        <div style="flex: 1;">
-                            <div style="font-size: 14px; font-weight: 600; margin-bottom: 5px;">${item.name}</div>
-                            <div style="font-size: 12px; color: var(--text-secondary);">${item.description}</div>
-                        </div>
-                        <button onclick="activatePowerUp('${item.id}')" class="btn-primary" style="padding: 6px 12px; font-size: 12px;">Use</button>
-                    </div>
-                </div>
-            `).join('');
-            
-            showModal(`
-                <div>
-                    <div style="text-align: center; margin-bottom: 20px;">
-                        <div style="font-size: 32px; margin-bottom: 10px;">🎒</div>
-                        <div style="font-size: 24px; font-weight: 700; color: var(--primary-pink);">Inventory</div>
-                    </div>
-                    <div style="max-height: 400px; overflow-y: auto;">
-                        ${inventoryItems.length > 0 ? inventoryItems : '<div style="text-align: center; color: var(--text-secondary); padding: 20px;">No items in inventory</div>'}
-                    </div>
-                    <div style="text-align: center; margin-top: 20px;"><!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    
-    <!-- PWA Meta Tags -->
-    <meta name="mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="apple-mobile-web-app-title" content="JomBro">
-    <meta name="theme-color" content="#ff6b9d">
-    <meta name="description" content="AI-Powered Social Challenge Platform - Connect, Challenge, Conquer!">
-       
-    <title>JomBro - Challenge Platform</title>
-
-    <style>
-        :root {
-            --safe-area-top: env(safe-area-inset-top, 20px);
-            --safe-area-bottom: env(safe-area-inset-bottom, 20px);
-            --primary-pink: #ff6b9d;
-            --primary-purple: #8b5cf6;
-            --primary-blue: #00d4ff;
-            --accent-pink: #ff8cc8;
-            --dark-bg: #0a0a0a;
-            --glass-bg: rgba(15, 15, 15, 0.45);
-            --glass-border: rgba(255, 255, 255, 0.08);
-            --text-primary: #ffffff;
-            --text-secondary: rgba(255, 255, 255, 0.7);
-            --success-green: #10b981;
-            --warning-orange: #f59e0b;
-            --error-red: #ef4444;
-            
-            /* Animation Variables */
-            --animation-speed-fast: 0.2s;
-            --animation-speed-normal: 0.3s;
-            --animation-speed-slow: 0.5s;
-            --easing-smooth: cubic-bezier(0.4, 0, 0.2, 1);
-            --easing-bounce: cubic-bezier(0.68, -0.55, 0.265, 1.55);
-        }
-
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            -webkit-tap-highlight-color: transparent;
-            -webkit-font-smoothing: antialiased;
-            -moz-osx-font-smoothing: grayscale;
-            touch-action: manipulation;
-        }
-
-        html, body {
-            height: 100vh;
-            width: 100%;
-            font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', Roboto, sans-serif;
-            background: #000000;
-            color: var(--text-primary);
-            user-select: none;
-            overflow: hidden;
-            perspective: 2000px;
-            perspective-origin: center center;
-        }
-
-        /* Animations */
-        @keyframes float-in {
-            from {
-                opacity: 0;
-                transform: translate3d(0, 20px, 0) scale(0.95);
-            }
-            to {
-                opacity: 1;
-                transform: translate3d(0, 0, 0) scale(1);
-            }
-        }
-        
-        @keyframes slide-up {
-            from {
-                opacity: 0;
-                transform: translate3d(0, 100%, 0);
-            }
-            to {
-                opacity: 1;
-                transform: translate3d(0, 0, 0);
-            }
-        }
-        
-        @keyframes scale-in {
-            from {
-                opacity: 0;
-                transform: scale3d(0.8, 0.8, 1);
-            }
-            to {
-                opacity: 1;
-                transform: scale3d(1, 1, 1);
-            }
-        }
-        
-        @keyframes pulse-glow {
-            0%, 100% { 
-                box-shadow: 0 0 20px rgba(255, 107, 157, 0.3);
-                transform: scale3d(1, 1, 1);
-            }
-            50% { 
-                box-shadow: 0 0 30px rgba(255, 107, 157, 0.6);
-                transform: scale3d(1.02, 1.02, 1);
-            }
-        }
-
-        /* Space Background */
-        .background-layer {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            z-index: 1;
-            overflow: hidden;
-        }
-
-        .space-background {
-            background: 
-                linear-gradient(180deg, 
-                    #000011 0%, 
-                    #001122 15%, 
-                    #002244 25%, 
-                    #001a3a 35%,
-                    #002850 45%, 
-                    #001133 55%, 
-                    #001428 65%,
-                    #000822 75%, 
-                    #000511 85%,
-                    #000208 100%
-                );
-            position: relative;
-            overflow: hidden;
-            height: 100%;
-        }
-
-        .stars {
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background-image: 
-                radial-gradient(3px 3px at 25px 30px, #ffffff, transparent),
-                radial-gradient(2px 2px at 85px 20px, rgba(255,255,255,0.9), transparent),
-                radial-gradient(3px 3px at 145px 40px, #ffffff, transparent),
-                radial-gradient(2px 2px at 205px 65px, rgba(255,255,255,0.8), transparent),
-                radial-gradient(3px 3px at 265px 25px, #ffffff, transparent),
-                radial-gradient(2px 2px at 325px 55px, rgba(255,255,255,0.9), transparent),
-                radial-gradient(1.5px 1.5px at 55px 50px, rgba(255,255,255,0.7), transparent),
-                radial-gradient(1px 1px at 115px 75px, rgba(255,255,255,0.6), transparent),
-                radial-gradient(1.5px 1.5px at 175px 15px, rgba(255,255,255,0.8), transparent);
-            background-repeat: repeat;
-            background-size: 400px 120px;
-            animation: starTwinkle 4s ease-in-out infinite;
-        }
-
-        @keyframes starTwinkle {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.6; }
-        }
-
-        .shooting-star {
-            position: absolute;
-            width: 2px;
-            height: 2px;
-            background: linear-gradient(45deg, #ffffff, #00bfff);
-            border-radius: 50%;
-            box-shadow: 0 0 6px 2px rgba(255, 255, 255, 0.8);
-            animation: meteorShower 8s linear infinite;
-        }
-
-        @keyframes meteorShower {
-            0% {
-                transform: translate3d(-100px, -100px, 0) scale(0);
-                opacity: 0;
-            }
-            10% {
-                opacity: 1;
-                transform: translate3d(-50px, -50px, 0) scale(1);
-            }
-            90% {
-                opacity: 1;
-                transform: translate3d(calc(100vw + 50px), calc(100vh + 50px), 0) scale(1);
-            }
-            100% {
-                transform: translate3d(calc(100vw + 100px), calc(100vh + 100px), 0) scale(0);
-                opacity: 0;
-            }
-        }
-
-        /* Glass UI Layer */
-        .glass-layer {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            z-index: 1000;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 20px;
-        }
-
-        /* Auth Screen */
-        .auth-screen {
-            width: 100%;
-            max-width: 420px;
-            animation: float-in var(--animation-speed-slow) var(--easing-smooth);
-        }
-
-        .auth-container {
-            background: rgba(15, 15, 15, 0.2);
-            backdrop-filter: blur(30px) saturate(180%);
-            border: 1px solid rgba(255, 255, 255, 0.15);
-            border-radius: 25px;
-            padding: 40px 35px;
-            text-align: center;
-            box-shadow: 
-                0 8mm 16mm rgba(0, 0, 0, 0.3),
-                0 2mm 8mm rgba(0, 0, 0, 0.2),
-                inset 0 1px 0 rgba(255, 255, 255, 0.2);
-            position: relative;
-            animation: scale-in var(--animation-speed-normal) var(--easing-bounce);
-        }
-
-        .auth-logo {
-            font-size: 48px;
-            margin-bottom: 15px;
-            animation: pulse-glow 3s ease-in-out infinite;
-        }
-
-        .auth-title {
-            font-size: 28px;
-            font-weight: 300;
-            color: var(--text-primary);
-            margin-bottom: 8px;
-            text-shadow: 0 0 15px rgba(255, 255, 255, 0.3);
-        }
-
-        .auth-subtitle {
-            font-size: 14px;
-            color: var(--text-secondary);
-            margin-bottom: 30px;
-            line-height: 1.4;
-        }
-
-        /* Form Elements */
-        .form-group {
-            margin-bottom: 20px;
-            text-align: left;
-        }
-
-        .form-label {
-            display: block;
-            font-size: 14px;
-            font-weight: 600;
-            color: var(--text-primary);
-            margin-bottom: 8px;
-            padding-left: 5px;
-        }
-
-        .form-input {
-            width: 100%;
-            padding: 16px 20px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 12px;
-            background: rgba(255, 255, 255, 0.05);
-            backdrop-filter: blur(15px);
-            color: var(--text-primary);
-            font-size: 16px;
-            transition: all var(--animation-speed-normal) var(--easing-smooth);
-            font-family: inherit;
-        }
-
-        .form-input:focus {
-            outline: none;
-            border-color: var(--primary-pink);
-            box-shadow: 0 0 0 3px rgba(255, 107, 157, 0.2);
-            background: rgba(255, 255, 255, 0.08);
-            transform: scale3d(1.01, 1.01, 1);
-        }
-
-        .form-input::placeholder {
-            color: rgba(255, 255, 255, 0.4);
-        }
-
-        .form-input:invalid {
-            border-color: var(--error-red);
-        }
-
-        /* Password field specific */
-        .password-container {
-            position: relative;
-        }
-
-        .password-toggle {
-            position: absolute;
-            right: 15px;
-            top: 50%;
-            transform: translateY(-50%);
-            background: none;
-            border: none;
-            color: var(--text-secondary);
-            cursor: pointer;
-            font-size: 18px;
-            padding: 5px;
-            border-radius: 4px;
-            transition: color var(--animation-speed-fast);
-        }
-
-        .password-toggle:hover {
-            color: var(--text-primary);
-        }
-
-        /* Buttons */
-        .btn-primary {
-            background: linear-gradient(145deg, rgba(255, 107, 157, 0.9), rgba(196, 69, 105, 0.9));
-            backdrop-filter: blur(20px);
-            color: #fff;
-            border: 1px solid rgba(255, 107, 157, 0.3);
-            padding: 18px 24px;
-            border-radius: 15px;
-            font-size: 16px;
-            font-weight: 700;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            transition: all var(--animation-speed-normal) var(--easing-smooth);
-            width: 100%;
-            box-shadow: 
-                0 6px 20px rgba(255, 107, 157, 0.4),
-                inset 0 1px 0 rgba(255, 255, 255, 0.2);
-            position: relative;
-            overflow: hidden;
-            margin: 25px 0 15px 0;
-            font-family: inherit;
-        }
-
-        .btn-primary::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
-            transition: left var(--animation-speed-normal) var(--easing-smooth);
-        }
-
-        .btn-primary:hover::before {
-            left: 100%;
-        }
-
-        .btn-primary:hover {
-            transform: translate3d(0, -4px, 0) scale(1.02);
-            box-shadow: 
-                0 12px 40px rgba(255, 107, 157, 0.6),
-                inset 0 1px 0 rgba(255, 255, 255, 0.3);
-        }
-
-        .btn-primary:active {
-            transform: translate3d(0, -2px, 0) scale(0.98);
-        }
-
-        .btn-primary:disabled {
-            opacity: 0.6;
-            cursor: not-allowed;
-            transform: none;
-        }
-
-        .toggle-btn {
-            background: none;
-            border: none;
-            color: var(--primary-pink);
-            margin-top: 15px;
-            cursor: pointer;
-            width: 100%;
-            font-size: 14px;
-            text-decoration: underline;
-            transition: color var(--animation-speed-normal);
-            font-family: inherit;
-            padding: 10px;
-            border-radius: 8px;
-        }
-
-        .toggle-btn:hover {
-            color: var(--accent-pink);
-            background: rgba(255, 107, 157, 0.1);
-        }
-
-        /* Loading State */
-        .loading {
-            position: relative;
-            pointer-events: none;
-            opacity: 0.7;
-        }
-
-        .loading .btn-text {
-            opacity: 0;
-        }
-
-        .loading::after {
-            content: '';
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            width: 24px;
-            height: 24px;
-            margin: -12px 0 0 -12px;
-            border: 3px solid rgba(255, 255, 255, 0.3);
-            border-top-color: #ffffff;
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-        }
-
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-
-        /* Messages */
-        .message {
-            padding: 15px 20px;
-            border-radius: 12px;
-            margin: 20px 0;
-            text-align: center;
-            font-weight: 600;
-            font-size: 14px;
-            animation: slide-up var(--animation-speed-normal) var(--easing-smooth);
-            line-height: 1.4;
-        }
-
-        .message.error {
-            background: rgba(239, 68, 68, 0.15);
-            border: 1px solid rgba(239, 68, 68, 0.3);
-            color: #fca5a5;
-        }
-
-        .message.success {
-            background: rgba(16, 185, 129, 0.15);
-            border: 1px solid rgba(16, 185, 129, 0.3);
-            color: #6ee7b7;
-        }
-
-        .message.info {
-            background: rgba(59, 130, 246, 0.15);
-            border: 1px solid rgba(59, 130, 246, 0.3);
-            color: #93c5fd;
-        }
-
-        .message.warning {
-            background: rgba(245, 158, 11, 0.15);
-            border: 1px solid rgba(245, 158, 11, 0.3);
-            color: #fbbf24;
-        }
-
-        /* Connection Status */
-        .connection-status {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            margin-bottom: 20px;
-            padding: 10px;
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 8px;
-            font-size: 12px;
-        }
-
-        .connection-status.connected {
-            color: var(--success-green);
-        }
-
-        .connection-status.disconnected {
-            color: var(--error-red);
-        }
-
-        .connection-status.connecting {
-            color: var(--warning-orange);
-        }
-
-        /* Main App Interface */
-        .glass-interface {
-            width: 100%;
-            max-width: 400px;
-            height: calc(100vh - 20px);
-            background: rgba(15, 15, 15, 0.15);
-            backdrop-filter: blur(25px) saturate(180%);
-            border: 1px solid rgba(255, 255, 255, 0.15);
-            border-radius: 25px;
-            box-shadow: 
-                0 10mm 20mm rgba(0, 0, 0, 0.3),
-                0 3mm 10mm rgba(0, 0, 0, 0.2),
-                inset 0 1px 0 rgba(255, 255, 255, 0.2),
-                0 0 100px rgba(255, 107, 157, 0.1);
-            display: flex;
-            flex-direction: column;
-            overflow: hidden;
-            position: relative;
-            animation: slide-up var(--animation-speed-slow) var(--easing-smooth);
-        }
-
-        .glass-header {
-            position: sticky;
-            top: 0;
-            z-index: 100;
-            padding: calc(var(--safe-area-top) + 20px) 25px 20px 25px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.12);
-            background: rgba(15, 15, 15, 0.1);
-            backdrop-filter: blur(30px) saturate(180%);
-        }
-
-        .logo-slogan {
-            font-size: 10px;
-            color: var(--primary-pink);
-            margin-top: -2px;
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            opacity: 0.9;
-        }
-
-        .glass-content {
-            flex: 1;
-            overflow-y: auto;
-            overflow-x: hidden;
-            -webkit-overflow-scrolling: touch;
-            scroll-behavior: smooth;
-            position: relative;
-            z-index: 2;
-            padding: 20px 25px;
-        }
-
-        .challenge-card {
-            background: rgba(255, 255, 255, 0.04);
-            backdrop-filter: blur(25px);
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            border-radius: 15px;
-            padding: 20px;
-            margin-bottom: 15px;
-            cursor: pointer;
-            transition: all var(--animation-speed-normal) var(--easing-smooth);
-            position: relative;
-            overflow: hidden;
-            display: flex;
-            flex-direction: column;
-            box-shadow: 
-                0 8px 32px rgba(0, 0, 0, 0.3),
-                inset 0 1px 0 rgba(255, 255, 255, 0.1);
-            animation: float-in var(--animation-speed-normal) var(--easing-smooth);
-        }
-
-        .challenge-card:hover {
-            background: rgba(255, 255, 255, 0.08);
-            transform: translate3d(0, -8px, 0) scale(1.02);
-            box-shadow: 
-                0 20px 60px rgba(0, 0, 0, 0.4),
-                0 0 40px rgba(255, 107, 157, 0.2),
-                inset 0 1px 0 rgba(255, 255, 255, 0.2);
-        }
-
-        /* Category Button Styles */
-        .category-btn {
-            transition: all var(--animation-speed-normal) var(--easing-smooth);
-            font-size: 14px;
-            font-weight: 600;
-            font-family: inherit;
-        }
-
-        .category-btn:hover {
-            transform: translateY(-2px) scale(1.05);
-            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
-        }
-
-        .category-btn:active {
-            transform: translateY(0) scale(0.95);
-        }
-
-        /* Achievement Badge */
-        .achievement-badge {
-            background: rgba(255, 255, 255, 0.04);
-            backdrop-filter: blur(15px);
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            border-radius: 12px;
-            padding: 12px 8px;
-            text-align: center;
-            cursor: pointer;
-            transition: all var(--animation-speed-normal) var(--easing-smooth);
-        }
-
-        .achievement-badge:hover {
-            background: rgba(255, 255, 255, 0.08);
-            transform: translateY(-3px);
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
-        }
-
-        .achievement-badge.earned {
-            border-color: var(--primary-pink);
-            box-shadow: 0 0 15px rgba(255, 107, 157, 0.3);
-        }
-
-        /* Leaderboard Entry */
-        .leaderboard-entry {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 12px 0;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-        }
-
-        .leaderboard-entry:last-child {
-            border-bottom: none;
-        }
-
-        .leaderboard-rank {
-            font-size: 18px;
-            font-weight: 700;
-            width: 30px;
-            text-align: center;
-        }
-
-        .leaderboard-rank.gold { color: var(--gold); }
-        .leaderboard-rank.silver { color: var(--silver); }
-        .leaderboard-rank.bronze { color: var(--bronze); }
-
-        /* Settings Toggle */
-        .settings-toggle {
-            transition: all var(--animation-speed-normal) var(--easing-smooth);
-            font-family: inherit;
-        }
-
-        /* Premium Features & Animations */
-        
-        /* Premium Glow Effects */
-        .premium-glow {
-            animation: premiumGlow 2s ease-in-out infinite;
-            box-shadow: 0 0 20px rgba(255, 215, 0, 0.4);
-        }
-        
-        @keyframes premiumGlow {
-            0%, 100% { box-shadow: 0 0 20px rgba(255, 215, 0, 0.4); }
-            50% { box-shadow: 0 0 35px rgba(255, 215, 0, 0.7); }
-        }
-        
-        /* Master Tier Effects */
-        .master-tier {
-            background: linear-gradient(135deg, #ff6b9d, #8b5cf6, #00d4ff);
-            background-size: 400% 400%;
-            animation: masterGradient 3s ease infinite;
-        }
-        
-        @keyframes masterGradient {
-            0% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
-            100% { background-position: 0% 50%; }
-        }
-        
-        /* Legendary Tier Effects */
-        .legendary-tier {
-            background: linear-gradient(45deg, #ffd700, #ff6b9d, #8b5cf6, #00d4ff, #ffd700);
-            background-size: 600% 600%;
-            animation: legendaryShine 4s ease infinite;
-            position: relative;
-            overflow: hidden;
-        }
-        
-        @keyframes legendaryShine {
-            0% { background-position: 0% 50%; }
-            25% { background-position: 100% 50%; }
-            50% { background-position: 100% 100%; }
-            75% { background-position: 0% 100%; }
-            100% { background-position: 0% 50%; }
-        }
-        
-        .legendary-tier::before {
-            content: '';
-            position: absolute;
-            top: -50%;
-            left: -50%;
-            width: 200%;
-            height: 200%;
-            background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.1), transparent);
-            animation: legendaryRotate 3s linear infinite;
-        }
-        
-        @keyframes legendaryRotate {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-        
-        /* Enhanced Challenge Cards */
-        .challenge-card-premium {
-            background: linear-gradient(135deg, rgba(255, 215, 0, 0.1), rgba(255, 107, 157, 0.1));
-            border: 2px solid rgba(255, 215, 0, 0.3);
-            position: relative;
-            overflow: hidden;
-        }
-        
-        .challenge-card-premium::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255, 215, 0, 0.2), transparent);
-            animation: premiumSweep 3s linear infinite;
-        }
-        
-        @keyframes premiumSweep {
-            0% { left: -100%; }
-            100% { left: 100%; }
-        }
-        
-        /* Tournament Mode */
-        .tournament-mode {
-            background: linear-gradient(135deg, #ff416c, #ff4b2b);
-            animation: tournamentPulse 1.5s ease-in-out infinite;
-        }
-        
-        @keyframes tournamentPulse {
-            0%, 100% { transform: scale(1); }
-            50% { transform: scale(1.05); }
-        }
-        
-        /* VIP Features */
-        .vip-feature {
-            background: linear-gradient(135deg, #667eea, #764ba2);
-            border: 1px solid rgba(102, 126, 234, 0.5);
-            box-shadow: 0 0 30px rgba(102, 126, 234, 0.3);
-        }
-        
-        /* Power-up Effects */
-        .power-up-active {
-            animation: powerUpGlow 1s ease-in-out infinite;
-            border: 2px solid #00ff88;
-        }
-        
-        @keyframes powerUpGlow {
-            0%, 100% { 
-                box-shadow: 0 0 15px rgba(0, 255, 136, 0.5);
-                border-color: #00ff88;
-            }
-            50% { 
-                box-shadow: 0 0 25px rgba(0, 255, 136, 0.8);
-                border-color: #88ffaa;
-            }
-        }
-        
-        /* Special Event Banner */
-        .special-event {
-            background: linear-gradient(45deg, #ff9a9e, #fecfef, #fecfef, #ff9a9e);
-            background-size: 400% 400%;
-            animation: specialEvent 2s ease infinite;
-        }
-        
-        @keyframes specialEvent {
-            0%, 100% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
-        }
-        
-        /* Notification Badge */
-        .notification-badge {
-            position: absolute;
-            top: -5px;
-            right: -5px;
-            background: #ff4757;
-            color: white;
-            border-radius: 50%;
-            width: 20px;
-            height: 20px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 12px;
-            font-weight: bold;
-            animation: notificationBounce 2s ease infinite;
-        }
-        
-        @keyframes notificationBounce {
-            0%, 100% { transform: scale(1); }
-            50% { transform: scale(1.2); }
-        }
-        
-        /* Modal Styles */
-        .modal-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(0, 0, 0, 0.8);
-            backdrop-filter: blur(10px);
-            z-index: 10000;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            animation: modalFadeIn 0.3s ease;
-        }
-        
-        @keyframes modalFadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
-        }
-        
-        .modal-content {
-            background: rgba(15, 15, 15, 0.9);
-            backdrop-filter: blur(30px);
-            border: 1px solid rgba(255, 255, 255, 0.15);
-            border-radius: 20px;
-            padding: 30px;
-            max-width: 500px;
-            width: 90%;
-            animation: modalSlideIn 0.3s ease;
-        }
-        
-        @keyframes modalSlideIn {
-            from { transform: translateY(-50px) scale(0.9); }
-            to { transform: translateY(0) scale(1); }
-        }
-        
-        /* Progress Bar */
-        .progress-bar {
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 10px;
-            overflow: hidden;
-            height: 8px;
-            margin: 10px 0;
-        }
-        
-        .progress-fill {
-            height: 100%;
-            background: linear-gradient(90deg, var(--primary-pink), var(--primary-purple));
-            transition: width 0.5s ease;
-            animation: progressShine 2s linear infinite;
-        }
-        
-        @keyframes progressShine {
-            0% { background-position: -100% 0; }
-            100% { background-position: 100% 0; }
-        }
-        
-        /* Tooltip */
-        .tooltip {
-            position: relative;
-            cursor: pointer;
-        }
-        
-        .tooltip::after {
-            content: attr(data-tooltip);
-            position: absolute;
-            bottom: 100%;
-            left: 50%;
-            transform: translateX(-50%);
-            background: rgba(0, 0, 0, 0.9);
-            color: white;
-            padding: 5px 10px;
-            border-radius: 5px;
-            font-size: 12px;
-            white-space: nowrap;
-            opacity: 0;
-            visibility: hidden;
-            transition: all 0.3s ease;
-            z-index: 1000;
-        }
-        
-        .tooltip:hover::after {
-            opacity: 1;
-            visibility: visible;
-        }
-        
-        /* Floating Action Button */
-        .fab {
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            width: 60px;
-            height: 60px;
-            border-radius: 50%;
-            background: linear-gradient(135deg, var(--primary-pink), var(--primary-purple));
-            border: none;
-            color: white;
-            font-size: 24px;
-            cursor: pointer;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
-            transition: all 0.3s ease;
-            z-index: 1000;
-        }
-        
-        .fab:hover {
-            transform: scale(1.1);
-            box-shadow: 0 6px 30px rgba(0, 0, 0, 0.4);
-        }
-        
-        /* Particle Effects */
-        .particle {
-            position: absolute;
-            width: 4px;
-            height: 4px;
-            background: var(--primary-pink);
-            border-radius: 50%;
-            pointer-events: none;
-            animation: particleFloat 3s ease-out forwards;
-        }
-        
-        @keyframes particleFloat {
-            0% {
-                opacity: 1;
-                transform: translateY(0) scale(1);
-            }
-            100% {
-                opacity: 0;
-                transform: translateY(-100px) scale(0.5);
-            }
-        }
-        
-        /* Streak Fire Effect */
-        .streak-fire {
-            position: relative;
-            overflow: hidden;
-        }
-        
-        .streak-fire::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: linear-gradient(0deg, #ff6b9d, #ff9500, #ffff00);
-            opacity: 0.3;
-            animation: fireFlicker 1s ease-in-out infinite;
-        }
-        
-        @keyframes fireFlicker {
-            0%, 100% { opacity: 0.3; }
-            50% { opacity: 0.6; }
-        }
-
-        /* Mobile responsive */
-        @media (max-width: 480px) {
-            .glass-interface {
-                max-width: 100%;
-                height: 100vh;
-                border-radius: 0;
-                margin: 0;
-            }
-            
-            .glass-layer {
-                padding: 0;
-            }
-
-            .auth-container {
-                padding: 30px 25px;
-            }
-        }
-    </style>
-</head>
-<body>
-    <!-- Background Layer -->
-    <div class="background-layer">
-        <div class="space-background">
-            <div class="stars"></div>
-            <div class="shooting-star" style="top: 15%; left: 5%; animation-delay: 0s;"></div>
-            <div class="shooting-star" style="top: 35%; left: 20%; animation-delay: 2s;"></div>
-            <div class="shooting-star" style="top: 60%; left: 30%; animation-delay: 4s;"></div>
-            <div class="shooting-star" style="top: 25%; left: 50%; animation-delay: 6s;"></div>
-        </div>
-    </div>
-
-    <!-- Glass UI Layer -->
-    <div class="glass-layer">
-        <!-- Auth Screen -->
-        <div id="authScreen" class="auth-screen">
-            <div class="auth-container">
-                <div class="auth-logo">🚀</div>
-                <div class="auth-title">Welcome to JomBro</div>
-                <div class="auth-subtitle">Join the ultimate challenge platform and push your limits!</div>
-                
-                <!-- Connection Status -->
-                <div id="connectionStatus" class="connection-status connecting">
-                    <span>🔄</span>
-                    <span>Connecting to Firebase...</span>
-                </div>
-                
-                <div id="messageContainer"></div>
-                
-                <!-- Authentication Form -->
-                <form id="authForm" novalidate>
-                    <div class="form-group">
-                        <label for="emailInput" class="form-label">Email Address</label>
-                        <input 
-                            type="email" 
-                            id="emailInput" 
-                            class="form-input" 
-                            placeholder="Enter your email address"
-                            required 
-                            autocomplete="email"
-                            spellcheck="false"
-                        >
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="passwordInput" class="form-label">Password</label>
-                        <div class="password-container">
-                            <input 
-                                type="password" 
-                                id="passwordInput" 
-                                class="form-input" 
-                                placeholder="Enter your password (6+ characters)"
-                                required 
-                                autocomplete="new-password"
-                                minlength="6"
-                            >
-                            <button type="button" class="password-toggle" onclick="togglePasswordVisibility()">
-                                <span id="passwordToggleIcon">👁️</span>
-                            </button>
-                        </div>
-                    </div>
-                    
-                    <button type="submit" class="btn-primary" id="submitBtn">
-                        <span class="btn-text" id="authBtnText">Create Account</span>
-                    </button>
-                </form>
-                
-                <button type="button" class="toggle-btn" onclick="toggleMode()">
-                    <span id="toggleText">Already have an account? Sign In</span>
-                </button>
-                
-                <div style="margin-top: 25px; font-size: 12px; color: var(--text-secondary); line-height: 1.4;">
-                    By continuing, you agree to our Terms of Service and Privacy Policy.<br>
-                    Your data is secured with Firebase Authentication.
-                </div>
-            </div>
-        </div>
-
-        <!-- Main App Interface -->
-        <div id="mainApp" class="hidden">
-            <div class="glass-interface">
-                <!-- Header -->
-                <div class="glass-header">
-                    <div class="logo-section">
-                        <div class="logo-text" style="font-size: 26px; font-weight: 200; color: var(--text-primary); letter-spacing: -1px;">JomBro</div>
-                        <div class="logo-slogan">Let's Go! Let's Go!</div>
-                        <div style="font-size: 9px; color: var(--text-secondary); margin-top: 2px; opacity: 0.8;" id="userDisplayName">Welcome!</div>
-                    </div>
-                    <div class="header-actions">
-                        <button style="background: none; border: none; color: var(--text-secondary); font-size: 18px; cursor: pointer; padding: 8px; border-radius: 8px; transition: all 0.2s;" onclick="signOut()" title="Sign Out">🚪</button>
-                    </div>
-                </div>
-
-                <!-- Main Content -->
-                <div class="glass-content">
-                    <div style="text-align: center; margin-bottom: 30px;">
-                        <div style="font-size: 48px; margin-bottom: 15px; animation: pulse-glow 3s infinite;">🎯</div>
-                        <div style="font-size: 20px; font-weight: 600; margin-bottom: 10px;">Welcome to JomBro!</div>
-                        <div style="color: var(--text-secondary); margin-bottom: 20px;">Your personal challenge platform is ready.</div>
-                        <!-- Enhanced Stats Display -->
-                        <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 20px;">
-                            <div style="background: rgba(255, 107, 157, 0.1); padding: 8px 12px; border-radius: 8px; border: 1px solid rgba(255, 107, 157, 0.3); text-align: center;">
-                                <div style="font-size: 10px; color: var(--text-secondary);">TOKENS</div>
-                                <div style="font-size: 16px; font-weight: 700; color: var(--primary-pink);" id="userTokens">0</div>
-                            </div>
-                            <div style="background: rgba(139, 92, 246, 0.1); padding: 8px 12px; border-radius: 8px; border: 1px solid rgba(139, 92, 246, 0.3); text-align: center;">
-                                <div style="font-size: 10px; color: var(--text-secondary);">LEVEL</div>
-                                <div style="font-size: 16px; font-weight: 700; color: var(--primary-purple);" id="userLevel">1</div>
-                            </div>
-                            <div style="background: rgba(0, 212, 255, 0.1); padding: 8px 12px; border-radius: 8px; border: 1px solid rgba(0, 212, 255, 0.3); text-align: center;">
-                                <div style="font-size: 10px; color: var(--text-secondary);">STREAK</div>
-                                <div style="font-size: 16px; font-weight: 700; color: var(--primary-blue);" id="userStreak">0</div>
-                            </div>
-                            <div style="background: rgba(16, 185, 129, 0.1); padding: 8px 12px; border-radius: 8px; border: 1px solid rgba(16, 185, 129, 0.3); text-align: center;">
-                                <div style="font-size: 10px; color: var(--text-secondary);">RANK</div>
-                                <div style="font-size: 16px; font-weight: 700; color: var(--success-green);" id="userRank">Beginner</div>
-                            </div>
-                        </div>
-                        
-                        <!-- XP Progress Bar -->
-                        <div style="margin-bottom: 20px;">
-                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px;">
-                                <span style="font-size: 12px; color: var(--text-secondary);">XP Progress</span>
-                                <span style="font-size: 12px; color: var(--text-secondary);" id="xpProgress">0 / 1000</span>
-                            </div>
-                            <div class="progress-bar">
-                                <div class="progress-fill" id="xpFill" style="width: 0%;"></div>
-                            </div>
-                        </div>
-                        
-                        <!-- Energy & Gems -->
-                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 20px;">
-                            <div style="background: rgba(255, 140, 0, 0.1); padding: 8px 12px; border-radius: 8px; border: 1px solid rgba(255, 140, 0, 0.3); text-align: center;">
-                                <div style="font-size: 10px; color: var(--text-secondary);">⚡ ENERGY</div>
-                                <div style="font-size: 16px; font-weight: 700; color: #ff8c00;" id="userEnergy">100</div>
-                            </div>
-                            <div style="background: rgba(0, 255, 136, 0.1); padding: 8px 12px; border-radius: 8px; border: 1px solid rgba(0, 255, 136, 0.3); text-align: center;">
-                                <div style="font-size: 10px; color: var(--text-secondary);">💎 GEMS</div>
-                                <div style="font-size: 16px; font-weight: 700; color: #00ff88;" id="userGems">0</div>
-                            </div>
-                        </div>
-                        
-                        <!-- Premium Status Banner -->
-                        <div id="premiumBanner" style="display: none; background: linear-gradient(135deg, #ffd700, #ff6b9d); padding: 12px; border-radius: 12px; margin-bottom: 20px; text-align: center; color: white; font-weight: 700; box-shadow: 0 4px 15px rgba(255, 215, 0, 0.3);">
-                            <div style="font-size: 16px; margin-bottom: 5px;">👑 PREMIUM ACCOUNT ACTIVE</div>
-                            <div style="font-size: 12px; opacity: 0.9;" id="premiumStatus">All features unlocked</div>
-                        </div>
-                        
-                        <!-- Special Events Banner -->
-                        <div id="specialEventBanner" style="display: none; margin-bottom: 20px;"></div>
-                        
-                        <!-- Daily Rewards -->
-                        <div style="margin-bottom: 20px;">
-                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
-                                <span style="font-size: 14px; font-weight: 600; color: var(--text-primary);">🎁 Daily Rewards</span>
-                                <button onclick="claimDailyReward()" id="dailyRewardBtn" class="btn-secondary" style="padding: 5px 10px; font-size: 12px;">Claim</button>
-                            </div>
-                            <div style="display: grid; grid-template-columns: repeat(7, 1fr); gap: 5px;" id="dailyRewardsGrid"></div>
-                        </div>
-                        
-                        <!-- Quick Actions -->
-                        <div style="margin-bottom: 20px;">
-                            <div style="font-size: 14px; font-weight: 600; margin-bottom: 10px; color: var(--text-primary);">⚡ Quick Actions</div>
-                            <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px;">
-                                <button class="btn-secondary" onclick="showShop()" style="padding: 8px; font-size: 12px;">🛒 Shop</button>
-                                <button class="btn-secondary" onclick="showFriends()" style="padding: 8px; font-size: 12px;">👥 Friends</button>
-                                <button class="btn-secondary" onclick="showStats()" style="padding: 8px; font-size: 12px;">📊 Stats</button>
-                            </div>
-                        </div>
-                        
-                        <!-- Power-ups -->
-                        <div style="margin-bottom: 20px;">
-                            <div style="font-size: 14px; font-weight: 600; margin-bottom: 10px; color: var(--text-primary);">💪 Active Power-ups</div>
-                            <div id="activePowerUps" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px;"></div>
-                        </div>
-                    </div>
-
-                    <!-- Challenge Categories -->
-                    <div style="margin-bottom: 25px;">
-                        <div style="font-size: 16px; font-weight: 600; margin-bottom: 15px; color: var(--text-primary);">🎮 Challenge Categories</div>
-                        <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 20px;">
-                            <button class="category-btn" onclick="showChallenges('fitness')" style="background: rgba(16, 185, 129, 0.1); border: 1px solid rgba(16, 185, 129, 0.3); color: #10b981; padding: 10px; border-radius: 8px; cursor: pointer;">
-                                💪 Fitness
-                            </button>
-                            <button class="category-btn" onclick="showChallenges('mental')" style="background: rgba(139, 92, 246, 0.1); border: 1px solid rgba(139, 92, 246, 0.3); color: #8b5cf6; padding: 10px; border-radius: 8px; cursor: pointer;">
-                                🧠 Mental
-                            </button>
-                            <button class="category-btn" onclick="showChallenges('social')" style="background: rgba(255, 107, 157, 0.1); border: 1px solid rgba(255, 107, 157, 0.3); color: #ff6b9d; padding: 10px; border-radius: 8px; cursor: pointer;">
-                                👥 Social
-                            </button>
-                            <button class="category-btn" onclick="showChallenges('creative')" style="background: rgba(245, 158, 11, 0.1); border: 1px solid rgba(245, 158, 11, 0.3); color: #f59e0b; padding: 10px; border-radius: 8px; cursor: pointer;">
-                                🎨 Creative
-                            </button>
-                        </div>
-                    </div>
-
-                    <!-- Daily Challenges -->
-                    <div style="margin-bottom: 25px;">
-                        <div style="font-size: 16px; font-weight: 600; margin-bottom: 15px; color: var(--text-primary);">🌟 Daily Challenges</div>
-                        <div id="dailyChallenges"></div>
-                    </div>
-
-                    <!-- Weekly Challenges -->
-                    <div style="margin-bottom: 25px;">
-                        <div style="font-size: 16px; font-weight: 600; margin-bottom: 15px; color: var(--text-primary);">🔥 Weekly Challenges</div>
-                        <div id="weeklyChallenges"></div>
-                    </div>
-
-                    <!-- Leaderboard -->
-                    <div style="margin-bottom: 25px;">
-                        <div style="font-size: 16px; font-weight: 600; margin-bottom: 15px; color: var(--text-primary);">🏆 Leaderboard</div>
-                        <div id="leaderboard" style="background: rgba(255, 255, 255, 0.04); backdrop-filter: blur(25px); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 15px; padding: 20px;"></div>
-                    </div>
-
-                    <!-- Achievement System -->
-                    <div style="margin-bottom: 25px;">
-                        <div style="font-size: 16px; font-weight: 600; margin-bottom: 15px; color: var(--text-primary);">🎖️ Achievements</div>
-                        <div id="achievements" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(80px, 1fr)); gap: 10px;"></div>
-                    </div>
-
-                    <!-- Profile Settings -->
-                    <div style="margin-bottom: 25px;">
-                        <div style="font-size: 16px; font-weight: 600; margin-bottom: 15px; color: var(--text-primary);">⚙️ Profile Settings</div>
-                        <div style="background: rgba(255, 255, 255, 0.04); backdrop-filter: blur(25px); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 15px; padding: 20px;">
-                            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 15px;">
-                                <span style="font-size: 14px;">🔔 Notifications</span>
-                                <button onclick="toggleNotifications()" id="notificationToggle" style="background: var(--primary-pink); color: white; border: none; padding: 5px 10px; border-radius: 5px; cursor: pointer;">ON</button>
-                            </div>
-                            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 15px;">
-                                <span style="font-size: 14px;">🌙 Dark Mode</span>
-                                <button onclick="toggleDarkMode()" id="darkModeToggle" style="background: var(--primary-purple); color: white; border: none; padding: 5px 10px; border-radius: 5px; cursor: pointer;">ON</button>
-                            </div>
-                            <div style="display: flex; align-items: center; justify-content: space-between;">
-                                <span style="font-size: 14px;">🔐 Privacy</span>
-                                <button onclick="togglePrivacy()" id="privacyToggle" style="background: var(--primary-blue); color: white; border: none; padding: 5px 10px; border-radius: 5px; cursor: pointer;">PRIVATE</button>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- User Info Section -->
-                    <div style="margin-top: 30px; text-align: center; color: var(--text-secondary);">
-                        <div style="font-size: 14px; margin-bottom: 10px;">🎮 Account Status:</div>
-                        <div style="font-size: 12px; line-height: 1.6;" id="accountInfo">
-                            ✅ Authenticated with Firebase<br>
-                            🔐 Account Secured<br>
-                            🎯 Challenge System Active<br>
-                            📊 Progress Tracking Ready<br>
-                            🎨 Premium UI Experience
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Floating Action Button -->
-    <button class="fab" onclick="quickAction()" title="Quick Action">
-        ⚡
-    </button>
-
-    <!-- Modal Container -->
-    <div id="modalContainer"></div>
-
-    <!-- Hidden utility -->
-    <div class="hidden" style="display: none !important;"></div>
-
-    <!-- Firebase Scripts - Latest Version -->
-    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
-
-    <script>
-        console.log('🚀 JomBro - Authentic Firebase Authentication');
-        
-        // Firebase Configuration - Your Production Config
-        const firebaseConfig = {
-            apiKey: "AIzaSyC_orriRUuf1ynDiFaJAPrO6-Gu3GeURxQ",
-            authDomain: "jombro-9d129.firebaseapp.com",
-            databaseURL: "https://jombro-9d129-default-rtdb.firebaseio.com",
-            projectId: "jombro-9d129",
-            storageBucket: "jombro-9d129.firebasestorage.app",
-            messagingSenderId: "390572076435",
-            appId: "1:390572076435:web:2a90027c66dc34d9834c66",
-            measurementId: "G-YPQ5R5GLP8"
-        };
-
-        // Global State
-        let firebaseApp = null;
-        let firebaseAuth = null;
-        let firebaseDb = null;
-        let currentUser = null;
-        let isSignUpMode = true;
-        let isInitialized = false;
-        let userStats = {
-            tokens: 0,
-            level: 1,
-            streak: 0,
-            achievements: [],
-            completedChallenges: [],
-            accountType: 'standard',
-            powerUps: [],
-            friends: [],
-            inventory: [],
-            tournamentWins: 0,
-            totalChallenges: 0,
-            bestStreak: 0,
-            rank: 'Beginner',
-            xp: 0,
-            gems: 0,
-            energy: 100,
-            dailyRewards: 0
-        };
-
-        // Enhanced Game Features
-        const gameFeatures = {
-            powerUps: [
-                { id: 'double_tokens', name: 'Double Tokens', icon: '💰', description: 'Double token rewards for 1 hour', cost: 100, duration: 3600 },
-                { id: 'energy_boost', name: 'Energy Boost', icon: '⚡', description: 'Unlimited energy for 30 minutes', cost: 50, duration: 1800 },
-                { id: 'streak_shield', name: 'Streak Shield', icon: '🛡️', description: 'Protect your streak for 24 hours', cost: 200, duration: 86400 },
-                { id: 'challenge_multiplier', name: 'Challenge Multiplier', icon: '🚀', description: '3x XP for next 5 challenges', cost: 150, uses: 5 },
-                { id: 'instant_complete', name: 'Instant Complete', icon: '⏱️', description: 'Instantly complete any challenge', cost: 300, uses: 1 }
-            ],
-            
-            ranks: [
-                { name: 'Beginner', minTokens: 0, color: '#888888', icon: '🥉' },
-                { name: 'Rookie', minTokens: 1000, color: '#cd7f32', icon: '🥈' },
-                { name: 'Skilled', minTokens: 5000, color: '#c0c0c0', icon: '🥇' },
-                { name: 'Expert', minTokens: 15000, color: '#ffd700', icon: '🏆' },
-                { name: 'Master', minTokens: 50000, color: '#ff6b9d', icon: '💎' },
-                { name: 'Legend', minTokens: 100000, color: '#8b5cf6', icon: '👑' },
-                { name: 'Mythic', minTokens: 500000, color: '#00d4ff', icon: '🌟' },
-                { name: 'Godlike', minTokens: 1000000, color: '#ff0000', icon: '🔥' }
-            ],
-            
-            tournaments: [
-                { name: 'Speed Runner', description: 'Complete 10 challenges in 1 hour', reward: 2000, type: 'time' },
-                { name: 'Token Master', description: 'Earn 5000 tokens in 24 hours', reward: 3000, type: 'tokens' },
-                { name: 'Social Champion', description: 'Complete 15 social challenges', reward: 2500, type: 'category' },
-                { name: 'Fitness Beast', description: 'Complete 20 fitness challenges', reward: 3500, type: 'category' },
-                { name: 'Mind Genius', description: 'Complete 12 mental challenges', reward: 2800, type: 'category' },
-                { name: 'Creative Master', description: 'Complete 8 creative challenges', reward: 2200, type: 'category' }
-            ],
-            
-            specialEvents: [
-                { name: 'Double XP Weekend', description: 'All challenges give 2x XP', active: true, expires: Date.now() + 86400000 },
-                { name: 'Token Frenzy', description: 'All challenges give 1.5x tokens', active: false, expires: null },
-                { name: 'Streak Bonus', description: 'Streak rewards increased by 50%', active: true, expires: Date.now() + 172800000 }
-            ],
-            
-            dailyRewards: [
-                { day: 1, reward: { tokens: 100, type: 'tokens' } },
-                { day: 2, reward: { tokens: 200, type: 'tokens' } },
-                { day: 3, reward: { gems: 5, type: 'gems' } },
-                { day: 4, reward: { tokens: 300, type: 'tokens' } },
-                { day: 5, reward: { powerUp: 'double_tokens', type: 'powerup' } },
-                { day: 6, reward: { tokens: 500, type: 'tokens' } },
-                { day: 7, reward: { gems: 20, tokens: 1000, type: 'mega' } }
-            ]
-        };
-
-        // Premium Founder Accounts
-        const founderAccounts = {
-            'stonne@jombro.com': {
-                password: 'stonne123',
-                displayName: 'Stonne (Founder)',
-                level: 10,
-                tokens: 500000,
-                streak: 365,
-                accountType: 'founder',
-                badge: '👑',
-                achievements: ['first_challenge', 'token_collector', 'streak_master', 'social_butterfly', 'fitness_guru', 'mind_master', 'creative_genius', 'level_up'],
-                specialPerks: ['unlimited_challenges', 'exclusive_content', 'priority_support', 'custom_themes'],
-                joinDate: '2024-01-01',
-                completedChallenges: Array.from({length: 150}, (_, i) => ({
-                    name: `Challenge ${i + 1}`,
-                    category: ['fitness', 'mental', 'social', 'creative'][i % 4],
-                    tokens: Math.floor(Math.random() * 500) + 100,
-                    completedAt: Date.now() - (i * 24 * 60 * 60 * 1000)
-                }))
-            },
-            'creator@jombro.com': {
-                password: 'creator123',
-                displayName: 'Creator (Master)',
-                level: 15,
-                tokens: 1000000,
-                streak: 500,
-                accountType: 'master',
-                badge: '🎯',
-                achievements: ['first_challenge', 'token_collector', 'streak_master', 'social_butterfly', 'fitness_guru', 'mind_master', 'creative_genius', 'level_up'],
-                specialPerks: ['admin_access', 'unlimited_challenges', 'exclusive_content', 'priority_support', 'custom_themes', 'challenge_creator'],
-                joinDate: '2023-12-01',
-                completedChallenges: Array.from({length: 250}, (_, i) => ({
-                    name: `Challenge ${i + 1}`,
-                    category: ['fitness', 'mental', 'social', 'creative'][i % 4],
-                    tokens: Math.floor(Math.random() * 800) + 200,
-                    completedAt: Date.now() - (i * 24 * 60 * 60 * 1000)
-                }))
-            }
-        };
-
-        // Challenge Data
-        const challengeCategories = {
-            fitness: [
-                { name: 'Morning Workout', description: 'Complete a 30-minute workout', tokens: 250, difficulty: 'Medium', time: '30min' },
-                { name: '10,000 Steps', description: 'Walk 10,000 steps today', tokens: 200, difficulty: 'Easy', time: 'All day' },
-                { name: 'Drink 8 Glasses', description: 'Drink 8 glasses of water', tokens: 150, difficulty: 'Easy', time: 'All day' },
-                { name: 'Plank Challenge', description: 'Hold a plank for 2 minutes', tokens: 300, difficulty: 'Hard', time: '2min' },
-                { name: 'Marathon Training', description: 'Run 5 miles at steady pace', tokens: 500, difficulty: 'Expert', time: '45min', premium: true }
-            ],
-            mental: [
-                { name: 'Meditation', description: 'Meditate for 15 minutes', tokens: 200, difficulty: 'Easy', time: '15min' },
-                { name: 'Read 20 Pages', description: 'Read 20 pages of a book', tokens: 250, difficulty: 'Medium', time: '30min' },
-                { name: 'Learn Something New', description: 'Learn a new skill or fact', tokens: 300, difficulty: 'Medium', time: '45min' },
-                { name: 'No Social Media', description: 'Avoid social media for 4 hours', tokens: 400, difficulty: 'Hard', time: '4hrs' },
-                { name: 'Deep Focus Session', description: 'Work on one task for 3 hours straight', tokens: 600, difficulty: 'Expert', time: '3hrs', premium: true }
-            ],
-            social: [
-                { name: 'Call a Friend', description: 'Have a meaningful conversation', tokens: 200, difficulty: 'Easy', time: '20min' },
-                { name: 'Help Someone', description: 'Do something kind for someone', tokens: 300, difficulty: 'Medium', time: '30min' },
-                { name: 'Share Achievement', description: 'Share your progress with friends', tokens: 150, difficulty: 'Easy', time: '5min' },
-                { name: 'Group Activity', description: 'Join a group activity or event', tokens: 350, difficulty: 'Medium', time: '1hr' },
-                { name: 'Network Builder', description: 'Connect with 5 new people professionally', tokens: 750, difficulty: 'Expert', time: '2hrs', premium: true }
-            ],
-            creative: [
-                { name: 'Draw or Paint', description: 'Create some art for 30 minutes', tokens: 250, difficulty: 'Medium', time: '30min' },
-                { name: 'Write a Story', description: 'Write a short story or poem', tokens: 300, difficulty: 'Medium', time: '45min' },
-                { name: 'Take Photos', description: 'Take 10 creative photos', tokens: 200, difficulty: 'Easy', time: '30min' },
-                { name: 'Music Practice', description: 'Practice an instrument or sing', tokens: 250, difficulty: 'Medium', time: '30min' },
-                { name: 'Master Creation', description: 'Create and publish original content', tokens: 800, difficulty: 'Expert', time: '2hrs', premium: true }
-            ]
-        };
-
-        const achievements = [
-            { id: 'first_challenge', name: 'First Steps', icon: '🎯', description: 'Complete your first challenge' },
-            { id: 'token_collector', name: 'Token Collector', icon: '💰', description: 'Earn 1000 tokens' },
-            { id: 'streak_master', name: 'Streak Master', icon: '🔥', description: 'Maintain a 7-day streak' },
-            { id: 'social_butterfly', name: 'Social Butterfly', icon: '👥', description: 'Complete 5 social challenges' },
-            { id: 'fitness_guru', name: 'Fitness Guru', icon: '💪', description: 'Complete 10 fitness challenges' },
-            { id: 'mind_master', name: 'Mind Master', icon: '🧠', description: 'Complete 10 mental challenges' },
-            { id: 'creative_genius', name: 'Creative Genius', icon: '🎨', description: 'Complete 5 creative challenges' },
-            { id: 'level_up', name: 'Level Up', icon: '⭐', description: 'Reach level 5' },
-            { id: 'founder_status', name: 'Founder', icon: '👑', description: 'Original JomBro founder', premium: true },
-            { id: 'master_status', name: 'Master', icon: '🎯', description: 'JomBro master creator', premium: true },
-            { id: 'legend_status', name: 'Legend', icon: '🏆', description: 'Legendary JomBro player', premium: true }
-        ];
-
-        // Global Functions for onclick handlers
-        window.toggleMode = toggleMode;
-        window.signOut = signOut;
-        window.takeChallenge = takeChallenge;
-        window.togglePasswordVisibility = togglePasswordVisibility;
-        window.showChallenges = showChallenges;
-        window.toggleNotifications = toggleNotifications;
-        window.toggleDarkMode = toggleDarkMode;
-        window.togglePrivacy = togglePrivacy;
-        window.showModal = showModal;
-        window.closeModal = closeModal;
-        window.startTournament = startTournament;
-        window.activatePowerUp = activatePowerUp;
-        window.showShop = showShop;
-        window.showFriends = showFriends;
-        window.showStats = showStats;
-        window.showInventory = showInventory;
-        window.quickAction = quickAction;
-
-        // Initialize Firebase
-        async function initializeFirebase() {
-            try {
-                console.log('🔥 Initializing Firebase Authentication...');
-                updateConnectionStatus('connecting', 'Initializing Firebase...');
-                
-                // Check if Firebase SDK is loaded
-                if (typeof firebase === 'undefined') {
-                    throw new Error('Firebase SDK not loaded. Please check your internet connection.');
-                }
-                
-                console.log('✅ Firebase SDK loaded successfully');
-                
-                // Initialize Firebase
-                firebaseApp = firebase.initializeApp(firebaseConfig);
-                firebaseAuth = firebase.auth();
-                firebaseDb = firebase.database();
-                
-                console.log('✅ Firebase services initialized');
-                
-                // Configure Auth settings
-                firebaseAuth.useDeviceLanguage();
-                
-                // Set up auth state persistence
-                try {
-                    await firebaseAuth.setPersistence(firebase.auth.Auth.Persistence.LOCAL);
-                    console.log('✅ Auth persistence set');
-                } catch (persistenceError) {
-                    console.warn('⚠️ Auth persistence failed, continuing:', persistenceError);
-                }
-                
-                // Set up auth state listener with detailed logging
-                firebaseAuth.onAuthStateChanged((user) => {
-                    console.log('🔄 Auth state changed:', user ? `User: ${user.email}` : 'No user');
-                    
-                    if (user) {
-                        currentUser = user;
-                        console.log('✅ User authenticated:', {
-                            email: user.email,
-                            emailVerified: user.emailVerified,
-                            uid: user.uid,
-                            displayName: user.displayName
-                        });
-                        
-                        // Small delay to ensure UI is ready
-                        setTimeout(() => {
-                            completeAuthentication(user);
-                        }, 500);
-                    } else {
-                        currentUser = null;
-                        console.log('🔌 User signed out');
-                        showAuthScreen();
-                    }
-                });
-                
-                console.log('✅ Auth state listener configured');
-                
-                // Test Firebase connection with timeout
-                try {
-                    const connectionTest = await Promise.race([
-                        firebaseDb.ref('.info/connected').once('value'),
-                        new Promise((_, reject) => 
-                            setTimeout(() => reject(new Error('Connection timeout')), 10000)
-                        )
-                    ]);
-                    console.log('✅ Firebase database connection test passed');
-                } catch (connectionError) {
-                    console.warn('⚠️ Database connection test failed, but auth may still work:', connectionError);
-                }
-                
-                isInitialized = true;
-                updateConnectionStatus('connected', 'Firebase Connected');
-                console.log('✅ Firebase initialized successfully');
-                
-                return true;
-                
-            } catch (error) {
-                console.error('❌ Firebase initialization failed:', error);
-                updateConnectionStatus('disconnected', 'Connection Failed');
-                
-                // More specific error messages
-                let errorMessage = 'Firebase connection failed';
-                if (error.message.includes('SDK not loaded')) {
-                    errorMessage = 'Firebase SDK failed to load. Please check your internet connection.';
-                } else if (error.message.includes('network')) {
-                    errorMessage = 'Network error. Please check your internet connection.';
-                } else if (error.message.includes('timeout')) {
-                    errorMessage = 'Connection timeout. Please try again.';
-                }
-                
-                showMessage(`❌ ${errorMessage}`, 'error');
-                return false;
-            }
-        }
-
-        // Authentication Functions
-        function handleAuthSubmit(event) {
-            event.preventDefault();
-            console.log('🔥 Form submitted - handleAuthSubmit called');
-            
+            // Enhanced form input handling
             const emailInput = document.getElementById('emailInput');
             const passwordInput = document.getElementById('passwordInput');
             
-            if (!emailInput || !passwordInput) {
-                console.log('❌ Form inputs not found');
-                showMessage('❌ Form error - please refresh the page', 'error');
-                return;
-            }
-            
-            const email = emailInput.value.trim().toLowerCase();
-            const password = passwordInput.value;
-            
-            console.log(`📝 ${isSignUpMode ? 'Sign Up' : 'Sign In'} attempt for:`, email);
-            
-            // Check for founder accounts first
-            if (founderAccounts[email]) {
-                console.log('👑 Founder account detected');
-                handleFounderLogin(email, password);
-                return;
-            }
-            
-            if (!isInitialized) {
-                console.log('❌ Firebase not initialized yet');
-                showMessage('❌ Firebase not ready. Please wait for connection...', 'error');
-                updateConnectionStatus('connecting', 'Please wait...');
-                return;
-            }
-            
-            if (!firebaseAuth) {
-                console.log('❌ Firebase Auth not available');
-                showMessage('❌ Authentication service not available. Please refresh the page.', 'error');
-                return;
-            }
-            
-            // Comprehensive validation
-            if (!validateForm(email, password)) {
-                console.log('❌ Form validation failed');
-                return;
-            }
-            
-            // Set loading state
-            const submitBtn = document.getElementById('submitBtn');
-            setLoadingState(submitBtn, true);
-            
-            console.log('🚀 Starting Firebase authentication...');
-            
-            // Perform authentication
-            const authPromise = isSignUpMode ? 
-                firebaseAuth.createUserWithEmailAndPassword(email, password) : 
-                firebaseAuth.signInWithEmailAndPassword(email, password);
-            
-            authPromise
-                .then((userCredential) => {
-                    const user = userCredential.user;
-                    console.log(`✅ ${isSignUpMode ? 'Account created' : 'Sign in'} successful:`, user.email);
-                    
-                    // Handle new user setup
-                    if (isSignUpMode) {
-                        setupNewUser(user, email);
+            if (emailInput) {
+                emailInput.addEventListener('input', function() {
+                    // Clear error state when user starts typing
+                    if (this.classList.contains('error')) {
+                        this.classList.remove('error');
                     }
-                    
-                    showMessage(isSignUpMode ? 
-                        '🎉 Account created successfully! Welcome to JomBro!' : 
-                        `✅ Welcome back, ${user.displayName || getDisplayNameFromEmail(email)}!`, 
-                        'success'
-                    );
-                    
-                    // The onAuthStateChanged will handle the UI transition
-                    console.log('✅ Authentication successful, waiting for state change...');
-                })
-                .catch((error) => {
-                    console.error(`❌ ${isSignUpMode ? 'Sign up' : 'Sign in'} failed:`, error.code, error.message);
-                    handleAuthError(error);
-                })
-                .finally(() => {
-                    setLoadingState(submitBtn, false);
-                });
-        }
-
-        function handleFounderLogin(email, password) {
-            console.log('👑 Processing founder login for:', email);
-            
-            const founderData = founderAccounts[email];
-            
-            if (founderData.password !== password) {
-                showMessage('❌ Invalid founder credentials!', 'error');
-                return;
-            }
-            
-            // Set loading state
-            const submitBtn = document.getElementById('submitBtn');
-            setLoadingState(submitBtn, true);
-            
-            // Simulate login process
-            setTimeout(() => {
-                // Set up founder user stats
-                userStats = {
-                    tokens: founderData.tokens,
-                    level: founderData.level,
-                    streak: founderData.streak,
-                    achievements: [...founderData.achievements],
-                    completedChallenges: [...founderData.completedChallenges],
-                    accountType: founderData.accountType,
-                    badge: founderData.badge,
-                    specialPerks: founderData.specialPerks,
-                    joinDate: founderData.joinDate
-                };
-                
-                // Add premium achievements
-                if (founderData.accountType === 'founder') {
-                    userStats.achievements.push('founder_status');
-                } else if (founderData.accountType === 'master') {
-                    userStats.achievements.push('master_status', 'founder_status');
-                }
-                
-                // Create mock user object
-                const mockUser = {
-                    email: email,
-                    displayName: founderData.displayName,
-                    emailVerified: true,
-                    uid: email.split('@')[0],
-                    isFounder: true,
-                    accountType: founderData.accountType
-                };
-                
-                currentUser = mockUser;
-                
-                setLoadingState(submitBtn, false);
-                
-                showMessage(`👑 Welcome back, ${founderData.displayName}! Premium features unlocked.`, 'success');
-                
-                // Complete authentication
-                setTimeout(() => {
-                    completeAuthentication(mockUser);
-                }, 500);
-                
-            }, 1500);
-        }
-
-        // Simplified - using direct Firebase calls in handleAuthSubmit
-
-        function setupNewUser(user, email) {
-            try {
-                // Update display name
-                const displayName = getDisplayNameFromEmail(email);
-                
-                user.updateProfile({
-                    displayName: displayName
-                }).then(() => {
-                    console.log('✅ Display name updated:', displayName);
-                }).catch((error) => {
-                    console.warn('⚠️ Display name update failed:', error);
                 });
                 
-                // Send email verification
-                user.sendEmailVerification().then(() => {
-                    console.log('📧 Verification email sent');
-                    setTimeout(() => {
-                        showMessage('📧 Verification email sent! Please check your inbox.', 'info');
-                    }, 2000);
-                }).catch((error) => {
-                    console.warn('⚠️ Verification email failed:', error);
-                });
-                
-                // Save user data to database
-                if (firebaseDb) {
-                    const userData = {
-                        email: email,
-                        displayName: displayName,
-                        createdAt: firebase.database.ServerValue.TIMESTAMP,
-                        lastLogin: firebase.database.ServerValue.TIMESTAMP,
-                        emailVerified: user.emailVerified
-                    };
-                    
-                    firebaseDb.ref(`users/${user.uid}`).set(userData).catch((error) => {
-                        console.warn('⚠️ User data save failed:', error);
-                    });
-                }
-                
-            } catch (error) {
-                console.error('❌ New user setup failed:', error);
-            }
-        }
-
-        function validateForm(email, password) {
-            // Email validation
-            if (!email) {
-                showMessage('❌ Please enter your email address!', 'error');
-                focusField('emailInput');
-                return false;
-            }
-            
-            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-            if (!emailRegex.test(email)) {
-                showMessage('❌ Please enter a valid email address!', 'error');
-                focusField('emailInput');
-                return false;
-            }
-            
-            // Password validation
-            if (!password) {
-                showMessage('❌ Please enter your password!', 'error');
-                focusField('passwordInput');
-                return false;
-            }
-            
-            if (password.length < 6) {
-                showMessage('❌ Password must be at least 6 characters long!', 'error');
-                focusField('passwordInput');
-                return false;
-            }
-            
-            // Strong password recommendation for sign up
-            if (isSignUpMode && password.length < 8) {
-                showMessage('💡 For better security, consider using 8+ characters', 'info');
-            }
-            
-            return true;
-        }
-
-        function handleAuthError(error) {
-            let message = '';
-            let shouldSwitchMode = false;
-            
-            switch (error.code) {
-                case 'auth/user-not-found':
-                    message = '❌ No account found with this email.';
-                    if (!isSignUpMode) {
-                        message += ' Creating account instead...';
-                        shouldSwitchMode = true;
-                    }
-                    break;
-                    
-                case 'auth/wrong-password':
-                    message = '❌ Incorrect password. Please try again.';
-                    focusField('passwordInput');
-                    break;
-                    
-                case 'auth/email-already-in-use':
-                    message = '❌ Account already exists with this email.';
-                    if (isSignUpMode) {
-                        message += ' Switching to sign in...';
-                        shouldSwitchMode = true;
-                    }
-                    break;
-                    
-                case 'auth/weak-password':
-                    message = '❌ Password is too weak. Use at least 6 characters with letters and numbers.';
-                    focusField('passwordInput');
-                    break;
-                    
-                case 'auth/network-request-failed':
-                    message = '❌ Network error. Please check your internet connection and try again.';
-                    break;
-                    
-                case 'auth/too-many-requests':
-                    message = '❌ Too many failed attempts. Please wait a few minutes before trying again.';
-                    break;
-                    
-                case 'auth/invalid-email':
-                    message = '❌ Invalid email format. Please check your email address.';
-                    focusField('emailInput');
-                    break;
-                    
-                case 'auth/user-disabled':
-                    message = '❌ This account has been disabled. Please contact support.';
-                    break;
-                    
-                case 'auth/operation-not-allowed':
-                    message = '❌ Email/password authentication is not enabled. Please contact support.';
-                    break;
-                    
-                default:
-                    message = `❌ Authentication failed: ${error.message}`;
-                    break;
-            }
-            
-            showMessage(message, 'error');
-            
-            // Auto-switch mode if appropriate
-            if (shouldSwitchMode) {
-                setTimeout(() => {
-                    toggleMode();
-                    showMessage('💡 Switched modes automatically', 'info');
-                }, 2500);
-            }
-        }
-
-        function toggleMode() {
-            try {
-                isSignUpMode = !isSignUpMode;
-                updateModeUI();
-                clearMessages();
-                console.log(`🔄 Mode switched to: ${isSignUpMode ? 'Sign Up' : 'Sign In'}`);
-            } catch (error) {
-                console.error('❌ Error in toggleMode:', error);
-            }
-        }
-
-        function updateModeUI() {
-            const toggleText = document.getElementById('toggleText');
-            const authBtnText = document.getElementById('authBtnText');
-            const passwordInput = document.getElementById('passwordInput');
-            
-            if (isSignUpMode) {
-                if (toggleText) toggleText.textContent = 'Already have an account? Sign In';
-                if (authBtnText) authBtnText.textContent = 'Create Account';
-                if (passwordInput) {
-                    passwordInput.placeholder = 'Create a strong password (6+ characters)';
-                    passwordInput.autocomplete = 'new-password';
-                }
-            } else {
-                if (toggleText) toggleText.textContent = "Don't have an account? Create one";
-                if (authBtnText) authBtnText.textContent = 'Sign In';
-                if (passwordInput) {
-                    passwordInput.placeholder = 'Enter your password';
-                    passwordInput.autocomplete = 'current-password';
-                }
-            }
-        }
-
-        function togglePasswordVisibility() {
-            try {
-                const passwordInput = document.getElementById('passwordInput');
-                const toggleIcon = document.getElementById('passwordToggleIcon');
-                
-                if (passwordInput.type === 'password') {
-                    passwordInput.type = 'text';
-                    toggleIcon.textContent = '🙈';
-                } else {
-                    passwordInput.type = 'password';
-                    toggleIcon.textContent = '👁️';
-                }
-            } catch (error) {
-                console.error('❌ Error toggling password visibility:', error);
-            }
-        }
-
-        function completeAuthentication(user) {
-            try {
-                console.log('✅ Completing authentication for:', user.email);
-                
-                // Clear any existing messages
-                clearMessages();
-                
-                // Load user data (skip for founders as they already have data)
-                if (!user.isFounder) {
-                    loadUserData(user);
-                }
-                
-                // Update user display with premium badges
-                const userDisplayName = document.getElementById('userDisplayName');
-                const accountInfo = document.getElementById('accountInfo');
-                
-                if (userDisplayName) {
-                    const displayName = user.displayName || getDisplayNameFromEmail(user.email);
-                    const badge = userStats.badge || '';
-                    const accountType = userStats.accountType === 'founder' ? ' (Founder)' : 
-                                     userStats.accountType === 'master' ? ' (Master)' : '';
-                    userDisplayName.textContent = `${badge} ${displayName}${accountType}`;
-                    console.log('✅ Updated user display name with premium status');
-                }
-                
-                if (accountInfo) {
-                    const premiumStatus = userStats.accountType !== 'standard' ? 
-                        `👑 Premium Account: ${userStats.accountType.toUpperCase()}<br>` : '';
-                    const specialPerks = userStats.specialPerks ? 
-                        `🎁 Special Perks: ${userStats.specialPerks.join(', ')}<br>` : '';
-                    
-                    accountInfo.innerHTML = `
-                        ✅ Authenticated: ${user.email}<br>
-                        🔐 Account Secured<br>
-                        ${premiumStatus}
-                        ${specialPerks}
-                        ${user.emailVerified ? '✅' : '⚠️'} Email ${user.emailVerified ? 'Verified' : 'Pending Verification'}<br>
-                        🎯 Challenge System Active<br>
-                        🎨 Premium UI Experience
-                    `;
-                    console.log('✅ Updated account info with premium details');
-                }
-                
-                // Update last login in database (skip for founders)
-                if (firebaseDb && user.uid && !user.isFounder) {
-                    firebaseDb.ref(`users/${user.uid}/lastLogin`).set(firebase.database.ServerValue.TIMESTAMP);
-                    console.log('✅ Updated last login timestamp');
-                }
-                
-                // Show main app
-                console.log('🎯 Showing main app...');
-                showMainApp();
-                
-                // Initialize app features
-                initializeAppFeatures();
-                
-                // Show premium welcome message
-                const welcomeMessage = userStats.accountType === 'founder' ? 
-                    `👑 Welcome back, Founder! All premium features unlocked.` :
-                    userStats.accountType === 'master' ? 
-                    `🎯 Welcome back, Master! Ultimate access granted.` :
-                    `🎉 Welcome to JomBro, ${user.displayName || getDisplayNameFromEmail(user.email)}!`;
-                
-                showMessage(welcomeMessage, 'success');
-                
-                console.log('✅ Authentication completed successfully');
-            } catch (error) {
-                console.error('❌ Error in completeAuthentication:', error);
-                showMessage('❌ Error completing login. Please try again.', 'error');
-            }
-        }
-
-        async function signOut() {
-            try {
-                console.log('🚪 Signing out...');
-                
-                if (firebaseAuth && currentUser) {
-                    await firebaseAuth.signOut();
-                    console.log('✅ Firebase sign-out successful');
-                } else {
-                    console.log('⚠️ No active session to sign out');
-                    showAuthScreen();
-                }
-                
-                showMessage('👋 Signed out successfully!', 'success');
-            } catch (error) {
-                console.error('❌ Sign-out error:', error);
-                showMessage('⚠️ Sign-out error, but logged out locally', 'warning');
-                showAuthScreen();
-            }
-        }
-
-        // UI Helper Functions
-        function showAuthScreen() {
-            const authScreen = document.getElementById('authScreen');
-            const mainApp = document.getElementById('mainApp');
-            
-            if (authScreen) authScreen.style.display = 'block';
-            if (mainApp) {
-                mainApp.style.display = 'none';
-                mainApp.classList.add('hidden');
-            }
-            
-            // Clear sensitive form data
-            const authForm = document.getElementById('authForm');
-            if (authForm) authForm.reset();
-            
-            // Reset password visibility
-            const passwordInput = document.getElementById('passwordInput');
-            const toggleIcon = document.getElementById('passwordToggleIcon');
-            if (passwordInput) passwordInput.type = 'password';
-            if (toggleIcon) toggleIcon.textContent = '👁️';
-        }
-
-        function showMainApp() {
-            const authScreen = document.getElementById('authScreen');
-            const mainApp = document.getElementById('mainApp');
-            
-            if (authScreen) authScreen.style.display = 'none';
-            if (mainApp) {
-                mainApp.classList.remove('hidden');
-                mainApp.style.display = 'flex';
-            }
-        }
-
-        function setLoadingState(button, isLoading) {
-            if (!button) return;
-            
-            if (isLoading) {
-                button.classList.add('loading');
-                button.disabled = true;
-            } else {
-                button.classList.remove('loading');
-                button.disabled = false;
-            }
-        }
-
-        function updateConnectionStatus(status, message) {
-            const connectionStatus = document.getElementById('connectionStatus');
-            if (!connectionStatus) return;
-            
-            connectionStatus.className = `connection-status ${status}`;
-            
-            const icons = {
-                connecting: '🔄',
-                connected: '🔥',
-                disconnected: '❌'
-            };
-            
-            connectionStatus.innerHTML = `
-                <span>${icons[status] || '🔄'}</span>
-                <span>${message}</span>
-            `;
-        }
-
-        function showMessage(message, type = 'info', duration = 5000) {
-            try {
-                const messageContainer = document.getElementById('messageContainer');
-                if (!messageContainer) return;
-                
-                // Clear existing messages
-                messageContainer.innerHTML = '';
-                
-                const messageEl = document.createElement('div');
-                messageEl.className = `message ${type}`;
-                messageEl.textContent = message;
-                
-                messageContainer.appendChild(messageEl);
-                
-                console.log(`📢 Message [${type.toUpperCase()}]: ${message}`);
-                
-                // Auto-remove message
-                setTimeout(() => {
-                    if (messageEl.parentNode) {
-                        messageEl.style.opacity = '0';
-                        messageEl.style.transform = 'translateY(-10px)';
-                        setTimeout(() => {
-                            if (messageEl.parentNode) {
-                                messageEl.remove();
-                            }
-                        }, 300);
-                    }
-                }, duration);
-            } catch (error) {
-                console.error('❌ Error showing message:', error);
-            }
-        }
-
-        function clearMessages() {
-            const messageContainer = document.getElementById('messageContainer');
-            if (messageContainer) {
-                messageContainer.innerHTML = '';
-            }
-        }
-
-        function focusField(fieldId) {
-            setTimeout(() => {
-                const field = document.getElementById(fieldId);
-                if (field) {
-                    field.focus();
-                    field.select();
-                }
-            }, 100);
-        }
-
-        function getDisplayNameFromEmail(email) {
-            const username = email.split('@')[0];
-            return username.charAt(0).toUpperCase() + username.slice(1);
-        }
-
-        // App Features Functions
-        function initializeAppFeatures() {
-            console.log('🎮 Initializing app features...');
-            
-            // Generate daily challenges
-            generateDailyChallenges();
-            
-            // Generate weekly challenges
-            generateWeeklyChallenges();
-            
-            // Load leaderboard
-            loadLeaderboard();
-            
-            // Load achievements
-            loadAchievements();
-            
-            // Update user stats display
-            updateUserStatsDisplay();
-            
-            console.log('✅ App features initialized');
-        }
-
-        function loadUserData(user) {
-            if (!firebaseDb || !user.uid) return;
-            
-            // Load user stats from Firebase
-            firebaseDb.ref(`users/${user.uid}/stats`).once('value')
-                .then((snapshot) => {
-                    if (snapshot.exists()) {
-                        userStats = { ...userStats, ...snapshot.val() };
-                        console.log('✅ User stats loaded:', userStats);
+                emailInput.addEventListener('blur', function() {
+                    const email = this.value.trim();
+                    if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+                        this.style.borderColor = 'var(--error-red)';
                     } else {
-                        // Initialize new user stats
-                        firebaseDb.ref(`users/${user.uid}/stats`).set(userStats);
-                        console.log('✅ New user stats created');
-                    }
-                    updateUserStatsDisplay();
-                })
-                .catch((error) => {
-                    console.warn('⚠️ Failed to load user stats:', error);
-                });
-        }
-
-        function updateUserStatsDisplay() {
-            const userTokens = document.getElementById('userTokens');
-            const userLevel = document.getElementById('userLevel');
-            const userStreak = document.getElementById('userStreak');
-            const premiumBanner = document.getElementById('premiumBanner');
-            const premiumStatus = document.getElementById('premiumStatus');
-            
-            if (userTokens) userTokens.textContent = userStats.tokens.toLocaleString();
-            if (userLevel) userLevel.textContent = userStats.level;
-            if (userStreak) userStreak.textContent = userStats.streak;
-            
-            // Show premium banner for premium accounts
-            if (premiumBanner && userStats.accountType !== 'standard') {
-                premiumBanner.style.display = 'block';
-                
-                if (premiumStatus) {
-                    const statusText = userStats.accountType === 'founder' ? 
-                        'Founder Benefits • Unlimited Challenges • Priority Support' :
-                        userStats.accountType === 'master' ? 
-                        'Master Access • Admin Tools • Challenge Creator • All Premium Features' :
-                        'Premium Features Unlocked';
-                    premiumStatus.textContent = statusText;
-                }
-            }
-        }
-
-        function generateDailyChallenges() {
-            const dailyChallenges = document.getElementById('dailyChallenges');
-            if (!dailyChallenges) return;
-            
-            // Get challenges based on account type
-            const isPremium = userStats.accountType !== 'standard';
-            const categories = Object.keys(challengeCategories);
-            const selectedChallenges = [];
-            
-            // Add more challenges for premium users
-            const challengeCount = isPremium ? 5 : 3;
-            
-            for (let i = 0; i < challengeCount; i++) {
-                const randomCategory = categories[Math.floor(Math.random() * categories.length)];
-                const categoryChallenge = challengeCategories[randomCategory];
-                
-                // Filter challenges based on premium status
-                const availableChallenges = isPremium ? 
-                    categoryChallenge : 
-                    categoryChallenge.filter(c => !c.premium);
-                
-                const randomChallenge = availableChallenges[Math.floor(Math.random() * availableChallenges.length)];
-                selectedChallenges.push({ ...randomChallenge, category: randomCategory });
-            }
-            
-            dailyChallenges.innerHTML = selectedChallenges.map(challenge => {
-                const isPremiumChallenge = challenge.premium;
-                const premiumBadge = isPremiumChallenge ? 
-                    '<div style="position: absolute; top: 10px; right: 10px; background: linear-gradient(45deg, #ffd700, #ff6b9d); color: white; padding: 2px 8px; border-radius: 10px; font-size: 10px; font-weight: 700;">PREMIUM</div>' : 
-                    '';
-                
-                return `
-                    <div class="challenge-card" onclick="takeChallenge('${challenge.name}', ${challenge.tokens}, '${challenge.category}')" style="position: relative;">
-                        ${premiumBadge}
-                        <div style="font-size: 18px; font-weight: 600; margin-bottom: 10px; color: var(--primary-pink);">
-                            ${getCategoryIcon(challenge.category)} ${challenge.name}
-                        </div>
-                        <div style="font-size: 14px; line-height: 1.4; margin-bottom: 15px; opacity: 0.9; color: var(--text-secondary);">
-                            ${challenge.description}
-                        </div>
-                        <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 15px;">
-                            <div style="text-align: center; background: rgba(255, 255, 255, 0.1); padding: 8px; border-radius: 8px;">
-                                <div style="font-size: 14px; font-weight: 700; color: var(--primary-pink);">${challenge.tokens}</div>
-                                <div style="font-size: 9px; color: var(--text-secondary);">TOKENS</div>
-                            </div>
-                            <div style="text-align: center; background: rgba(255, 255, 255, 0.1); padding: 8px; border-radius: 8px;">
-                                <div style="font-size: 14px; font-weight: 700; color: var(--primary-pink);">${challenge.difficulty}</div>
-                                <div style="font-size: 9px; color: var(--text-secondary);">LEVEL</div>
-                            </div>
-                            <div style="text-align: center; background: rgba(255, 255, 255, 0.1); padding: 8px; border-radius: 8px;">
-                                <div style="font-size: 14px; font-weight: 700; color: var(--primary-pink);">${challenge.time}</div>
-                                <div style="font-size: 9px; color: var(--text-secondary);">TIME</div>
-                            </div>
-                        </div>
-                        <button class="btn-primary" style="width: 100%;">🚀 TAKE CHALLENGE</button>
-                    </div>
-                `;
-            }).join('');
-        }
-
-        function generateWeeklyChallenges() {
-            const weeklyChallenges = document.getElementById('weeklyChallenges');
-            if (!weeklyChallenges) return;
-            
-            const weeklyList = [
-                { name: 'Fitness Master', description: 'Complete 5 fitness challenges this week', tokens: 1000, difficulty: 'Hard', time: '7 days' },
-                { name: 'Mind Expansion', description: 'Complete 3 mental challenges this week', tokens: 750, difficulty: 'Medium', time: '7 days' },
-                { name: 'Social Connector', description: 'Complete 3 social challenges this week', tokens: 800, difficulty: 'Medium', time: '7 days' }
-            ];
-            
-            weeklyChallenges.innerHTML = weeklyList.map(challenge => `
-                <div class="challenge-card" onclick="takeChallenge('${challenge.name}', ${challenge.tokens}, 'weekly')">
-                    <div style="font-size: 18px; font-weight: 600; margin-bottom: 10px; color: var(--primary-purple);">
-                        🗓️ ${challenge.name}
-                    </div>
-                    <div style="font-size: 14px; line-height: 1.4; margin-bottom: 15px; opacity: 0.9; color: var(--text-secondary);">
-                        ${challenge.description}
-                    </div>
-                    <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 15px;">
-                        <div style="text-align: center; background: rgba(255, 255, 255, 0.1); padding: 8px; border-radius: 8px;">
-                            <div style="font-size: 14px; font-weight: 700; color: var(--primary-purple);">${challenge.tokens}</div>
-                            <div style="font-size: 9px; color: var(--text-secondary);">TOKENS</div>
-                        </div>
-                        <div style="text-align: center; background: rgba(255, 255, 255, 0.1); padding: 8px; border-radius: 8px;">
-                            <div style="font-size: 14px; font-weight: 700; color: var(--primary-purple);">${challenge.difficulty}</div>
-                            <div style="font-size: 9px; color: var(--text-secondary);">LEVEL</div>
-                        </div>
-                        <div style="text-align: center; background: rgba(255, 255, 255, 0.1); padding: 8px; border-radius: 8px;">
-                            <div style="font-size: 14px; font-weight: 700; color: var(--primary-purple);">${challenge.time}</div>
-                            <div style="font-size: 9px; color: var(--text-secondary);">TIME</div>
-                        </div>
-                    </div>
-                    <button class="btn-primary" style="width: 100%;">🚀 TAKE CHALLENGE</button>
-                </div>
-            `).join('');
-        }
-
-        function loadLeaderboard() {
-            const leaderboard = document.getElementById('leaderboard');
-            if (!leaderboard) return;
-            
-            // Enhanced leaderboard with founder accounts
-            const leaderboardData = [
-                { name: 'Creator (Master)', tokens: 1000000, level: 15, rank: 1, badge: '🎯', accountType: 'master' },
-                { name: 'Stonne (Founder)', tokens: 500000, level: 10, rank: 2, badge: '👑', accountType: 'founder' },
-                { name: 'ChampionPlayer', tokens: 5420, level: 12, rank: 3, accountType: 'standard' },
-                { name: 'FitnessGuru', tokens: 4890, level: 11, rank: 4, accountType: 'standard' },
-                { name: 'MindMaster', tokens: 4320, level: 10, rank: 5, accountType: 'standard' },
-                { name: 'SocialBee', tokens: 3950, level: 9, rank: 6, accountType: 'standard' },
-                { name: 'CreativeGenius', tokens: 3680, level: 8, rank: 7, accountType: 'standard' }
-            ];
-            
-            // Add current user to leaderboard if they have significant progress
-            if (currentUser && userStats.tokens > 1000) {
-                const userEntry = {
-                    name: `${userStats.badge || ''} ${currentUser.displayName || 'You'}`,
-                    tokens: userStats.tokens,
-                    level: userStats.level,
-                    rank: 'YOU',
-                    accountType: userStats.accountType || 'standard',
-                    isCurrentUser: true
-                };
-                leaderboardData.push(userEntry);
-            }
-            
-            leaderboard.innerHTML = leaderboardData.map(player => {
-                const isPremium = player.accountType !== 'standard';
-                const premiumGlow = isPremium ? 'box-shadow: 0 0 15px rgba(255, 215, 0, 0.3);' : '';
-                const userHighlight = player.isCurrentUser ? 'background: rgba(255, 107, 157, 0.1); border: 1px solid rgba(255, 107, 157, 0.3);' : '';
-                
-                return `
-                    <div class="leaderboard-entry" style="${premiumGlow} ${userHighlight}">
-                        <div style="display: flex; align-items: center; gap: 15px;">
-                            <div class="leaderboard-rank ${player.rank === 1 ? 'gold' : player.rank === 2 ? 'silver' : player.rank === 3 ? 'bronze' : ''}">
-                                ${player.rank === 1 ? '🥇' : player.rank === 2 ? '🥈' : player.rank === 3 ? '🥉' : player.rank}
-                            </div>
-                            <div>
-                                <div style="font-weight: 600; color: var(--text-primary); display: flex; align-items: center; gap: 5px;">
-                                    ${player.name}
-                                    ${isPremium ? `<span style="font-size: 10px; background: linear-gradient(45deg, #ffd700, #ff6b9d); color: white; padding: 1px 6px; border-radius: 8px;">${player.accountType.toUpperCase()}</span>` : ''}
-                                </div>
-                                <div style="font-size: 12px; color: var(--text-secondary);">Level ${player.level}</div>
-                            </div>
-                        </div>
-                        <div style="text-align: right;">
-                            <div style="font-weight: 700; color: var(--primary-pink);">${player.tokens.toLocaleString()}</div>
-                            <div style="font-size: 12px; color: var(--text-secondary);">tokens</div>
-                        </div>
-                    </div>
-                `;
-            }).join('');
-        }
-
-        function loadAchievements() {
-            const achievementsContainer = document.getElementById('achievements');
-            if (!achievementsContainer) return;
-            
-            achievementsContainer.innerHTML = achievements.map(achievement => `
-                <div class="achievement-badge ${userStats.achievements.includes(achievement.id) ? 'earned' : ''}" 
-                     onclick="showAchievementDetails('${achievement.id}')" 
-                     title="${achievement.description}">
-                    <div style="font-size: 24px; margin-bottom: 5px;">${achievement.icon}</div>
-                    <div style="font-size: 10px; color: var(--text-secondary);">${achievement.name}</div>
-                </div>
-            `).join('');
-        }
-
-        function showChallenges(category) {
-            console.log(`🎯 Showing ${category} challenges`);
-            
-            const challenges = challengeCategories[category];
-            if (!challenges) return;
-            
-            const challengeList = challenges.map(challenge => `
-                <div class="challenge-card" onclick="takeChallenge('${challenge.name}', ${challenge.tokens}, '${category}')">
-                    <div style="font-size: 18px; font-weight: 600; margin-bottom: 10px; color: var(--primary-pink);">
-                        ${getCategoryIcon(category)} ${challenge.name}
-                    </div>
-                    <div style="font-size: 14px; line-height: 1.4; margin-bottom: 15px; opacity: 0.9; color: var(--text-secondary);">
-                        ${challenge.description}
-                    </div>
-                    <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 15px;">
-                        <div style="text-align: center; background: rgba(255, 255, 255, 0.1); padding: 8px; border-radius: 8px;">
-                            <div style="font-size: 14px; font-weight: 700; color: var(--primary-pink);">${challenge.tokens}</div>
-                            <div style="font-size: 9px; color: var(--text-secondary);">TOKENS</div>
-                        </div>
-                        <div style="text-align: center; background: rgba(255, 255, 255, 0.1); padding: 8px; border-radius: 8px;">
-                            <div style="font-size: 14px; font-weight: 700; color: var(--primary-pink);">${challenge.difficulty}</div>
-                            <div style="font-size: 9px; color: var(--text-secondary);">LEVEL</div>
-                        </div>
-                        <div style="text-align: center; background: rgba(255, 255, 255, 0.1); padding: 8px; border-radius: 8px;">
-                            <div style="font-size: 14px; font-weight: 700; color: var(--primary-pink);">${challenge.time}</div>
-                            <div style="font-size: 9px; color: var(--text-secondary);">TIME</div>
-                        </div>
-                    </div>
-                    <button class="btn-primary" style="width: 100%;">🚀 TAKE CHALLENGE</button>
-                </div>
-            `).join('');
-            
-            // Show challenges in a modal or replace daily challenges
-            showMessage(`🎯 ${category.charAt(0).toUpperCase() + category.slice(1)} challenges loaded!`, 'info');
-        }
-
-        function getCategoryIcon(category) {
-            const icons = {
-                fitness: '💪',
-                mental: '🧠',
-                social: '👥',
-                creative: '🎨',
-                weekly: '🗓️'
-            };
-            return icons[category] || '🎯';
-        }
-
-        // Settings Functions
-        function toggleNotifications() {
-            const toggle = document.getElementById('notificationToggle');
-            if (toggle) {
-                const isOn = toggle.textContent === 'ON';
-                toggle.textContent = isOn ? 'OFF' : 'ON';
-                toggle.style.background = isOn ? '#666' : 'var(--primary-pink)';
-                showMessage(isOn ? '🔕 Notifications disabled' : '🔔 Notifications enabled', 'info');
-            }
-        }
-
-        function toggleDarkMode() {
-            const toggle = document.getElementById('darkModeToggle');
-            if (toggle) {
-                const isOn = toggle.textContent === 'ON';
-                toggle.textContent = isOn ? 'OFF' : 'ON';
-                toggle.style.background = isOn ? '#666' : 'var(--primary-purple)';
-                showMessage(isOn ? '☀️ Light mode enabled' : '🌙 Dark mode enabled', 'info');
-            }
-        }
-
-        function togglePrivacy() {
-            const toggle = document.getElementById('privacyToggle');
-            if (toggle) {
-                const isPrivate = toggle.textContent === 'PRIVATE';
-                toggle.textContent = isPrivate ? 'PUBLIC' : 'PRIVATE';
-                toggle.style.background = isPrivate ? '#666' : 'var(--primary-blue)';
-                showMessage(isPrivate ? '🌐 Profile is now public' : '🔐 Profile is now private', 'info');
-            }
-        }
-
-        // Challenge Functions
-        function takeChallenge(challengeName, tokens, category = 'general') {
-            try {
-                console.log(`🎯 Taking challenge: ${challengeName}`);
-                
-                if (confirm(`🎯 Ready to take on "${challengeName}"?\n\nReward: ${tokens} tokens\nCategory: ${category}\n\nClick OK to accept the challenge!`)) {
-                    showMessage(`🎯 Challenge "${challengeName}" accepted!`, 'success');
-                    
-                    // Simulate challenge completion
-                    setTimeout(() => {
-                        // Update user stats
-                        userStats.tokens += tokens;
-                        userStats.completedChallenges.push({
-                            name: challengeName,
-                            category: category,
-                            tokens: tokens,
-                            completedAt: Date.now()
-                        });
-                        
-                        // Check for level up
-                        const newLevel = Math.floor(userStats.tokens / 1000) + 1;
-                        if (newLevel > userStats.level) {
-                            userStats.level = newLevel;
-                            showMessage(`🎉 Level up! You're now level ${newLevel}!`, 'success');
-                            checkAchievements();
-                        }
-                        
-                        // Update streak
-                        userStats.streak += 1;
-                        
-                        // Update display
-                        updateUserStatsDisplay();
-                        
-                        // Save to Firebase
-                        if (firebaseDb && currentUser) {
-                            const challengeData = {
-                                challengeName: challengeName,
-                                category: category,
-                                tokensEarned: tokens,
-                                completedAt: firebase.database.ServerValue.TIMESTAMP
-                            };
-                            
-                            firebaseDb.ref(`users/${currentUser.uid}/challenges`).push(challengeData);
-                            firebaseDb.ref(`users/${currentUser.uid}/stats`).set(userStats);
-                        }
-                        
-                        showMessage(`🏆 Challenge completed! You earned ${tokens} tokens!`, 'success');
-                        createCelebrationEffect();
-                        
-                        // Check achievements
-                        checkAchievements();
-                    }, 2000);
-                }
-            } catch (error) {
-                console.error('❌ Error in takeChallenge:', error);
-                showMessage('❌ Challenge error occurred', 'error');
-            }
-        }
-
-        function checkAchievements() {
-            const newAchievements = [];
-            
-            // Check first challenge
-            if (userStats.completedChallenges.length >= 1 && !userStats.achievements.includes('first_challenge')) {
-                newAchievements.push('first_challenge');
-            }
-            
-            // Check token collector
-            if (userStats.tokens >= 1000 && !userStats.achievements.includes('token_collector')) {
-                newAchievements.push('token_collector');
-            }
-            
-            // Check streak master
-            if (userStats.streak >= 7 && !userStats.achievements.includes('streak_master')) {
-                newAchievements.push('streak_master');
-            }
-            
-            // Check category-specific achievements
-            const socialChallenges = userStats.completedChallenges.filter(c => c.category === 'social').length;
-            if (socialChallenges >= 5 && !userStats.achievements.includes('social_butterfly')) {
-                newAchievements.push('social_butterfly');
-            }
-            
-            const fitnessChallenges = userStats.completedChallenges.filter(c => c.category === 'fitness').length;
-            if (fitnessChallenges >= 10 && !userStats.achievements.includes('fitness_guru')) {
-                newAchievements.push('fitness_guru');
-            }
-            
-            const mentalChallenges = userStats.completedChallenges.filter(c => c.category === 'mental').length;
-            if (mentalChallenges >= 10 && !userStats.achievements.includes('mind_master')) {
-                newAchievements.push('mind_master');
-            }
-            
-            const creativeChallenges = userStats.completedChallenges.filter(c => c.category === 'creative').length;
-            if (creativeChallenges >= 5 && !userStats.achievements.includes('creative_genius')) {
-                newAchievements.push('creative_genius');
-            }
-            
-            // Check level achievement
-            if (userStats.level >= 5 && !userStats.achievements.includes('level_up')) {
-                newAchievements.push('level_up');
-            }
-            
-            // Award new achievements
-            if (newAchievements.length > 0) {
-                userStats.achievements.push(...newAchievements);
-                
-                newAchievements.forEach(achievementId => {
-                    const achievement = achievements.find(a => a.id === achievementId);
-                    if (achievement) {
-                        setTimeout(() => {
-                            showMessage(`🎖️ Achievement Unlocked: ${achievement.icon} ${achievement.name}!`, 'success');
-                            createCelebrationEffect();
-                        }, 1000);
+                        this.style.borderColor = 'rgba(255, 255, 255, 0.1)';
                     }
                 });
-                
-                // Refresh achievements display
-                loadAchievements();
-                
-                // Save to Firebase
-                if (firebaseDb && currentUser) {
-                    firebaseDb.ref(`users/${currentUser.uid}/stats`).set(userStats);
-                }
             }
-        }
-
-        function createCelebrationEffect() {
-            try {
-                const emojis = ['🎉', '🏆', '⭐', '🎊', '🔥', '💫', '✨', '🌟'];
-                
-                for (let i = 0; i < 10; i++) {
-                    setTimeout(() => {
-                        const emoji = document.createElement('div');
-                        emoji.textContent = emojis[Math.floor(Math.random() * emojis.length)];
-                        emoji.style.cssText = `
-                            position: fixed;
-                            font-size: ${20 + Math.random() * 15}px;
-                            left: ${Math.random() * window.innerWidth}px;
-                            top: ${window.innerHeight}px;
-                            pointer-events: none;
-                            z-index: 10000;
-                            animation: celebrationFloat 3s ease-out forwards;
-                        `;
-                        
-                        document.body.appendChild(emoji);
-                        
-                        setTimeout(() => {
-                            if (emoji.parentNode) {
-                                emoji.remove();
-                            }
-                        }, 3000);
-                    }, i * 150);
-                }
-                
-                // Add celebration CSS if not exists
-                if (!document.querySelector('#celebration-style')) {
-                    const style = document.createElement('style');
-                    style.id = 'celebration-style';
-                    style.textContent = `
-                        @keyframes celebrationFloat {
-                            0% {
-                                transform: translateY(0) rotate(0deg) scale(0);
-                                opacity: 1;
-                            }
-                            50% {
-                                transform: translateY(-60vh) rotate(180deg) scale(1.3);
-                                opacity: 1;
-                            }
-                            100% {
-                                transform: translateY(-100vh) rotate(360deg) scale(0.5);
-                                opacity: 0;
-                            }
-                        }
-                    `;
-                    document.head.appendChild(style);
-                }
-            } catch (error) {
-                console.error('❌ Error in celebration effect:', error);
-            }
-        }
-
-        // Event Listeners and Initialization
-        document.addEventListener('DOMContentLoaded', function() {
-            console.log('🚀 JomBro - Initializing Authentic Firebase Authentication...');
             
-            // Set up form submission with debugging
-            const authForm = document.getElementById('authForm');
-            if (authForm) {
-                authForm.addEventListener('submit', function(e) {
-                    console.log('📝 Form submit event triggered');
-                    handleAuthSubmit(e);
+            if (passwordInput) {
+                passwordInput.addEventListener('input', function() {
+                    // Clear error state when user starts typing
+                    if (this.classList.contains('error')) {
+                        this.classList.remove('error');
+                    }
+                    
+                    // Real-time password strength indicator
+                    const password = this.value;
+                    if (password.length >= 6) {
+                        this.style.borderColor = password.length >= 8 ? 'var(--success-green)' : 'var(--warning-orange)';
+                    } else if (password.length > 0) {
+                        this.style.borderColor = 'var(--error-red)';
+                    } else {
+                        this.style.borderColor = 'rgba(255, 255, 255, 0.1)';
+                    }
                 });
-                console.log('✅ Form event listener added');
-            } else {
-                console.error('❌ Auth form not found');
             }
             
-            // Initialize Firebase with retry logic
-            setTimeout(async () => {
-                console.log('🔥 Starting Firebase initialization...');
-                
-                let success = false;
-                let attempts = 0;
-                const maxAttempts = 3;
-                
-                while (!success && attempts < maxAttempts) {
-                    attempts++;
-                    console.log(`🔄 Firebase initialization attempt ${attempts}/${maxAttempts}`);
-                    
-                    success = await initializeFirebase();
-                    
-                    if (!success && attempts < maxAttempts) {
-                        console.log(`⚠️ Attempt ${attempts} failed, retrying in 2 seconds...`);
-                        updateConnectionStatus('connecting', `Retrying... (${attempts}/${maxAttempts})`);
-                        await new Promise(resolve => setTimeout(resolve, 2000));
-                    }
-                }
-                
-                if (success) {
-                    console.log('✅ Application ready for Firebase testing');
-                    showMessage('🔥 Firebase authentication ready!', 'success', 3000);
-                } else {
-                    console.error('❌ Firebase initialization failed after all attempts');
-                    showMessage('❌ Unable to connect to Firebase. Please check your internet connection and try refreshing the page.', 'error');
-                }
-            }, 1000);
+            // Enhanced connection monitoring
+            let connectionCheckInterval;
             
-            // Add keyboard shortcuts
-            document.addEventListener('keydown', function(e) {
-                // Ctrl/Cmd + Enter to submit form
-                if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
-                    const submitBtn = document.getElementById('submitBtn');
-                    if (submitBtn && !submitBtn.disabled) {
-                        e.preventDefault();
-                        submitBtn.click();
+            function startConnectionMonitoring() {
+                if (connectionCheckInterval) {
+                    clearInterval(connectionCheckInterval);
+                }
+                
+                connectionCheckInterval = setInterval(() => {
+                    if (navigator.onLine) {
+                        if (!isInitialized) {
+                            console.log('🔄 Network back online, attempting to reconnect...');
+                            initializeFirebase();
+                        }
+                    } else {
+                        console.log('📵 Network offline detected');
+                        updateConnectionStatus('disconnected', 'No Internet Connection');
+                        showMessage('📵 No internet connection. Please check your network.', 'warning');
                     }
+                }, 10000); // Check every 10 seconds
+            }
+            
+            // Network event listeners
+            window.addEventListener('online', () => {
+                console.log('🌐 Network connection restored');
+                if (!isInitialized) {
+                    showMessage('🌐 Network restored. Reconnecting...', 'info');
+                    initializeFirebase();
                 }
             });
             
-            console.log('✅ JomBro Authentication System Ready!');
-            console.log('🎯 Firebase Email/Password Authentication Active');
-            console.log('🔐 Production-Ready Security Implementation');
+            window.addEventListener('offline', () => {
+                console.log('📵 Network connection lost');
+                updateConnectionStatus('disconnected', 'Offline');
+                showMessage('📵 Network connection lost. Please check your internet.', 'warning');
+            });
+            
+            // Start connection monitoring
+            startConnectionMonitoring();
+            
+            // Page visibility handling
+            document.addEventListener('visibilitychange', function() {
+                if (document.visibilityState === 'visible' && !isInitialized) {
+                    console.log('👁️ Page became visible, checking Firebase connection...');
+                    initializeFirebase();
+                }
+            });
+            
+            console.log('✅ JomBro Enhanced initialization complete');
+            console.log('🎯 Features: Enhanced Stability, Live Players, AI Challenges, Better Error Handling');
         });
     </script>
 </body>
