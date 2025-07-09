@@ -638,9 +638,9 @@
             font-family: inherit;
         }
 
-        .settings-toggle:hover {
-            transform: scale(1.05);
-            filter: brightness(1.2);
+        /* Hidden utility */
+        .hidden {
+            display: none !important;
         }
 
         /* Mobile responsive */
@@ -1758,11 +1758,130 @@
             }
         }
 
-        function showAchievementDetails(achievementId) {
-            const achievement = achievements.find(a => a.id === achievementId);
-            if (achievement) {
-                const isEarned = userStats.achievements.includes(achievementId);
-                showMessage(`${achievement.icon} ${achievement.name}\n${achievement.description}\n${isEarned ? '✅ Earned!' : '⏳ Not earned yet'}`, 'info');
+        // Challenge Functions
+        function takeChallenge(challengeName, tokens, category = 'general') {
+            try {
+                console.log(`🎯 Taking challenge: ${challengeName}`);
+                
+                if (confirm(`🎯 Ready to take on "${challengeName}"?\n\nReward: ${tokens} tokens\nCategory: ${category}\n\nClick OK to accept the challenge!`)) {
+                    showMessage(`🎯 Challenge "${challengeName}" accepted!`, 'success');
+                    
+                    // Simulate challenge completion
+                    setTimeout(() => {
+                        // Update user stats
+                        userStats.tokens += tokens;
+                        userStats.completedChallenges.push({
+                            name: challengeName,
+                            category: category,
+                            tokens: tokens,
+                            completedAt: Date.now()
+                        });
+                        
+                        // Check for level up
+                        const newLevel = Math.floor(userStats.tokens / 1000) + 1;
+                        if (newLevel > userStats.level) {
+                            userStats.level = newLevel;
+                            showMessage(`🎉 Level up! You're now level ${newLevel}!`, 'success');
+                            checkAchievements();
+                        }
+                        
+                        // Update streak
+                        userStats.streak += 1;
+                        
+                        // Update display
+                        updateUserStatsDisplay();
+                        
+                        // Save to Firebase
+                        if (firebaseDb && currentUser) {
+                            const challengeData = {
+                                challengeName: challengeName,
+                                category: category,
+                                tokensEarned: tokens,
+                                completedAt: firebase.database.ServerValue.TIMESTAMP
+                            };
+                            
+                            firebaseDb.ref(`users/${currentUser.uid}/challenges`).push(challengeData);
+                            firebaseDb.ref(`users/${currentUser.uid}/stats`).set(userStats);
+                        }
+                        
+                        showMessage(`🏆 Challenge completed! You earned ${tokens} tokens!`, 'success');
+                        createCelebrationEffect();
+                        
+                        // Check achievements
+                        checkAchievements();
+                    }, 2000);
+                }
+            } catch (error) {
+                console.error('❌ Error in takeChallenge:', error);
+                showMessage('❌ Challenge error occurred', 'error');
+            }
+        }
+
+        function checkAchievements() {
+            const newAchievements = [];
+            
+            // Check first challenge
+            if (userStats.completedChallenges.length >= 1 && !userStats.achievements.includes('first_challenge')) {
+                newAchievements.push('first_challenge');
+            }
+            
+            // Check token collector
+            if (userStats.tokens >= 1000 && !userStats.achievements.includes('token_collector')) {
+                newAchievements.push('token_collector');
+            }
+            
+            // Check streak master
+            if (userStats.streak >= 7 && !userStats.achievements.includes('streak_master')) {
+                newAchievements.push('streak_master');
+            }
+            
+            // Check category-specific achievements
+            const socialChallenges = userStats.completedChallenges.filter(c => c.category === 'social').length;
+            if (socialChallenges >= 5 && !userStats.achievements.includes('social_butterfly')) {
+                newAchievements.push('social_butterfly');
+            }
+            
+            const fitnessChallenges = userStats.completedChallenges.filter(c => c.category === 'fitness').length;
+            if (fitnessChallenges >= 10 && !userStats.achievements.includes('fitness_guru')) {
+                newAchievements.push('fitness_guru');
+            }
+            
+            const mentalChallenges = userStats.completedChallenges.filter(c => c.category === 'mental').length;
+            if (mentalChallenges >= 10 && !userStats.achievements.includes('mind_master')) {
+                newAchievements.push('mind_master');
+            }
+            
+            const creativeChallenges = userStats.completedChallenges.filter(c => c.category === 'creative').length;
+            if (creativeChallenges >= 5 && !userStats.achievements.includes('creative_genius')) {
+                newAchievements.push('creative_genius');
+            }
+            
+            // Check level achievement
+            if (userStats.level >= 5 && !userStats.achievements.includes('level_up')) {
+                newAchievements.push('level_up');
+            }
+            
+            // Award new achievements
+            if (newAchievements.length > 0) {
+                userStats.achievements.push(...newAchievements);
+                
+                newAchievements.forEach(achievementId => {
+                    const achievement = achievements.find(a => a.id === achievementId);
+                    if (achievement) {
+                        setTimeout(() => {
+                            showMessage(`🎖️ Achievement Unlocked: ${achievement.icon} ${achievement.name}!`, 'success');
+                            createCelebrationEffect();
+                        }, 1000);
+                    }
+                });
+                
+                // Refresh achievements display
+                loadAchievements();
+                
+                // Save to Firebase
+                if (firebaseDb && currentUser) {
+                    firebaseDb.ref(`users/${currentUser.uid}/stats`).set(userStats);
+                }
             }
         }
 
