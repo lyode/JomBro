@@ -1,4 +1,92 @@
-<!DOCTYPE html>
+/* Mobile responsive adjustments */
+        @media (max-width: 480px) {
+            .top-right-buttons {
+                top: 10px;
+                right: 10px;
+                gap: 6px;
+            }
+
+            .top-feature-btn {
+                padding: 8px 12px;
+                font-size: 12px;
+            }
+
+            .top-feature-btn span:last-child {
+                display: none;
+            }
+
+            .right-overlay-buttons {
+                right: 10px;
+                gap: 8px;
+            }
+
+            .overlay-button {
+                width: 48px;
+                height: 48px;
+                font-size: 16px;
+            }
+
+            .overlay-button::after {
+                right: 60px;
+            }
+
+            .overlay-button:hover::after {
+                right: 55px;
+            }
+
+            .feature-modal {
+                padding: 20px;
+                max-width: 95%;
+            }
+
+            .feature-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .online-players-overlay {
+                top: 60px;
+                right: 10px;
+                max-width: 180px;
+            }
+
+            .chat-container {
+                height: 300px;
+            }
+
+            .champion-item {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .champion-stats {
+                text-align: center;
+                margin-top: 10px;
+            }
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        /* Global Functions - Updated list */
+        window.toggleMode = toggleMode;
+        window.signOut = signOut;
+        window.takeChallenge = takeChallenge;
+        window.togglePasswordVisibility = togglePasswordVisibility;
+        window.showChallenges = showChallenges;
+        window.toggleNotifications = toggleNotifications;
+        window.toggleDarkMode = toggleDarkMode;
+        window.togglePrivacy = togglePrivacy;
+        window.showModal = showModal;
+        window.closeModal = closeModal;
+        window.showShop = showShop;
+        window.showFriends = showFriends;
+        window.showStats = showStats;
+        window.showInventory = showInventory;
+        window.quickAction = quickAction;
+        window.generateAIChallenge = generateAIChallenge;
+        window.toggleOnlinePlayers = toggleOnlinePlayers;
+        window.claimDailyReward = claimDailyReward;<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -223,10 +311,454 @@
             padding: 20px;
         }
 
-        /* Online Players Overlay */
-        .online-players-overlay {
+        /* Top Right Feature Buttons */
+        .top-right-buttons {
             position: fixed;
             top: 20px;
+            right: 20px;
+            display: flex;
+            gap: 10px;
+            z-index: 4500;
+        }
+
+        .top-feature-btn {
+            background: rgba(15, 15, 15, 0.9);
+            backdrop-filter: blur(25px);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 12px;
+            padding: 12px 16px;
+            color: var(--text-primary);
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .top-feature-btn:hover {
+            background: rgba(255, 107, 157, 0.2);
+            border-color: var(--primary-pink);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 30px rgba(0, 0, 0, 0.4);
+        }
+
+        .top-feature-btn.active {
+            background: linear-gradient(135deg, var(--primary-pink), var(--primary-purple));
+            border-color: var(--primary-pink);
+            color: white;
+        }
+
+        /* Enhanced Right Side Overlay Buttons */
+        .right-overlay-buttons {
+            position: fixed;
+            top: 50%;
+            right: 20px;
+            transform: translateY(-50%);
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            z-index: 4000;
+        }
+
+        .overlay-button {
+            width: 56px;
+            height: 56px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary-pink), var(--primary-purple));
+            border: none;
+            color: white;
+            font-size: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .overlay-button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.5s ease;
+        }
+
+        .overlay-button:hover::before {
+            left: 100%;
+        }
+
+        .overlay-button:hover {
+            transform: scale(1.1);
+            box-shadow: 0 6px 30px rgba(0, 0, 0, 0.4);
+        }
+
+        .overlay-button.champions {
+            background: linear-gradient(135deg, #ffd700, #ff6b9d);
+        }
+
+        .overlay-button.shames {
+            background: linear-gradient(135deg, #ff4757, #ff3838);
+        }
+
+        .overlay-button.chat {
+            background: linear-gradient(135deg, #00d4ff, #0099cc);
+        }
+
+        .overlay-button.online {
+            background: linear-gradient(135deg, #10b981, #059669);
+        }
+
+        .overlay-button.groups {
+            background: linear-gradient(135deg, #8b5cf6, #7c3aed);
+        }
+
+        .overlay-button.profile {
+            background: linear-gradient(135deg, #ff6b9d, #e91e63);
+        }
+
+        .overlay-button.ai-generating {
+            animation: ai-generate 2s infinite;
+        }
+
+        /* Notification badges for buttons */
+        .button-badge {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background: #ff4757;
+            color: white;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 11px;
+            font-weight: bold;
+            animation: notificationBounce 2s ease infinite;
+        }
+
+        /* Button labels on hover */
+        .overlay-button::after {
+            content: attr(data-label);
+            position: absolute;
+            right: 70px;
+            background: rgba(0, 0, 0, 0.9);
+            color: white;
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 600;
+            white-space: nowrap;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+            pointer-events: none;
+            z-index: 1000;
+        }
+
+        .overlay-button:hover::after {
+            opacity: 1;
+            visibility: visible;
+            right: 65px;
+        }
+
+        /* Enhanced Modal Styles */
+        .feature-modal {
+            background: rgba(10, 10, 10, 0.95);
+            backdrop-filter: blur(30px);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 20px;
+            padding: 30px;
+            max-width: 600px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+            animation: modalSlideIn 0.3s ease;
+        }
+
+        .feature-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .feature-icon {
+            font-size: 32px;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary-pink), var(--primary-purple));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .feature-title {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .feature-subtitle {
+            font-size: 14px;
+            color: var(--text-secondary);
+            margin-top: 5px;
+        }
+
+        .feature-content {
+            margin-bottom: 20px;
+        }
+
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .feature-card {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .feature-card:hover {
+            background: rgba(255, 255, 255, 0.08);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+        }
+
+        .task-item {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 15px;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            transition: all 0.3s ease;
+        }
+
+        .task-item:hover {
+            background: rgba(255, 255, 255, 0.08);
+            border-color: var(--primary-pink);
+        }
+
+        .task-checkbox {
+            width: 20px;
+            height: 20px;
+            border: 2px solid var(--primary-pink);
+            border-radius: 4px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+        }
+
+        .task-checkbox.completed {
+            background: var(--primary-pink);
+            color: white;
+        }
+
+        .task-info {
+            flex: 1;
+        }
+
+        .task-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 5px;
+        }
+
+        .task-meta {
+            font-size: 12px;
+            color: var(--text-secondary);
+            display: flex;
+            gap: 15px;
+        }
+
+        .champions-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .champion-item {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 15px;
+            background: rgba(255, 215, 0, 0.1);
+            border: 1px solid rgba(255, 215, 0, 0.3);
+            border-radius: 12px;
+            transition: all 0.3s ease;
+        }
+
+        .champion-item:hover {
+            background: rgba(255, 215, 0, 0.2);
+            transform: translateY(-2px);
+        }
+
+        .champion-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #ffd700, #ff6b9d);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            font-weight: bold;
+        }
+
+        .champion-info {
+            flex: 1;
+        }
+
+        .champion-name {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .champion-achievement {
+            font-size: 12px;
+            color: #ffd700;
+            margin-top: 2px;
+        }
+
+        .champion-stats {
+            text-align: right;
+            font-size: 14px;
+            font-weight: 700;
+            color: #ffd700;
+        }
+
+        /* Chat Interface */
+        .chat-container {
+            height: 400px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .chat-messages {
+            flex: 1;
+            overflow-y: auto;
+            padding: 10px;
+            background: rgba(255, 255, 255, 0.02);
+            border-radius: 8px;
+            margin-bottom: 15px;
+        }
+
+        .chat-message {
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            margin-bottom: 15px;
+            padding: 10px;
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .chat-message.own {
+            background: rgba(255, 107, 157, 0.2);
+            margin-left: 20px;
+        }
+
+        .chat-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary-pink), var(--primary-purple));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            font-weight: bold;
+        }
+
+        .chat-content {
+            flex: 1;
+        }
+
+        .chat-username {
+            font-size: 12px;
+            color: var(--primary-pink);
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        .chat-text {
+            font-size: 14px;
+            color: var(--text-primary);
+            line-height: 1.4;
+        }
+
+        .chat-time {
+            font-size: 10px;
+            color: var(--text-secondary);
+            margin-top: 5px;
+        }
+
+        .chat-input {
+            display: flex;
+            gap: 10px;
+        }
+
+        .chat-input input {
+            flex: 1;
+            padding: 10px 15px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            background: rgba(255, 255, 255, 0.05);
+            color: var(--text-primary);
+            font-size: 14px;
+        }
+
+        .chat-input input:focus {
+            outline: none;
+            border-color: var(--primary-pink);
+        }
+
+        .chat-send-btn {
+            background: var(--primary-pink);
+            border: none;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .chat-send-btn:hover {
+            background: var(--accent-pink);
+            transform: scale(1.05);
+        }
+
+        /* Online Players Overlay - Updated styles */
+        .online-players-overlay {
+            position: fixed;
+            top: 80px;
             right: 20px;
             background: rgba(15, 15, 15, 0.9);
             backdrop-filter: blur(25px);
@@ -294,43 +826,6 @@
         .player-status {
             font-size: 12px;
             color: var(--text-secondary);
-        }
-
-        /* Right Side Overlay Buttons */
-        .right-overlay-buttons {
-            position: fixed;
-            top: 50%;
-            right: 20px;
-            transform: translateY(-50%);
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-            z-index: 4000;
-        }
-
-        .overlay-button {
-            width: 60px;
-            height: 60px;
-            border-radius: 50%;
-            background: linear-gradient(135deg, var(--primary-pink), var(--primary-purple));
-            border: none;
-            color: white;
-            font-size: 24px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .overlay-button:hover {
-            transform: scale(1.1);
-            box-shadow: 0 6px 30px rgba(0, 0, 0, 0.4);
-        }
-
-        .overlay-button.ai-generating {
-            animation: ai-generate 2s infinite;
         }
 
         /* AI Challenge Notification */
@@ -907,6 +1402,22 @@
         </div>
     </div>
 
+    <!-- Top Right Feature Buttons -->
+    <div id="topRightButtons" class="top-right-buttons hidden">
+        <button class="top-feature-btn" onclick="showCreateChallenge()" data-feature="create">
+            <span>➕</span>
+            <span>Create Challenge</span>
+        </button>
+        <button class="top-feature-btn" onclick="showMyTasks()" data-feature="tasks">
+            <span>📋</span>
+            <span>My Tasks</span>
+        </button>
+        <button class="top-feature-btn" onclick="showSettings()" data-feature="settings">
+            <span>⚙️</span>
+            <span>Settings</span>
+        </button>
+    </div>
+
     <!-- Online Players Overlay -->
     <div id="onlinePlayersOverlay" class="online-players-overlay hidden">
         <div class="online-players-header">
@@ -919,17 +1430,27 @@
 
     <!-- Right Side Overlay Buttons -->
     <div id="rightOverlayButtons" class="right-overlay-buttons hidden">
-        <button class="overlay-button" onclick="toggleOnlinePlayers()" title="Online Players">
+        <button class="overlay-button champions" onclick="showChampions()" data-label="Champions">
+            🏆
+            <span class="button-badge" id="championsBadge">3</span>
+        </button>
+        <button class="overlay-button shames" onclick="showShames()" data-label="Hall of Shame">
+            😅
+            <span class="button-badge" id="shamesBadge">1</span>
+        </button>
+        <button class="overlay-button chat" onclick="showChat()" data-label="Global Chat">
+            💬
+            <span class="button-badge" id="chatBadge">7</span>
+        </button>
+        <button class="overlay-button online" onclick="toggleOnlinePlayers()" data-label="Online Players">
             👥
         </button>
-        <button class="overlay-button" onclick="generateAIChallenge()" title="AI Challenge" id="aiChallengeBtn">
-            🤖
+        <button class="overlay-button groups" onclick="showGroups()" data-label="Groups">
+            🏘️
+            <span class="button-badge" id="groupsBadge">2</span>
         </button>
-        <button class="overlay-button" onclick="showInventory()" title="Inventory">
-            🎒
-        </button>
-        <button class="overlay-button" onclick="quickAction()" title="Quick Action">
-            ⚡
+        <button class="overlay-button profile" onclick="showProfile()" data-label="My Profile">
+            👤
         </button>
     </div>
 
@@ -1413,25 +1934,55 @@
             { id: 'legend_status', name: 'Legend', icon: '🏆', description: 'Legendary JomBro player', premium: true }
         ];
 
-        // Global Functions
-        window.toggleMode = toggleMode;
-        window.signOut = signOut;
-        window.takeChallenge = takeChallenge;
-        window.togglePasswordVisibility = togglePasswordVisibility;
-        window.showChallenges = showChallenges;
-        window.toggleNotifications = toggleNotifications;
-        window.toggleDarkMode = toggleDarkMode;
-        window.togglePrivacy = togglePrivacy;
-        window.showModal = showModal;
-        window.closeModal = closeModal;
-        window.showShop = showShop;
-        window.showFriends = showFriends;
-        window.showStats = showStats;
-        window.showInventory = showInventory;
-        window.quickAction = quickAction;
-        window.generateAIChallenge = generateAIChallenge;
-        window.toggleOnlinePlayers = toggleOnlinePlayers;
-        window.claimDailyReward = claimDailyReward;
+        // Sample data for new features
+        const championsData = [
+            { name: 'Pepp', avatar: '🎯', achievement: 'Master Creator - 50 challenges created', stats: '1M tokens' },
+            { name: 'Stonne', avatar: '👑', achievement: 'Founder - 365 day streak', stats: '500K tokens' },
+            { name: 'FitnessGuru', avatar: '💪', achievement: 'Marathon Master - 100 fitness challenges', stats: '25K tokens' },
+            { name: 'MindMaster', avatar: '🧠', achievement: 'Zen Master - 200 meditation sessions', stats: '22K tokens' },
+            { name: 'CreativeArt', avatar: '🎨', achievement: 'Artist - 150 creative challenges', stats: '18K tokens' }
+        ];
+
+        const shamesToday = [
+            { name: 'LazyBones', avatar: '😴', shame: 'Broke 47-day streak by oversleeping', penalty: '-1000 tokens' }
+        ];
+
+        const chatMessages = [
+            { id: 1, user: 'Pepp', avatar: '🎯', message: 'Hey everyone! New AI challenges are live!', time: '2 mins ago', own: false },
+            { id: 2, user: 'FitnessGuru', avatar: '💪', message: 'Just completed my morning workout challenge!', time: '5 mins ago', own: false },
+            { id: 3, user: 'You', avatar: '🎮', message: 'Great job everyone! Keep pushing!', time: '8 mins ago', own: true },
+            { id: 4, user: 'MindMaster', avatar: '🧠', message: 'Anyone up for a meditation challenge?', time: '12 mins ago', own: false },
+            { id: 5, user: 'CreativeArt', avatar: '🎨', message: 'Check out my latest artwork challenge!', time: '15 mins ago', own: false }
+        ];
+
+        const userGroups = [
+            { id: 1, name: 'Fitness Warriors', members: 24, avatar: '💪', description: 'Daily fitness challenges and motivation' },
+            { id: 2, name: 'Creative Minds', members: 18, avatar: '🎨', description: 'Art, writing, and creative challenges' },
+            { id: 3, name: 'Mind & Soul', members: 31, avatar: '🧠', description: 'Meditation, mindfulness, and mental health' },
+            { id: 4, name: 'Social Butterflies', members: 15, avatar: '👥', description: 'Social challenges and community building' }
+        ];
+
+        const myTasks = [
+            { id: 1, title: 'Morning Workout', category: 'fitness', completed: false, tokens: 250, deadline: '2 hours' },
+            { id: 2, title: 'Meditation Session', category: 'mental', completed: true, tokens: 200, deadline: 'completed' },
+            { id: 3, title: 'Call a Friend', category: 'social', completed: false, tokens: 200, deadline: '6 hours' },
+            { id: 4, title: 'Creative Writing', category: 'creative', completed: false, tokens: 300, deadline: '1 day' },
+            { id: 5, title: 'AI Challenge: Power Walk', category: 'fitness', completed: false, tokens: 280, deadline: '45 mins' }
+        ];
+
+        // Global Functions for new features
+        window.showCreateChallenge = showCreateChallenge;
+        window.showMyTasks = showMyTasks;
+        window.showSettings = showSettings;
+        window.showChampions = showChampions;
+        window.showShames = showShames;
+        window.showChat = showChat;
+        window.showGroups = showGroups;
+        window.showProfile = showProfile;
+        window.sendChatMessage = sendChatMessage;
+        window.joinGroup = joinGroup;
+        window.completeTask = completeTask;
+        window.createCustomChallenge = createCustomChallenge;
 
         // Initialize Firebase with enhanced stability
         async function initializeFirebase() {
@@ -2147,10 +2698,26 @@
         }
 
         // UI Helper Functions
+        function showMainApp() {
+            const authScreen = document.getElementById('authScreen');
+            const mainApp = document.getElementById('mainApp');
+            const rightButtons = document.getElementById('rightOverlayButtons');
+            const topButtons = document.getElementById('topRightButtons');
+            
+            if (authScreen) authScreen.style.display = 'none';
+            if (mainApp) {
+                mainApp.classList.remove('hidden');
+                mainApp.style.display = 'flex';
+            }
+            if (rightButtons) rightButtons.classList.remove('hidden');
+            if (topButtons) topButtons.classList.remove('hidden');
+        }
+
         function showAuthScreen() {
             const authScreen = document.getElementById('authScreen');
             const mainApp = document.getElementById('mainApp');
             const rightButtons = document.getElementById('rightOverlayButtons');
+            const topButtons = document.getElementById('topRightButtons');
             const onlineOverlay = document.getElementById('onlinePlayersOverlay');
             
             if (authScreen) authScreen.style.display = 'block';
@@ -2159,6 +2726,7 @@
                 mainApp.classList.add('hidden');
             }
             if (rightButtons) rightButtons.classList.add('hidden');
+            if (topButtons) topButtons.classList.add('hidden');
             if (onlineOverlay) onlineOverlay.classList.add('hidden');
             
             const authForm = document.getElementById('authForm');
@@ -2170,17 +2738,495 @@
             if (toggleIcon) toggleIcon.textContent = '👁️';
         }
 
-        function showMainApp() {
-            const authScreen = document.getElementById('authScreen');
-            const mainApp = document.getElementById('mainApp');
-            const rightButtons = document.getElementById('rightOverlayButtons');
-            
-            if (authScreen) authScreen.style.display = 'none';
-            if (mainApp) {
-                mainApp.classList.remove('hidden');
-                mainApp.style.display = 'flex';
+        // Top Feature Functions
+        function showCreateChallenge() {
+            showModal(`
+                <div class="feature-modal">
+                    <div class="feature-header">
+                        <div class="feature-icon">➕</div>
+                        <div>
+                            <div class="feature-title">Create Challenge</div>
+                            <div class="feature-subtitle">Design your own custom challenge</div>
+                        </div>
+                    </div>
+                    <div class="feature-content">
+                        <div style="margin-bottom: 20px;">
+                            <label style="display: block; margin-bottom: 8px; font-weight: 600;">Challenge Name</label>
+                            <input type="text" id="challengeName" placeholder="Enter challenge name..." style="width: 100%; padding: 12px; border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; background: rgba(255,255,255,0.05); color: var(--text-primary);">
+                        </div>
+                        <div style="margin-bottom: 20px;">
+                            <label style="display: block; margin-bottom: 8px; font-weight: 600;">Description</label>
+                            <textarea id="challengeDescription" placeholder="Describe your challenge..." style="width: 100%; padding: 12px; border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; background: rgba(255,255,255,0.05); color: var(--text-primary); height: 80px; resize: vertical;"></textarea>
+                        </div>
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 20px;">
+                            <div>
+                                <label style="display: block; margin-bottom: 8px; font-weight: 600;">Category</label>
+                                <select id="challengeCategory" style="width: 100%; padding: 12px; border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; background: rgba(255,255,255,0.05); color: var(--text-primary);">
+                                    <option value="fitness">💪 Fitness</option>
+                                    <option value="mental">🧠 Mental</option>
+                                    <option value="social">👥 Social</option>
+                                    <option value="creative">🎨 Creative</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label style="display: block; margin-bottom: 8px; font-weight: 600;">Difficulty</label>
+                                <select id="challengeDifficulty" style="width: 100%; padding: 12px; border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; background: rgba(255,255,255,0.05); color: var(--text-primary);">
+                                    <option value="Easy">Easy</option>
+                                    <option value="Medium">Medium</option>
+                                    <option value="Hard">Hard</option>
+                                    <option value="Expert">Expert</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 20px;">
+                            <div>
+                                <label style="display: block; margin-bottom: 8px; font-weight: 600;">Token Reward</label>
+                                <input type="number" id="challengeTokens" placeholder="250" min="50" max="1000" style="width: 100%; padding: 12px; border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; background: rgba(255,255,255,0.05); color: var(--text-primary);">
+                            </div>
+                            <div>
+                                <label style="display: block; margin-bottom: 8px; font-weight: 600;">Time Limit</label>
+                                <input type="text" id="challengeTime" placeholder="30min" style="width: 100%; padding: 12px; border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; background: rgba(255,255,255,0.05); color: var(--text-primary);">
+                            </div>
+                        </div>
+                    </div>
+                    <div style="display: flex; gap: 15px; justify-content: flex-end;">
+                        <button onclick="closeModal()" class="btn-secondary">Cancel</button>
+                        <button onclick="createCustomChallenge()" class="btn-primary">Create Challenge</button>
+                    </div>
+                </div>
+            `);
+        }
+
+        function showMyTasks() {
+            const tasksHtml = myTasks.map(task => `
+                <div class="task-item" data-task-id="${task.id}">
+                    <div class="task-checkbox ${task.completed ? 'completed' : ''}" onclick="completeTask(${task.id})">
+                        ${task.completed ? '✓' : ''}
+                    </div>
+                    <div class="task-info">
+                        <div class="task-title">${task.title}</div>
+                        <div class="task-meta">
+                            <span>${getCategoryIcon(task.category)} ${task.category}</span>
+                            <span>💰 ${task.tokens} tokens</span>
+                            <span>⏰ ${task.deadline}</span>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+
+            showModal(`
+                <div class="feature-modal">
+                    <div class="feature-header">
+                        <div class="feature-icon">📋</div>
+                        <div>
+                            <div class="feature-title">My Tasks</div>
+                            <div class="feature-subtitle">Track your active challenges</div>
+                        </div>
+                    </div>
+                    <div class="feature-content">
+                        <div style="margin-bottom: 20px;">
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                                <span style="font-weight: 600;">Active Tasks (${myTasks.filter(t => !t.completed).length})</span>
+                                <span style="font-size: 14px; color: var(--text-secondary);">Completed: ${myTasks.filter(t => t.completed).length}</span>
+                            </div>
+                            ${tasksHtml}
+                        </div>
+                    </div>
+                    <div style="text-align: center;">
+                        <button onclick="closeModal()" class="btn-primary">Close</button>
+                    </div>
+                </div>
+            `);
+        }
+
+        function showSettings() {
+            showModal(`
+                <div class="feature-modal">
+                    <div class="feature-header">
+                        <div class="feature-icon">⚙️</div>
+                        <div>
+                            <div class="feature-title">Settings</div>
+                            <div class="feature-subtitle">Customize your JomBro experience</div>
+                        </div>
+                    </div>
+                    <div class="feature-content">
+                        <div class="feature-grid">
+                            <div class="feature-card">
+                                <div style="font-size: 24px; margin-bottom: 10px;">🔔</div>
+                                <div style="font-weight: 600; margin-bottom: 5px;">Notifications</div>
+                                <div style="font-size: 12px; color: var(--text-secondary); margin-bottom: 10px;">Manage your notification preferences</div>
+                                <button onclick="toggleNotifications()" id="notificationToggle" style="background: var(--primary-pink); color: white; border: none; padding: 5px 10px; border-radius: 5px; cursor: pointer;">ON</button>
+                            </div>
+                            <div class="feature-card">
+                                <div style="font-size: 24px; margin-bottom: 10px;">🌙</div>
+                                <div style="font-weight: 600; margin-bottom: 5px;">Dark Mode</div>
+                                <div style="font-size: 12px; color: var(--text-secondary); margin-bottom: 10px;">Toggle dark/light theme</div>
+                                <button onclick="toggleDarkMode()" id="darkModeToggle" style="background: var(--primary-purple); color: white; border: none; padding: 5px 10px; border-radius: 5px; cursor: pointer;">ON</button>
+                            </div>
+                            <div class="feature-card">
+                                <div style="font-size: 24px; margin-bottom: 10px;">🔐</div>
+                                <div style="font-weight: 600; margin-bottom: 5px;">Privacy</div>
+                                <div style="font-size: 12px; color: var(--text-secondary); margin-bottom: 10px;">Control your profile visibility</div>
+                                <button onclick="togglePrivacy()" id="privacyToggle" style="background: var(--primary-blue); color: white; border: none; padding: 5px 10px; border-radius: 5px; cursor: pointer;">PRIVATE</button>
+                            </div>
+                            <div class="feature-card">
+                                <div style="font-size: 24px; margin-bottom: 10px;">📊</div>
+                                <div style="font-weight: 600; margin-bottom: 5px;">Data Export</div>
+                                <div style="font-size: 12px; color: var(--text-secondary); margin-bottom: 10px;">Download your challenge data</div>
+                                <button onclick="exportData()" class="btn-secondary" style="padding: 5px 10px; font-size: 12px;">Export</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div style="text-align: center;">
+                        <button onclick="closeModal()" class="btn-primary">Close</button>
+                    </div>
+                </div>
+            `);
+        }
+
+        // Right Overlay Functions
+        function showChampions() {
+            const championsHtml = championsData.map(champion => `
+                <div class="champion-item">
+                    <div class="champion-avatar">${champion.avatar}</div>
+                    <div class="champion-info">
+                        <div class="champion-name">${champion.name}</div>
+                        <div class="champion-achievement">${champion.achievement}</div>
+                    </div>
+                    <div class="champion-stats">${champion.stats}</div>
+                </div>
+            `).join('');
+
+            showModal(`
+                <div class="feature-modal">
+                    <div class="feature-header">
+                        <div class="feature-icon">🏆</div>
+                        <div>
+                            <div class="feature-title">Champions</div>
+                            <div class="feature-subtitle">Celebrate our top performers</div>
+                        </div>
+                    </div>
+                    <div class="feature-content">
+                        <div class="champions-list">
+                            ${championsHtml}
+                        </div>
+                    </div>
+                    <div style="text-align: center;">
+                        <button onclick="closeModal()" class="btn-primary">Close</button>
+                    </div>
+                </div>
+            `);
+        }
+
+        function showShames() {
+            const shamesTodayHtml = shamesToday.map(shame => `
+                <div style="display: flex; align-items: center; gap: 15px; padding: 15px; background: rgba(255, 68, 68, 0.1); border: 1px solid rgba(255, 68, 68, 0.3); border-radius: 12px; margin-bottom: 10px;">
+                    <div style="width: 40px; height: 40px; border-radius: 50%; background: linear-gradient(135deg, #ff4757, #ff3838); display: flex; align-items: center; justify-content: center; font-size: 20px;">${shame.avatar}</div>
+                    <div style="flex: 1;">
+                        <div style="font-size: 16px; font-weight: 600; color: var(--text-primary);">${shame.name}</div>
+                        <div style="font-size: 12px; color: #ff6b6b; margin-top: 2px;">${shame.shame}</div>
+                    </div>
+                    <div style="text-align: right; font-size: 14px; font-weight: 700; color: #ff4757;">${shame.penalty}</div>
+                </div>
+            `).join('');
+
+            showModal(`
+                <div class="feature-modal">
+                    <div class="feature-header">
+                        <div class="feature-icon">😅</div>
+                        <div>
+                            <div class="feature-title">Hall of Shame</div>
+                            <div class="feature-subtitle">Learn from others' mistakes</div>
+                        </div>
+                    </div>
+                    <div class="feature-content">
+                        <div style="margin-bottom: 20px;">
+                            <div style="font-size: 14px; font-weight: 600; margin-bottom: 15px;">Today's Shame</div>
+                            ${shamesTodayHtml}
+                        </div>
+                        <div style="background: rgba(255, 255, 255, 0.05); padding: 15px; border-radius: 12px; text-align: center;">
+                            <div style="font-size: 16px; margin-bottom: 10px;">💪 Stay Strong!</div>
+                            <div style="font-size: 14px; color: var(--text-secondary);">Learn from mistakes and keep pushing forward. Every setback is a setup for a comeback!</div>
+                        </div>
+                    </div>
+                    <div style="text-align: center;">
+                        <button onclick="closeModal()" class="btn-primary">Close</button>
+                    </div>
+                </div>
+            `);
+        }
+
+        function showChat() {
+            const messagesHtml = chatMessages.map(msg => `
+                <div class="chat-message ${msg.own ? 'own' : ''}">
+                    <div class="chat-avatar">${msg.avatar}</div>
+                    <div class="chat-content">
+                        <div class="chat-username">${msg.user}</div>
+                        <div class="chat-text">${msg.message}</div>
+                        <div class="chat-time">${msg.time}</div>
+                    </div>
+                </div>
+            `).join('');
+
+            showModal(`
+                <div class="feature-modal">
+                    <div class="feature-header">
+                        <div class="feature-icon">💬</div>
+                        <div>
+                            <div class="feature-title">Global Chat</div>
+                            <div class="feature-subtitle">Connect with the JomBro community</div>
+                        </div>
+                    </div>
+                    <div class="feature-content">
+                        <div class="chat-container">
+                            <div class="chat-messages" id="chatMessages">
+                                ${messagesHtml}
+                            </div>
+                            <div class="chat-input">
+                                <input type="text" id="chatInput" placeholder="Type your message..." maxlength="200">
+                                <button onclick="sendChatMessage()" class="chat-send-btn">Send</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div style="text-align: center;">
+                        <button onclick="closeModal()" class="btn-primary">Close</button>
+                    </div>
+                </div>
+            `);
+
+            // Auto-scroll to bottom
+            const chatContainer = document.getElementById('chatMessages');
+            if (chatContainer) {
+                chatContainer.scrollTop = chatContainer.scrollHeight;
             }
-            if (rightButtons) rightButtons.classList.remove('hidden');
+
+            // Enter key to send
+            const chatInput = document.getElementById('chatInput');
+            if (chatInput) {
+                chatInput.addEventListener('keypress', function(e) {
+                    if (e.key === 'Enter') {
+                        sendChatMessage();
+                    }
+                });
+            }
+        }
+
+        function showGroups() {
+            const groupsHtml = userGroups.map(group => `
+                <div class="feature-card" onclick="joinGroup(${group.id})">
+                    <div style="display: flex; align-items: center; gap: 15px; margin-bottom: 10px;">
+                        <div style="font-size: 32px;">${group.avatar}</div>
+                        <div style="flex: 1;">
+                            <div style="font-size: 16px; font-weight: 600; margin-bottom: 5px;">${group.name}</div>
+                            <div style="font-size: 12px; color: var(--text-secondary);">${group.members} members</div>
+                        </div>
+                    </div>
+                    <div style="font-size: 14px; color: var(--text-secondary); margin-bottom: 15px;">${group.description}</div>
+                    <button class="btn-primary" style="width: 100%; padding: 8px; font-size: 12px;">Join Group</button>
+                </div>
+            `).join('');
+
+            showModal(`
+                <div class="feature-modal">
+                    <div class="feature-header">
+                        <div class="feature-icon">🏘️</div>
+                        <div>
+                            <div class="feature-title">Groups</div>
+                            <div class="feature-subtitle">Join communities that share your interests</div>
+                        </div>
+                    </div>
+                    <div class="feature-content">
+                        <div class="feature-grid">
+                            ${groupsHtml}
+                        </div>
+                    </div>
+                    <div style="text-align: center;">
+                        <button onclick="closeModal()" class="btn-primary">Close</button>
+                    </div>
+                </div>
+            `);
+        }
+
+        function showProfile() {
+            const completedChallenges = userStats.completedChallenges.length;
+            const totalTokens = userStats.tokens;
+            const currentLevel = userStats.level;
+            const currentStreak = userStats.streak;
+
+            showModal(`
+                <div class="feature-modal">
+                    <div class="feature-header">
+                        <div class="feature-icon">👤</div>
+                        <div>
+                            <div class="feature-title">My Profile</div>
+                            <div class="feature-subtitle">${currentUser?.displayName || 'JomBro User'}</div>
+                        </div>
+                    </div>
+                    <div class="feature-content">
+                        <div style="text-align: center; margin-bottom: 30px;">
+                            <div style="width: 80px; height: 80px; border-radius: 50%; background: linear-gradient(135deg, var(--primary-pink), var(--primary-purple)); display: flex; align-items: center; justify-content: center; font-size: 32px; margin: 0 auto 15px;">${userStats.badge || '🎮'}</div>
+                            <div style="font-size: 20px; font-weight: 700; margin-bottom: 5px;">${currentUser?.displayName || 'JomBro User'}</div>
+                            <div style="font-size: 14px; color: var(--text-secondary);">${userStats.accountType === 'standard' ? 'Standard Member' : userStats.accountType.charAt(0).toUpperCase() + userStats.accountType.slice(1)}</div>
+                        </div>
+                        
+                        <div class="feature-grid">
+                            <div style="background: rgba(255, 107, 157, 0.1); padding: 20px; border-radius: 12px; text-align: center;">
+                                <div style="font-size: 24px; font-weight: 700; color: var(--primary-pink);">${totalTokens.toLocaleString()}</div>
+                                <div style="font-size: 12px; color: var(--text-secondary);">Total Tokens</div>
+                            </div>
+                            <div style="background: rgba(139, 92, 246, 0.1); padding: 20px; border-radius: 12px; text-align: center;">
+                                <div style="font-size: 24px; font-weight: 700; color: var(--primary-purple);">${completedChallenges}</div>
+                                <div style="font-size: 12px; color: var(--text-secondary);">Challenges Completed</div>
+                            </div>
+                            <div style="background: rgba(0, 212, 255, 0.1); padding: 20px; border-radius: 12px; text-align: center;">
+                                <div style="font-size: 24px; font-weight: 700; color: var(--primary-blue);">${currentStreak}</div>
+                                <div style="font-size: 12px; color: var(--text-secondary);">Current Streak</div>
+                            </div>
+                            <div style="background: rgba(16, 185, 129, 0.1); padding: 20px; border-radius: 12px; text-align: center;">
+                                <div style="font-size: 24px; font-weight: 700; color: var(--success-green);">${currentLevel}</div>
+                                <div style="font-size: 12px; color: var(--text-secondary);">Current Level</div>
+                            </div>
+                        </div>
+                        
+                        <div style="margin-top: 20px; display: flex; gap: 10px;">
+                            <button onclick="editProfile()" class="btn-secondary" style="flex: 1;">Edit Profile</button>
+                            <button onclick="shareProfile()" class="btn-primary" style="flex: 1;">Share Profile</button>
+                        </div>
+                    </div>
+                    <div style="text-align: center;">
+                        <button onclick="closeModal()" class="btn-primary">Close</button>
+                    </div>
+                </div>
+            `);
+        }
+
+        // Helper Functions
+        function sendChatMessage() {
+            const chatInput = document.getElementById('chatInput');
+            if (!chatInput || !chatInput.value.trim()) return;
+
+            const message = chatInput.value.trim();
+            const newMessage = {
+                id: Date.now(),
+                user: 'You',
+                avatar: userStats.badge || '🎮',
+                message: message,
+                time: 'now',
+                own: true
+            };
+
+            chatMessages.unshift(newMessage);
+            chatInput.value = '';
+            
+            // Update chat display
+            const chatContainer = document.getElementById('chatMessages');
+            if (chatContainer) {
+                const messageEl = document.createElement('div');
+                messageEl.className = 'chat-message own';
+                messageEl.innerHTML = `
+                    <div class="chat-avatar">${newMessage.avatar}</div>
+                    <div class="chat-content">
+                        <div class="chat-username">${newMessage.user}</div>
+                        <div class="chat-text">${newMessage.message}</div>
+                        <div class="chat-time">${newMessage.time}</div>
+                    </div>
+                `;
+                chatContainer.appendChild(messageEl);
+                chatContainer.scrollTop = chatContainer.scrollHeight;
+            }
+
+            showMessage('💬 Message sent!', 'success');
+        }
+
+        function joinGroup(groupId) {
+            const group = userGroups.find(g => g.id === groupId);
+            if (group) {
+                showMessage(`🏘️ Joined ${group.name}! Welcome to the community!`, 'success');
+                closeModal();
+            }
+        }
+
+        function completeTask(taskId) {
+            const task = myTasks.find(t => t.id === taskId);
+            if (task && !task.completed) {
+                task.completed = true;
+                userStats.tokens += task.tokens;
+                userStats.xp += Math.floor(task.tokens * 0.5);
+                
+                updateUserStatsDisplay();
+                showMessage(`✅ Task completed! +${task.tokens} tokens earned!`, 'success');
+                
+                // Update UI
+                const taskEl = document.querySelector(`[data-task-id="${taskId}"]`);
+                if (taskEl) {
+                    const checkbox = taskEl.querySelector('.task-checkbox');
+                    checkbox.classList.add('completed');
+                    checkbox.innerHTML = '✓';
+                }
+            }
+        }
+
+        function createCustomChallenge() {
+            const name = document.getElementById('challengeName')?.value;
+            const description = document.getElementById('challengeDescription')?.value;
+            const category = document.getElementById('challengeCategory')?.value;
+            const difficulty = document.getElementById('challengeDifficulty')?.value;
+            const tokens = parseInt(document.getElementById('challengeTokens')?.value) || 250;
+            const time = document.getElementById('challengeTime')?.value || '30min';
+
+            if (!name || !description) {
+                showMessage('❌ Please fill in all required fields!', 'error');
+                return;
+            }
+
+            showMessage('🎯 Custom challenge created successfully!', 'success');
+            closeModal();
+            
+            // Add to available challenges
+            setTimeout(() => {
+                showMessage(`🚀 "${name}" is now available in your challenges!`, 'info');
+            }, 1500);
+        }
+
+        function exportData() {
+            const data = {
+                userStats: userStats,
+                completedChallenges: userStats.completedChallenges,
+                achievements: userStats.achievements,
+                exportDate: new Date().toISOString()
+            };
+            
+            const dataStr = JSON.stringify(data, null, 2);
+            const dataBlob = new Blob([dataStr], { type: 'application/json' });
+            const url = URL.createObjectURL(dataBlob);
+            
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = `jombro-data-${new Date().toISOString().split('T')[0]}.json`;
+            link.click();
+            
+            URL.revokeObjectURL(url);
+            showMessage('📊 Data exported successfully!', 'success');
+        }
+
+        function editProfile() {
+            showMessage('✏️ Profile editing feature coming soon!', 'info');
+        }
+
+        function shareProfile() {
+            if (navigator.share) {
+                navigator.share({
+                    title: 'Check out my JomBro profile!',
+                    text: `I'm level ${userStats.level} with ${userStats.tokens} tokens on JomBro!`,
+                    url: window.location.href
+                });
+            } else {
+                // Fallback for browsers that don't support Web Share API
+                const shareText = `Check out my JomBro profile! Level ${userStats.level} with ${userStats.tokens} tokens!`;
+                navigator.clipboard.writeText(shareText).then(() => {
+                    showMessage('📋 Profile info copied to clipboard!', 'success');
+                });
+            }
         }
 
         function setLoadingState(button, isLoading) {
