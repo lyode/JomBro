@@ -2555,183 +2555,77 @@
             }
         ];
 
-        // Initialize Firebase with enhanced stability
+        // Simple, stable Firebase initialization
         async function initializeFirebase() {
             try {
-                console.log('🔥 Initializing Firebase Authentication...');
-                updateConnectionStatus('connecting', 'Connecting to Firebase...');
+                console.log('🔥 Initializing Firebase...');
+                updateConnectionStatus('connecting', 'Connecting...');
                 
-                // Check if Firebase SDK is loaded
                 if (typeof firebase === 'undefined') {
-                    console.error('❌ Firebase SDK not loaded');
-                    throw new Error('Firebase SDK not loaded. Please check your internet connection.');
+                    throw new Error('Firebase SDK not loaded');
                 }
                 
-                console.log('✅ Firebase SDK loaded successfully');
-                
-                // Initialize Firebase only if not already initialized
-                if (!firebaseApp) {
-                    try {
-                        firebaseApp = firebase.initializeApp(firebaseConfig);
-                        console.log('✅ Firebase app initialized');
-                    } catch (error) {
-                        if (error.code === 'app/duplicate-app') {
-                            firebaseApp = firebase.app();
-                            console.log('✅ Using existing Firebase app');
-                        } else {
-                            throw error;
-                        }
-                    }
-                }
-                
+                firebaseApp = firebase.initializeApp(firebaseConfig);
                 firebaseAuth = firebase.auth();
                 firebaseDb = firebase.database();
                 
-                console.log('✅ Firebase services connected');
-                
-                // Configure Auth settings
-                firebaseAuth.useDeviceLanguage();
-                
-                // Set up auth state persistence with error handling
-                try {
-                    await firebaseAuth.setPersistence(firebase.auth.Auth.Persistence.LOCAL);
-                    console.log('✅ Auth persistence configured');
-                } catch (persistenceError) {
-                    console.warn('⚠️ Auth persistence failed, continuing without it:', persistenceError);
-                }
-                
-                // Set up auth state listener with better error handling
                 firebaseAuth.onAuthStateChanged((user) => {
-                    console.log('🔄 Auth state changed:', user ? `User: ${user.email}` : 'No user');
-                    
                     if (user) {
                         currentUser = user;
-                        console.log('✅ User authenticated:', {
-                            email: user.email,
-                            emailVerified: user.emailVerified,
-                            uid: user.uid,
-                            displayName: user.displayName
-                        });
-                        
-                        // Delay to ensure UI is ready
-                        setTimeout(() => {
-                            completeAuthentication(user);
-                        }, 500);
+                        completeAuthentication(user);
                     } else {
                         currentUser = null;
-                        console.log('🔌 User signed out');
                         showAuthScreen();
                     }
-                }, (error) => {
-                    console.error('❌ Auth state listener error:', error);
-                    updateConnectionStatus('disconnected', 'Auth Error');
-                    showMessage('❌ Authentication error occurred', 'error');
                 });
                 
-                console.log('✅ Auth state listener configured');
-                
-                // Test Firebase connection with proper timeout
-                try {
-                    const connectionPromise = firebaseDb.ref('.info/connected').once('value');
-                    const timeoutPromise = new Promise((_, reject) => 
-                        setTimeout(() => reject(new Error('Connection timeout')), 8000)
-                    );
-                    
-                    await Promise.race([connectionPromise, timeoutPromise]);
-                    console.log('✅ Firebase database connection verified');
-                } catch (connectionError) {
-                    console.warn('⚠️ Database connection test failed, but auth may still work:', connectionError);
-                    // Don't fail initialization for database connection issues
-                }
-                
-                // Mark as initialized
                 isInitialized = true;
-                updateConnectionStatus('connected', 'Firebase Ready');
-                console.log('✅ Firebase initialization completed successfully');
-                
+                updateConnectionStatus('connected', 'Connected');
+                console.log('✅ Firebase ready');
                 return true;
                 
             } catch (error) {
-                console.error('❌ Firebase initialization failed:', error);
-                updateConnectionStatus('disconnected', 'Connection Failed');
-                
-                // More specific error messages
-                let errorMessage = 'Firebase connection failed. ';
-                if (error.message.includes('SDK not loaded')) {
-                    errorMessage += 'Please check your internet connection and refresh the page.';
-                } else if (error.message.includes('network')) {
-                    errorMessage += 'Network error. Please check your connection.';
-                } else if (error.message.includes('timeout')) {
-                    errorMessage += 'Connection timeout. Please try again.';
-                } else if (error.code === 'auth/network-request-failed') {
-                    errorMessage += 'Network request failed. Please check your internet connection.';
-                } else {
-                    errorMessage += error.message;
-                }
-                
-                showMessage(`❌ ${errorMessage}`, 'error');
+                console.error('❌ Firebase failed:', error);
+                updateConnectionStatus('disconnected', 'Failed');
+                showMessage('❌ Connection failed', 'error');
                 return false;
             }
         }
 
-        // Authentication Functions
+        // Simple authentication
         function handleAuthSubmit(event) {
             event.preventDefault();
-            console.log('🔥 Auth form submitted');
             
             const emailInput = document.getElementById('emailInput');
             const passwordInput = document.getElementById('passwordInput');
             
             if (!emailInput || !passwordInput) {
-                console.error('❌ Form inputs not found');
-                showMessage('❌ Form error - please refresh the page', 'error');
+                showMessage('❌ Form error', 'error');
                 return;
             }
             
             const email = emailInput.value.trim().toLowerCase();
             const password = passwordInput.value;
             
-            console.log(`📧 Email: ${email}, Mode: ${isSignUpMode ? 'Sign Up' : 'Sign In'}`);
-            
-            // Check for founder accounts first
+            // Check founder accounts
             if (founderAccounts[email]) {
-                console.log('👑 Founder account detected');
                 handleFounderLogin(email, password);
                 return;
             }
             
-            // Basic validation first
-            if (!validateForm(email, password)) {
-                console.log('❌ Form validation failed');
+            // Basic validation
+            if (!email || !password) {
+                showMessage('❌ Please fill all fields', 'error');
                 return;
             }
             
-            // Check Firebase initialization
             if (!isInitialized || !firebaseAuth) {
-                console.log('❌ Firebase not ready');
-                showMessage('❌ Please wait for Firebase to connect...', 'error');
-                // Retry initialization
-                setTimeout(() => {
-                    initializeFirebase().then(success => {
-                        if (success) {
-                            showMessage('✅ Firebase connected! Please try again.', 'success');
-                        }
-                    });
-                }, 1000);
+                showMessage('❌ Please wait...', 'error');
                 return;
             }
             
             const submitBtn = document.getElementById('submitBtn');
             setLoadingState(submitBtn, true);
-            
-            console.log('🚀 Starting Firebase authentication...');
-            
-            // Add timeout to prevent hanging
-            const authTimeout = setTimeout(() => {
-                console.log('⏰ Auth timeout - resetting');
-                setLoadingState(submitBtn, false);
-                showMessage('❌ Authentication timed out. Please try again.', 'error');
-            }, 15000);
             
             const authPromise = isSignUpMode ? 
                 firebaseAuth.createUserWithEmailAndPassword(email, password) : 
@@ -2739,27 +2633,14 @@
             
             authPromise
                 .then((userCredential) => {
-                    clearTimeout(authTimeout);
                     const user = userCredential.user;
-                    console.log(`✅ ${isSignUpMode ? 'Sign up' : 'Sign in'} successful:`, user.email);
-                    
-                    if (isSignUpMode) {
-                        setupNewUser(user, email);
-                    }
-                    
-                    showMessage(isSignUpMode ? 
-                        '🎉 Account created successfully! Welcome to JomBro!' : 
-                        `✅ Welcome back, ${user.displayName || getDisplayNameFromEmail(email)}!`, 
-                        'success'
-                    );
+                    showMessage(isSignUpMode ? '🎉 Account created!' : '✅ Welcome back!', 'success');
                 })
                 .catch((error) => {
-                    clearTimeout(authTimeout);
-                    console.error(`❌ ${isSignUpMode ? 'Sign up' : 'Sign in'} failed:`, error);
-                    handleAuthError(error);
+                    console.error('Auth error:', error);
+                    showMessage('❌ Authentication failed', 'error');
                 })
                 .finally(() => {
-                    clearTimeout(authTimeout);
                     setLoadingState(submitBtn, false);
                 });
         }
@@ -2768,146 +2649,118 @@
             const founderData = founderAccounts[email];
             
             if (founderData.password !== password) {
-                showMessage('❌ Invalid founder credentials!', 'error');
+                showMessage('❌ Invalid credentials', 'error');
                 return;
             }
             
-            const submitBtn = document.getElementById('submitBtn');
-            setLoadingState(submitBtn, true);
+            userStats = {
+                tokens: founderData.tokens,
+                level: founderData.level,
+                streak: founderData.streak,
+                achievements: [...founderData.achievements],
+                completedChallenges: [...founderData.completedChallenges],
+                accountType: founderData.accountType,
+                badge: founderData.badge,
+                xp: founderData.level * 1000,
+                gems: Math.floor(founderData.tokens / 100),
+                energy: 100,
+                dailyRewards: 1
+            };
             
-            setTimeout(() => {
+            const mockUser = {
+                email: email,
+                displayName: founderData.displayName,
+                emailVerified: true,
+                uid: email.split('@')[0],
+                isFounder: true
+            };
+            
+            currentUser = mockUser;
+            showMessage(`👑 Welcome ${founderData.displayName}!`, 'success');
+            completeAuthentication(mockUser);
+        }
+
+        function completeAuthentication(user) {
+            clearMessages();
+            
+            if (!user.isFounder) {
+                // Set default stats for regular users
                 userStats = {
-                    tokens: founderData.tokens,
-                    level: founderData.level,
-                    streak: founderData.streak,
-                    achievements: [...founderData.achievements],
-                    completedChallenges: [...founderData.completedChallenges],
-                    accountType: founderData.accountType,
-                    badge: founderData.badge,
-                    specialPerks: founderData.specialPerks,
-                    joinDate: founderData.joinDate,
-                    xp: founderData.level * 1000,
-                    gems: Math.floor(founderData.tokens / 100),
+                    tokens: 0,
+                    level: 1,
+                    streak: 0,
+                    achievements: [],
+                    completedChallenges: [],
+                    accountType: 'standard',
+                    xp: 0,
+                    gems: 0,
                     energy: 100,
                     dailyRewards: 1
                 };
-                
-                if (founderData.accountType === 'founder') {
-                    userStats.achievements.push('founder_status');
-                } else if (founderData.accountType === 'master') {
-                    userStats.achievements.push('master_status', 'founder_status');
-                }
-                
-                const mockUser = {
-                    email: email,
-                    displayName: founderData.displayName,
-                    emailVerified: true,
-                    uid: email.split('@')[0],
-                    isFounder: true,
-                    accountType: founderData.accountType
-                };
-                
-                currentUser = mockUser;
-                
-                setLoadingState(submitBtn, false);
-                
-                showMessage(`👑 Welcome back, ${founderData.displayName}! Premium features unlocked.`, 'success');
-                
-                setTimeout(() => {
-                    completeAuthentication(mockUser);
-                }, 500);
-                
-            }, 1500);
-        }
-
-        function setupNewUser(user, email) {
-            try {
-                const displayName = getDisplayNameFromEmail(email);
-                
-                user.updateProfile({
-                    displayName: displayName
-                }).then(() => {
-                    console.log('✅ Display name updated:', displayName);
-                }).catch((error) => {
-                    console.warn('⚠️ Display name update failed:', error);
-                });
-                
-                user.sendEmailVerification().then(() => {
-                    setTimeout(() => {
-                        showMessage('📧 Verification email sent! Please check your inbox.', 'info');
-                    }, 2000);
-                }).catch((error) => {
-                    console.warn('⚠️ Verification email failed:', error);
-                });
-                
-                if (firebaseDb) {
-                    const userData = {
-                        email: email,
-                        displayName: displayName,
-                        createdAt: firebase.database.ServerValue.TIMESTAMP,
-                        lastLogin: firebase.database.ServerValue.TIMESTAMP,
-                        emailVerified: user.emailVerified
-                    };
-                    
-                    firebaseDb.ref(`users/${user.uid}`).set(userData).catch((error) => {
-                        console.warn('⚠️ User data save failed:', error);
-                    });
-                }
-                
-            } catch (error) {
-                console.error('❌ New user setup failed:', error);
+            }
+            
+            const userDisplayName = document.getElementById('userDisplayName');
+            if (userDisplayName) {
+                const displayName = user.displayName || getDisplayNameFromEmail(user.email);
+                const badge = userStats.badge || '';
+                userDisplayName.textContent = `${badge} ${displayName}`;
+            }
+            
+            showMainApp();
+            initializeAppFeatures();
+            
+            // Start features
+            if (typeof startAIChallengeGeneration === 'function') {
+                startAIChallengeGeneration();
+            }
+            if (typeof startOnlinePlayersUpdate === 'function') {
+                startOnlinePlayersUpdate();
             }
         }
 
-        // Enhanced form validation with better error handling
-        function validateForm(email, password) {
-            // Clear any existing messages first
+        function toggleMode() {
+            isSignUpMode = !isSignUpMode;
+            updateModeUI();
             clearMessages();
+        }
+
+        function updateModeUI() {
+            const toggleText = document.getElementById('toggleText');
+            const authBtnText = document.getElementById('authBtnText');
             
-            // Email validation
-            if (!email || email.length === 0) {
-                showMessage('❌ Please enter your email address!', 'error');
-                focusField('emailInput');
-                return false;
-            }
-            
-            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-            if (!emailRegex.test(email)) {
-                showMessage('❌ Please enter a valid email address!', 'error');
-                focusField('emailInput');
-                return false;
-            }
-            
-            // Password validation
-            if (!password || password.length === 0) {
-                showMessage('❌ Please enter your password!', 'error');
-                focusField('passwordInput');
-                return false;
-            }
-            
-            if (password.length < 6) {
-                showMessage('❌ Password must be at least 6 characters long!', 'error');
-                focusField('passwordInput');
-                return false;
-            }
-            
-            // Additional validation for sign up
             if (isSignUpMode) {
-                if (password.length < 8) {
-                    showMessage('💡 For better security, consider using 8+ characters with numbers and symbols', 'info');
-                }
-                
-                // Check for common weak passwords
-                const weakPasswords = ['password', '123456', 'password123', 'admin', 'user'];
-                if (weakPasswords.includes(password.toLowerCase())) {
-                    showMessage('❌ Please choose a stronger password!', 'error');
-                    focusField('passwordInput');
-                    return false;
-                }
+                if (toggleText) toggleText.textContent = 'Already have an account? Sign In';
+                if (authBtnText) authBtnText.textContent = 'Create Account';
+            } else {
+                if (toggleText) toggleText.textContent = "Don't have an account? Create one";
+                if (authBtnText) authBtnText.textContent = 'Sign In';
             }
+        }
+
+        function togglePasswordVisibility() {
+            const passwordInput = document.getElementById('passwordInput');
+            const toggleIcon = document.getElementById('passwordToggleIcon');
             
-            console.log('✅ Form validation passed');
-            return true;
+            if (passwordInput.type === 'password') {
+                passwordInput.type = 'text';
+                toggleIcon.textContent = '🙈';
+            } else {
+                passwordInput.type = 'password';
+                toggleIcon.textContent = '👁️';
+            }
+        }
+
+        async function signOut() {
+            try {
+                if (firebaseAuth && currentUser) {
+                    await firebaseAuth.signOut();
+                }
+                showMessage('👋 Signed out', 'success');
+                showAuthScreen();
+            } catch (error) {
+                console.error('Sign out error:', error);
+                showAuthScreen();
+            }
         }
 
         // Enhanced error handling for authentication
@@ -5195,126 +5048,26 @@
             }, 1000);
         }
 
-        // Enhanced initialization with stable retry logic
+        // Simple initialization
         document.addEventListener('DOMContentLoaded', function() {
-            console.log('🚀 JomBro Enhanced - Initializing...');
+            console.log('🚀 JomBro - Starting...');
             
-            // Set up form submission with enhanced error handling
+            // Form setup
             const authForm = document.getElementById('authForm');
             if (authForm) {
-                authForm.addEventListener('submit', function(e) {
-                    console.log('📝 Form submit event triggered');
-                    handleAuthSubmit(e);
-                });
-                console.log('✅ Form event listener added');
-            } else {
-                console.error('❌ Auth form not found');
+                authForm.addEventListener('submit', handleAuthSubmit);
             }
             
-            // Initialize Firebase with stable retry logic
-            setTimeout(async () => {
-                console.log('🔥 Starting Firebase initialization...');
-                
-                let success = false;
-                let attempts = 0;
-                const maxAttempts = 3;
-                
-                while (!success && attempts < maxAttempts) {
-                    attempts++;
-                    console.log(`🔄 Firebase initialization attempt ${attempts}/${maxAttempts}`);
-                    updateConnectionStatus('connecting', `Connecting... (${attempts}/${maxAttempts})`);
-                    
-                    success = await initializeFirebase();
-                    
-                    if (!success && attempts < maxAttempts) {
-                        console.log(`⚠️ Attempt ${attempts} failed, retrying in 2 seconds...`);
-                        updateConnectionStatus('connecting', `Retrying in 2s... (${attempts}/${maxAttempts})`);
-                        await new Promise(resolve => setTimeout(resolve, 2000));
-                    }
-                }
-                
-                if (success) {
-                    console.log('✅ Firebase initialization successful');
-                    showMessage('🔥 Firebase authentication ready!', 'success', 3000);
-                } else {
-                    console.error('❌ Firebase initialization failed after all attempts');
-                    updateConnectionStatus('disconnected', 'Connection Failed');
-                    showMessage('❌ Unable to connect to Firebase. Please check your internet connection and refresh the page.', 'error', 10000);
-                }
-            }, 500);
-            
-            // Enhanced keyboard shortcuts
-            document.addEventListener('keydown', function(e) {
-                // Ctrl/Cmd + Enter to submit form
-                if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
-                    const submitBtn = document.getElementById('submitBtn');
-                    if (submitBtn && !submitBtn.disabled) {
-                        e.preventDefault();
-                        console.log('⌨️ Keyboard shortcut triggered');
-                        submitBtn.click();
-                    }
-                }
-                
-                // Escape to clear messages
-                if (e.key === 'Escape') {
-                    clearMessages();
-                }
-            });
-            
-            // Hide online players when clicking outside
-            document.addEventListener('click', function(e) {
-                const onlineOverlay = document.getElementById('onlinePlayersOverlay');
-                if (onlineOverlay && !onlineOverlay.contains(e.target) && !e.target.closest('.overlay-button')) {
-                    if (isOnlinePlayersVisible) {
-                        onlineOverlay.classList.add('hidden');
-                        isOnlinePlayersVisible = false;
-                    }
-                }
-            });
-            
-            // Enhanced form input handling
-            const emailInput = document.getElementById('emailInput');
-            const passwordInput = document.getElementById('passwordInput');
-            
-            if (emailInput) {
-                emailInput.addEventListener('input', function() {
-                    // Clear error state when user starts typing
-                    if (this.classList.contains('error')) {
-                        this.classList.remove('error');
+            // Initialize Firebase
+            setTimeout(() => {
+                initializeFirebase().then(success => {
+                    if (success) {
+                        showMessage('🔥 Ready!', 'success');
                     }
                 });
-                
-                emailInput.addEventListener('blur', function() {
-                    const email = this.value.trim();
-                    if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-                        this.style.borderColor = 'var(--error-red)';
-                    } else {
-                        this.style.borderColor = 'rgba(255, 255, 255, 0.1)';
-                    }
-                });
-            }
+            }, 1000);
             
-            if (passwordInput) {
-                passwordInput.addEventListener('input', function() {
-                    // Clear error state when user starts typing
-                    if (this.classList.contains('error')) {
-                        this.classList.remove('error');
-                    }
-                    
-                    // Real-time password strength indicator
-                    const password = this.value;
-                    if (password.length >= 6) {
-                        this.style.borderColor = password.length >= 8 ? 'var(--success-green)' : 'var(--warning-orange)';
-                    } else if (password.length > 0) {
-                        this.style.borderColor = 'var(--error-red)';
-                    } else {
-                        this.style.borderColor = 'rgba(255, 255, 255, 0.1)';
-                    }
-                });
-            }
-            
-            console.log('✅ JomBro Enhanced initialization complete');
-            console.log('🎯 Features: Enhanced Stability, Live Players, AI Challenges, Friends & Groups');
+            console.log('✅ JomBro Ready');
         });
     </script>
 </body>
