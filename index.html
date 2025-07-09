@@ -1,4 +1,400 @@
-<!DOCTYPE html>
+// Enhanced App Features Functions
+        function initializeAppFeatures() {
+            console.log('🎮 Initializing full app features...');
+            
+            // Generate daily challenges
+            generateDailyChallenges();
+            
+            // Generate weekly challenges  
+            generateWeeklyChallenges();
+            
+            // Load leaderboard
+            loadLeaderboard();
+            
+            // Load achievements
+            loadAchievements();
+            
+            // Update user stats display
+            updateUserStatsDisplay();
+            
+            // Initialize daily rewards
+            initializeDailyRewards();
+            
+            // Check for special events
+            checkSpecialEvents();
+            
+            // Initialize power-ups
+            initializePowerUps();
+            
+            // Update user rank
+            updateUserRank();
+            
+            console.log('✅ Full app features initialized');
+        }
+
+        function updateUserStatsDisplay() {
+            const userTokens = document.getElementById('userTokens');
+            const userLevel = document.getElementById('userLevel');
+            const userStreak = document.getElementById('userStreak');
+            const userRank = document.getElementById('userRank');
+            const userEnergy = document.getElementById('userEnergy');
+            const userGems = document.getElementById('userGems');
+            const xpProgress = document.getElementById('xpProgress');
+            const xpFill = document.getElementById('xpFill');
+            const premiumBanner = document.getElementById('premiumBanner');
+            const premiumStatus = document.getElementById('premiumStatus');
+            
+            if (userTokens) userTokens.textContent = userStats.tokens.toLocaleString();
+            if (userLevel) userLevel.textContent = userStats.level;
+            if (userStreak) userStreak.textContent = userStats.streak;
+            if (userRank) userRank.textContent = userStats.rank;
+            if (userEnergy) userEnergy.textContent = userStats.energy;
+            if (userGems) userGems.textContent = userStats.gems;
+            
+            // Update XP progress
+            const xpNeeded = userStats.level * 1000;
+            const xpPercent = Math.min((userStats.xp / xpNeeded) * 100, 100);
+            if (xpProgress) xpProgress.textContent = `${userStats.xp} / ${xpNeeded}`;
+            if (xpFill) xpFill.style.width = `${xpPercent}%`;
+            
+            // Show premium banner for premium accounts
+            if (premiumBanner && userStats.accountType !== 'standard') {
+                premiumBanner.style.display = 'block';
+                
+                if (premiumStatus) {
+                    const statusText = userStats.accountType === 'founder' ? 
+                        'Founder Benefits • Unlimited Challenges • Priority Support' :
+                        userStats.accountType === 'master' ? 
+                        'Master Access • Admin Tools • Challenge Creator • All Premium Features' :
+                        'Premium Features Unlocked';
+                    premiumStatus.textContent = statusText;
+                }
+            }
+        }
+
+        function updateUserRank() {
+            const currentRank = gameFeatures.ranks.find(rank => 
+                userStats.tokens >= rank.minTokens && 
+                userStats.tokens < (gameFeatures.ranks[gameFeatures.ranks.indexOf(rank) + 1]?.minTokens || Infinity)
+            );
+            
+            if (currentRank) {
+                userStats.rank = currentRank.name;
+                const userRankElement = document.getElementById('userRank');
+                if (userRankElement) {
+                    userRankElement.textContent = currentRank.name;
+                    userRankElement.style.color = currentRank.color;
+                }
+            }
+        }
+
+        function initializeDailyRewards() {
+            const dailyRewardsGrid = document.getElementById('dailyRewardsGrid');
+            const dailyRewardBtn = document.getElementById('dailyRewardBtn');
+            
+            if (!dailyRewardsGrid) return;
+            
+            const today = new Date().getDate();
+            const currentDay = userStats.dailyRewards || 1;
+            
+            dailyRewardsGrid.innerHTML = gameFeatures.dailyRewards.map((reward, index) => {
+                const day = index + 1;
+                const isToday = day === currentDay;
+                const isClaimed = day < currentDay;
+                const isAvailable = day === currentDay;
+                
+                return `
+                    <div style="background: ${isClaimed ? 'rgba(16, 185, 129, 0.2)' : isToday ? 'rgba(255, 107, 157, 0.2)' : 'rgba(255, 255, 255, 0.05)'}; 
+                                border: 1px solid ${isClaimed ? '#10b981' : isToday ? '#ff6b9d' : 'rgba(255, 255, 255, 0.1)'}; 
+                                border-radius: 8px; padding: 8px; text-align: center; font-size: 12px;">
+                        <div style="font-weight: 700; margin-bottom: 5px;">Day ${day}</div>
+                        <div style="font-size: 10px; opacity: 0.8;">
+                            ${reward.reward.type === 'tokens' ? `${reward.reward.tokens} tokens` : 
+                              reward.reward.type === 'gems' ? `${reward.reward.gems} gems` : 
+                              reward.reward.type === 'powerup' ? 'Power-up' : 'Mega Reward'}
+                        </div>
+                        ${isClaimed ? '<div style="color: #10b981; font-size: 14px; margin-top: 5px;">✅</div>' : ''}
+                        ${isToday ? '<div style="color: #ff6b9d; font-size: 14px; margin-top: 5px;">🎁</div>' : ''}
+                    </div>
+                `;
+            }).join('');
+            
+            if (dailyRewardBtn) {
+                dailyRewardBtn.style.display = currentDay <= 7 ? 'block' : 'none';
+                dailyRewardBtn.disabled = currentDay > 7;
+            }
+        }
+
+        function checkSpecialEvents() {
+            const specialEventBanner = document.getElementById('specialEventBanner');
+            if (!specialEventBanner) return;
+            
+            const activeEvents = gameFeatures.specialEvents.filter(event => event.active);
+            
+            if (activeEvents.length > 0) {
+                specialEventBanner.style.display = 'block';
+                specialEventBanner.innerHTML = activeEvents.map(event => `
+                    <div class="special-event" style="padding: 10px; border-radius: 10px; margin-bottom: 5px; text-align: center;">
+                        <div style="font-size: 14px; font-weight: 600; color: white; margin-bottom: 5px;">
+                            🎉 ${event.name}
+                        </div>
+                        <div style="font-size: 12px; color: white; opacity: 0.9;">
+                            ${event.description}
+                        </div>
+                        <div style="font-size: 10px; color: white; opacity: 0.7; margin-top: 5px;">
+                            Expires: ${new Date(event.expires).toLocaleDateString()}
+                        </div>
+                    </div>
+                `).join('');
+            }
+        }
+
+        function initializePowerUps() {
+            const activePowerUps = document.getElementById('activePowerUps');
+            if (!activePowerUps) return;
+            
+            const active = userStats.powerUps.filter(p => p.active);
+            
+            if (active.length === 0) {
+                activePowerUps.innerHTML = '<div style="text-align: center; color: var(--text-secondary); font-size: 12px; grid-column: 1 / -1;">No active power-ups</div>';
+                return;
+            }
+            
+            activePowerUps.innerHTML = active.map(powerUp => `
+                <div class="power-up-active" style="padding: 8px; border-radius: 8px; text-align: center; font-size: 12px;">
+                    <div style="font-size: 16px; margin-bottom: 5px;">${powerUp.icon}</div>
+                    <div style="font-weight: 600; margin-bottom: 3px;">${powerUp.name}</div>
+                    <div style="font-size: 10px; opacity: 0.8;">
+                        ${powerUp.timeLeft ? `${Math.ceil(powerUp.timeLeft / 60)}m left` : `${powerUp.usesLeft} uses left`}
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Enhanced Game Functions
+        function claimDailyReward() {
+            const currentDay = userStats.dailyRewards || 1;
+            
+            if (currentDay > 7) {
+                showMessage('🎁 Daily rewards cycle completed! Come back tomorrow for a new cycle.', 'info');
+                return;
+            }
+            
+            const reward = gameFeatures.dailyRewards[currentDay - 1].reward;
+            
+            if (reward.type === 'tokens') {
+                userStats.tokens += reward.tokens;
+                showMessage(`🎁 Daily reward claimed! +${reward.tokens} tokens!`, 'success');
+            } else if (reward.type === 'gems') {
+                userStats.gems += reward.gems;
+                showMessage(`🎁 Daily reward claimed! +${reward.gems} gems!`, 'success');
+            } else if (reward.type === 'powerup') {
+                userStats.powerUps.push({
+                    ...gameFeatures.powerUps.find(p => p.id === reward.powerUp),
+                    active: false
+                });
+                showMessage(`🎁 Daily reward claimed! Power-up unlocked!`, 'success');
+            } else if (reward.type === 'mega') {
+                userStats.tokens += reward.tokens;
+                userStats.gems += reward.gems;
+                showMessage(`🎁 MEGA REWARD! +${reward.tokens} tokens & +${reward.gems} gems!`, 'success');
+            }
+            
+            userStats.dailyRewards = currentDay + 1;
+            updateUserStatsDisplay();
+            initializeDailyRewards();
+            createCelebrationEffect();
+        }
+
+        function startTournament(tournamentId) {
+            const tournament = gameFeatures.tournaments.find(t => t.name.toLowerCase().replace(' ', '_') === tournamentId);
+            if (!tournament) return;
+            
+            showModal(`
+                <div style="text-align: center;">
+                    <div style="font-size: 48px; margin-bottom: 20px;">🏆</div>
+                    <div style="font-size: 24px; font-weight: 700; margin-bottom: 15px; color: var(--primary-pink);">
+                        ${tournament.name}
+                    </div>
+                    <div style="font-size: 16px; margin-bottom: 20px; color: var(--text-secondary);">
+                        ${tournament.description}
+                    </div>
+                    <div style="font-size: 18px; font-weight: 600; margin-bottom: 25px; color: var(--success-green);">
+                        🏆 Reward: ${tournament.reward} tokens
+                    </div>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                        <button onclick="closeModal()" class="btn-secondary">Cancel</button>
+                        <button onclick="joinTournament('${tournamentId}')" class="btn-primary">Join Tournament</button>
+                    </div>
+                </div>
+            `);
+        }
+
+        function joinTournament(tournamentId) {
+            closeModal();
+            showMessage('🏆 Tournament joined! Check your challenges for tournament tasks.', 'success');
+            
+            // Add tournament challenge to daily challenges
+            setTimeout(() => {
+                generateDailyChallenges();
+                showMessage('📝 Tournament challenges added to your daily tasks!', 'info');
+            }, 1000);
+        }
+
+        function activatePowerUp(powerUpId) {
+            const powerUp = userStats.powerUps.find(p => p.id === powerUpId && !p.active);
+            if (!powerUp) return;
+            
+            powerUp.active = true;
+            powerUp.activatedAt = Date.now();
+            
+            if (powerUp.duration) {
+                powerUp.timeLeft = powerUp.duration;
+            } else if (powerUp.uses) {
+                powerUp.usesLeft = powerUp.uses;
+            }
+            
+            showMessage(`⚡ ${powerUp.name} activated!`, 'success');
+            initializePowerUps();
+            
+            // Set expiration timer
+            if (powerUp.duration) {
+                setTimeout(() => {
+                    powerUp.active = false;
+                    showMessage(`⏰ ${powerUp.name} expired!`, 'info');
+                    initializePowerUps();
+                }, powerUp.duration * 1000);
+            }
+        }
+
+        function showShop() {
+            const shopItems = gameFeatures.powerUps.map(item => `
+                <div style="background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 12px; padding: 15px; margin-bottom: 15px;">
+                    <div style="display: flex; align-items: center; gap: 15px;">
+                        <div style="font-size: 32px;">${item.icon}</div>
+                        <div style="flex: 1;">
+                            <div style="font-size: 16px; font-weight: 600; margin-bottom: 5px;">${item.name}</div>
+                            <div style="font-size: 12px; color: var(--text-secondary); margin-bottom: 10px;">${item.description}</div>
+                            <div style="font-size: 14px; color: var(--success-green); font-weight: 600;">${item.cost} gems</div>
+                        </div>
+                        <button onclick="buyItem('${item.id}')" class="btn-primary" style="padding: 8px 16px; font-size: 12px;">Buy</button>
+                    </div>
+                </div>
+            `).join('');
+            
+            showModal(`
+                <div>
+                    <div style="text-align: center; margin-bottom: 20px;">
+                        <div style="font-size: 32px; margin-bottom: 10px;">🛒</div>
+                        <div style="font-size: 24px; font-weight: 700; color: var(--primary-pink);">Shop</div>
+                        <div style="font-size: 14px; color: var(--text-secondary); margin-top: 5px;">
+                            Your gems: ${userStats.gems} 💎
+                        </div>
+                    </div>
+                    <div style="max-height: 400px; overflow-y: auto;">
+                        ${shopItems}
+                    </div>
+                    <div style="text-align: center; margin-top: 20px;">
+                        <button onclick="closeModal()" class="btn-secondary">Close</button>
+                    </div>
+                </div>
+            `);
+        }
+
+        function buyItem(itemId) {
+            const item = gameFeatures.powerUps.find(p => p.id === itemId);
+            if (!item) return;
+            
+            if (userStats.gems < item.cost) {
+                showMessage('💎 Not enough gems!', 'error');
+                return;
+            }
+            
+            userStats.gems -= item.cost;
+            userStats.powerUps.push({
+                ...item,
+                active: false,
+                purchasedAt: Date.now()
+            });
+            
+            updateUserStatsDisplay();
+            showMessage(`✅ ${item.name} purchased!`, 'success');
+            closeModal();
+        }
+
+        function showFriends() {
+            showModal(`
+                <div style="text-align: center;">
+                    <div style="font-size: 32px; margin-bottom: 15px;">👥</div>
+                    <div style="font-size: 24px; font-weight: 700; margin-bottom: 20px; color: var(--primary-pink);">Friends</div>
+                    <div style="font-size: 16px; color: var(--text-secondary); margin-bottom: 20px;">
+                        Connect with friends to compete and share achievements!
+                    </div>
+                    <div style="background: rgba(255, 255, 255, 0.05); border-radius: 12px; padding: 20px; margin-bottom: 20px;">
+                        <div style="font-size: 18px; margin-bottom: 10px;">🎯 Friend Challenges</div>
+                        <div style="font-size: 14px; color: var(--text-secondary);">Challenge friends to beat your scores and earn bonus rewards!</div>
+                    </div>
+                    <button onclick="closeModal()" class="btn-primary">Close</button>
+                </div>
+            `);
+        }
+
+        function showStats() {
+            showModal(`
+                <div>
+                    <div style="text-align: center; margin-bottom: 20px;">
+                        <div style="font-size: 32px; margin-bottom: 10px;">📊</div>
+                        <div style="font-size: 24px; font-weight: 700; color: var(--primary-pink);">Your Stats</div>
+                    </div>
+                    <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; margin-bottom: 20px;">
+                        <div style="background: rgba(255, 107, 157, 0.1); padding: 15px; border-radius: 12px; text-align: center;">
+                            <div style="font-size: 24px; font-weight: 700; color: var(--primary-pink);">${userStats.tokens.toLocaleString()}</div>
+                            <div style="font-size: 12px; color: var(--text-secondary);">Total Tokens</div>
+                        </div>
+                        <div style="background: rgba(139, 92, 246, 0.1); padding: 15px; border-radius: 12px; text-align: center;">
+                            <div style="font-size: 24px; font-weight: 700; color: var(--primary-purple);">${userStats.completedChallenges.length}</div>
+                            <div style="font-size: 12px; color: var(--text-secondary);">Completed Challenges</div>
+                        </div>
+                        <div style="background: rgba(0, 212, 255, 0.1); padding: 15px; border-radius: 12px; text-align: center;">
+                            <div style="font-size: 24px; font-weight: 700; color: var(--primary-blue);">${userStats.streak}</div>
+                            <div style="font-size: 12px; color: var(--text-secondary);">Current Streak</div>
+                        </div>
+                        <div style="background: rgba(16, 185, 129, 0.1); padding: 15px; border-radius: 12px; text-align: center;">
+                            <div style="font-size: 24px; font-weight: 700; color: var(--success-green);">${userStats.level}</div>
+                            <div style="font-size: 12px; color: var(--text-secondary);">Current Level</div>
+                        </div>
+                    </div>
+                    <div style="text-align: center;">
+                        <button onclick="closeModal()" class="btn-primary">Close</button>
+                    </div>
+                </div>
+            `);
+        }
+
+        function showInventory() {
+            const inventoryItems = userStats.powerUps.filter(p => !p.active).map(item => `
+                <div style="background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 12px; padding: 15px; margin-bottom: 10px;">
+                    <div style="display: flex; align-items: center; gap: 15px;">
+                        <div style="font-size: 24px;">${item.icon}</div>
+                        <div style="flex: 1;">
+                            <div style="font-size: 14px; font-weight: 600; margin-bottom: 5px;">${item.name}</div>
+                            <div style="font-size: 12px; color: var(--text-secondary);">${item.description}</div>
+                        </div>
+                        <button onclick="activatePowerUp('${item.id}')" class="btn-primary" style="padding: 6px 12px; font-size: 12px;">Use</button>
+                    </div>
+                </div>
+            `).join('');
+            
+            showModal(`
+                <div>
+                    <div style="text-align: center; margin-bottom: 20px;">
+                        <div style="font-size: 32px; margin-bottom: 10px;">🎒</div>
+                        <div style="font-size: 24px; font-weight: 700; color: var(--primary-pink);">Inventory</div>
+                    </div>
+                    <div style="max-height: 400px; overflow-y: auto;">
+                        ${inventoryItems.length > 0 ? inventoryItems : '<div style="text-align: center; color: var(--text-secondary); padding: 20px;">No items in inventory</div>'}
+                    </div>
+                    <div style="text-align: center; margin-top: 20px;"><!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -638,9 +1034,312 @@
             font-family: inherit;
         }
 
-        /* Hidden utility */
-        .hidden {
-            display: none !important;
+        /* Premium Features & Animations */
+        
+        /* Premium Glow Effects */
+        .premium-glow {
+            animation: premiumGlow 2s ease-in-out infinite;
+            box-shadow: 0 0 20px rgba(255, 215, 0, 0.4);
+        }
+        
+        @keyframes premiumGlow {
+            0%, 100% { box-shadow: 0 0 20px rgba(255, 215, 0, 0.4); }
+            50% { box-shadow: 0 0 35px rgba(255, 215, 0, 0.7); }
+        }
+        
+        /* Master Tier Effects */
+        .master-tier {
+            background: linear-gradient(135deg, #ff6b9d, #8b5cf6, #00d4ff);
+            background-size: 400% 400%;
+            animation: masterGradient 3s ease infinite;
+        }
+        
+        @keyframes masterGradient {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+        
+        /* Legendary Tier Effects */
+        .legendary-tier {
+            background: linear-gradient(45deg, #ffd700, #ff6b9d, #8b5cf6, #00d4ff, #ffd700);
+            background-size: 600% 600%;
+            animation: legendaryShine 4s ease infinite;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        @keyframes legendaryShine {
+            0% { background-position: 0% 50%; }
+            25% { background-position: 100% 50%; }
+            50% { background-position: 100% 100%; }
+            75% { background-position: 0% 100%; }
+            100% { background-position: 0% 50%; }
+        }
+        
+        .legendary-tier::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+            animation: legendaryRotate 3s linear infinite;
+        }
+        
+        @keyframes legendaryRotate {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        /* Enhanced Challenge Cards */
+        .challenge-card-premium {
+            background: linear-gradient(135deg, rgba(255, 215, 0, 0.1), rgba(255, 107, 157, 0.1));
+            border: 2px solid rgba(255, 215, 0, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .challenge-card-premium::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 215, 0, 0.2), transparent);
+            animation: premiumSweep 3s linear infinite;
+        }
+        
+        @keyframes premiumSweep {
+            0% { left: -100%; }
+            100% { left: 100%; }
+        }
+        
+        /* Tournament Mode */
+        .tournament-mode {
+            background: linear-gradient(135deg, #ff416c, #ff4b2b);
+            animation: tournamentPulse 1.5s ease-in-out infinite;
+        }
+        
+        @keyframes tournamentPulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+        
+        /* VIP Features */
+        .vip-feature {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            border: 1px solid rgba(102, 126, 234, 0.5);
+            box-shadow: 0 0 30px rgba(102, 126, 234, 0.3);
+        }
+        
+        /* Power-up Effects */
+        .power-up-active {
+            animation: powerUpGlow 1s ease-in-out infinite;
+            border: 2px solid #00ff88;
+        }
+        
+        @keyframes powerUpGlow {
+            0%, 100% { 
+                box-shadow: 0 0 15px rgba(0, 255, 136, 0.5);
+                border-color: #00ff88;
+            }
+            50% { 
+                box-shadow: 0 0 25px rgba(0, 255, 136, 0.8);
+                border-color: #88ffaa;
+            }
+        }
+        
+        /* Special Event Banner */
+        .special-event {
+            background: linear-gradient(45deg, #ff9a9e, #fecfef, #fecfef, #ff9a9e);
+            background-size: 400% 400%;
+            animation: specialEvent 2s ease infinite;
+        }
+        
+        @keyframes specialEvent {
+            0%, 100% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+        }
+        
+        /* Notification Badge */
+        .notification-badge {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background: #ff4757;
+            color: white;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: bold;
+            animation: notificationBounce 2s ease infinite;
+        }
+        
+        @keyframes notificationBounce {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.2); }
+        }
+        
+        /* Modal Styles */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(10px);
+            z-index: 10000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            animation: modalFadeIn 0.3s ease;
+        }
+        
+        @keyframes modalFadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        .modal-content {
+            background: rgba(15, 15, 15, 0.9);
+            backdrop-filter: blur(30px);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 20px;
+            padding: 30px;
+            max-width: 500px;
+            width: 90%;
+            animation: modalSlideIn 0.3s ease;
+        }
+        
+        @keyframes modalSlideIn {
+            from { transform: translateY(-50px) scale(0.9); }
+            to { transform: translateY(0) scale(1); }
+        }
+        
+        /* Progress Bar */
+        .progress-bar {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            overflow: hidden;
+            height: 8px;
+            margin: 10px 0;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary-pink), var(--primary-purple));
+            transition: width 0.5s ease;
+            animation: progressShine 2s linear infinite;
+        }
+        
+        @keyframes progressShine {
+            0% { background-position: -100% 0; }
+            100% { background-position: 100% 0; }
+        }
+        
+        /* Tooltip */
+        .tooltip {
+            position: relative;
+            cursor: pointer;
+        }
+        
+        .tooltip::after {
+            content: attr(data-tooltip);
+            position: absolute;
+            bottom: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0, 0, 0, 0.9);
+            color: white;
+            padding: 5px 10px;
+            border-radius: 5px;
+            font-size: 12px;
+            white-space: nowrap;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+            z-index: 1000;
+        }
+        
+        .tooltip:hover::after {
+            opacity: 1;
+            visibility: visible;
+        }
+        
+        /* Floating Action Button */
+        .fab {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary-pink), var(--primary-purple));
+            border: none;
+            color: white;
+            font-size: 24px;
+            cursor: pointer;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+            transition: all 0.3s ease;
+            z-index: 1000;
+        }
+        
+        .fab:hover {
+            transform: scale(1.1);
+            box-shadow: 0 6px 30px rgba(0, 0, 0, 0.4);
+        }
+        
+        /* Particle Effects */
+        .particle {
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            background: var(--primary-pink);
+            border-radius: 50%;
+            pointer-events: none;
+            animation: particleFloat 3s ease-out forwards;
+        }
+        
+        @keyframes particleFloat {
+            0% {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+            100% {
+                opacity: 0;
+                transform: translateY(-100px) scale(0.5);
+            }
+        }
+        
+        /* Streak Fire Effect */
+        .streak-fire {
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .streak-fire::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(0deg, #ff6b9d, #ff9500, #ffff00);
+            opacity: 0.3;
+            animation: fireFlicker 1s ease-in-out infinite;
+        }
+        
+        @keyframes fireFlicker {
+            0%, 100% { opacity: 0.3; }
+            50% { opacity: 0.6; }
         }
 
         /* Mobile responsive */
@@ -761,18 +1460,46 @@
                         <div style="font-size: 48px; margin-bottom: 15px; animation: pulse-glow 3s infinite;">🎯</div>
                         <div style="font-size: 20px; font-weight: 600; margin-bottom: 10px;">Welcome to JomBro!</div>
                         <div style="color: var(--text-secondary); margin-bottom: 20px;">Your personal challenge platform is ready.</div>
-                        <div style="display: flex; justify-content: center; gap: 15px; margin-bottom: 20px;">
-                            <div style="background: rgba(255, 107, 157, 0.1); padding: 8px 16px; border-radius: 8px; border: 1px solid rgba(255, 107, 157, 0.3);">
-                                <div style="font-size: 12px; color: var(--text-secondary);">TOKENS</div>
-                                <div style="font-size: 18px; font-weight: 700; color: var(--primary-pink);" id="userTokens">0</div>
+                        <!-- Enhanced Stats Display -->
+                        <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 20px;">
+                            <div style="background: rgba(255, 107, 157, 0.1); padding: 8px 12px; border-radius: 8px; border: 1px solid rgba(255, 107, 157, 0.3); text-align: center;">
+                                <div style="font-size: 10px; color: var(--text-secondary);">TOKENS</div>
+                                <div style="font-size: 16px; font-weight: 700; color: var(--primary-pink);" id="userTokens">0</div>
                             </div>
-                            <div style="background: rgba(139, 92, 246, 0.1); padding: 8px 16px; border-radius: 8px; border: 1px solid rgba(139, 92, 246, 0.3);">
-                                <div style="font-size: 12px; color: var(--text-secondary);">LEVEL</div>
-                                <div style="font-size: 18px; font-weight: 700; color: var(--primary-purple);" id="userLevel">1</div>
+                            <div style="background: rgba(139, 92, 246, 0.1); padding: 8px 12px; border-radius: 8px; border: 1px solid rgba(139, 92, 246, 0.3); text-align: center;">
+                                <div style="font-size: 10px; color: var(--text-secondary);">LEVEL</div>
+                                <div style="font-size: 16px; font-weight: 700; color: var(--primary-purple);" id="userLevel">1</div>
                             </div>
-                            <div style="background: rgba(0, 212, 255, 0.1); padding: 8px 16px; border-radius: 8px; border: 1px solid rgba(0, 212, 255, 0.3);">
-                                <div style="font-size: 12px; color: var(--text-secondary);">STREAK</div>
-                                <div style="font-size: 18px; font-weight: 700; color: var(--primary-blue);" id="userStreak">0</div>
+                            <div style="background: rgba(0, 212, 255, 0.1); padding: 8px 12px; border-radius: 8px; border: 1px solid rgba(0, 212, 255, 0.3); text-align: center;">
+                                <div style="font-size: 10px; color: var(--text-secondary);">STREAK</div>
+                                <div style="font-size: 16px; font-weight: 700; color: var(--primary-blue);" id="userStreak">0</div>
+                            </div>
+                            <div style="background: rgba(16, 185, 129, 0.1); padding: 8px 12px; border-radius: 8px; border: 1px solid rgba(16, 185, 129, 0.3); text-align: center;">
+                                <div style="font-size: 10px; color: var(--text-secondary);">RANK</div>
+                                <div style="font-size: 16px; font-weight: 700; color: var(--success-green);" id="userRank">Beginner</div>
+                            </div>
+                        </div>
+                        
+                        <!-- XP Progress Bar -->
+                        <div style="margin-bottom: 20px;">
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px;">
+                                <span style="font-size: 12px; color: var(--text-secondary);">XP Progress</span>
+                                <span style="font-size: 12px; color: var(--text-secondary);" id="xpProgress">0 / 1000</span>
+                            </div>
+                            <div class="progress-bar">
+                                <div class="progress-fill" id="xpFill" style="width: 0%;"></div>
+                            </div>
+                        </div>
+                        
+                        <!-- Energy & Gems -->
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 20px;">
+                            <div style="background: rgba(255, 140, 0, 0.1); padding: 8px 12px; border-radius: 8px; border: 1px solid rgba(255, 140, 0, 0.3); text-align: center;">
+                                <div style="font-size: 10px; color: var(--text-secondary);">⚡ ENERGY</div>
+                                <div style="font-size: 16px; font-weight: 700; color: #ff8c00;" id="userEnergy">100</div>
+                            </div>
+                            <div style="background: rgba(0, 255, 136, 0.1); padding: 8px 12px; border-radius: 8px; border: 1px solid rgba(0, 255, 136, 0.3); text-align: center;">
+                                <div style="font-size: 10px; color: var(--text-secondary);">💎 GEMS</div>
+                                <div style="font-size: 16px; font-weight: 700; color: #00ff88;" id="userGems">0</div>
                             </div>
                         </div>
                         
@@ -780,6 +1507,34 @@
                         <div id="premiumBanner" style="display: none; background: linear-gradient(135deg, #ffd700, #ff6b9d); padding: 12px; border-radius: 12px; margin-bottom: 20px; text-align: center; color: white; font-weight: 700; box-shadow: 0 4px 15px rgba(255, 215, 0, 0.3);">
                             <div style="font-size: 16px; margin-bottom: 5px;">👑 PREMIUM ACCOUNT ACTIVE</div>
                             <div style="font-size: 12px; opacity: 0.9;" id="premiumStatus">All features unlocked</div>
+                        </div>
+                        
+                        <!-- Special Events Banner -->
+                        <div id="specialEventBanner" style="display: none; margin-bottom: 20px;"></div>
+                        
+                        <!-- Daily Rewards -->
+                        <div style="margin-bottom: 20px;">
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                                <span style="font-size: 14px; font-weight: 600; color: var(--text-primary);">🎁 Daily Rewards</span>
+                                <button onclick="claimDailyReward()" id="dailyRewardBtn" class="btn-secondary" style="padding: 5px 10px; font-size: 12px;">Claim</button>
+                            </div>
+                            <div style="display: grid; grid-template-columns: repeat(7, 1fr); gap: 5px;" id="dailyRewardsGrid"></div>
+                        </div>
+                        
+                        <!-- Quick Actions -->
+                        <div style="margin-bottom: 20px;">
+                            <div style="font-size: 14px; font-weight: 600; margin-bottom: 10px; color: var(--text-primary);">⚡ Quick Actions</div>
+                            <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px;">
+                                <button class="btn-secondary" onclick="showShop()" style="padding: 8px; font-size: 12px;">🛒 Shop</button>
+                                <button class="btn-secondary" onclick="showFriends()" style="padding: 8px; font-size: 12px;">👥 Friends</button>
+                                <button class="btn-secondary" onclick="showStats()" style="padding: 8px; font-size: 12px;">📊 Stats</button>
+                            </div>
+                        </div>
+                        
+                        <!-- Power-ups -->
+                        <div style="margin-bottom: 20px;">
+                            <div style="font-size: 14px; font-weight: 600; margin-bottom: 10px; color: var(--text-primary);">💪 Active Power-ups</div>
+                            <div id="activePowerUps" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px;"></div>
                         </div>
                     </div>
 
@@ -861,6 +1616,17 @@
         </div>
     </div>
 
+    <!-- Floating Action Button -->
+    <button class="fab" onclick="quickAction()" title="Quick Action">
+        ⚡
+    </button>
+
+    <!-- Modal Container -->
+    <div id="modalContainer"></div>
+
+    <!-- Hidden utility -->
+    <div class="hidden" style="display: none !important;"></div>
+
     <!-- Firebase Scripts - Latest Version -->
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
@@ -894,7 +1660,65 @@
             streak: 0,
             achievements: [],
             completedChallenges: [],
-            accountType: 'standard'
+            accountType: 'standard',
+            powerUps: [],
+            friends: [],
+            inventory: [],
+            tournamentWins: 0,
+            totalChallenges: 0,
+            bestStreak: 0,
+            rank: 'Beginner',
+            xp: 0,
+            gems: 0,
+            energy: 100,
+            dailyRewards: 0
+        };
+
+        // Enhanced Game Features
+        const gameFeatures = {
+            powerUps: [
+                { id: 'double_tokens', name: 'Double Tokens', icon: '💰', description: 'Double token rewards for 1 hour', cost: 100, duration: 3600 },
+                { id: 'energy_boost', name: 'Energy Boost', icon: '⚡', description: 'Unlimited energy for 30 minutes', cost: 50, duration: 1800 },
+                { id: 'streak_shield', name: 'Streak Shield', icon: '🛡️', description: 'Protect your streak for 24 hours', cost: 200, duration: 86400 },
+                { id: 'challenge_multiplier', name: 'Challenge Multiplier', icon: '🚀', description: '3x XP for next 5 challenges', cost: 150, uses: 5 },
+                { id: 'instant_complete', name: 'Instant Complete', icon: '⏱️', description: 'Instantly complete any challenge', cost: 300, uses: 1 }
+            ],
+            
+            ranks: [
+                { name: 'Beginner', minTokens: 0, color: '#888888', icon: '🥉' },
+                { name: 'Rookie', minTokens: 1000, color: '#cd7f32', icon: '🥈' },
+                { name: 'Skilled', minTokens: 5000, color: '#c0c0c0', icon: '🥇' },
+                { name: 'Expert', minTokens: 15000, color: '#ffd700', icon: '🏆' },
+                { name: 'Master', minTokens: 50000, color: '#ff6b9d', icon: '💎' },
+                { name: 'Legend', minTokens: 100000, color: '#8b5cf6', icon: '👑' },
+                { name: 'Mythic', minTokens: 500000, color: '#00d4ff', icon: '🌟' },
+                { name: 'Godlike', minTokens: 1000000, color: '#ff0000', icon: '🔥' }
+            ],
+            
+            tournaments: [
+                { name: 'Speed Runner', description: 'Complete 10 challenges in 1 hour', reward: 2000, type: 'time' },
+                { name: 'Token Master', description: 'Earn 5000 tokens in 24 hours', reward: 3000, type: 'tokens' },
+                { name: 'Social Champion', description: 'Complete 15 social challenges', reward: 2500, type: 'category' },
+                { name: 'Fitness Beast', description: 'Complete 20 fitness challenges', reward: 3500, type: 'category' },
+                { name: 'Mind Genius', description: 'Complete 12 mental challenges', reward: 2800, type: 'category' },
+                { name: 'Creative Master', description: 'Complete 8 creative challenges', reward: 2200, type: 'category' }
+            ],
+            
+            specialEvents: [
+                { name: 'Double XP Weekend', description: 'All challenges give 2x XP', active: true, expires: Date.now() + 86400000 },
+                { name: 'Token Frenzy', description: 'All challenges give 1.5x tokens', active: false, expires: null },
+                { name: 'Streak Bonus', description: 'Streak rewards increased by 50%', active: true, expires: Date.now() + 172800000 }
+            ],
+            
+            dailyRewards: [
+                { day: 1, reward: { tokens: 100, type: 'tokens' } },
+                { day: 2, reward: { tokens: 200, type: 'tokens' } },
+                { day: 3, reward: { gems: 5, type: 'gems' } },
+                { day: 4, reward: { tokens: 300, type: 'tokens' } },
+                { day: 5, reward: { powerUp: 'double_tokens', type: 'powerup' } },
+                { day: 6, reward: { tokens: 500, type: 'tokens' } },
+                { day: 7, reward: { gems: 20, tokens: 1000, type: 'mega' } }
+            ]
         };
 
         // Premium Founder Accounts
@@ -992,6 +1816,15 @@
         window.toggleNotifications = toggleNotifications;
         window.toggleDarkMode = toggleDarkMode;
         window.togglePrivacy = togglePrivacy;
+        window.showModal = showModal;
+        window.closeModal = closeModal;
+        window.startTournament = startTournament;
+        window.activatePowerUp = activatePowerUp;
+        window.showShop = showShop;
+        window.showFriends = showFriends;
+        window.showStats = showStats;
+        window.showInventory = showInventory;
+        window.quickAction = quickAction;
 
         // Initialize Firebase
         async function initializeFirebase() {
