@@ -208,7 +208,7 @@
         /* Auth Screen */
         .auth-screen {
             width: 100%;
-            max-width: 400px;
+            max-width: 420px;
             animation: float-in var(--animation-speed-slow) var(--easing-smooth);
         }
 
@@ -217,7 +217,7 @@
             backdrop-filter: blur(30px) saturate(180%);
             border: 1px solid rgba(255, 255, 255, 0.15);
             border-radius: 25px;
-            padding: 40px 30px;
+            padding: 40px 35px;
             text-align: center;
             box-shadow: 
                 0 8mm 16mm rgba(0, 0, 0, 0.3),
@@ -229,7 +229,7 @@
 
         .auth-logo {
             font-size: 48px;
-            margin-bottom: 10px;
+            margin-bottom: 15px;
             animation: pulse-glow 3s ease-in-out infinite;
         }
 
@@ -245,13 +245,27 @@
             font-size: 14px;
             color: var(--text-secondary);
             margin-bottom: 30px;
+            line-height: 1.4;
         }
 
         /* Form Elements */
+        .form-group {
+            margin-bottom: 20px;
+            text-align: left;
+        }
+
+        .form-label {
+            display: block;
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 8px;
+            padding-left: 5px;
+        }
+
         .form-input {
             width: 100%;
-            padding: 15px;
-            margin: 10px 0;
+            padding: 16px 20px;
             border: 1px solid rgba(255, 255, 255, 0.1);
             border-radius: 12px;
             background: rgba(255, 255, 255, 0.05);
@@ -259,12 +273,13 @@
             color: var(--text-primary);
             font-size: 16px;
             transition: all var(--animation-speed-normal) var(--easing-smooth);
+            font-family: inherit;
         }
 
         .form-input:focus {
             outline: none;
             border-color: var(--primary-pink);
-            box-shadow: 0 0 0 2px rgba(255, 107, 157, 0.2);
+            box-shadow: 0 0 0 3px rgba(255, 107, 157, 0.2);
             background: rgba(255, 255, 255, 0.08);
             transform: scale3d(1.01, 1.01, 1);
         }
@@ -273,13 +288,41 @@
             color: rgba(255, 255, 255, 0.4);
         }
 
+        .form-input:invalid {
+            border-color: var(--error-red);
+        }
+
+        /* Password field specific */
+        .password-container {
+            position: relative;
+        }
+
+        .password-toggle {
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            color: var(--text-secondary);
+            cursor: pointer;
+            font-size: 18px;
+            padding: 5px;
+            border-radius: 4px;
+            transition: color var(--animation-speed-fast);
+        }
+
+        .password-toggle:hover {
+            color: var(--text-primary);
+        }
+
         /* Buttons */
         .btn-primary {
             background: linear-gradient(145deg, rgba(255, 107, 157, 0.9), rgba(196, 69, 105, 0.9));
             backdrop-filter: blur(20px);
             color: #fff;
             border: 1px solid rgba(255, 107, 157, 0.3);
-            padding: 16px 24px;
+            padding: 18px 24px;
             border-radius: 15px;
             font-size: 16px;
             font-weight: 700;
@@ -295,7 +338,8 @@
                 inset 0 1px 0 rgba(255, 255, 255, 0.2);
             position: relative;
             overflow: hidden;
-            margin: 15px 0;
+            margin: 25px 0 15px 0;
+            font-family: inherit;
         }
 
         .btn-primary::before {
@@ -324,22 +368,10 @@
             transform: translate3d(0, -2px, 0) scale(0.98);
         }
 
-        .btn-secondary {
-            background: rgba(255, 255, 255, 0.08);
-            backdrop-filter: blur(20px);
-            color: var(--text-primary);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            padding: 12px 20px;
-            border-radius: 12px;
-            font-size: 14px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all var(--animation-speed-normal) var(--easing-smooth);
-        }
-
-        .btn-secondary:hover {
-            background: rgba(255, 255, 255, 0.12);
-            transform: translateY(-2px);
+        .btn-primary:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
         }
 
         .toggle-btn {
@@ -352,10 +384,14 @@
             font-size: 14px;
             text-decoration: underline;
             transition: color var(--animation-speed-normal);
+            font-family: inherit;
+            padding: 10px;
+            border-radius: 8px;
         }
 
         .toggle-btn:hover {
             color: var(--accent-pink);
+            background: rgba(255, 107, 157, 0.1);
         }
 
         /* Loading State */
@@ -365,16 +401,20 @@
             opacity: 0.7;
         }
 
+        .loading .btn-text {
+            opacity: 0;
+        }
+
         .loading::after {
             content: '';
             position: absolute;
             top: 50%;
             left: 50%;
-            width: 20px;
-            height: 20px;
-            margin: -10px 0 0 -10px;
-            border: 2px solid rgba(255, 255, 255, 0.3);
-            border-top-color: var(--primary-pink);
+            width: 24px;
+            height: 24px;
+            margin: -12px 0 0 -12px;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-top-color: #ffffff;
             border-radius: 50%;
             animation: spin 1s linear infinite;
         }
@@ -386,31 +426,63 @@
 
         /* Messages */
         .message {
-            padding: 12px;
-            border-radius: 8px;
-            margin: 15px 0;
+            padding: 15px 20px;
+            border-radius: 12px;
+            margin: 20px 0;
             text-align: center;
             font-weight: 600;
             font-size: 14px;
             animation: slide-up var(--animation-speed-normal) var(--easing-smooth);
+            line-height: 1.4;
         }
 
         .message.error {
-            background: rgba(239, 68, 68, 0.2);
-            border: 1px solid #ef4444;
+            background: rgba(239, 68, 68, 0.15);
+            border: 1px solid rgba(239, 68, 68, 0.3);
             color: #fca5a5;
         }
 
         .message.success {
-            background: rgba(16, 185, 129, 0.2);
-            border: 1px solid #10b981;
+            background: rgba(16, 185, 129, 0.15);
+            border: 1px solid rgba(16, 185, 129, 0.3);
             color: #6ee7b7;
         }
 
         .message.info {
-            background: rgba(59, 130, 246, 0.2);
-            border: 1px solid #3b82f6;
+            background: rgba(59, 130, 246, 0.15);
+            border: 1px solid rgba(59, 130, 246, 0.3);
             color: #93c5fd;
+        }
+
+        .message.warning {
+            background: rgba(245, 158, 11, 0.15);
+            border: 1px solid rgba(245, 158, 11, 0.3);
+            color: #fbbf24;
+        }
+
+        /* Connection Status */
+        .connection-status {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            margin-bottom: 20px;
+            padding: 10px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+            font-size: 12px;
+        }
+
+        .connection-status.connected {
+            color: var(--success-green);
+        }
+
+        .connection-status.disconnected {
+            color: var(--error-red);
+        }
+
+        .connection-status.connecting {
+            color: var(--warning-orange);
         }
 
         /* Main App Interface */
@@ -513,6 +585,10 @@
             .glass-layer {
                 padding: 0;
             }
+
+            .auth-container {
+                padding: 30px 25px;
+            }
         }
     </style>
 </head>
@@ -535,26 +611,61 @@
             <div class="auth-container">
                 <div class="auth-logo">🚀</div>
                 <div class="auth-title">Welcome to JomBro</div>
-                <div class="auth-subtitle">Create your account and start challenging yourself today!</div>
+                <div class="auth-subtitle">Join the ultimate challenge platform and push your limits!</div>
+                
+                <!-- Connection Status -->
+                <div id="connectionStatus" class="connection-status connecting">
+                    <span>🔄</span>
+                    <span>Connecting to Firebase...</span>
+                </div>
                 
                 <div id="messageContainer"></div>
                 
-                <!-- Email & Password Form -->
-                <div id="authForm">
-                    <input type="email" id="emailInput" class="form-input" placeholder="Enter your email" required autocomplete="email">
-                    <input type="password" id="passwordInput" class="form-input" placeholder="Enter password (6+ characters)" required autocomplete="new-password">
+                <!-- Authentication Form -->
+                <form id="authForm" novalidate>
+                    <div class="form-group">
+                        <label for="emailInput" class="form-label">Email Address</label>
+                        <input 
+                            type="email" 
+                            id="emailInput" 
+                            class="form-input" 
+                            placeholder="Enter your email address"
+                            required 
+                            autocomplete="email"
+                            spellcheck="false"
+                        >
+                    </div>
                     
-                    <button class="btn-primary" id="submitBtn" onclick="handleAuth()">
-                        <span id="authBtnText">Create Account</span>
-                    </button>
+                    <div class="form-group">
+                        <label for="passwordInput" class="form-label">Password</label>
+                        <div class="password-container">
+                            <input 
+                                type="password" 
+                                id="passwordInput" 
+                                class="form-input" 
+                                placeholder="Enter your password (6+ characters)"
+                                required 
+                                autocomplete="new-password"
+                                minlength="6"
+                            >
+                            <button type="button" class="password-toggle" onclick="togglePasswordVisibility()">
+                                <span id="passwordToggleIcon">👁️</span>
+                            </button>
+                        </div>
+                    </div>
                     
-                    <button type="button" class="toggle-btn" onclick="toggleMode()">
-                        <span id="toggleText">Already have an account? Sign In</span>
+                    <button type="submit" class="btn-primary" id="submitBtn">
+                        <span class="btn-text" id="authBtnText">Create Account</span>
                     </button>
-                </div>
+                </form>
                 
-                <div style="margin-top: 25px; font-size: 12px; color: var(--text-secondary);">
-                    By continuing, you agree to our Terms & Privacy Policy
+                <button type="button" class="toggle-btn" onclick="toggleMode()">
+                    <span id="toggleText">Already have an account? Sign In</span>
+                </button>
+                
+                <div style="margin-top: 25px; font-size: 12px; color: var(--text-secondary); line-height: 1.4;">
+                    By continuing, you agree to our Terms of Service and Privacy Policy.<br>
+                    Your data is secured with Firebase Authentication.
                 </div>
             </div>
         </div>
@@ -570,7 +681,7 @@
                         <div style="font-size: 9px; color: var(--text-secondary); margin-top: 2px; opacity: 0.8;" id="userDisplayName">Welcome!</div>
                     </div>
                     <div class="header-actions">
-                        <button style="background: none; border: none; color: var(--text-secondary); font-size: 18px; cursor: pointer;" onclick="signOut()" title="Sign Out">🚪</button>
+                        <button style="background: none; border: none; color: var(--text-secondary); font-size: 18px; cursor: pointer; padding: 8px; border-radius: 8px; transition: all 0.2s;" onclick="signOut()" title="Sign Out">🚪</button>
                     </div>
                 </div>
 
@@ -607,14 +718,15 @@
                         <button class="btn-primary" style="width: 100%;">🚀 TAKE CHALLENGE</button>
                     </div>
 
+                    <!-- User Info Section -->
                     <div style="margin-top: 30px; text-align: center; color: var(--text-secondary);">
-                        <div style="font-size: 14px; margin-bottom: 10px;">🎮 Status:</div>
-                        <div style="font-size: 12px; line-height: 1.6;" id="connectionStatus">
-                            🔥 Firebase Authentication Active<br>
-                            ✅ Real Account System Ready<br>
+                        <div style="font-size: 14px; margin-bottom: 10px;">🎮 Account Status:</div>
+                        <div style="font-size: 12px; line-height: 1.6;" id="accountInfo">
+                            ✅ Authenticated with Firebase<br>
+                            🔐 Account Secured<br>
                             🎯 Challenge System Active<br>
-                            📊 User Progress Tracking<br>
-                            🎨 Beautiful Glass UI Design
+                            📊 Progress Tracking Ready<br>
+                            🎨 Premium UI Experience
                         </div>
                     </div>
                 </div>
@@ -622,15 +734,15 @@
         </div>
     </div>
 
-    <!-- Firebase Scripts -->
-    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+    <!-- Firebase Scripts - Latest Version -->
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
 
     <script>
-        console.log('🚀 JomBro Production Version Loading...');
+        console.log('🚀 JomBro - Authentic Firebase Authentication');
         
-        // Firebase Configuration
+        // Firebase Configuration - Your Production Config
         const firebaseConfig = {
             apiKey: "AIzaSyC_orriRUuf1ynDiFaJAPrO6-Gu3GeURxQ",
             authDomain: "jombro-9d129.firebaseapp.com",
@@ -642,38 +754,59 @@
             measurementId: "G-YPQ5R5GLP8"
         };
 
-        // Global Variables
-        let firebaseApp, firebaseAuth, firebaseDb;
+        // Global State
+        let firebaseApp = null;
+        let firebaseAuth = null;
+        let firebaseDb = null;
         let currentUser = null;
-        let isSignUpMode = true; // Start with sign up mode
+        let isSignUpMode = true;
+        let isInitialized = false;
 
-        // Global Functions
-        window.handleAuth = handleAuth;
+        // Global Functions for onclick handlers
         window.toggleMode = toggleMode;
         window.signOut = signOut;
         window.takeChallenge = takeChallenge;
+        window.togglePasswordVisibility = togglePasswordVisibility;
 
         // Initialize Firebase
-        function initializeFirebase() {
+        async function initializeFirebase() {
             try {
-                console.log('🔥 Initializing Firebase...');
+                console.log('🔥 Initializing Firebase Authentication...');
+                updateConnectionStatus('connecting', 'Initializing Firebase...');
                 
+                // Check if Firebase SDK is loaded
                 if (typeof firebase === 'undefined') {
-                    throw new Error('Firebase SDK not loaded');
+                    throw new Error('Firebase SDK not loaded. Please check your internet connection.');
                 }
                 
+                // Initialize Firebase
                 firebaseApp = firebase.initializeApp(firebaseConfig);
                 firebaseAuth = firebase.auth();
                 firebaseDb = firebase.database();
                 
-                console.log('✅ Firebase initialized successfully');
+                // Configure Auth settings
+                firebaseAuth.useDeviceLanguage();
                 
-                // Auth state listener
+                // Set up auth state persistence
+                await firebaseAuth.setPersistence(firebase.auth.Auth.Persistence.LOCAL);
+                
+                // Set up auth state listener with detailed logging
                 firebaseAuth.onAuthStateChanged((user) => {
+                    console.log('🔄 Auth state changed:', user ? `User: ${user.email}` : 'No user');
+                    
                     if (user) {
                         currentUser = user;
-                        console.log('✅ User authenticated:', user.email);
-                        completeAuthentication(user);
+                        console.log('✅ User authenticated:', {
+                            email: user.email,
+                            emailVerified: user.emailVerified,
+                            uid: user.uid,
+                            displayName: user.displayName
+                        });
+                        
+                        // Small delay to ensure UI is ready
+                        setTimeout(() => {
+                            completeAuthentication(user);
+                        }, 500);
                     } else {
                         currentUser = null;
                         console.log('🔌 User signed out');
@@ -681,162 +814,239 @@
                     }
                 });
                 
-                showMessage('🔥 Firebase connected successfully!', 'success');
-                updateConnectionStatus('🔥 Firebase Connected & Ready');
+                // Test Firebase connection
+                await firebaseDb.ref('.info/connected').once('value');
+                
+                isInitialized = true;
+                updateConnectionStatus('connected', 'Firebase Connected');
+                console.log('✅ Firebase initialized successfully');
+                
                 return true;
                 
             } catch (error) {
                 console.error('❌ Firebase initialization failed:', error);
-                showMessage('❌ Firebase connection failed. Please check your internet connection.', 'error');
-                updateConnectionStatus('❌ Firebase Connection Failed');
+                updateConnectionStatus('disconnected', 'Connection Failed');
+                showMessage(`❌ Firebase initialization failed: ${error.message}`, 'error');
                 return false;
             }
         }
 
         // Authentication Functions
-        function handleAuth() {
+        function handleAuthSubmit(event) {
+            event.preventDefault();
+            console.log('🔥 Form submitted - handleAuthSubmit called');
+            
+            if (!isInitialized) {
+                console.log('❌ Firebase not initialized yet');
+                showMessage('❌ Firebase not initialized. Please wait...', 'error');
+                return;
+            }
+            
+            const emailInput = document.getElementById('emailInput');
+            const passwordInput = document.getElementById('passwordInput');
+            
+            if (!emailInput || !passwordInput) {
+                console.log('❌ Form inputs not found');
+                showMessage('❌ Form error - please refresh the page', 'error');
+                return;
+            }
+            
+            const email = emailInput.value.trim().toLowerCase();
+            const password = passwordInput.value;
+            
+            console.log(`📝 ${isSignUpMode ? 'Sign Up' : 'Sign In'} attempt for:`, email);
+            
+            // Comprehensive validation
+            if (!validateForm(email, password)) {
+                console.log('❌ Form validation failed');
+                return;
+            }
+            
+            // Set loading state
+            const submitBtn = document.getElementById('submitBtn');
+            setLoadingState(submitBtn, true);
+            
+            console.log('🚀 Starting Firebase authentication...');
+            
+            // Perform authentication
+            const authPromise = isSignUpMode ? 
+                firebaseAuth.createUserWithEmailAndPassword(email, password) : 
+                firebaseAuth.signInWithEmailAndPassword(email, password);
+            
+            authPromise
+                .then((userCredential) => {
+                    const user = userCredential.user;
+                    console.log(`✅ ${isSignUpMode ? 'Account created' : 'Sign in'} successful:`, user.email);
+                    
+                    // Handle new user setup
+                    if (isSignUpMode) {
+                        setupNewUser(user, email);
+                    }
+                    
+                    showMessage(isSignUpMode ? 
+                        '🎉 Account created successfully! Welcome to JomBro!' : 
+                        `✅ Welcome back, ${user.displayName || getDisplayNameFromEmail(email)}!`, 
+                        'success'
+                    );
+                    
+                    // The onAuthStateChanged will handle the UI transition
+                    console.log('✅ Authentication successful, waiting for state change...');
+                })
+                .catch((error) => {
+                    console.error(`❌ ${isSignUpMode ? 'Sign up' : 'Sign in'} failed:`, error.code, error.message);
+                    handleAuthError(error);
+                })
+                .finally(() => {
+                    setLoadingState(submitBtn, false);
+                });
+        }
+
+        // Simplified - using direct Firebase calls in handleAuthSubmit
+
+        function setupNewUser(user, email) {
             try {
-                console.log(`📝 ${isSignUpMode ? 'Sign Up' : 'Sign In'} attempt`);
+                // Update display name
+                const displayName = getDisplayNameFromEmail(email);
                 
-                const emailInput = document.getElementById('emailInput');
-                const passwordInput = document.getElementById('passwordInput');
+                user.updateProfile({
+                    displayName: displayName
+                }).then(() => {
+                    console.log('✅ Display name updated:', displayName);
+                }).catch((error) => {
+                    console.warn('⚠️ Display name update failed:', error);
+                });
                 
-                if (!emailInput || !passwordInput) {
-                    showMessage('❌ Form elements not found', 'error');
-                    return;
-                }
+                // Send email verification
+                user.sendEmailVerification().then(() => {
+                    console.log('📧 Verification email sent');
+                    setTimeout(() => {
+                        showMessage('📧 Verification email sent! Please check your inbox.', 'info');
+                    }, 2000);
+                }).catch((error) => {
+                    console.warn('⚠️ Verification email failed:', error);
+                });
                 
-                const email = emailInput.value.trim().toLowerCase();
-                const password = passwordInput.value;
-                
-                // Validation
-                if (!validateInput(email, password)) {
-                    return;
-                }
-                
-                // Set loading state
-                const btn = document.getElementById('submitBtn');
-                setLoadingState(btn, 'Connecting...');
-                
-                // Firebase Authentication
-                if (!firebaseAuth) {
-                    showMessage('❌ Firebase not initialized. Please refresh the page.', 'error');
-                    resetLoadingState(btn);
-                    return;
-                }
-                
-                const authPromise = isSignUpMode ? 
-                    firebaseAuth.createUserWithEmailAndPassword(email, password) : 
-                    firebaseAuth.signInWithEmailAndPassword(email, password);
-                
-                authPromise
-                    .then((userCredential) => {
-                        const user = userCredential.user;
-                        console.log(`✅ ${isSignUpMode ? 'Sign Up' : 'Sign In'} successful:`, user.email);
-                        
-                        // Update display name for new users
-                        if (isSignUpMode && user.updateProfile) {
-                            const userName = email.split('@')[0];
-                            const displayName = userName.charAt(0).toUpperCase() + userName.slice(1);
-                            user.updateProfile({ displayName: displayName })
-                                .then(() => {
-                                    console.log('✅ Display name updated');
-                                })
-                                .catch((error) => {
-                                    console.warn('⚠️ Display name update failed:', error);
-                                });
-                        }
-                        
-                        showMessage(isSignUpMode ? 
-                            '🎉 Account created successfully! Welcome to JomBro!' : 
-                            `✅ Welcome back, ${user.displayName || user.email}!`, 'success');
-                        
-                        // User will be authenticated via onAuthStateChanged
-                        resetLoadingState(btn);
-                    })
-                    .catch((error) => {
-                        console.error(`❌ ${isSignUpMode ? 'Sign Up' : 'Sign In'} failed:`, error.code);
-                        handleAuthError(error);
-                        resetLoadingState(btn);
+                // Save user data to database
+                if (firebaseDb) {
+                    const userData = {
+                        email: email,
+                        displayName: displayName,
+                        createdAt: firebase.database.ServerValue.TIMESTAMP,
+                        lastLogin: firebase.database.ServerValue.TIMESTAMP,
+                        emailVerified: user.emailVerified
+                    };
+                    
+                    firebaseDb.ref(`users/${user.uid}`).set(userData).catch((error) => {
+                        console.warn('⚠️ User data save failed:', error);
                     });
+                }
                 
             } catch (error) {
-                console.error('❌ Error in handleAuth:', error);
-                showMessage('❌ Authentication error: ' + error.message, 'error');
-                resetLoadingState();
+                console.error('❌ New user setup failed:', error);
             }
         }
 
-        function validateInput(email, password) {
+        function validateForm(email, password) {
+            // Email validation
             if (!email) {
                 showMessage('❌ Please enter your email address!', 'error');
-                document.getElementById('emailInput').focus();
+                focusField('emailInput');
                 return false;
             }
             
             const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
             if (!emailRegex.test(email)) {
                 showMessage('❌ Please enter a valid email address!', 'error');
-                document.getElementById('emailInput').focus();
+                focusField('emailInput');
                 return false;
             }
             
+            // Password validation
             if (!password) {
                 showMessage('❌ Please enter your password!', 'error');
-                document.getElementById('passwordInput').focus();
+                focusField('passwordInput');
                 return false;
             }
             
             if (password.length < 6) {
-                showMessage('❌ Password must be at least 6 characters!', 'error');
-                document.getElementById('passwordInput').focus();
+                showMessage('❌ Password must be at least 6 characters long!', 'error');
+                focusField('passwordInput');
                 return false;
+            }
+            
+            // Strong password recommendation for sign up
+            if (isSignUpMode && password.length < 8) {
+                showMessage('💡 For better security, consider using 8+ characters', 'info');
             }
             
             return true;
         }
 
         function handleAuthError(error) {
+            let message = '';
+            let shouldSwitchMode = false;
+            
             switch (error.code) {
                 case 'auth/user-not-found':
-                    showMessage('❌ No account found with this email. Please create an account first.', 'error');
+                    message = '❌ No account found with this email.';
                     if (!isSignUpMode) {
-                        setTimeout(() => {
-                            toggleMode(); // Switch to sign up
-                            showMessage('💡 Switched to account creation mode', 'info');
-                        }, 2000);
+                        message += ' Creating account instead...';
+                        shouldSwitchMode = true;
                     }
                     break;
+                    
                 case 'auth/wrong-password':
-                    showMessage('❌ Incorrect password. Please try again.', 'error');
-                    document.getElementById('passwordInput').focus();
+                    message = '❌ Incorrect password. Please try again.';
+                    focusField('passwordInput');
                     break;
+                    
                 case 'auth/email-already-in-use':
-                    showMessage('❌ Account already exists with this email. Please sign in instead.', 'error');
+                    message = '❌ Account already exists with this email.';
                     if (isSignUpMode) {
-                        setTimeout(() => {
-                            toggleMode(); // Switch to sign in
-                            showMessage('💡 Switched to sign in mode', 'info');
-                        }, 2000);
+                        message += ' Switching to sign in...';
+                        shouldSwitchMode = true;
                     }
                     break;
+                    
                 case 'auth/weak-password':
-                    showMessage('❌ Password is too weak. Please choose a stronger password.', 'error');
-                    document.getElementById('passwordInput').focus();
+                    message = '❌ Password is too weak. Use at least 6 characters with letters and numbers.';
+                    focusField('passwordInput');
                     break;
+                    
                 case 'auth/network-request-failed':
-                    showMessage('❌ Network error. Please check your internet connection.', 'error');
+                    message = '❌ Network error. Please check your internet connection and try again.';
                     break;
+                    
                 case 'auth/too-many-requests':
-                    showMessage('❌ Too many attempts. Please wait a moment before trying again.', 'error');
+                    message = '❌ Too many failed attempts. Please wait a few minutes before trying again.';
                     break;
+                    
                 case 'auth/invalid-email':
-                    showMessage('❌ Invalid email format. Please check your email address.', 'error');
-                    document.getElementById('emailInput').focus();
+                    message = '❌ Invalid email format. Please check your email address.';
+                    focusField('emailInput');
                     break;
+                    
+                case 'auth/user-disabled':
+                    message = '❌ This account has been disabled. Please contact support.';
+                    break;
+                    
+                case 'auth/operation-not-allowed':
+                    message = '❌ Email/password authentication is not enabled. Please contact support.';
+                    break;
+                    
                 default:
-                    showMessage(`❌ Authentication failed: ${error.message}`, 'error');
+                    message = `❌ Authentication failed: ${error.message}`;
                     break;
+            }
+            
+            showMessage(message, 'error');
+            
+            // Auto-switch mode if appropriate
+            if (shouldSwitchMode) {
+                setTimeout(() => {
+                    toggleMode();
+                    showMessage('💡 Switched modes automatically', 'info');
+                }, 2500);
             }
         }
 
@@ -844,6 +1054,7 @@
             try {
                 isSignUpMode = !isSignUpMode;
                 updateModeUI();
+                clearMessages();
                 console.log(`🔄 Mode switched to: ${isSignUpMode ? 'Sign Up' : 'Sign In'}`);
             } catch (error) {
                 console.error('❌ Error in toggleMode:', error);
@@ -852,66 +1063,112 @@
 
         function updateModeUI() {
             const toggleText = document.getElementById('toggleText');
-            const btnText = document.getElementById('authBtnText');
+            const authBtnText = document.getElementById('authBtnText');
             const passwordInput = document.getElementById('passwordInput');
             
             if (isSignUpMode) {
                 if (toggleText) toggleText.textContent = 'Already have an account? Sign In';
-                if (btnText) btnText.textContent = 'Create Account';
-                if (passwordInput) passwordInput.placeholder = 'Create password (6+ characters)';
+                if (authBtnText) authBtnText.textContent = 'Create Account';
+                if (passwordInput) {
+                    passwordInput.placeholder = 'Create a strong password (6+ characters)';
+                    passwordInput.autocomplete = 'new-password';
+                }
             } else {
                 if (toggleText) toggleText.textContent = "Don't have an account? Create one";
-                if (btnText) btnText.textContent = 'Sign In';
-                if (passwordInput) passwordInput.placeholder = 'Enter your password';
+                if (authBtnText) authBtnText.textContent = 'Sign In';
+                if (passwordInput) {
+                    passwordInput.placeholder = 'Enter your password';
+                    passwordInput.autocomplete = 'current-password';
+                }
+            }
+        }
+
+        function togglePasswordVisibility() {
+            try {
+                const passwordInput = document.getElementById('passwordInput');
+                const toggleIcon = document.getElementById('passwordToggleIcon');
+                
+                if (passwordInput.type === 'password') {
+                    passwordInput.type = 'text';
+                    toggleIcon.textContent = '🙈';
+                } else {
+                    passwordInput.type = 'password';
+                    toggleIcon.textContent = '👁️';
+                }
+            } catch (error) {
+                console.error('❌ Error toggling password visibility:', error);
             }
         }
 
         function completeAuthentication(user) {
             try {
-                console.log('✅ completeAuthentication() called');
+                console.log('✅ Completing authentication for:', user.email);
+                
+                // Clear any existing messages
+                clearMessages();
                 
                 // Update user display
                 const userDisplayName = document.getElementById('userDisplayName');
+                const accountInfo = document.getElementById('accountInfo');
+                
                 if (userDisplayName) {
-                    const displayName = user.displayName || user.email || 'User';
+                    const displayName = user.displayName || getDisplayNameFromEmail(user.email);
                     userDisplayName.textContent = `Welcome, ${displayName}!`;
+                    console.log('✅ Updated user display name');
+                }
+                
+                if (accountInfo) {
+                    accountInfo.innerHTML = `
+                        ✅ Authenticated: ${user.email}<br>
+                        🔐 Account Secured<br>
+                        ${user.emailVerified ? '✅' : '⚠️'} Email ${user.emailVerified ? 'Verified' : 'Pending Verification'}<br>
+                        🎯 Challenge System Active<br>
+                        🎨 Premium UI Experience
+                    `;
+                    console.log('✅ Updated account info');
+                }
+                
+                // Update last login in database
+                if (firebaseDb && user.uid) {
+                    firebaseDb.ref(`users/${user.uid}/lastLogin`).set(firebase.database.ServerValue.TIMESTAMP);
+                    console.log('✅ Updated last login timestamp');
                 }
                 
                 // Show main app
+                console.log('🎯 Showing main app...');
                 showMainApp();
+                
+                // Show success message
+                showMessage(`🎉 Welcome to JomBro, ${user.displayName || getDisplayNameFromEmail(user.email)}!`, 'success');
                 
                 console.log('✅ Authentication completed successfully');
             } catch (error) {
                 console.error('❌ Error in completeAuthentication:', error);
+                showMessage('❌ Error completing login. Please try again.', 'error');
             }
         }
 
-        function signOut() {
+        async function signOut() {
             try {
-                console.log('🚪 signOut() called');
+                console.log('🚪 Signing out...');
                 
                 if (firebaseAuth && currentUser) {
-                    firebaseAuth.signOut()
-                        .then(() => {
-                            console.log('✅ Firebase sign-out successful');
-                            showMessage('👋 Signed out successfully!', 'success');
-                        })
-                        .catch((error) => {
-                            console.error('Firebase sign-out error:', error);
-                            showMessage('⚠️ Sign-out error, but logged out locally', 'info');
-                            showAuthScreen();
-                        });
+                    await firebaseAuth.signOut();
+                    console.log('✅ Firebase sign-out successful');
                 } else {
+                    console.log('⚠️ No active session to sign out');
                     showAuthScreen();
-                    showMessage('👋 Signed out successfully!', 'success');
                 }
+                
+                showMessage('👋 Signed out successfully!', 'success');
             } catch (error) {
-                console.error('❌ Error in signOut:', error);
+                console.error('❌ Sign-out error:', error);
+                showMessage('⚠️ Sign-out error, but logged out locally', 'warning');
                 showAuthScreen();
             }
         }
 
-        // UI Functions
+        // UI Helper Functions
         function showAuthScreen() {
             const authScreen = document.getElementById('authScreen');
             const mainApp = document.getElementById('mainApp');
@@ -922,11 +1179,15 @@
                 mainApp.classList.add('hidden');
             }
             
-            // Clear form
-            const emailInput = document.getElementById('emailInput');
+            // Clear sensitive form data
+            const authForm = document.getElementById('authForm');
+            if (authForm) authForm.reset();
+            
+            // Reset password visibility
             const passwordInput = document.getElementById('passwordInput');
-            if (emailInput) emailInput.value = '';
-            if (passwordInput) passwordInput.value = '';
+            const toggleIcon = document.getElementById('passwordToggleIcon');
+            if (passwordInput) passwordInput.type = 'password';
+            if (toggleIcon) toggleIcon.textContent = '👁️';
         }
 
         function showMainApp() {
@@ -940,36 +1201,53 @@
             }
         }
 
-        function setLoadingState(button, text) {
-            if (button) {
+        function setLoadingState(button, isLoading) {
+            if (!button) return;
+            
+            if (isLoading) {
                 button.classList.add('loading');
-                button.innerHTML = `<span>${text}</span>`;
                 button.disabled = true;
-            }
-        }
-
-        function resetLoadingState(button) {
-            if (button) {
+            } else {
                 button.classList.remove('loading');
                 button.disabled = false;
-                updateModeUI(); // Restore correct button text
             }
         }
 
-        function showMessage(message, type) {
+        function updateConnectionStatus(status, message) {
+            const connectionStatus = document.getElementById('connectionStatus');
+            if (!connectionStatus) return;
+            
+            connectionStatus.className = `connection-status ${status}`;
+            
+            const icons = {
+                connecting: '🔄',
+                connected: '🔥',
+                disconnected: '❌'
+            };
+            
+            connectionStatus.innerHTML = `
+                <span>${icons[status] || '🔄'}</span>
+                <span>${message}</span>
+            `;
+        }
+
+        function showMessage(message, type = 'info', duration = 5000) {
             try {
                 const messageContainer = document.getElementById('messageContainer');
                 if (!messageContainer) return;
+                
+                // Clear existing messages
+                messageContainer.innerHTML = '';
                 
                 const messageEl = document.createElement('div');
                 messageEl.className = `message ${type}`;
                 messageEl.textContent = message;
                 
-                messageContainer.innerHTML = '';
                 messageContainer.appendChild(messageEl);
                 
-                console.log(`📢 Message: [${type.toUpperCase()}] ${message}`);
+                console.log(`📢 Message [${type.toUpperCase()}]: ${message}`);
                 
+                // Auto-remove message
                 setTimeout(() => {
                     if (messageEl.parentNode) {
                         messageEl.style.opacity = '0';
@@ -980,37 +1258,62 @@
                             }
                         }, 300);
                     }
-                }, 4000);
+                }, duration);
             } catch (error) {
-                console.error('❌ Error in showMessage:', error);
+                console.error('❌ Error showing message:', error);
             }
         }
 
-        function updateConnectionStatus(status) {
-            const connectionStatus = document.getElementById('connectionStatus');
-            if (connectionStatus) {
-                const lines = connectionStatus.innerHTML.split('<br>');
-                lines[0] = status;
-                connectionStatus.innerHTML = lines.join('<br>');
+        function clearMessages() {
+            const messageContainer = document.getElementById('messageContainer');
+            if (messageContainer) {
+                messageContainer.innerHTML = '';
             }
+        }
+
+        function focusField(fieldId) {
+            setTimeout(() => {
+                const field = document.getElementById(fieldId);
+                if (field) {
+                    field.focus();
+                    field.select();
+                }
+            }, 100);
+        }
+
+        function getDisplayNameFromEmail(email) {
+            const username = email.split('@')[0];
+            return username.charAt(0).toUpperCase() + username.slice(1);
         }
 
         // Challenge Functions
         function takeChallenge(challengeName, tokens) {
             try {
-                console.log(`🎯 takeChallenge() called: ${challengeName}`);
+                console.log(`🎯 Taking challenge: ${challengeName}`);
                 
-                if (confirm(`🎯 Ready to take on "${challengeName}"?\n\nThis challenge will reward you with ${tokens} tokens!\n\nClick OK to accept!`)) {
+                if (confirm(`🎯 Ready to take on "${challengeName}"?\n\nReward: ${tokens} tokens\n\nClick OK to accept the challenge!`)) {
                     showMessage(`🎯 Challenge "${challengeName}" accepted!`, 'success');
                     
                     // Simulate challenge completion
                     setTimeout(() => {
-                        showMessage(`🏆 Challenge completed! +${tokens} tokens earned!`, 'success');
+                        showMessage(`🏆 Challenge completed! You earned ${tokens} tokens!`, 'success');
                         createCelebrationEffect();
+                        
+                        // Update user progress in database
+                        if (firebaseDb && currentUser) {
+                            const challengeData = {
+                                challengeName: challengeName,
+                                tokensEarned: tokens,
+                                completedAt: firebase.database.ServerValue.TIMESTAMP
+                            };
+                            
+                            firebaseDb.ref(`users/${currentUser.uid}/challenges`).push(challengeData);
+                        }
                     }, 2000);
                 }
             } catch (error) {
                 console.error('❌ Error in takeChallenge:', error);
+                showMessage('❌ Challenge error occurred', 'error');
             }
         }
 
@@ -1018,17 +1321,17 @@
             try {
                 const emojis = ['🎉', '🏆', '⭐', '🎊', '🔥', '💫', '✨', '🌟'];
                 
-                for (let i = 0; i < 8; i++) {
+                for (let i = 0; i < 10; i++) {
                     setTimeout(() => {
                         const emoji = document.createElement('div');
                         emoji.textContent = emojis[Math.floor(Math.random() * emojis.length)];
                         emoji.style.cssText = `
                             position: fixed;
-                            font-size: ${20 + Math.random() * 10}px;
+                            font-size: ${20 + Math.random() * 15}px;
                             left: ${Math.random() * window.innerWidth}px;
                             top: ${window.innerHeight}px;
                             pointer-events: none;
-                            z-index: 9999;
+                            z-index: 10000;
                             animation: celebrationFloat 3s ease-out forwards;
                         `;
                         
@@ -1036,16 +1339,16 @@
                         
                         setTimeout(() => {
                             if (emoji.parentNode) {
-                                emoji.parentNode.removeChild(emoji);
+                                emoji.remove();
                             }
                         }, 3000);
-                    }, i * 100);
+                    }, i * 150);
                 }
                 
-                // Add celebration animation
-                if (!document.querySelector('#celebration-animation')) {
+                // Add celebration CSS if not exists
+                if (!document.querySelector('#celebration-style')) {
                     const style = document.createElement('style');
-                    style.id = 'celebration-animation';
+                    style.id = 'celebration-style';
                     style.textContent = `
                         @keyframes celebrationFloat {
                             0% {
@@ -1053,11 +1356,11 @@
                                 opacity: 1;
                             }
                             50% {
-                                transform: translateY(-50vh) rotate(180deg) scale(1.2);
+                                transform: translateY(-60vh) rotate(180deg) scale(1.3);
                                 opacity: 1;
                             }
                             100% {
-                                transform: translateY(-100vh) rotate(360deg) scale(0.8);
+                                transform: translateY(-100vh) rotate(360deg) scale(0.5);
                                 opacity: 0;
                             }
                         }
@@ -1065,52 +1368,52 @@
                     document.head.appendChild(style);
                 }
             } catch (error) {
-                console.error('❌ Error in createCelebrationEffect:', error);
+                console.error('❌ Error in celebration effect:', error);
             }
         }
 
-        // Event Listeners
+        // Event Listeners and Initialization
         document.addEventListener('DOMContentLoaded', function() {
-            console.log('🚀 JomBro Production App Initializing...');
+            console.log('🚀 JomBro - Initializing Authentic Firebase Authentication...');
+            
+            // Set up form submission with debugging
+            const authForm = document.getElementById('authForm');
+            if (authForm) {
+                authForm.addEventListener('submit', function(e) {
+                    console.log('📝 Form submit event triggered');
+                    handleAuthSubmit(e);
+                });
+                console.log('✅ Form event listener added');
+            } else {
+                console.error('❌ Auth form not found');
+            }
             
             // Initialize Firebase
-            setTimeout(() => {
-                const firebaseReady = initializeFirebase();
-                if (firebaseReady) {
-                    console.log('✅ Application ready for testing');
+            setTimeout(async () => {
+                const success = await initializeFirebase();
+                if (success) {
+                    console.log('✅ Application ready for authentic Firebase testing');
+                    showMessage('🔥 Firebase authentication ready!', 'success', 3000);
+                } else {
+                    console.error('❌ Firebase initialization failed');
                 }
-            }, 500);
-            
-            // Add keyboard event listeners
-            setTimeout(() => {
-                const emailInput = document.getElementById('emailInput');
-                const passwordInput = document.getElementById('passwordInput');
-                
-                if (emailInput) {
-                    emailInput.addEventListener('keypress', function(e) {
-                        if (e.key === 'Enter') {
-                            const passwordField = document.getElementById('passwordInput');
-                            if (passwordField) {
-                                passwordField.focus();
-                            }
-                        }
-                    });
-                }
-                
-                if (passwordInput) {
-                    passwordInput.addEventListener('keypress', function(e) {
-                        if (e.key === 'Enter') {
-                            e.preventDefault();
-                            handleAuth();
-                        }
-                    });
-                }
-                
-                console.log('✅ Event listeners configured');
             }, 1000);
             
-            console.log('✅ JomBro Production App Ready!');
-            console.log('🎯 Ready for real player testing');
+            // Add keyboard shortcuts
+            document.addEventListener('keydown', function(e) {
+                // Ctrl/Cmd + Enter to submit form
+                if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+                    const submitBtn = document.getElementById('submitBtn');
+                    if (submitBtn && !submitBtn.disabled) {
+                        e.preventDefault();
+                        submitBtn.click();
+                    }
+                }
+            });
+            
+            console.log('✅ JomBro Authentication System Ready!');
+            console.log('🎯 Firebase Email/Password Authentication Active');
+            console.log('🔐 Production-Ready Security Implementation');
         });
     </script>
 </body>
