@@ -12,757 +12,6 @@
             -webkit-tap-highlight-color: transparent;
         }
 
-        // Render friends carousel
-        function renderFriendsCarousel() {
-            const friendsTrack = document.getElementById('friendsTrack');
-            const friendsToShow = appState.showingOnlineOnly ? 
-                appState.friends.filter(f => f.online) : 
-                appState.friends;
-            
-            friendsTrack.innerHTML = '';
-
-            friendsToShow.forEach((friend, index) => {
-                const friendElement = document.createElement('div');
-                friendElement.className = 'friend-avatar-item';
-                friendElement.onclick = () => selectFriendFromCarousel(friend.id);
-                friendElement.innerHTML = `
-                    <div class="friend-avatar-wrapper">
-                        <div class="friend-avatar ${friend.online ? '' : 'offline'}">
-                            ${friend.avatar}
-                        </div>
-                        ${friend.online ? 
-                            '<div class="online-indicator"></div>' : 
-                            '<div class="offline-indicator"></div>'
-                        }
-                    </div>
-                    <div class="friend-name-small">${friend.name.split(' ')[0]}</div>
-                `;
-                friendsTrack.appendChild(friendElement);
-            });
-
-            // Reset slide position
-            appState.friendsSlideIndex = 0;
-            updateCarouselPosition();
-        }
-
-        // Slide friends carousel
-        function slideFriends(direction) {
-            const friendsToShow = appState.showingOnlineOnly ? 
-                appState.friends.filter(f => f.online) : 
-                appState.friends;
-            
-            const maxVisible = 3; // Number of friends visible at once on mobile
-            const maxIndex = Math.max(0, friendsToShow.length - maxVisible);
-            
-            appState.friendsSlideIndex += direction;
-            
-            if (appState.friendsSlideIndex < 0) {
-                appState.friendsSlideIndex = 0;
-            } else if (appState.friendsSlideIndex > maxIndex) {
-                appState.friendsSlideIndex = maxIndex;
-            }
-            
-            updateCarouselPosition();
-        }
-
-        // Update carousel position
-        function updateCarouselPosition() {
-            const friendsTrack = document.getElementById('friendsTrack');
-            const slideWidth = 75; // 50px avatar + 15px gap + 10px margin
-            const translateX = -appState.friendsSlideIndex * slideWidth;
-            
-            friendsTrack.style.transform = `translateX(${translateX}px)`;
-            
-            // Update navigation buttons
-            const friendsToShow = appState.showingOnlineOnly ? 
-                appState.friends.filter(f => f.online) : 
-                appState.friends;
-            
-            const maxVisible = 3;
-            const maxIndex = Math.max(0, friendsToShow.length - maxVisible);
-            
-            document.getElementById('prevBtn').disabled = appState.friendsSlideIndex === 0;
-            document.getElementById('nextBtn').disabled = appState.friendsSlideIndex >= maxIndex;
-        }
-
-        // Select friend from carousel
-        function selectFriendFromCarousel(friendId) {
-            const friend = appState.friends.find(f => f.id === friendId);
-            if (friend) {
-                showMessage(`👋 Selected ${friend.name}`, 'info');
-            }
-        }
-
-        // Toggle view all friends
-        function toggleViewAll() {
-            appState.showingAllFriends = !appState.showingAllFriends;
-            const friendsList = document.getElementById('friendsList');
-            const viewAllBtn = document.getElementById('viewAllBtn');
-            
-            if (appState.showingAllFriends) {
-                friendsList.classList.add('show');
-                viewAllBtn.textContent = 'Hide All';
-                renderFriends();
-            } else {
-                friendsList.classList.remove('show');
-                viewAllBtn.textContent = 'View All';
-            }
-        }
-
-        // Show online only
-        function showOnlineOnly() {
-            appState.showingOnlineOnly = !appState.showingOnlineOnly;
-            const onlineBtn = document.querySelector('.friends-actions .btn-secondary');
-            
-            if (appState.showingOnlineOnly) {
-                onlineBtn.textContent = 'Show All';
-                onlineBtn.style.background = 'rgba(155, 89, 182, 0.4)';
-            } else {
-                onlineBtn.textContent = 'Online Only';
-                onlineBtn.style.background = 'rgba(255, 255, 255, 0.1)';
-            }
-            
-            renderFriendsCarousel();
-            if (appState.showingAllFriends) {
-                renderFriends();
-            }
-        }
-
-        // Update friends counts
-        function updateFriendsCounts() {
-            const onlineCount = appState.friends.filter(f => f.online).length;
-            const totalCount = appState.friends.length;
-            
-            document.getElementById('onlineCount').textContent = onlineCount;
-            document.getElementById('totalFriends').textContent = totalCount;
-        }
-
-        // Render friends list
-        function renderFriends() {
-            const friendsList = document.getElementById('friendsList');
-            const friendsToShow = appState.showingOnlineOnly ? 
-                appState.friends.filter(f => f.online) : 
-                appState.friends;
-            
-            friendsList.innerHTML = '';
-
-            friendsToShow.forEach(friend => {
-                const friendElement = document.createElement('div');
-                friendElement.className = 'friend-item';
-                friendElement.innerHTML = `
-                    <div class="friend-avatar-wrapper">
-                        <div class="friend-avatar ${friend.online ? '' : 'offline'}">
-                            ${friend.avatar}
-                        </div>
-                        ${friend.online ? 
-                            '<div class="online-indicator"></div>' : 
-                            '<div class="offline-indicator"></div>'
-                        }
-                    </div>
-                    <div class="friend-info">
-                        <div class="friend-name">${friend.name}</div>
-                        <div class="friend-status">${friend.status}</div>
-                    </div>
-                    <div class="friend-actions">
-                        <button class="btn btn-primary btn-small" onclick="challengeFriend('${friend.id}')">Challenge</button>
-                        <button class="btn btn-secondary btn-small" onclick="chatWithFriend('${friend.id}')">Chat</button>
-                    </div>
-                `;
-                friendsList.appendChild(friendElement);
-            });
-        }
-
-        // Render groups list
-        function renderGroups() {
-            const groupsList = document.getElementById('groupsList');
-            groupsList.innerHTML = '';
-
-            appState.groups.forEach(group => {
-                const groupElement = document.createElement('div');
-                groupElement.className = 'group-item';
-                groupElement.innerHTML = `
-                    <div class="group-avatar">${group.avatar}</div>
-                    <div class="group-info">
-                        <div class="group-name">${group.name}</div>
-                        <div class="group-members">${group.members} members</div>
-                    </div>
-                    <div class="friend-actions">
-                        <button class="btn ${group.joined ? 'btn-secondary' : 'btn-primary'} btn-small" onclick="toggleGroup('${group.id}')">
-                            ${group.joined ? 'Leave' : 'Join'}
-                        </button>
-                    </div>
-                `;
-                groupsList.appendChild(groupElement);
-            });
-        }
-
-        // Update user stats
-        function updateUserStats() {
-            document.getElementById('userTokens').textContent = appState.user.tokens.toLocaleString();
-            document.getElementById('userLevel').textContent = appState.user.level;
-            document.getElementById('userFriends').textContent = appState.user.friends;
-            document.getElementById('userAvatar').textContent = appState.user.avatar;
-            document.getElementById('userName').textContent = appState.user.name;
-        }
-
-        // Quick Challenge Functions
-        function toggleQuickChallenge() {
-            appState.quickChallengeActive = !appState.quickChallengeActive;
-            const toggle = document.getElementById('quickToggle');
-            const form = document.getElementById('quickChallengeForm');
-            
-            if (appState.quickChallengeActive) {
-                toggle.classList.add('active');
-                form.style.display = 'flex';
-                showMessage('⚡ Quick Challenge Creator activated!', 'success');
-            } else {
-                toggle.classList.remove('active');
-                form.style.display = 'none';
-                showMessage('⚡ Quick Challenge Creator deactivated', 'info');
-            }
-        }
-
-        function createQuickChallenge() {
-            const title = document.getElementById('quickChallengeTitle').value;
-            const description = document.getElementById('quickChallengeDesc').value;
-            const category = document.getElementById('quickCategory').value;
-            const reward = parseInt(document.getElementById('quickReward').value);
-            
-            if (!title || !description) {
-                showMessage('❌ Please fill in title and description!', 'error');
-                return;
-            }
-            
-            if (appState.user.tokens < 50) {
-                showMessage('❌ Not enough tokens! You need 50 tokens to create a challenge.', 'error');
-                return;
-            }
-            
-            // Deduct creation cost
-            appState.user.tokens -= 50;
-            updateUserStats();
-            
-            // Clear form
-            document.getElementById('quickChallengeTitle').value = '';
-            document.getElementById('quickChallengeDesc').value = '';
-            
-            showMessage(`⚡ Challenge "${title}" created and sent! Cost: 50 tokens`, 'success');
-            
-            // Simulate friend accepting challenge
-            setTimeout(() => {
-                appState.user.tokens += 75; // Reward for successful challenge
-                updateUserStats();
-                showMessage(`🎯 Someone accepted your challenge! You earned 75 tokens!`, 'success');
-            }, 3000);
-        }
-
-        // Start AI challenge generator
-        function startAIChallengeGenerator() {
-            // Generate first challenge after 3 seconds
-            setTimeout(() => {
-                generateAIChallenge();
-            }, 3000);
-
-            // Generate challenges every 30 seconds for demo
-            setInterval(() => {
-                generateAIChallenge();
-            }, 30000);
-        }
-
-        // Generate AI challenge
-        function generateAIChallenge() {
-            const availableChallenges = aiChallengeTemplates.filter(challenge => 
-                !appState.aiChallenges.slice(-10).includes(challenge.title)
-            );
-
-            if (availableChallenges.length === 0) {
-                appState.aiChallenges = [];
-                return generateAIChallenge();
-            }
-
-            const randomChallenge = availableChallenges[Math.floor(Math.random() * availableChallenges.length)];
-            appState.aiChallenges.push(randomChallenge.title);
-            showAINotification(randomChallenge);
-        }
-
-        // Show AI notification
-        function showAINotification(challenge) {
-            const notification = document.getElementById('aiNotification');
-            
-            document.getElementById('aiChallengeTitle').textContent = challenge.title;
-            document.getElementById('aiChallengeDescription').textContent = challenge.description;
-            document.getElementById('aiTokens').textContent = challenge.tokens;
-            document.getElementById('aiDifficulty').textContent = challenge.difficulty.charAt(0).toUpperCase() + challenge.difficulty.slice(1);
-            document.getElementById('aiDuration').textContent = challenge.duration;
-
-            notification.style.display = 'block';
-            notification.classList.remove('hide');
-
-            // Auto-dismiss after 15 seconds
-            setTimeout(() => {
-                dismissAIChallenge();
-            }, 15000);
-        }
-
-        // Accept AI challenge
-        function acceptAIChallenge() {
-            const notification = document.getElementById('aiNotification');
-            const tokensEarned = parseInt(document.getElementById('aiTokens').textContent);
-            
-            appState.user.tokens += tokensEarned;
-            appState.user.challengesCompleted += 1;
-            
-            // Random chance to increase streak
-            if (Math.random() > 0.5) {
-                appState.user.streak += 1;
-            }
-            
-            updateUserStats();
-            
-            notification.classList.add('hide');
-            setTimeout(() => {
-                notification.style.display = 'none';
-            }, 500);
-
-            showMessage(`🎉 Challenge completed! You earned ${tokensEarned} tokens! 🚀`, 'success');
-        }
-
-        // Dismiss AI challenge
-        function dismissAIChallenge() {
-            const notification = document.getElementById('aiNotification');
-            notification.classList.add('hide');
-            setTimeout(() => {
-                notification.style.display = 'none';
-            }, 500);
-        }
-
-        // Challenge friend
-        function challengeFriend(friendId) {
-            const friend = appState.friends.find(f => f.id === friendId);
-            if (friend) {
-                if (appState.user.tokens < 50) {
-                    showMessage('❌ Not enough tokens! You need 50 tokens to send a challenge.', 'error');
-                    return;
-                }
-                
-                appState.user.tokens -= 50;
-                updateUserStats();
-                
-                // Simulate friend accepting challenge
-                setTimeout(() => {
-                    appState.user.tokens += 75; // Reward for successful challenge
-                    updateUserStats();
-                    showMessage(`🎯 ${friend.name} accepted your challenge! You earned 75 tokens!`, 'success');
-                }, 3000);
-                
-                showMessage(`🎯 Challenge sent to ${friend.name}! Cost: 50 tokens`, 'success');
-            }
-        }
-
-        // Chat with friend
-        function chatWithFriend(friendId) {
-            const friend = appState.friends.find(f => f.id === friendId);
-            if (friend) {
-                showMessage(`💬 Opening chat with ${friend.name}...`, 'info');
-            }
-        }
-
-        // Toggle group membership
-        function toggleGroup(groupId) {
-            const group = appState.groups.find(g => g.id === groupId);
-            if (group) {
-                if (!group.joined) {
-                    // Joining a group
-                    group.joined = true;
-                    appState.user.tokens += 30; // Reward for joining
-                    updateUserStats();
-                    showMessage(`🏠 Joined ${group.name}! You earned 30 tokens for joining the community!`, 'success');
-                } else {
-                    // Leaving a group
-                    group.joined = false;
-                    showMessage(`👋 Left ${group.name}`, 'info');
-                }
-                renderGroups();
-            }
-        }
-
-        // Show add friend modal
-        function showAddFriendModal() {
-            document.getElementById('addFriendModal').classList.add('show');
-        }
-
-        // Add friend
-        function addFriend() {
-            const email = document.getElementById('friendEmail').value;
-            if (email && email.trim()) {
-                showMessage(`📤 Friend request sent to ${email}!`, 'success');
-                
-                // Simulate friend accepting
-                setTimeout(() => {
-                    const newFriend = {
-                        id: 'manual_' + Date.now(),
-                        name: email.split('@')[0] || 'New Friend',
-                        avatar: '👤',
-                        status: 'Online • Just joined',
-                        online: true
-                    };
-                    
-                    appState.friends.push(newFriend);
-                    appState.user.tokens += 30;
-                    updateUserStats();
-                    renderFriendsCarousel();
-                    renderFriends();
-                    updateFriendsCounts();
-                    
-                    showMessage(`🎉 ${newFriend.name} accepted your friend request! +30 tokens`, 'success');
-                }, 3000);
-                
-                hideModal('addFriendModal');
-                document.getElementById('friendEmail').value = '';
-            } else {
-                showMessage('❌ Please enter a valid email or username!', 'error');
-            }
-        }
-
-        // Show friend select modal
-        function showFriendSelectModal() {
-            const title = document.getElementById('challengeTitle').value;
-            const description = document.getElementById('challengeDescription').value;
-            
-            if (!title || !description) {
-                showMessage('❌ Please fill in challenge title and description first!', 'error');
-                return;
-            }
-
-            if (appState.user.tokens < 100) {
-                showMessage('❌ Not enough tokens! You need 100 tokens to create a challenge.', 'error');
-                return;
-            }
-
-            const friendSelectList = document.getElementById('friendSelectList');
-            friendSelectList.innerHTML = '';
-
-            appState.friends.forEach(friend => {
-                const friendElement = document.createElement('div');
-                friendElement.className = 'friend-select-item';
-                friendElement.onclick = () => selectFriend(friend.id, friendElement);
-                friendElement.innerHTML = `
-                    <div class="friend-avatar-wrapper">
-                        <div class="friend-avatar ${friend.online ? '' : 'offline'}">
-                            ${friend.avatar}
-                        </div>
-                        ${friend.online ? 
-                            '<div class="online-indicator"></div>' : 
-                            '<div class="offline-indicator"></div>'
-                        }
-                    </div>
-                    <div class="friend-info">
-                        <div class="friend-name">${friend.name}</div>
-                        <div class="friend-status">${friend.status}</div>
-                    </div>
-                `;
-                friendSelectList.appendChild(friendElement);
-            });
-
-            document.getElementById('friendSelectModal').classList.add('show');
-        }
-
-        // Select friend
-        function selectFriend(friendId, element) {
-            document.querySelectorAll('.friend-select-item').forEach(item => {
-                item.classList.remove('selected');
-            });
-            
-            element.classList.add('selected');
-            appState.selectedFriend = friendId;
-        }
-
-        // Send challenge to friend
-        function sendChallengeToFriend() {
-            if (!appState.selectedFriend) {
-                showMessage('❌ Please select a friend first!', 'error');
-                return;
-            }
-
-            const friend = appState.friends.find(f => f.id === appState.selectedFriend);
-            const title = document.getElementById('challengeTitle').value;
-
-            appState.user.tokens -= 100;
-            updateUserStats();
-
-            showMessage(`🎯 Challenge "${title}" sent to ${friend.name}!`, 'success');
-            
-            clearChallengeForm();
-            hideModal('friendSelectModal');
-        }
-
-        // Create personal challenge
-        function createPersonalChallenge() {
-            const title = document.getElementById('challengeTitle').value;
-            const description = document.getElementById('challengeDescription').value;
-
-            if (!title || !description) {
-                showMessage('❌ Please fill in all required fields!', 'error');
-                return;
-            }
-
-            if (appState.user.tokens < 100) {
-                showMessage('❌ Not enough tokens! You need 100 tokens to create a challenge.', 'error');
-                return;
-            }
-
-            appState.user.tokens -= 100;
-            
-            // Reward for creativity
-            setTimeout(() => {
-                appState.user.tokens += 150;
-                updateUserStats();
-                showMessage(`🎨 Your challenge "${title}" is popular! You earned 150 tokens!`, 'success');
-            }, 5000);
-            
-            updateUserStats();
-            showMessage(`✨ Personal challenge "${title}" created! Cost: 100 tokens`, 'success');
-            clearChallengeForm();
-        }
-
-        // Clear challenge form
-        function clearChallengeForm() {
-            document.getElementById('challengeTitle').value = '';
-            document.getElementById('challengeDescription').value = '';
-            document.getElementById('challengeTokens').value = '';
-            document.getElementById('challengeCategory').value = 'fitness';
-            document.getElementById('challengeDifficulty').value = 'easy';
-        }
-
-        // Create group
-        function createGroup() {
-            showMessage('🏠 Group creation feature coming soon!', 'info');
-        }
-
-        // Open profile
-        function openProfile() {
-            showMessage('📱 Profile section is below! Scroll down to view your stats.', 'info');
-        }
-
-        // Hide modal
-        function hideModal(modalId) {
-            document.getElementById(modalId).classList.remove('show');
-        }
-
-        // Add random events
-        function startRandomEvents() {
-            setInterval(() => {
-                const events = [
-                    () => {
-                        appState.user.tokens += 5;
-                        updateUserStats();
-                        showMessage('🎁 Daily login bonus! +5 tokens', 'success');
-                    },
-                    () => {
-                        const friend = appState.friends[Math.floor(Math.random() * appState.friends.length)];
-                        showMessage(`💬 ${friend.name} says: "Great job on your challenges!"`, 'info');
-                    },
-                    () => {
-                        if (appState.user.streak > 0) {
-                            appState.user.tokens += appState.user.streak * 2;
-                            updateUserStats();
-                            showMessage(`🔥 Streak bonus! +${appState.user.streak * 2} tokens for ${appState.user.streak} day streak!`, 'success');
-                        }
-                    },
-                    () => {
-                        showMessage('🌟 New challenges available! Check them out!', 'info');
-                    }
-                ];
-                
-                // Random event every 45 seconds
-                const randomEvent = events[Math.floor(Math.random() * events.length)];
-                randomEvent();
-            }, 45000);
-        }
-
-        // Show message
-        function showMessage(message, type) {
-            const messageDiv = document.createElement('div');
-            messageDiv.style.cssText = `
-                position: fixed;
-                top: 20px;
-                right: 20px;
-                padding: 12px 18px;
-                border-radius: 12px;
-                color: white;
-                font-weight: 500;
-                z-index: 1001;
-                animation: slideIn 0.3s ease;
-                max-width: 280px;
-                backdrop-filter: blur(20px);
-                border: 1px solid rgba(255, 255, 255, 0.2);
-                box-shadow: 0 8px 25px rgba(0, 0, 0, 0.5);
-                font-size: 0.9rem;
-            `;
-
-            if (type === 'success') {
-                messageDiv.style.background = 'rgba(155, 89, 182, 0.9)';
-                messageDiv.style.borderColor = '#9b59b6';
-            } else if (type === 'error') {
-                messageDiv.style.background = 'rgba(233, 30, 99, 0.9)';
-                messageDiv.style.borderColor = '#e91e63';
-            } else {
-                messageDiv.style.background = 'rgba(63, 81, 181, 0.9)';
-                messageDiv.style.borderColor = '#3f51b5';
-            }
-
-            messageDiv.textContent = message;
-            document.body.appendChild(messageDiv);
-
-            setTimeout(() => {
-                messageDiv.style.animation = 'slideOut 0.3s ease';
-                setTimeout(() => {
-                    if (document.body.contains(messageDiv)) {
-                        document.body.removeChild(messageDiv);
-                    }
-                }, 300);
-            }, 3000);
-        }
-
-        // Proof type selection
-        document.addEventListener('DOMContentLoaded', function() {
-            // Add event listeners for proof options
-            document.querySelectorAll('.proof-option').forEach(option => {
-                option.addEventListener('click', function() {
-                    // Remove previous selection
-                    document.querySelectorAll('.proof-option').forEach(opt => {
-                        opt.classList.remove('selected');
-                    });
-                    
-                    // Add selection to clicked option
-                    this.classList.add('selected');
-                    appState.selectedProofType = this.getAttribute('data-type');
-                });
-            });
-        });
-
-        // Initialize app when page loads
-        window.addEventListener('load', init);
-
-        // Close modals when clicking outside
-        window.addEventListener('click', (e) => {
-            if (e.target.classList.contains('modal') && e.target.id !== 'authModal') {
-                e.target.classList.remove('show');
-            }
-        });
-
-        // Add keyboard support
-        window.addEventListener('keydown', (e) => {
-            if (e.key === 'Escape') {
-                // Close any open modals except auth modal
-                document.querySelectorAll('.modal').forEach(modal => {
-                    if (modal.id !== 'authModal') {
-                        modal.classList.remove('show');
-                    }
-                });
-                
-                // Dismiss AI notification
-                const aiNotification = document.getElementById('aiNotification');
-                if (aiNotification.style.display === 'block') {
-                    dismissAIChallenge();
-                }
-            }
-        });
-
-        // Add touch support for mobile
-        let touchStartX = 0;
-        let touchStartY = 0;
-
-        document.addEventListener('touchstart', (e) => {
-            touchStartX = e.touches[0].clientX;
-            touchStartY = e.touches[0].clientY;
-        });
-
-        document.addEventListener('touchend', (e) => {
-            if (!touchStartX || !touchStartY) return;
-
-            const touchEndX = e.changedTouches[0].clientX;
-            const touchEndY = e.changedTouches[0].clientY;
-
-            const deltaX = touchStartX - touchEndX;
-            const deltaY = touchStartY - touchEndY;
-
-            // Check if swipe is on friends carousel
-            const friendsCarousel = document.querySelector('.friends-carousel');
-            if (friendsCarousel && friendsCarousel.contains(e.target)) {
-                if (Math.abs(deltaX) > Math.abs(deltaY) && Math.abs(deltaX) > 50) {
-                    if (deltaX > 0) {
-                        // Swipe left - next
-                        slideFriends(1);
-                    } else {
-                        // Swipe right - previous
-                        slideFriends(-1);
-                    }
-                }
-            }
-
-            touchStartX = 0;
-            touchStartY = 0;
-        });
-
-        // Prevent zoom on double tap
-        let lastTouchEnd = 0;
-        document.addEventListener('touchend', (e) => {
-            const now = (new Date()).getTime();
-            if (now - lastTouchEnd <= 300) {
-                e.preventDefault();
-            }
-            lastTouchEnd = now;
-        }, false);
-
-        // Auto-hide address bar on mobile
-        window.addEventListener('load', () => {
-            setTimeout(() => {
-                window.scrollTo(0, 1);
-            }, 100);
-        });
-    </script>
-
-    <!-- Firebase SDK -->
-    <script type="module">
-        import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
-        import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged, updateProfile } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
-        import { getFirestore, doc, setDoc, getDoc, updateDoc } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
-
-        // Your Firebase configuration
-        const firebaseConfig = {
-            apiKey: "AIzaSyDAgSczYCYTXq21o10X7ccUzpGpkUU6ZoY",
-            authDomain: "jombro-14ddb.firebaseapp.com",
-            projectId: "jombro-14ddb",
-            storageBucket: "jombro-14ddb.firebasestorage.app",
-            messagingSenderId: "282248299120",
-            appId: "1:282248299120:web:1eea070f23d7e8db966ab5",
-            measurementId: "G-78BGMCGCVJ"
-        };
-
-        // Initialize Firebase
-        const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
-        const db = getFirestore(app);
-        
-        // Make Firebase available globally
-        window.auth = auth;
-        window.db = db;
-        window.createUserWithEmailAndPassword = createUserWithEmailAndPassword;
-        window.signInWithEmailAndPassword = signInWithEmailAndPassword;
-        window.signOut = signOut;
-        window.onAuthStateChanged = onAuthStateChanged;
-        window.updateProfile = updateProfile;
-        window.doc = doc;
-        window.setDoc = setDoc;
-        window.getDoc = getDoc;
-        window.updateDoc = updateDoc;
-
-        console.log('🔥 Firebase initialized successfully!');
-    </script>
-</body>
-</html>
-
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
             background: #0a0a0a;
@@ -2190,7 +1439,9 @@
             .proof-options {
                 grid-template-columns: 1fr;
             }
-            
+        }
+
+        @media (max-width: 480px) {
             .container {
                 padding: 10px;
             }
@@ -3109,3 +2360,754 @@
                 showMessage('👋 You are now visible to nearby strangers', 'info');
             }
         }
+
+        // Render friends carousel
+        function renderFriendsCarousel() {
+            const friendsTrack = document.getElementById('friendsTrack');
+            const friendsToShow = appState.showingOnlineOnly ? 
+                appState.friends.filter(f => f.online) : 
+                appState.friends;
+            
+            friendsTrack.innerHTML = '';
+
+            friendsToShow.forEach((friend, index) => {
+                const friendElement = document.createElement('div');
+                friendElement.className = 'friend-avatar-item';
+                friendElement.onclick = () => selectFriendFromCarousel(friend.id);
+                friendElement.innerHTML = `
+                    <div class="friend-avatar-wrapper">
+                        <div class="friend-avatar ${friend.online ? '' : 'offline'}">
+                            ${friend.avatar}
+                        </div>
+                        ${friend.online ? 
+                            '<div class="online-indicator"></div>' : 
+                            '<div class="offline-indicator"></div>'
+                        }
+                    </div>
+                    <div class="friend-name-small">${friend.name.split(' ')[0]}</div>
+                `;
+                friendsTrack.appendChild(friendElement);
+            });
+
+            // Reset slide position
+            appState.friendsSlideIndex = 0;
+            updateCarouselPosition();
+        }
+
+        // Slide friends carousel
+        function slideFriends(direction) {
+            const friendsToShow = appState.showingOnlineOnly ? 
+                appState.friends.filter(f => f.online) : 
+                appState.friends;
+            
+            const maxVisible = 3; // Number of friends visible at once on mobile
+            const maxIndex = Math.max(0, friendsToShow.length - maxVisible);
+            
+            appState.friendsSlideIndex += direction;
+            
+            if (appState.friendsSlideIndex < 0) {
+                appState.friendsSlideIndex = 0;
+            } else if (appState.friendsSlideIndex > maxIndex) {
+                appState.friendsSlideIndex = maxIndex;
+            }
+            
+            updateCarouselPosition();
+        }
+
+        // Update carousel position
+        function updateCarouselPosition() {
+            const friendsTrack = document.getElementById('friendsTrack');
+            const slideWidth = 75; // 50px avatar + 15px gap + 10px margin
+            const translateX = -appState.friendsSlideIndex * slideWidth;
+            
+            friendsTrack.style.transform = `translateX(${translateX}px)`;
+            
+            // Update navigation buttons
+            const friendsToShow = appState.showingOnlineOnly ? 
+                appState.friends.filter(f => f.online) : 
+                appState.friends;
+            
+            const maxVisible = 3;
+            const maxIndex = Math.max(0, friendsToShow.length - maxVisible);
+            
+            document.getElementById('prevBtn').disabled = appState.friendsSlideIndex === 0;
+            document.getElementById('nextBtn').disabled = appState.friendsSlideIndex >= maxIndex;
+        }
+
+        // Select friend from carousel
+        function selectFriendFromCarousel(friendId) {
+            const friend = appState.friends.find(f => f.id === friendId);
+            if (friend) {
+                showMessage(`👋 Selected ${friend.name}`, 'info');
+            }
+        }
+
+        // Toggle view all friends
+        function toggleViewAll() {
+            appState.showingAllFriends = !appState.showingAllFriends;
+            const friendsList = document.getElementById('friendsList');
+            const viewAllBtn = document.getElementById('viewAllBtn');
+            
+            if (appState.showingAllFriends) {
+                friendsList.classList.add('show');
+                viewAllBtn.textContent = 'Hide All';
+                renderFriends();
+            } else {
+                friendsList.classList.remove('show');
+                viewAllBtn.textContent = 'View All';
+            }
+        }
+
+        // Show online only
+        function showOnlineOnly() {
+            appState.showingOnlineOnly = !appState.showingOnlineOnly;
+            const onlineBtn = document.querySelector('.friends-actions .btn-secondary');
+            
+            if (appState.showingOnlineOnly) {
+                onlineBtn.textContent = 'Show All';
+                onlineBtn.style.background = 'rgba(155, 89, 182, 0.4)';
+            } else {
+                onlineBtn.textContent = 'Online Only';
+                onlineBtn.style.background = 'rgba(255, 255, 255, 0.1)';
+            }
+            
+            renderFriendsCarousel();
+            if (appState.showingAllFriends) {
+                renderFriends();
+            }
+        }
+
+        // Update friends counts
+        function updateFriendsCounts() {
+            const onlineCount = appState.friends.filter(f => f.online).length;
+            const totalCount = appState.friends.length;
+            
+            document.getElementById('onlineCount').textContent = onlineCount;
+            document.getElementById('totalFriends').textContent = totalCount;
+        }
+
+        // Render friends list
+        function renderFriends() {
+            const friendsList = document.getElementById('friendsList');
+            const friendsToShow = appState.showingOnlineOnly ? 
+                appState.friends.filter(f => f.online) : 
+                appState.friends;
+            
+            friendsList.innerHTML = '';
+
+            friendsToShow.forEach(friend => {
+                const friendElement = document.createElement('div');
+                friendElement.className = 'friend-item';
+                friendElement.innerHTML = `
+                    <div class="friend-avatar-wrapper">
+                        <div class="friend-avatar ${friend.online ? '' : 'offline'}">
+                            ${friend.avatar}
+                        </div>
+                        ${friend.online ? 
+                            '<div class="online-indicator"></div>' : 
+                            '<div class="offline-indicator"></div>'
+                        }
+                    </div>
+                    <div class="friend-info">
+                        <div class="friend-name">${friend.name}</div>
+                        <div class="friend-status">${friend.status}</div>
+                    </div>
+                    <div class="friend-actions">
+                        <button class="btn btn-primary btn-small" onclick="challengeFriend('${friend.id}')">Challenge</button>
+                        <button class="btn btn-secondary btn-small" onclick="chatWithFriend('${friend.id}')">Chat</button>
+                    </div>
+                `;
+                friendsList.appendChild(friendElement);
+            });
+        }
+
+        // Render groups list
+        function renderGroups() {
+            const groupsList = document.getElementById('groupsList');
+            groupsList.innerHTML = '';
+
+            appState.groups.forEach(group => {
+                const groupElement = document.createElement('div');
+                groupElement.className = 'group-item';
+                groupElement.innerHTML = `
+                    <div class="group-avatar">${group.avatar}</div>
+                    <div class="group-info">
+                        <div class="group-name">${group.name}</div>
+                        <div class="group-members">${group.members} members</div>
+                    </div>
+                    <div class="friend-actions">
+                        <button class="btn ${group.joined ? 'btn-secondary' : 'btn-primary'} btn-small" onclick="toggleGroup('${group.id}')">
+                            ${group.joined ? 'Leave' : 'Join'}
+                        </button>
+                    </div>
+                `;
+                groupsList.appendChild(groupElement);
+            });
+        }
+
+        // Update user stats
+        function updateUserStats() {
+            document.getElementById('userTokens').textContent = appState.user.tokens.toLocaleString();
+            document.getElementById('userLevel').textContent = appState.user.level;
+            document.getElementById('userFriends').textContent = appState.user.friends;
+            document.getElementById('userAvatar').textContent = appState.user.avatar;
+            document.getElementById('userName').textContent = appState.user.name;
+        }
+
+        // Quick Challenge Functions
+        function toggleQuickChallenge() {
+            appState.quickChallengeActive = !appState.quickChallengeActive;
+            const toggle = document.getElementById('quickToggle');
+            const form = document.getElementById('quickChallengeForm');
+            
+            if (appState.quickChallengeActive) {
+                toggle.classList.add('active');
+                form.style.display = 'flex';
+                showMessage('⚡ Quick Challenge Creator activated!', 'success');
+            } else {
+                toggle.classList.remove('active');
+                form.style.display = 'none';
+                showMessage('⚡ Quick Challenge Creator deactivated', 'info');
+            }
+        }
+
+        function createQuickChallenge() {
+            const title = document.getElementById('quickChallengeTitle').value;
+            const description = document.getElementById('quickChallengeDesc').value;
+            const category = document.getElementById('quickCategory').value;
+            const reward = parseInt(document.getElementById('quickReward').value);
+            
+            if (!title || !description) {
+                showMessage('❌ Please fill in title and description!', 'error');
+                return;
+            }
+            
+            if (appState.user.tokens < 50) {
+                showMessage('❌ Not enough tokens! You need 50 tokens to create a challenge.', 'error');
+                return;
+            }
+            
+            // Deduct creation cost
+            appState.user.tokens -= 50;
+            updateUserStats();
+            
+            // Clear form
+            document.getElementById('quickChallengeTitle').value = '';
+            document.getElementById('quickChallengeDesc').value = '';
+            
+            showMessage(`⚡ Challenge "${title}" created and sent! Cost: 50 tokens`, 'success');
+            
+            // Simulate friend accepting challenge
+            setTimeout(() => {
+                appState.user.tokens += 75; // Reward for successful challenge
+                updateUserStats();
+                showMessage(`🎯 Someone accepted your challenge! You earned 75 tokens!`, 'success');
+            }, 3000);
+        }
+
+        // Start AI challenge generator
+        function startAIChallengeGenerator() {
+            // Generate first challenge after 3 seconds
+            setTimeout(() => {
+                generateAIChallenge();
+            }, 3000);
+
+            // Generate challenges every 30 seconds for demo
+            setInterval(() => {
+                generateAIChallenge();
+            }, 30000);
+        }
+
+        // Generate AI challenge
+        function generateAIChallenge() {
+            const availableChallenges = aiChallengeTemplates.filter(challenge => 
+                !appState.aiChallenges.slice(-10).includes(challenge.title)
+            );
+
+            if (availableChallenges.length === 0) {
+                appState.aiChallenges = [];
+                return generateAIChallenge();
+            }
+
+            const randomChallenge = availableChallenges[Math.floor(Math.random() * availableChallenges.length)];
+            appState.aiChallenges.push(randomChallenge.title);
+            showAINotification(randomChallenge);
+        }
+
+        // Show AI notification
+        function showAINotification(challenge) {
+            const notification = document.getElementById('aiNotification');
+            
+            document.getElementById('aiChallengeTitle').textContent = challenge.title;
+            document.getElementById('aiChallengeDescription').textContent = challenge.description;
+            document.getElementById('aiTokens').textContent = challenge.tokens;
+            document.getElementById('aiDifficulty').textContent = challenge.difficulty.charAt(0).toUpperCase() + challenge.difficulty.slice(1);
+            document.getElementById('aiDuration').textContent = challenge.duration;
+
+            notification.style.display = 'block';
+            notification.classList.remove('hide');
+
+            // Auto-dismiss after 15 seconds
+            setTimeout(() => {
+                dismissAIChallenge();
+            }, 15000);
+        }
+
+        // Accept AI challenge
+        function acceptAIChallenge() {
+            const notification = document.getElementById('aiNotification');
+            const tokensEarned = parseInt(document.getElementById('aiTokens').textContent);
+            
+            appState.user.tokens += tokensEarned;
+            appState.user.challengesCompleted += 1;
+            
+            // Random chance to increase streak
+            if (Math.random() > 0.5) {
+                appState.user.streak += 1;
+            }
+            
+            updateUserStats();
+            
+            notification.classList.add('hide');
+            setTimeout(() => {
+                notification.style.display = 'none';
+            }, 500);
+
+            showMessage(`🎉 Challenge completed! You earned ${tokensEarned} tokens! 🚀`, 'success');
+        }
+
+        // Dismiss AI challenge
+        function dismissAIChallenge() {
+            const notification = document.getElementById('aiNotification');
+            notification.classList.add('hide');
+            setTimeout(() => {
+                notification.style.display = 'none';
+            }, 500);
+        }
+
+        // Challenge friend
+        function challengeFriend(friendId) {
+            const friend = appState.friends.find(f => f.id === friendId);
+            if (friend) {
+                if (appState.user.tokens < 50) {
+                    showMessage('❌ Not enough tokens! You need 50 tokens to send a challenge.', 'error');
+                    return;
+                }
+                
+                appState.user.tokens -= 50;
+                updateUserStats();
+                
+                // Simulate friend accepting challenge
+                setTimeout(() => {
+                    appState.user.tokens += 75; // Reward for successful challenge
+                    updateUserStats();
+                    showMessage(`🎯 ${friend.name} accepted your challenge! You earned 75 tokens!`, 'success');
+                }, 3000);
+                
+                showMessage(`🎯 Challenge sent to ${friend.name}! Cost: 50 tokens`, 'success');
+            }
+        }
+
+        // Chat with friend
+        function chatWithFriend(friendId) {
+            const friend = appState.friends.find(f => f.id === friendId);
+            if (friend) {
+                showMessage(`💬 Opening chat with ${friend.name}...`, 'info');
+            }
+        }
+
+        // Toggle group membership
+        function toggleGroup(groupId) {
+            const group = appState.groups.find(g => g.id === groupId);
+            if (group) {
+                if (!group.joined) {
+                    // Joining a group
+                    group.joined = true;
+                    appState.user.tokens += 30; // Reward for joining
+                    updateUserStats();
+                    showMessage(`🏠 Joined ${group.name}! You earned 30 tokens for joining the community!`, 'success');
+                } else {
+                    // Leaving a group
+                    group.joined = false;
+                    showMessage(`👋 Left ${group.name}`, 'info');
+                }
+                renderGroups();
+            }
+        }
+
+        // Show add friend modal
+        function showAddFriendModal() {
+            document.getElementById('addFriendModal').classList.add('show');
+        }
+
+        // Add friend
+        function addFriend() {
+            const email = document.getElementById('friendEmail').value;
+            if (email && email.trim()) {
+                showMessage(`📤 Friend request sent to ${email}!`, 'success');
+                
+                // Simulate friend accepting
+                setTimeout(() => {
+                    const newFriend = {
+                        id: 'manual_' + Date.now(),
+                        name: email.split('@')[0] || 'New Friend',
+                        avatar: '👤',
+                        status: 'Online • Just joined',
+                        online: true
+                    };
+                    
+                    appState.friends.push(newFriend);
+                    appState.user.tokens += 30;
+                    updateUserStats();
+                    renderFriendsCarousel();
+                    renderFriends();
+                    updateFriendsCounts();
+                    
+                    showMessage(`🎉 ${newFriend.name} accepted your friend request! +30 tokens`, 'success');
+                }, 3000);
+                
+                hideModal('addFriendModal');
+                document.getElementById('friendEmail').value = '';
+            } else {
+                showMessage('❌ Please enter a valid email or username!', 'error');
+            }
+        }
+
+        // Show friend select modal
+        function showFriendSelectModal() {
+            const title = document.getElementById('challengeTitle').value;
+            const description = document.getElementById('challengeDescription').value;
+            
+            if (!title || !description) {
+                showMessage('❌ Please fill in challenge title and description first!', 'error');
+                return;
+            }
+
+            if (appState.user.tokens < 100) {
+                showMessage('❌ Not enough tokens! You need 100 tokens to create a challenge.', 'error');
+                return;
+            }
+
+            const friendSelectList = document.getElementById('friendSelectList');
+            friendSelectList.innerHTML = '';
+
+            appState.friends.forEach(friend => {
+                const friendElement = document.createElement('div');
+                friendElement.className = 'friend-select-item';
+                friendElement.onclick = () => selectFriend(friend.id, friendElement);
+                friendElement.innerHTML = `
+                    <div class="friend-avatar-wrapper">
+                        <div class="friend-avatar ${friend.online ? '' : 'offline'}">
+                            ${friend.avatar}
+                        </div>
+                        ${friend.online ? 
+                            '<div class="online-indicator"></div>' : 
+                            '<div class="offline-indicator"></div>'
+                        }
+                    </div>
+                    <div class="friend-info">
+                        <div class="friend-name">${friend.name}</div>
+                        <div class="friend-status">${friend.status}</div>
+                    </div>
+                `;
+                friendSelectList.appendChild(friendElement);
+            });
+
+            document.getElementById('friendSelectModal').classList.add('show');
+        }
+
+        // Select friend
+        function selectFriend(friendId, element) {
+            document.querySelectorAll('.friend-select-item').forEach(item => {
+                item.classList.remove('selected');
+            });
+            
+            element.classList.add('selected');
+            appState.selectedFriend = friendId;
+        }
+
+        // Send challenge to friend
+        function sendChallengeToFriend() {
+            if (!appState.selectedFriend) {
+                showMessage('❌ Please select a friend first!', 'error');
+                return;
+            }
+
+            const friend = appState.friends.find(f => f.id === appState.selectedFriend);
+            const title = document.getElementById('challengeTitle').value;
+
+            appState.user.tokens -= 100;
+            updateUserStats();
+
+            showMessage(`🎯 Challenge "${title}" sent to ${friend.name}!`, 'success');
+            
+            clearChallengeForm();
+            hideModal('friendSelectModal');
+        }
+
+        // Create personal challenge
+        function createPersonalChallenge() {
+            const title = document.getElementById('challengeTitle').value;
+            const description = document.getElementById('challengeDescription').value;
+
+            if (!title || !description) {
+                showMessage('❌ Please fill in all required fields!', 'error');
+                return;
+            }
+
+            if (appState.user.tokens < 100) {
+                showMessage('❌ Not enough tokens! You need 100 tokens to create a challenge.', 'error');
+                return;
+            }
+
+            appState.user.tokens -= 100;
+            
+            // Reward for creativity
+            setTimeout(() => {
+                appState.user.tokens += 150;
+                updateUserStats();
+                showMessage(`🎨 Your challenge "${title}" is popular! You earned 150 tokens!`, 'success');
+            }, 5000);
+            
+            updateUserStats();
+            showMessage(`✨ Personal challenge "${title}" created! Cost: 100 tokens`, 'success');
+            clearChallengeForm();
+        }
+
+        // Clear challenge form
+        function clearChallengeForm() {
+            document.getElementById('challengeTitle').value = '';
+            document.getElementById('challengeDescription').value = '';
+            document.getElementById('challengeTokens').value = '';
+            document.getElementById('challengeCategory').value = 'fitness';
+            document.getElementById('challengeDifficulty').value = 'easy';
+        }
+
+        // Create group
+        function createGroup() {
+            showMessage('🏠 Group creation feature coming soon!', 'info');
+        }
+
+        // Open profile
+        function openProfile() {
+            showMessage('📱 Profile section is below! Scroll down to view your stats.', 'info');
+        }
+
+        // Hide modal
+        function hideModal(modalId) {
+            document.getElementById(modalId).classList.remove('show');
+        }
+
+        // Add random events
+        function startRandomEvents() {
+            setInterval(() => {
+                const events = [
+                    () => {
+                        appState.user.tokens += 5;
+                        updateUserStats();
+                        showMessage('🎁 Daily login bonus! +5 tokens', 'success');
+                    },
+                    () => {
+                        const friend = appState.friends[Math.floor(Math.random() * appState.friends.length)];
+                        showMessage(`💬 ${friend.name} says: "Great job on your challenges!"`, 'info');
+                    },
+                    () => {
+                        if (appState.user.streak > 0) {
+                            appState.user.tokens += appState.user.streak * 2;
+                            updateUserStats();
+                            showMessage(`🔥 Streak bonus! +${appState.user.streak * 2} tokens for ${appState.user.streak} day streak!`, 'success');
+                        }
+                    },
+                    () => {
+                        showMessage('🌟 New challenges available! Check them out!', 'info');
+                    }
+                ];
+                
+                // Random event every 45 seconds
+                const randomEvent = events[Math.floor(Math.random() * events.length)];
+                randomEvent();
+            }, 45000);
+        }
+
+        // Show message
+        function showMessage(message, type) {
+            const messageDiv = document.createElement('div');
+            messageDiv.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                padding: 12px 18px;
+                border-radius: 12px;
+                color: white;
+                font-weight: 500;
+                z-index: 1001;
+                animation: slideIn 0.3s ease;
+                max-width: 280px;
+                backdrop-filter: blur(20px);
+                border: 1px solid rgba(255, 255, 255, 0.2);
+                box-shadow: 0 8px 25px rgba(0, 0, 0, 0.5);
+                font-size: 0.9rem;
+            `;
+
+            if (type === 'success') {
+                messageDiv.style.background = 'rgba(155, 89, 182, 0.9)';
+                messageDiv.style.borderColor = '#9b59b6';
+            } else if (type === 'error') {
+                messageDiv.style.background = 'rgba(233, 30, 99, 0.9)';
+                messageDiv.style.borderColor = '#e91e63';
+            } else {
+                messageDiv.style.background = 'rgba(63, 81, 181, 0.9)';
+                messageDiv.style.borderColor = '#3f51b5';
+            }
+
+            messageDiv.textContent = message;
+            document.body.appendChild(messageDiv);
+
+            setTimeout(() => {
+                messageDiv.style.animation = 'slideOut 0.3s ease';
+                setTimeout(() => {
+                    if (document.body.contains(messageDiv)) {
+                        document.body.removeChild(messageDiv);
+                    }
+                }, 300);
+            }, 3000);
+        }
+
+        // Proof type selection
+        document.addEventListener('DOMContentLoaded', function() {
+            // Add event listeners for proof options
+            document.querySelectorAll('.proof-option').forEach(option => {
+                option.addEventListener('click', function() {
+                    // Remove previous selection
+                    document.querySelectorAll('.proof-option').forEach(opt => {
+                        opt.classList.remove('selected');
+                    });
+                    
+                    // Add selection to clicked option
+                    this.classList.add('selected');
+                    appState.selectedProofType = this.getAttribute('data-type');
+                });
+            });
+        });
+
+        // Initialize app when page loads
+        window.addEventListener('load', init);
+
+        // Close modals when clicking outside
+        window.addEventListener('click', (e) => {
+            if (e.target.classList.contains('modal') && e.target.id !== 'authModal') {
+                e.target.classList.remove('show');
+            }
+        });
+
+        // Add keyboard support
+        window.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                // Close any open modals except auth modal
+                document.querySelectorAll('.modal').forEach(modal => {
+                    if (modal.id !== 'authModal') {
+                        modal.classList.remove('show');
+                    }
+                });
+                
+                // Dismiss AI notification
+                const aiNotification = document.getElementById('aiNotification');
+                if (aiNotification.style.display === 'block') {
+                    dismissAIChallenge();
+                }
+            }
+        });
+
+        // Add touch support for mobile
+        let touchStartX = 0;
+        let touchStartY = 0;
+
+        document.addEventListener('touchstart', (e) => {
+            touchStartX = e.touches[0].clientX;
+            touchStartY = e.touches[0].clientY;
+        });
+
+        document.addEventListener('touchend', (e) => {
+            if (!touchStartX || !touchStartY) return;
+
+            const touchEndX = e.changedTouches[0].clientX;
+            const touchEndY = e.changedTouches[0].clientY;
+
+            const deltaX = touchStartX - touchEndX;
+            const deltaY = touchStartY - touchEndY;
+
+            // Check if swipe is on friends carousel
+            const friendsCarousel = document.querySelector('.friends-carousel');
+            if (friendsCarousel && friendsCarousel.contains(e.target)) {
+                if (Math.abs(deltaX) > Math.abs(deltaY) && Math.abs(deltaX) > 50) {
+                    if (deltaX > 0) {
+                        // Swipe left - next
+                        slideFriends(1);
+                    } else {
+                        // Swipe right - previous
+                        slideFriends(-1);
+                    }
+                }
+            }
+
+            touchStartX = 0;
+            touchStartY = 0;
+        });
+
+        // Prevent zoom on double tap
+        let lastTouchEnd = 0;
+        document.addEventListener('touchend', (e) => {
+            const now = (new Date()).getTime();
+            if (now - lastTouchEnd <= 300) {
+                e.preventDefault();
+            }
+            lastTouchEnd = now;
+        }, false);
+
+        // Auto-hide address bar on mobile
+        window.addEventListener('load', () => {
+            setTimeout(() => {
+                window.scrollTo(0, 1);
+            }, 100);
+        });
+    </script>
+
+    <!-- Firebase SDK -->
+    <script type="module">
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
+        import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged, updateProfile } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
+        import { getFirestore, doc, setDoc, getDoc, updateDoc } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
+
+        // Your Firebase configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyDAgSczYCYTXq21o10X7ccUzpGpkUU6ZoY",
+            authDomain: "jombro-14ddb.firebaseapp.com",
+            projectId: "jombro-14ddb",
+            storageBucket: "jombro-14ddb.firebasestorage.app",
+            messagingSenderId: "282248299120",
+            appId: "1:282248299120:web:1eea070f23d7e8db966ab5",
+            measurementId: "G-78BGMCGCVJ"
+        };
+
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+        
+        // Make Firebase available globally
+        window.auth = auth;
+        window.db = db;
+        window.createUserWithEmailAndPassword = createUserWithEmailAndPassword;
+        window.signInWithEmailAndPassword = signInWithEmailAndPassword;
+        window.signOut = signOut;
+        window.onAuthStateChanged = onAuthStateChanged;
+        window.updateProfile = updateProfile;
+        window.doc = doc;
+        window.setDoc = setDoc;
+        window.getDoc = getDoc;
+        window.updateDoc = updateDoc;
+
+        console.log('🔥 Firebase initialized successfully!');
+    </script>
+</body>
+</html>
