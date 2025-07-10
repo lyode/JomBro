@@ -234,7 +234,7 @@
             text-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
         }
 
-        /* Strangers Section - Same styling as Friends */
+        /* Nearby Players Section - Same styling as Friends */
         .strangers-section {
             margin-bottom: 15px;
         }
@@ -1906,7 +1906,110 @@
             color: white;
         }
 
-        /* Mobile adjustments for new sections */
+        /* Add Friend Modal Enhancements */
+        .add-friend-options {
+            display: flex;
+            flex-direction: column;
+            gap: 25px;
+        }
+
+        .add-friend-method {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .method-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #9b59b6;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            text-shadow: 0 0 10px rgba(155, 89, 182, 0.3);
+        }
+
+        .social-connect-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+        }
+
+        .social-connect-item {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(155, 89, 182, 0.2);
+            border-radius: 12px;
+            padding: 15px 10px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .social-connect-item:hover {
+            background: rgba(155, 89, 182, 0.1);
+            border-color: rgba(155, 89, 182, 0.4);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(155, 89, 182, 0.2);
+        }
+
+        .social-connect-item.connecting {
+            background: rgba(155, 89, 182, 0.2);
+            border-color: #9b59b6;
+            animation: pulse 1s infinite;
+        }
+
+        .social-connect-icon {
+            font-size: 1.8rem;
+            margin-bottom: 5px;
+        }
+
+        .social-connect-name {
+            font-size: 0.8rem;
+            font-weight: 500;
+            color: white;
+        }
+
+        .add-friend-divider {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin: 10px 0;
+        }
+
+        .divider-line {
+            flex: 1;
+            height: 1px;
+            background: rgba(155, 89, 182, 0.3);
+        }
+
+        .divider-text {
+            font-size: 0.9rem;
+            color: rgba(255, 255, 255, 0.6);
+            font-weight: 500;
+        }
+
+        /* Mobile adjustments for add friend modal */
+        @media (max-width: 480px) {
+            .social-connect-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .social-connect-item {
+                padding: 12px 8px;
+            }
+            
+            .social-connect-icon {
+                font-size: 1.5rem;
+            }
+            
+            .social-connect-name {
+                font-size: 0.7rem;
+            }
+        }
         @media (max-width: 480px) {
             .pictures-grid {
                 grid-template-columns: 1fr;
@@ -2092,11 +2195,11 @@
 
         <!-- Main Content -->
         <div class="main-content">
-            <!-- Nearby Strangers Section -->
+            <!-- Nearby Players Section -->
             <div class="card floating-element">
                 <div class="card-title">
-                    <span>🌍</span>
-                    <span>Nearby Strangers</span>
+                    <span>🎮</span>
+                    <span>Nearby Players</span>
                     <span style="font-size: 0.8rem; opacity: 0.7;">(3km)</span>
                 </div>
                 
@@ -2105,13 +2208,13 @@
                         <div class="strangers-count">
                             <span class="online-count" id="strangersOnlineCount">12</span> online nearby
                         </div>
-                        <button class="btn btn-secondary btn-small" onclick="refreshNearbyStrangers()">Refresh</button>
+                        <button class="btn btn-secondary btn-small" onclick="refreshNearbyPlayers()">Refresh</button>
                     </div>
                     
                     <div class="strangers-carousel">
                         <button class="carousel-nav prev" id="strangersprevBtn" onclick="slideStrangers(-1)">‹</button>
                         <div class="strangers-track" id="strangersTrack">
-                            <!-- Strangers avatars will be populated here -->
+                            <!-- Players avatars will be populated here -->
                         </div>
                         <button class="carousel-nav next" id="strangersNextBtn" onclick="slideStrangers(1)">›</button>
                     </div>
@@ -2354,12 +2457,52 @@
                 <div class="modal-title">Add Friend</div>
                 <button class="close-btn" onclick="hideModal('addFriendModal')">&times;</button>
             </div>
-            <div class="form-group">
-                <label class="form-label">Friend's Email or Username</label>
-                <input type="text" class="form-input" id="friendEmail" placeholder="Enter email or username...">
-            </div>
-            <div style="margin-top: 20px;">
-                <button class="btn btn-primary" onclick="addFriend()">Send Friend Request</button>
+            
+            <div class="add-friend-options">
+                <div class="add-friend-method">
+                    <div class="method-title">📱 Via Social Media</div>
+                    <div class="social-connect-grid">
+                        <div class="social-connect-item" onclick="connectSocial('facebook')">
+                            <div class="social-connect-icon">📘</div>
+                            <div class="social-connect-name">Facebook</div>
+                        </div>
+                        <div class="social-connect-item" onclick="connectSocial('instagram')">
+                            <div class="social-connect-icon">📸</div>
+                            <div class="social-connect-name">Instagram</div>
+                        </div>
+                        <div class="social-connect-item" onclick="connectSocial('tiktok')">
+                            <div class="social-connect-icon">🎵</div>
+                            <div class="social-connect-name">TikTok</div>
+                        </div>
+                        <div class="social-connect-item" onclick="connectSocial('whatsapp')">
+                            <div class="social-connect-icon">💬</div>
+                            <div class="social-connect-name">WhatsApp</div>
+                        </div>
+                        <div class="social-connect-item" onclick="connectSocial('telegram')">
+                            <div class="social-connect-icon">✈️</div>
+                            <div class="social-connect-name">Telegram</div>
+                        </div>
+                        <div class="social-connect-item" onclick="connectSocial('discord')">
+                            <div class="social-connect-icon">🎮</div>
+                            <div class="social-connect-name">Discord</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="add-friend-divider">
+                    <div class="divider-line"></div>
+                    <div class="divider-text">OR</div>
+                    <div class="divider-line"></div>
+                </div>
+                
+                <div class="add-friend-method">
+                    <div class="method-title">👤 Manual Search</div>
+                    <div class="form-group">
+                        <label class="form-label">Friend's Email or Username</label>
+                        <input type="text" class="form-input" id="friendEmail" placeholder="Enter email or username...">
+                    </div>
+                    <button class="btn btn-primary" onclick="addFriendManually()">Send Friend Request</button>
+                </div>
             </div>
         </div>
     </div>
@@ -2613,16 +2756,184 @@
             renderProfile();
             renderGallery();
             renderVideos();
-            renderNearbyStrangers();
+            renderNearbyPlayers();
             renderFriendsCarousel();
             renderFriends();
             renderGroups();
             updateUserStats();
             updateFriendsCounts();
-            updateStrangersCount();
+            updatePlayersCount();
             startAIChallengeGenerator();
             startRandomEvents();
             showWelcomeMessage();
+        }
+
+        // Render nearby players carousel
+        function renderNearbyPlayers() {
+            const strangersTrack = document.getElementById('strangersTrack');
+            strangersTrack.innerHTML = '';
+
+            appState.nearbyStrangers.forEach((player, index) => {
+                const playerElement = document.createElement('div');
+                playerElement.className = 'stranger-avatar-item';
+                playerElement.onclick = () => selectPlayerFromCarousel(player.id);
+                playerElement.innerHTML = `
+                    <div class="stranger-avatar-wrapper">
+                        <div class="stranger-avatar">
+                            ${player.avatar}
+                        </div>
+                        <div class="distance-indicator">${player.distance}</div>
+                        <div class="online-indicator"></div>
+                    </div>
+                    <div class="stranger-name-small">${player.name}</div>
+                `;
+                strangersTrack.appendChild(playerElement);
+            });
+
+            // Reset slide position
+            appState.strangersSlideIndex = 0;
+            updateStrangersCarouselPosition();
+        }
+
+        // Select player from carousel
+        function selectPlayerFromCarousel(playerId) {
+            const player = appState.nearbyStrangers.find(s => s.id === playerId);
+            if (player) {
+                showMessage(`🎮 Say hi to ${player.name} (${player.distance} away)!`, 'info');
+            }
+        }
+
+        // Update players count
+        function updatePlayersCount() {
+            document.getElementById('strangersOnlineCount').textContent = appState.nearbyStrangers.length;
+        }
+
+        // Refresh nearby players
+        function refreshNearbyPlayers() {
+            showMessage('🔄 Refreshing nearby players...', 'info');
+            
+            // Simulate refreshing by shuffling the array
+            appState.nearbyStrangers = appState.nearbyStrangers.sort(() => Math.random() - 0.5);
+            
+            // Update distances slightly
+            appState.nearbyStrangers.forEach(player => {
+                const currentDistance = parseFloat(player.distance);
+                const newDistance = (currentDistance + (Math.random() - 0.5) * 0.5).toFixed(1);
+                player.distance = Math.max(0.1, Math.min(3.0, newDistance)) + 'km';
+            });
+            
+            renderNearbyPlayers();
+            updatePlayersCount();
+            
+            setTimeout(() => {
+                showMessage('✅ Found new players nearby!', 'success');
+            }, 1000);
+        }
+
+        // Enhanced social connection functions
+        function connectSocial(platform) {
+            const socialItem = event.target.closest('.social-connect-item');
+            socialItem.classList.add('connecting');
+            
+            const platformNames = {
+                'facebook': 'Facebook',
+                'instagram': 'Instagram', 
+                'tiktok': 'TikTok',
+                'whatsapp': 'WhatsApp',
+                'telegram': 'Telegram',
+                'discord': 'Discord'
+            };
+            
+            const platformName = platformNames[platform];
+            showMessage(`🔗 Connecting to ${platformName}...`, 'info');
+            
+            // Simulate connection process
+            setTimeout(() => {
+                socialItem.classList.remove('connecting');
+                
+                // Simulate finding friends
+                const friendsFound = Math.floor(Math.random() * 8) + 3; // 3-10 friends
+                
+                setTimeout(() => {
+                    appState.user.tokens += 20; // Reward for connecting
+                    updateUserStats();
+                    showMessage(`🎉 Found ${friendsFound} friends on ${platformName}! +20 tokens`, 'success');
+                    
+                    // Add some of them to friends list
+                    const newFriends = [
+                        { id: 'social_1', name: 'Sarah Connect', avatar: '🌸', status: `Online via ${platformName}`, online: true },
+                        { id: 'social_2', name: 'Mike Social', avatar: '🤘', status: `Online via ${platformName}`, online: true }
+                    ];
+                    
+                    // Add to friends list
+                    newFriends.forEach(friend => {
+                        if (!appState.friends.find(f => f.id === friend.id)) {
+                            appState.friends.push(friend);
+                        }
+                    });
+                    
+                    renderFriendsCarousel();
+                    renderFriends();
+                    updateFriendsCounts();
+                    
+                    hideModal('addFriendModal');
+                }, 1500);
+            }, 2000);
+        }
+
+        // Manual friend addition
+        function addFriendManually() {
+            const email = document.getElementById('friendEmail').value;
+            if (email && email.trim()) {
+                showMessage(`📤 Friend request sent to ${email}!`, 'success');
+                
+                // Simulate friend accepting
+                setTimeout(() => {
+                    const newFriend = {
+                        id: 'manual_' + Date.now(),
+                        name: email.split('@')[0] || 'New Friend',
+                        avatar: '👤',
+                        status: 'Online • Just joined',
+                        online: true
+                    };
+                    
+                    appState.friends.push(newFriend);
+                    appState.user.tokens += 30;
+                    updateUserStats();
+                    renderFriendsCarousel();
+                    renderFriends();
+                    updateFriendsCounts();
+                    
+                    showMessage(`🎉 ${newFriend.name} accepted your friend request! +30 tokens`, 'success');
+                }, 3000);
+                
+                hideModal('addFriendModal');
+                document.getElementById('friendEmail').value = '';
+            } else {
+                showMessage('❌ Please enter a valid email or username!', 'error');
+            }
+        }
+
+        // Legacy function for backward compatibility
+        function addFriend() {
+            addFriendManually();
+        }
+
+        // Legacy function names updated
+        function renderNearbyStrangers() {
+            renderNearbyPlayers();
+        }
+
+        function updateStrangersCount() {
+            updatePlayersCount();
+        }
+
+        function refreshNearbyStrangers() {
+            refreshNearbyPlayers();
+        }
+
+        function selectStrangerFromCarousel(playerId) {
+            selectPlayerFromCarousel(playerId);
         }
 
         // Show welcome message
