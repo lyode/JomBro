@@ -1961,7 +1961,21 @@
                     visibleToNearby: true,
                     autoAcceptChallenges: false,
                     pushNotifications: true
-                }
+                },
+                profilePictures: {
+                    main: null,
+                    background: null,
+                    business: null
+                },
+                gallery: Array(10).fill(null),
+                videos: Array(3).fill(null),
+                socialLinks: {
+                    instagram: { connected: false, url: '' },
+                    tiktok: { connected: false, url: '' },
+                    youtube: { connected: false, url: '' },
+                    website: { connected: false, url: '' }
+                },
+                businessType: null
             },
             friends: [
                 { id: 'f1', name: 'Alex Fitness', avatar: '💪', status: 'Online • Completing workout', online: true },
@@ -2000,7 +2014,9 @@
             strangersSlideIndex: 0,
             showingAllFriends: false,
             showingOnlineOnly: false,
-            isHiddenFromNearby: false
+            isHiddenFromNearby: false,
+            challengeHistory: [],
+            unreadNotifications: 3
         };
 
         // AI Challenge Templates
@@ -2129,6 +2145,23 @@
             updateFriendsCounts();
             updateStrangersCount();
             startAIChallengeGenerator();
+            startRandomEvents();
+            showWelcomeMessage();
+        }
+
+        // Show welcome message
+        function showWelcomeMessage() {
+            setTimeout(() => {
+                showMessage('🎉 Welcome to JomBro! All features are now active. Start exploring!', 'success');
+            }, 1000);
+            
+            setTimeout(() => {
+                showMessage('💡 Tip: Click on your avatar to access your profile!', 'info');
+            }, 3000);
+            
+            setTimeout(() => {
+                showMessage('🚀 AI challenges will start appearing soon. Get ready!', 'info');
+            }, 5000);
         }
 
         // Open profile when user avatar is clicked
@@ -2173,35 +2206,96 @@
 
         // Picture upload functions
         function uploadProfilePicture() {
-            showMessage('📷 Profile picture upload coming soon!', 'info');
+            const emojis = ['📸', '🌟', '💫', '✨', '🎯', '🚀', '💎', '🏆'];
+            const randomEmoji = emojis[Math.floor(Math.random() * emojis.length)];
+            
+            const slot = document.querySelector('.main-picture .picture-placeholder');
+            slot.innerHTML = `
+                <div class="upload-icon" style="font-size: 3rem">${randomEmoji}</div>
+                <div class="upload-text">Profile Picture Uploaded!</div>
+            `;
+            slot.parentElement.style.background = 'rgba(155, 89, 182, 0.2)';
+            slot.parentElement.style.borderColor = 'rgba(155, 89, 182, 0.6)';
+            
+            appState.user.profilePictures.main = randomEmoji;
+            showMessage('📷 Profile picture uploaded successfully!', 'success');
         }
 
         function uploadBackgroundPicture() {
-            showMessage('🌄 Background picture upload coming soon!', 'info');
+            const backgrounds = ['🌄', '🌅', '🏞️', '🌊', '🌸', '🌺', '🌙', '⭐'];
+            const randomBg = backgrounds[Math.floor(Math.random() * backgrounds.length)];
+            
+            const slots = document.querySelectorAll('.picture-slot');
+            const bgSlot = slots[1]; // Second slot is background
+            bgSlot.innerHTML = `
+                <div class="picture-placeholder">
+                    <div class="upload-icon" style="font-size: 2rem">${randomBg}</div>
+                    <div class="upload-text">Background Set!</div>
+                </div>
+            `;
+            bgSlot.style.background = 'rgba(155, 89, 182, 0.2)';
+            bgSlot.style.borderColor = 'rgba(155, 89, 182, 0.6)';
+            
+            appState.user.profilePictures.background = randomBg;
+            showMessage('🌄 Background picture uploaded successfully!', 'success');
         }
 
         function uploadBusinessPicture() {
-            showMessage('🏢 Business picture upload coming soon!', 'info');
+            const business = ['🏢', '💼', '🏪', '🛍️', '🎯', '📊', '💰', '🌟'];
+            const randomBiz = business[Math.floor(Math.random() * business.length)];
+            
+            const slots = document.querySelectorAll('.picture-slot');
+            const bizSlot = slots[2]; // Third slot is business
+            bizSlot.innerHTML = `
+                <div class="picture-placeholder">
+                    <div class="upload-icon" style="font-size: 2rem">${randomBiz}</div>
+                    <div class="upload-text">Business Logo!</div>
+                </div>
+            `;
+            bizSlot.style.background = 'rgba(155, 89, 182, 0.2)';
+            bizSlot.style.borderColor = 'rgba(155, 89, 182, 0.6)';
+            
+            appState.user.profilePictures.business = randomBiz;
+            showMessage('🏢 Business picture uploaded successfully!', 'success');
         }
 
         function uploadGalleryImage(index) {
+            const images = ['🎨', '🏔️', '🌸', '🐾', '🍕', '🎪', '🎭', '🎪', '🎨', '🌈'];
+            const randomImage = images[Math.floor(Math.random() * images.length)];
+            
             const slot = document.querySelectorAll('.gallery-slot')[index];
             slot.classList.add('filled');
-            slot.innerHTML = '📸';
-            showMessage(`🖼️ Gallery image ${index + 1} uploaded!`, 'success');
+            slot.innerHTML = randomImage;
+            slot.style.fontSize = '1.5rem';
+            
+            appState.user.gallery[index] = randomImage;
+            showMessage(`🖼️ Gallery image ${index + 1} uploaded successfully!`, 'success');
+            
+            // Add some tokens as reward
+            appState.user.tokens += 10;
+            updateUserStats();
         }
 
         function uploadVideo(index) {
+            const videos = ['🎬', '🎥', '📹', '🎪', '🎭', '🎨', '🎵', '🎤'];
+            const randomVideo = videos[Math.floor(Math.random() * videos.length)];
+            
             const slot = document.querySelectorAll('.video-slot')[index];
             slot.style.background = 'rgba(155, 89, 182, 0.2)';
-            slot.style.borderColor = 'rgba(155, 89, 182, 0.5)';
+            slot.style.borderColor = 'rgba(155, 89, 182, 0.6)';
             slot.innerHTML = `
                 <div class="video-placeholder">
-                    <div class="video-icon">🎥</div>
-                    <div class="video-text">Video ${index + 1} Uploaded</div>
+                    <div class="video-icon" style="font-size: 2.5rem">${randomVideo}</div>
+                    <div class="video-text">Video ${index + 1} Ready!</div>
                 </div>
             `;
-            showMessage(`🎬 Video ${index + 1} uploaded!`, 'success');
+            
+            appState.user.videos[index] = randomVideo;
+            showMessage(`🎬 Video ${index + 1} uploaded successfully!`, 'success');
+            
+            // Add tokens as reward
+            appState.user.tokens += 25;
+            updateUserStats();
         }
 
         // Social media functions
@@ -2217,10 +2311,27 @@
             const item = socialItems[platformMap[platform]];
             item.classList.add('connected');
             const status = item.querySelector('.social-status');
-            status.textContent = 'Connected';
+            status.textContent = 'Connected ✓';
             status.classList.add('connected');
             
-            showMessage(`🔗 ${platform.charAt(0).toUpperCase() + platform.slice(1)} connected!`, 'success');
+            // Generate fake URLs
+            const urls = {
+                'instagram': '@' + appState.user.name.replace(' ', '').toLowerCase(),
+                'tiktok': '@' + appState.user.name.replace(' ', '').toLowerCase() + '_official',
+                'youtube': 'youtube.com/c/' + appState.user.name.replace(' ', ''),
+                'website': 'www.' + appState.user.name.replace(' ', '').toLowerCase() + '.com'
+            };
+            
+            appState.user.socialLinks[platform] = { 
+                connected: true, 
+                url: urls[platform] 
+            };
+            
+            showMessage(`🔗 ${platform.charAt(0).toUpperCase() + platform.slice(1)} connected: ${urls[platform]}`, 'success');
+            
+            // Add tokens as reward
+            appState.user.tokens += 50;
+            updateUserStats();
         }
 
         // Business platform functions
@@ -2244,7 +2355,57 @@
             const item = businessItems[typeMap[type]];
             item.classList.add('selected');
             
-            showMessage(`🏢 Business type set to ${type.charAt(0).toUpperCase() + type.slice(1)}!`, 'success');
+            appState.user.businessType = type;
+            showMessage(`🏢 Business type set to ${type.charAt(0).toUpperCase() + type.slice(1)}! You're now discoverable by customers.`, 'success');
+            
+            // Add tokens as reward
+            appState.user.tokens += 100;
+            updateUserStats();
+        }
+
+        // Enhanced profile functions
+        function editProfile() {
+            const newName = prompt('Enter your new name:', appState.user.name);
+            if (newName && newName.trim()) {
+                appState.user.name = newName.trim();
+                document.getElementById('userName').textContent = appState.user.name;
+                document.getElementById('profileName').textContent = appState.user.name;
+                showMessage('👤 Profile name updated successfully!', 'success');
+            }
+        }
+
+        function shareProfile() {
+            const shareText = `Check out my JomBro profile! 🌟\n\nName: ${appState.user.name}\nLevel: ${appState.user.level}\nChallenges Completed: ${appState.user.challengesCompleted}\nStreak: ${appState.user.streak} days\n\nJoin me on JomBro - Come-on bro, Let's go! 🚀`;
+            
+            if (navigator.share) {
+                navigator.share({
+                    title: 'JomBro Profile',
+                    text: shareText,
+                    url: window.location.href
+                });
+            } else {
+                // Fallback for browsers that don't support native sharing
+                navigator.clipboard.writeText(shareText).then(() => {
+                    showMessage('📋 Profile link copied to clipboard!', 'success');
+                }).catch(() => {
+                    showMessage('📤 Profile shared successfully!', 'success');
+                });
+            }
+        }
+
+        function viewAchievements() {
+            const achievements = [
+                '🏆 First Challenge Completed',
+                '🔥 Week Streak Master',
+                '👥 Social Butterfly',
+                '💪 Fitness Enthusiast',
+                '🎨 Creative Mind',
+                '🌟 Rising Star',
+                '🚀 Challenge Creator',
+                '🤝 Community Helper'
+            ];
+            
+            showMessage(`🏆 Your Achievements:\n${achievements.join('\n')}`, 'success');
         }
 
         // Render profile section
@@ -2689,20 +2850,197 @@
             }, 15000);
         }
 
-        // Accept AI challenge
+        // Accept AI challenge with auto-accept support
         function acceptAIChallenge() {
             const notification = document.getElementById('aiNotification');
             const tokensEarned = parseInt(document.getElementById('aiTokens').textContent);
             
             appState.user.tokens += tokensEarned;
+            appState.user.challengesCompleted += 1;
+            
+            // Random chance to increase streak
+            if (Math.random() > 0.5) {
+                appState.user.streak += 1;
+            }
+            
+            // Add to challenge history
+            const challengeTitle = document.getElementById('aiChallengeTitle').textContent;
+            appState.challengeHistory.push({
+                title: challengeTitle,
+                tokens: tokensEarned,
+                completed: new Date().toISOString(),
+                status: 'completed'
+            });
+            
             updateUserStats();
+            renderProfile();
             
             notification.classList.add('hide');
             setTimeout(() => {
                 notification.style.display = 'none';
             }, 500);
 
-            showMessage(`🎉 Challenge accepted! You earned ${tokensEarned} tokens!`, 'success');
+            showMessage(`🎉 Challenge completed! You earned ${tokensEarned} tokens! 🚀`, 'success');
+        }
+
+        // Enhanced challenge friend with rewards
+        function challengeFriend(friendId) {
+            const friend = appState.friends.find(f => f.id === friendId);
+            if (friend) {
+                if (appState.user.tokens < 50) {
+                    showMessage('❌ Not enough tokens! You need 50 tokens to send a challenge.', 'error');
+                    return;
+                }
+                
+                appState.user.tokens -= 50;
+                updateUserStats();
+                
+                // Simulate friend accepting challenge
+                setTimeout(() => {
+                    appState.user.tokens += 75; // Reward for successful challenge
+                    updateUserStats();
+                    showMessage(`🎯 ${friend.name} accepted your challenge! You earned 75 tokens!`, 'success');
+                }, 3000);
+                
+                showMessage(`🎯 Challenge sent to ${friend.name}! Cost: 50 tokens`, 'success');
+            }
+        }
+
+        // Enhanced wave function with rewards
+        function sendWaveToNearby() {
+            if (appState.user.tokens < 10) {
+                showMessage('❌ Not enough tokens! You need 10 tokens to send a wave.', 'error');
+                return;
+            }
+            
+            appState.user.tokens -= 10;
+            updateUserStats();
+            
+            const randomStranger = appState.nearbyStrangers[Math.floor(Math.random() * appState.nearbyStrangers.length)];
+            
+            // Simulate stranger responding positively
+            setTimeout(() => {
+                appState.user.tokens += 20; // Reward for social interaction
+                updateUserStats();
+                showMessage(`👋 ${randomStranger.name} waved back! You earned 20 tokens for being social!`, 'success');
+            }, 2000);
+            
+            showMessage(`👋 Wave sent to ${randomStranger.name}! Cost: 10 tokens`, 'success');
+        }
+
+        // Enhanced group toggle with rewards
+        function toggleGroup(groupId) {
+            const group = appState.groups.find(g => g.id === groupId);
+            if (group) {
+                if (!group.joined) {
+                    // Joining a group
+                    group.joined = true;
+                    appState.user.tokens += 30; // Reward for joining
+                    updateUserStats();
+                    showMessage(`🏠 Joined ${group.name}! You earned 30 tokens for joining the community!`, 'success');
+                } else {
+                    // Leaving a group
+                    group.joined = false;
+                    showMessage(`👋 Left ${group.name}`, 'info');
+                }
+                renderGroups();
+            }
+        }
+
+        // Auto-accept AI challenges if enabled
+        function handleAutoAcceptChallenge() {
+            if (appState.user.settings.autoAcceptChallenges) {
+                setTimeout(() => {
+                    acceptAIChallenge();
+                }, 2000); // Auto-accept after 2 seconds
+            }
+        }
+
+        // Enhanced AI notification with auto-accept
+        function showAINotification(challenge) {
+            const notification = document.getElementById('aiNotification');
+            
+            document.getElementById('aiChallengeTitle').textContent = challenge.title;
+            document.getElementById('aiChallengeDescription').textContent = challenge.description;
+            document.getElementById('aiTokens').textContent = challenge.tokens;
+            document.getElementById('aiDifficulty').textContent = challenge.difficulty.charAt(0).toUpperCase() + challenge.difficulty.slice(1);
+            document.getElementById('aiDuration').textContent = challenge.duration;
+
+            notification.style.display = 'block';
+            notification.classList.remove('hide');
+
+            // Check for auto-accept
+            if (appState.user.settings.autoAcceptChallenges) {
+                handleAutoAcceptChallenge();
+            } else {
+                // Auto-dismiss after 15 seconds if not auto-accepted
+                setTimeout(() => {
+                    if (notification.style.display === 'block') {
+                        dismissAIChallenge();
+                    }
+                }, 15000);
+            }
+        }
+
+        // Add random events to keep the app lively
+        function startRandomEvents() {
+            setInterval(() => {
+                const events = [
+                    () => {
+                        appState.user.tokens += 5;
+                        updateUserStats();
+                        showMessage('🎁 Daily login bonus! +5 tokens', 'success');
+                    },
+                    () => {
+                        const friend = appState.friends[Math.floor(Math.random() * appState.friends.length)];
+                        showMessage(`💬 ${friend.name} says: "Great job on your challenges!"`, 'info');
+                    },
+                    () => {
+                        if (appState.user.streak > 0) {
+                            appState.user.tokens += appState.user.streak * 2;
+                            updateUserStats();
+                            showMessage(`🔥 Streak bonus! +${appState.user.streak * 2} tokens for ${appState.user.streak} day streak!`, 'success');
+                        }
+                    },
+                    () => {
+                        showMessage('🌟 New challenges available! Check them out!', 'info');
+                    }
+                ];
+                
+                // Random event every 45 seconds
+                const randomEvent = events[Math.floor(Math.random() * events.length)];
+                randomEvent();
+            }, 45000);
+        }
+
+        // Enhanced create challenge with better rewards
+        function createPersonalChallenge() {
+            const title = document.getElementById('challengeTitle').value;
+            const description = document.getElementById('challengeDescription').value;
+            const tokens = parseInt(document.getElementById('challengeTokens').value) || 100;
+
+            if (!title || !description) {
+                showMessage('❌ Please fill in all required fields!', 'error');
+                return;
+            }
+
+            if (appState.user.tokens < 100) {
+                showMessage('❌ Not enough tokens! You need 100 tokens to create a challenge.', 'error');
+                return;
+            }
+
+            appState.user.tokens -= 100;
+            
+            // Reward for creativity
+            setTimeout(() => {
+                appState.user.tokens += 150;
+                updateUserStats();
+                showMessage(`🎨 Your challenge "${title}" is popular! You earned 150 tokens!`, 'success');
+            }, 5000);
+            
+            updateUserStats();
+            showMessage(`✨ Personal challenge "${title}" created! Cost: 100 tokens`, 'success');
+            clearChallengeForm();
         }
 
         // Dismiss AI challenge
