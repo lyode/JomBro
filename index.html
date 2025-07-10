@@ -1741,10 +1741,30 @@
     <!-- Modal Container -->
     <div id="modalContainer"></div>
 
+    <!-- Firebase Scripts - Latest Version -->
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
+
     <script>
-        console.log('🚀 JomBro Enhanced - Transparent UI Version');
+        console.log('🚀 JomBro Enhanced - Transparent UI Version with Firebase Auth');
         
+        // Firebase Configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyC_orriRUuf1ynDiFaJAPrO6-Gu3GeURxQ",
+            authDomain: "jombro-9d129.firebaseapp.com",
+            databaseURL: "https://jombro-9d129-default-rtdb.firebaseio.com",
+            projectId: "jombro-9d129",
+            storageBucket: "jombro-9d129.firebasestorage.app",
+            messagingSenderId: "390572076435",
+            appId: "1:390572076435:web:2a90027c66dc34d9834c66",
+            measurementId: "G-YPQ5R5GLP8"
+        };
+
         // Global State
+        let firebaseApp = null;
+        let firebaseAuth = null;
+        let firebaseDb = null;
         let currentUser = null;
         let isSignUpMode = true;
         let isInitialized = false;
@@ -1768,7 +1788,36 @@
             xp: 0,
             gems: 0,
             energy: 100,
-            dailyRewards: 0
+            dailyRewards: 0,
+            badge: '🎮'
+        };
+
+        // Premium Founder Accounts
+        const founderAccounts = {
+            'stonne@jombro.com': {
+                password: 'stonne123',
+                displayName: 'Stonne',
+                level: 10,
+                tokens: 500000,
+                streak: 365,
+                accountType: 'founder',
+                badge: '👑',
+                achievements: ['first_challenge', 'token_collector', 'streak_master', 'social_butterfly', 'fitness_guru', 'mind_master', 'creative_genius', 'level_up'],
+                specialPerks: ['unlimited_challenges', 'exclusive_content', 'priority_support', 'custom_themes'],
+                joinDate: '2024-01-01'
+            },
+            'creator@jombro.com': {
+                password: 'creator123',
+                displayName: 'Pepp',
+                level: 15,
+                tokens: 1000000,
+                streak: 500,
+                accountType: 'master',
+                badge: '🎯',
+                achievements: ['first_challenge', 'token_collector', 'streak_master', 'social_butterfly', 'fitness_guru', 'mind_master', 'creative_genius', 'level_up'],
+                specialPerks: ['admin_access', 'unlimited_challenges', 'exclusive_content', 'priority_support', 'custom_themes', 'challenge_creator'],
+                joinDate: '2023-12-01'
+            }
         };
 
         // Demo data
@@ -1798,6 +1847,239 @@
                 { name: 'Music Practice', description: 'Practice an instrument or sing', tokens: 250, difficulty: 'Medium', time: '30min' }
             ]
         };
+
+        // Firebase Initialization
+        function initializeFirebase() {
+            try {
+                firebaseApp = firebase.initializeApp(firebaseConfig);
+                firebaseAuth = firebase.auth();
+                firebaseDb = firebase.database();
+                
+                updateConnectionStatus('connected', 'Connected to Firebase');
+                console.log('✅ Firebase initialized successfully');
+                
+                // Listen for auth state changes
+                firebaseAuth.onAuthStateChanged((user) => {
+                    if (user) {
+                        currentUser = user;
+                        console.log('👤 User signed in:', user.email);
+                        
+                        // Update display name
+                        const userDisplayName = document.getElementById('userDisplayName');
+                        if (userDisplayName) {
+                            userDisplayName.textContent = `Welcome, ${user.displayName || getDisplayNameFromEmail(user.email)}!`;
+                        }
+                        
+                        // Load user data and show main app
+                        loadUserData(user);
+                        showMainApp();
+                        initializeAppFeatures();
+                    } else {
+                        currentUser = null;
+                        console.log('👤 User signed out');
+                        showAuthScreen();
+                    }
+                });
+                
+            } catch (error) {
+                console.error('❌ Firebase initialization failed:', error);
+                updateConnectionStatus('disconnected', 'Connection failed');
+                showMessage('Failed to connect to Firebase. Please refresh the page.', 'error');
+            }
+        }
+
+        // Authentication Functions
+        async function handleAuth(email, password, isSignUp) {
+            try {
+                updateConnectionStatus('connecting', 'Authenticating...');
+                
+                // Check for founder accounts first
+                if (founderAccounts[email] && founderAccounts[email].password === password) {
+                    const founderData = founderAccounts[email];
+                    console.log('🏆 Founder account detected:', founderData.displayName);
+                    
+                    // Apply founder stats
+                    userStats = {
+                        ...userStats,
+                        ...founderData,
+                        accountType: founderData.accountType,
+                        badge: founderData.badge
+                    };
+                    
+                    // Create/sign in founder account
+                    let userCredential;
+                    if (isSignUp) {
+                        userCredential = await firebaseAuth.createUserWithEmailAndPassword(email, password);
+                        await userCredential.user.updateProfile({
+                            displayName: founderData.displayName
+                        });
+                    } else {
+                        userCredential = await firebaseAuth.signInWithEmailAndPassword(email, password);
+                    }
+                    
+                    showMessage(`🎉 Welcome ${founderData.displayName}! ${founderData.accountType === 'founder' ? 'Founder' : 'Master'} account activated!`, 'success');
+                    return;
+                }
+                
+                // Regular authentication
+                let userCredential;
+                if (isSignUp) {
+                    userCredential = await firebaseAuth.createUserWithEmailAndPassword(email, password);
+                    
+                    // Set display name for new users
+                    const displayName = getDisplayNameFromEmail(email);
+                    await userCredential.user.updateProfile({
+                        displayName: displayName
+                    });
+                    
+                    showMessage(`🎉 Account created successfully! Welcome ${displayName}!`, 'success');
+                } else {
+                    userCredential = await firebaseAuth.signInWithEmailAndPassword(email, password);
+                    showMessage(`👋 Welcome back, ${userCredential.user.displayName || getDisplayNameFromEmail(email)}!`, 'success');
+                }
+                
+            } catch (error) {
+                console.error('❌ Authentication error:', error);
+                updateConnectionStatus('disconnected', 'Authentication failed');
+                
+                let errorMessage = 'Authentication failed. Please try again.';
+                
+                switch (error.code) {
+                    case 'auth/user-not-found':
+                        errorMessage = 'No account found with this email. Please sign up first.';
+                        break;
+                    case 'auth/wrong-password':
+                        errorMessage = 'Incorrect password. Please try again.';
+                        break;
+                    case 'auth/email-already-in-use':
+                        errorMessage = 'An account with this email already exists. Please sign in instead.';
+                        break;
+                    case 'auth/weak-password':
+                        errorMessage = 'Password should be at least 6 characters long.';
+                        break;
+                    case 'auth/invalid-email':
+                        errorMessage = 'Please enter a valid email address.';
+                        break;
+                    case 'auth/too-many-requests':
+                        errorMessage = 'Too many failed attempts. Please try again later.';
+                        break;
+                }
+                
+                showMessage(errorMessage, 'error');
+            }
+        }
+
+        function loadUserData(user) {
+            if (!firebaseDb || !user.uid) return;
+            
+            firebaseDb.ref(`users/${user.uid}/stats`).once('value')
+                .then((snapshot) => {
+                    if (snapshot.exists()) {
+                        userStats = { ...userStats, ...snapshot.val() };
+                    } else {
+                        firebaseDb.ref(`users/${user.uid}/stats`).set(userStats);
+                    }
+                    updateUserStatsDisplay();
+                })
+                .catch((error) => {
+                    console.warn('⚠️ Failed to load user stats:', error);
+                });
+        }
+
+        function getDisplayNameFromEmail(email) {
+            const username = email.split('@')[0];
+            return username.charAt(0).toUpperCase() + username.slice(1);
+        }
+
+        function signOut() {
+            if (firebaseAuth) {
+                firebaseAuth.signOut().then(() => {
+                    showMessage('👋 See you later!', 'info');
+                }).catch((error) => {
+                    console.error('Sign out error:', error);
+                });
+            }
+        }
+
+        function showMainApp() {
+            const authScreen = document.getElementById('authScreen');
+            const mainApp = document.getElementById('mainApp');
+            const rightButtons = document.getElementById('rightOverlayButtons');
+            const topButtons = document.getElementById('topRightButtons');
+            
+            if (authScreen) authScreen.style.display = 'none';
+            if (mainApp) {
+                mainApp.classList.remove('hidden');
+                mainApp.style.display = 'flex';
+            }
+            if (rightButtons) rightButtons.classList.remove('hidden');
+            if (topButtons) topButtons.classList.remove('hidden');
+        }
+
+        function showAuthScreen() {
+            const authScreen = document.getElementById('authScreen');
+            const mainApp = document.getElementById('mainApp');
+            const rightButtons = document.getElementById('rightOverlayButtons');
+            const topButtons = document.getElementById('topRightButtons');
+            const onlineOverlay = document.getElementById('onlinePlayersOverlay');
+            
+            if (authScreen) authScreen.style.display = 'block';
+            if (mainApp) {
+                mainApp.style.display = 'none';
+                mainApp.classList.add('hidden');
+            }
+            if (rightButtons) rightButtons.classList.add('hidden');
+            if (topButtons) topButtons.classList.add('hidden');
+            if (onlineOverlay) onlineOverlay.classList.add('hidden');
+            
+            const authForm = document.getElementById('authForm');
+            if (authForm) authForm.reset();
+            
+            const passwordInput = document.getElementById('passwordInput');
+            const toggleIcon = document.getElementById('passwordToggleIcon');
+            if (passwordInput) passwordInput.type = 'password';
+            if (toggleIcon) toggleIcon.textContent = '👁️';
+        }
+
+        function initializeAppFeatures() {
+            generateDailyChallenges();
+            updateUserStatsDisplay();
+            
+            // Show premium banner for premium accounts
+            const premiumBanner = document.getElementById('premiumBanner');
+            const premiumStatus = document.getElementById('premiumStatus');
+            
+            if (premiumBanner && userStats.accountType !== 'standard') {
+                premiumBanner.style.display = 'block';
+                
+                if (premiumStatus) {
+                    const statusText = userStats.accountType === 'founder' ? 
+                        'Founder Benefits • Unlimited Challenges • Priority Support' :
+                        userStats.accountType === 'master' ? 
+                        'Master Access • Admin Tools • Challenge Creator • All Premium Features' :
+                        'Premium Features Unlocked';
+                    premiumStatus.textContent = statusText;
+                }
+            }
+        }
+
+        function updateConnectionStatus(status, message) {
+            const connectionStatus = document.getElementById('connectionStatus');
+            if (!connectionStatus) return;
+            
+            connectionStatus.className = `connection-status ${status}`;
+            
+            const icons = {
+                connecting: '🔄',
+                connected: '🔥',
+                disconnected: '❌'
+            };
+            
+            connectionStatus.innerHTML = `
+                <span>${icons[status] || '🔄'}</span>
+                <span>${message}</span>
+            `;
+        }
 
         // Utility Functions
         function showMessage(message, type = 'info', duration = 3000) {
@@ -2304,18 +2586,36 @@
         // Auth form handler
         document.getElementById('authForm').addEventListener('submit', function(e) {
             e.preventDefault();
+            
+            const emailInput = document.getElementById('emailInput');
+            const passwordInput = document.getElementById('passwordInput');
             const submitBtn = document.getElementById('submitBtn');
+            
+            const email = emailInput.value.trim();
+            const password = passwordInput.value;
+            
+            if (!email || !password) {
+                showMessage('Please fill in all fields', 'error');
+                return;
+            }
+            
+            if (password.length < 6) {
+                showMessage('Password must be at least 6 characters long', 'error');
+                return;
+            }
             
             submitBtn.classList.add('loading');
             
-            setTimeout(() => {
+            handleAuth(email, password, isSignUpMode).finally(() => {
                 submitBtn.classList.remove('loading');
-                initializeApp();
-            }, 2000);
+            });
         });
 
-        // Auto-start demo
-        setTimeout(initializeApp, 1000);
+        // Initialize Firebase on page load
+        window.addEventListener('load', () => {
+            console.log('🚀 JomBro Starting...');
+            initializeFirebase();
+        });
     </script>
 </body>
 </html>
