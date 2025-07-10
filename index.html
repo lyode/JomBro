@@ -2369,6 +2369,9 @@
                         <div class="stat-label">Friends</div>
                     </div>
                 </div>
+                <button class="logout-btn" onclick="logoutUser()" id="logoutBtn" style="display: none;">
+                    Logout
+                </button>
             </div>
         </div>
 
@@ -2808,7 +2811,52 @@
         </div>
     </div>
 
-    <!-- Add Friend Modal -->
+    <!-- Auth Modal -->
+    <div class="modal" id="authModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-title">🎮 Welcome to JomBro</div>
+            </div>
+            
+            <div class="auth-tabs">
+                <div class="auth-tab active" onclick="switchAuthTab('login')">Login</div>
+                <div class="auth-tab" onclick="switchAuthTab('signup')">Sign Up</div>
+            </div>
+            
+            <div class="auth-form" id="loginForm">
+                <div class="form-group">
+                    <input type="email" class="form-input" id="loginEmail" placeholder="Email address">
+                </div>
+                <div class="form-group">
+                    <input type="password" class="form-input" id="loginPassword" placeholder="Password">
+                </div>
+                <button class="btn btn-primary" onclick="loginUser()">
+                    <span>🚀</span>
+                    <span>Login to JomBro</span>
+                </button>
+            </div>
+            
+            <div class="auth-form" id="signupForm" style="display: none;">
+                <div class="form-group">
+                    <input type="text" class="form-input" id="signupName" placeholder="Your awesome username">
+                </div>
+                <div class="form-group">
+                    <input type="email" class="form-input" id="signupEmail" placeholder="Email address">
+                </div>
+                <div class="form-group">
+                    <input type="password" class="form-input" id="signupPassword" placeholder="Create password (min 6 chars)">
+                </div>
+                <button class="btn btn-primary" onclick="signupUser()">
+                    <span>✨</span>
+                    <span>Join JomBro</span>
+                </button>
+            </div>
+            
+            <div class="auth-footer">
+                <p>Join the adventure and challenge your friends!</p>
+            </div>
+        </div>
+    </div>
     <div class="modal" id="addFriendModal">
         <div class="modal-content">
             <div class="modal-header">
@@ -3149,6 +3197,13 @@
 
         // Initialize the application
         function init() {
+            // Don't start the app until user is authenticated
+            // initializeFirebase() will handle calling startApp()
+            initializeFirebase();
+        }
+
+        // Start the main app after authentication
+        function startApp() {
             createStarfield();
             renderProfile();
             renderGallery();
@@ -3165,6 +3220,211 @@
             startDisasterEvents();
             showWelcomeMessage();
         }
+
+        // Firebase Authentication Functions
+        function initializeFirebase() {
+            // Check if Firebase is loaded
+            if (typeof window.auth === 'undefined') {
+                setTimeout(initializeFirebase, 100);
+                return;
+            }
+
+            // Monitor authentication state
+            window.onAuthStateChanged(window.auth, (user) => {
+                if (user) {
+                    // User is signed in
+                    loadUserData(user);
+                    hideModal('authModal');
+                    document.getElementById('logoutBtn').style.display = 'block';
+                    startApp();
+                } else {
+                    // User is signed out
+                    showModal('authModal');
+                    document.getElementById('logoutBtn').style.display = 'none';
+                }
+            });
+        }
+
+        // Authentication functions
+        function switchAuthTab(tab) {
+            document.querySelectorAll('.auth-tab').forEach(t => t.classList.remove('active'));
+            document.querySelector(`[onclick="switchAuthTab('${tab}')"]`).classList.add('active');
+            
+            if (tab === 'login') {
+                document.getElementById('loginForm').style.display = 'flex';
+                document.getElementById('signupForm').style.display = 'none';
+            } else {
+                document.getElementById('loginForm').style.display = 'none';
+                document.getElementById('signupForm').style.display = 'flex';
+            }
+        }
+
+        async function loginUser() {
+            const email = document.getElementById('loginEmail').value;
+            const password = document.getElementById('loginPassword').value;
+            
+            if (!email || !password) {
+                showMessage('❌ Please fill in all fields!', 'error');
+                return;
+            }
+            
+            try {
+                const btn = event.target;
+                const originalText = btn.innerHTML;
+                btn.innerHTML = '<span class="loading-spinner"></span><span>Logging in...</span>';
+                btn.disabled = true;
+                
+                await window.signInWithEmailAndPassword(window.auth, email, password);
+                showMessage('🎉 Welcome back to JomBro!', 'success');
+                
+                // Clear form
+                document.getElementById('loginEmail').value = '';
+                document.getElementById('loginPassword').value = '';
+                
+            } catch (error) {
+                showMessage('❌ Login failed: ' + error.message, 'error');
+                
+                // Restore button
+                event.target.innerHTML = originalText;
+                event.target.disabled = false;
+            }
+        }
+
+        async function signupUser() {
+            const name = document.getElementById('signupName').value;
+            const email = document.getElementById('signupEmail').value;
+            const password = document.getElementById('signupPassword').value;
+            
+            if (!name || !email || !password) {
+                showMessage('❌ Please fill in all fields!', 'error');
+                return;
+            }
+            
+            if (password.length < 6) {
+                showMessage('❌ Password must be at least 6 characters!', 'error');
+                return;
+            }
+            
+            try {
+                const btn = event.target;
+                const originalText = btn.innerHTML;
+                btn.innerHTML = '<span class="loading-spinner"></span><span>Creating account...</span>';
+                btn.disabled = true;
+                
+                const userCredential = await window.createUserWithEmailAndPassword(window.auth, email, password);
+                
+                // Create user document in Firestore
+                await window.setDoc(window.doc(window.db, 'users', userCredential.user.uid), {
+                    name: name,
+                    email: email,
+                    tokens: 1000, // Starting tokens
+                    level: 1,
+                    challengesCompleted: 0,
+                    streak: 0,
+                    globalRank: 999,
+                    badges: 0,
+                    createdAt: new Date().toISOString(),
+                    lastActive: new Date().toISOString()
+                });
+                
+                showMessage('🎉 Welcome to JomBro! You got 1000 starting tokens!', 'success');
+                
+                // Clear form
+                document.getElementById('signupName').value = '';
+                document.getElementById('signupEmail').value = '';
+                document.getElementById('signupPassword').value = '';
+                
+            } catch (error) {
+                showMessage('❌ Signup failed: ' + error.message, 'error');
+                
+                // Restore button
+                event.target.innerHTML = originalText;
+                event.target.disabled = false;
+            }
+        }
+
+        async function loadUserData(user) {
+            try {
+                const docRef = window.doc(window.db, 'users', user.uid);
+                const docSnap = await window.getDoc(docRef);
+                
+                if (docSnap.exists()) {
+                    const userData = docSnap.data();
+                    appState.user = {
+                        ...appState.user,
+                        id: user.uid,
+                        name: userData.name || 'JomBro Player',
+                        email: userData.email,
+                        tokens: userData.tokens || 1000,
+                        level: userData.level || 1,
+                        challengesCompleted: userData.challengesCompleted || 0,
+                        streak: userData.streak || 0,
+                        globalRank: userData.globalRank || 999,
+                        badges: userData.badges || 0
+                    };
+                    
+                    // Update last active
+                    await window.updateDoc(docRef, {
+                        lastActive: new Date().toISOString()
+                    });
+                    
+                    updateUserStats();
+                    renderProfile();
+                }
+            } catch (error) {
+                console.error('Error loading user data:', error);
+                showMessage('⚠️ Error loading user data, using defaults', 'info');
+            }
+        }
+
+        async function saveUserData() {
+            if (window.auth?.currentUser) {
+                try {
+                    await window.updateDoc(window.doc(window.db, 'users', window.auth.currentUser.uid), {
+                        tokens: appState.user.tokens,
+                        level: appState.user.level,
+                        challengesCompleted: appState.user.challengesCompleted,
+                        streak: appState.user.streak,
+                        globalRank: appState.user.globalRank,
+                        badges: appState.user.badges,
+                        lastActive: new Date().toISOString()
+                    });
+                } catch (error) {
+                    console.error('Error saving user data:', error);
+                }
+            }
+        }
+
+        async function logoutUser() {
+            try {
+                await window.signOut(window.auth);
+                showMessage('👋 Logged out successfully!', 'info');
+                
+                // Reset app state
+                appState.user = {
+                    id: 'demo',
+                    name: 'Demo User',
+                    avatar: '🤗',
+                    tokens: 0,
+                    level: 1,
+                    friends: 0
+                };
+                
+            } catch (error) {
+                showMessage('❌ Logout failed: ' + error.message, 'error');
+            }
+        }
+
+        function showModal(modalId) {
+            document.getElementById(modalId).classList.add('show');
+        }
+
+        // Override updateUserStats to save data
+        const originalUpdateUserStats = updateUserStats;
+        updateUserStats = function() {
+            originalUpdateUserStats();
+            saveUserData(); // Save to Firebase whenever stats update
+        };
 
         // Render nearby players carousel
         function renderNearbyPlayers() {
@@ -4858,7 +5118,7 @@
 
         // Close modals when clicking outside
         window.addEventListener('click', (e) => {
-            if (e.target.classList.contains('modal')) {
+            if (e.target.classList.contains('modal') && e.target.id !== 'authModal') {
                 e.target.classList.remove('show');
             }
         });
@@ -4866,9 +5126,11 @@
         // Add keyboard support
         window.addEventListener('keydown', (e) => {
             if (e.key === 'Escape') {
-                // Close any open modals
+                // Close any open modals except auth modal
                 document.querySelectorAll('.modal').forEach(modal => {
-                    modal.classList.remove('show');
+                    if (modal.id !== 'authModal') {
+                        modal.classList.remove('show');
+                    }
                 });
                 
                 // Dismiss AI notification
@@ -4931,6 +5193,43 @@
                 window.scrollTo(0, 1);
             }, 100);
         });
+    </script>
+
+    <!-- Firebase SDK -->
+    <script type="module">
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
+        import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
+        import { getFirestore, doc, setDoc, getDoc, updateDoc } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
+
+        // Your Firebase configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyDAgSczYCYTXq21o10X7ccUzpGpkUU6ZoY",
+            authDomain: "jombro-14ddb.firebaseapp.com",
+            projectId: "jombro-14ddb",
+            storageBucket: "jombro-14ddb.firebasestorage.app",
+            messagingSenderId: "282248299120",
+            appId: "1:282248299120:web:1eea070f23d7e8db966ab5",
+            measurementId: "G-78BGMCGCVJ"
+        };
+
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+        
+        // Make Firebase available globally
+        window.auth = auth;
+        window.db = db;
+        window.createUserWithEmailAndPassword = createUserWithEmailAndPassword;
+        window.signInWithEmailAndPassword = signInWithEmailAndPassword;
+        window.signOut = signOut;
+        window.onAuthStateChanged = onAuthStateChanged;
+        window.doc = doc;
+        window.setDoc = setDoc;
+        window.getDoc = getDoc;
+        window.updateDoc = updateDoc;
+
+        console.log('🔥 Firebase initialized successfully!');
     </script>
 </body>
 </html>
