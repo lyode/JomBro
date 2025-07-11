@@ -119,12 +119,8 @@
         .logo {
             font-size: 1.5rem;
             font-weight: 100;
-            background: linear-gradient(45deg, #9b59b6, #e91e63, #3f51b5, #8e44ad);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-size: 300% 300%;
-            animation: gradient 4s ease infinite;
-            text-shadow: 0 0 20px rgba(155, 89, 182, 0.5);
+            color: white;
+            text-shadow: 0 0 20px rgba(255, 255, 255, 0.3);
             letter-spacing: 2px;
         }
 
@@ -234,7 +230,109 @@
             text-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
         }
 
-        /* Nearby Players Section - Same styling as Friends */
+        /* Detection Range Section */
+        .detection-range-section {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            padding: 15px;
+            margin-bottom: 20px;
+            border: 1px solid rgba(63, 81, 181, 0.2);
+        }
+
+        .range-header {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 12px;
+            font-size: 0.95rem;
+            font-weight: 600;
+            color: rgba(63, 81, 181, 0.9);
+        }
+
+        .range-options {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .range-presets {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 8px;
+        }
+
+        .range-btn {
+            padding: 10px 12px;
+            border: 1px solid rgba(63, 81, 181, 0.3);
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.05);
+            color: white;
+            font-size: 0.9rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+        }
+
+        .range-btn:hover {
+            background: rgba(63, 81, 181, 0.2);
+            border-color: rgba(63, 81, 181, 0.5);
+            transform: translateY(-1px);
+        }
+
+        .range-btn.active {
+            background: rgba(63, 81, 181, 0.4);
+            border-color: #3f51b5;
+            box-shadow: 0 0 10px rgba(63, 81, 181, 0.3);
+            color: white;
+            font-weight: bold;
+        }
+
+        .range-custom {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            justify-content: center;
+        }
+
+        .range-input {
+            width: 80px;
+            padding: 8px 10px;
+            border: 1px solid rgba(63, 81, 181, 0.3);
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.05);
+            color: white;
+            font-size: 0.9rem;
+            text-align: center;
+        }
+
+        .range-input:focus {
+            outline: none;
+            border-color: #3f51b5;
+            box-shadow: 0 0 0 2px rgba(63, 81, 181, 0.2);
+        }
+
+        .range-input::placeholder {
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        .range-unit {
+            font-size: 0.9rem;
+            color: rgba(255, 255, 255, 0.7);
+            font-weight: 500;
+        }
+
+        /* Mobile adjustments for range section */
+        @media (max-width: 480px) {
+            .range-presets {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .range-custom {
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+        }
         .strangers-section {
             margin-bottom: 15px;
         }
@@ -2112,7 +2210,28 @@
                 <div class="card-title">
                     <span>🎮</span>
                     <span>Nearby Players</span>
-                    <span style="font-size: 0.8rem; opacity: 0.7;">(3km)</span>
+                    <span style="font-size: 0.8rem; opacity: 0.7;" id="currentRange">(3km)</span>
+                </div>
+                
+                <!-- Detection Range Selector -->
+                <div class="detection-range-section">
+                    <div class="range-header">
+                        <span>📡</span>
+                        <span>Detection Range</span>
+                    </div>
+                    <div class="range-options">
+                        <div class="range-presets">
+                            <button class="range-btn" onclick="setDetectionRange(1)">1km</button>
+                            <button class="range-btn" onclick="setDetectionRange(3)" id="defaultRange">3km</button>
+                            <button class="range-btn" onclick="setDetectionRange(5)">5km</button>
+                            <button class="range-btn" onclick="setDetectionRange(10)">10km</button>
+                        </div>
+                        <div class="range-custom">
+                            <input type="number" class="range-input" id="customRange" placeholder="Custom" min="0.1" max="50" step="0.1">
+                            <span class="range-unit">km</span>
+                            <button class="btn btn-secondary btn-small" onclick="setCustomRange()">Set</button>
+                        </div>
+                    </div>
                 </div>
                 
                 <div class="strangers-section">
@@ -2506,7 +2625,8 @@
             selectedSurvivalTasks: [],
             currentChallenge: null,
             pendingSubmission: null,
-            currentDisaster: null
+            currentDisaster: null,
+            detectionRange: 3 // Default 3km detection range
         };
 
 
@@ -2677,6 +2797,7 @@
         function startApp() {
             createStarfield();
             initRealUserData();
+            initDetectionRange(); // Initialize detection range
             renderProfile();
             renderNearbyPlayers();
             renderFriendsCarousel();
@@ -2938,26 +3059,15 @@
         function refreshNearbyPlayers() {
             showMessage('🔄 Searching for nearby players...', 'info');
             
-            // Simulate finding real players (normally would come from server/database)
+            // Use current detection range to simulate finding players
             setTimeout(() => {
-                if (appState.nearbyStrangers.length === 0) {
-                    showMessage('😔 No players found nearby. Try again later or invite friends!', 'info');
-                } else {
-                    // Shuffle existing players and update distances
-                    appState.nearbyStrangers = appState.nearbyStrangers.sort(() => Math.random() - 0.5);
-                    
-                    // Update distances slightly
-                    appState.nearbyStrangers.forEach(player => {
-                        const currentDistance = parseFloat(player.distance);
-                        const newDistance = (currentDistance + (Math.random() - 0.5) * 0.5).toFixed(1);
-                        player.distance = Math.max(0.1, Math.min(3.0, newDistance)) + 'km';
-                    });
-                    
-                    showMessage(`✅ Found ${appState.nearbyStrangers.length} players nearby!`, 'success');
-                }
+                simulatePlayersInRange(appState.detectionRange);
                 
-                renderNearbyPlayers();
-                updatePlayersCount();
+                if (appState.nearbyStrangers.length === 0) {
+                    showMessage(`😔 No players found within ${appState.detectionRange}km. Try increasing your detection range!`, 'info');
+                } else {
+                    showMessage(`✅ Found ${appState.nearbyStrangers.length} players within ${appState.detectionRange}km!`, 'success');
+                }
             }, 1500);
         }
 
