@@ -8,6 +8,12 @@
     <meta name="apple-mobile-web-app-title" content="JomBro">
     <title>JomBro - Friends & AI Challenge Platform</title>
     
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-storage-compat.js"></script>
+    
     <style>
         * {
             margin: 0;
@@ -209,7 +215,7 @@
             margin-top: 2px;
         }
 
-        /* Mobile-First Layout */
+        /* Main Content */
         .main-content {
             display: flex;
             flex-direction: column;
@@ -228,567 +234,6 @@
             align-items: center;
             gap: 10px;
             text-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
-        }
-
-        /* Detection Range Section */
-        .detection-range-section {
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 12px;
-            padding: 15px;
-            margin-bottom: 20px;
-            border: 1px solid rgba(63, 81, 181, 0.2);
-        }
-
-        .range-header {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            margin-bottom: 12px;
-            font-size: 0.95rem;
-            font-weight: 600;
-            color: rgba(63, 81, 181, 0.9);
-        }
-
-        .range-options {
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-        }
-
-        .range-presets {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 8px;
-        }
-
-        .range-btn {
-            padding: 10px 12px;
-            border: 1px solid rgba(63, 81, 181, 0.3);
-            border-radius: 8px;
-            background: rgba(255, 255, 255, 0.05);
-            color: white;
-            font-size: 0.9rem;
-            font-weight: 500;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            text-align: center;
-        }
-
-        .range-btn:hover {
-            background: rgba(63, 81, 181, 0.2);
-            border-color: rgba(63, 81, 181, 0.5);
-            transform: translateY(-1px);
-        }
-
-        .range-btn.active {
-            background: rgba(63, 81, 181, 0.4);
-            border-color: #3f51b5;
-            box-shadow: 0 0 10px rgba(63, 81, 181, 0.3);
-            color: white;
-            font-weight: bold;
-        }
-
-        .range-custom {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            justify-content: center;
-        }
-
-        .range-input {
-            width: 80px;
-            padding: 8px 10px;
-            border: 1px solid rgba(63, 81, 181, 0.3);
-            border-radius: 8px;
-            background: rgba(255, 255, 255, 0.05);
-            color: white;
-            font-size: 0.9rem;
-            text-align: center;
-        }
-
-        .range-input:focus {
-            outline: none;
-            border-color: #3f51b5;
-            box-shadow: 0 0 0 2px rgba(63, 81, 181, 0.2);
-        }
-
-        .range-input::placeholder {
-            color: rgba(255, 255, 255, 0.6);
-        }
-
-        .range-unit {
-            font-size: 0.9rem;
-            color: rgba(255, 255, 255, 0.7);
-            font-weight: 500;
-        }
-
-        /* Strangers/Nearby Section */
-        .strangers-section {
-            margin-bottom: 15px;
-        }
-
-        .strangers-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 15px;
-            gap: 10px;
-        }
-
-        .strangers-count {
-            font-size: 0.9rem;
-            opacity: 0.9;
-            padding: 6px 12px;
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 15px;
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            flex-shrink: 0;
-        }
-
-        .strangers-carousel {
-            position: relative;
-            overflow: hidden;
-            margin-bottom: 15px;
-            padding: 10px 0;
-        }
-
-        .strangers-track {
-            display: flex;
-            gap: 15px;
-            transition: transform 0.3s ease;
-            padding: 5px 0;
-        }
-
-        .stranger-avatar-item {
-            flex: 0 0 auto;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            position: relative;
-        }
-
-        .stranger-avatar-item:hover {
-            transform: translateY(-5px);
-        }
-
-        .stranger-avatar-wrapper {
-            position: relative;
-            margin-bottom: 8px;
-        }
-
-        .stranger-avatar {
-            width: 50px;
-            height: 50px;
-            border-radius: 50%;
-            background: linear-gradient(45deg, #3f51b5, #8e44ad);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.3rem;
-            position: relative;
-            border: 3px solid rgba(63, 81, 181, 0.5);
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-        }
-
-        .stranger-avatar-item:hover .stranger-avatar {
-            border-color: rgba(63, 81, 181, 0.8);
-            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4), 0 0 15px rgba(63, 81, 181, 0.4);
-        }
-
-        .distance-indicator {
-            position: absolute;
-            top: -5px;
-            right: -5px;
-            background: rgba(63, 81, 181, 0.9);
-            color: white;
-            font-size: 0.7rem;
-            padding: 2px 6px;
-            border-radius: 10px;
-            font-weight: bold;
-        }
-
-        .stranger-name-small {
-            font-size: 0.8rem;
-            font-weight: 500;
-            text-align: center;
-            max-width: 60px;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
-            text-shadow: 0 0 5px rgba(255, 255, 255, 0.3);
-        }
-
-        .strangers-actions {
-            display: flex;
-            gap: 10px;
-            justify-content: center;
-            margin-bottom: 15px;
-            flex-wrap: wrap;
-        }
-
-        /* Friends Section */
-        .friends-section {
-            margin-bottom: 15px;
-        }
-
-        .friends-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 15px;
-            gap: 10px;
-        }
-
-        .friends-count {
-            font-size: 0.9rem;
-            opacity: 0.9;
-            padding: 6px 12px;
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 15px;
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            flex-shrink: 0;
-        }
-
-        .online-count {
-            color: #9b59b6;
-            font-weight: bold;
-            text-shadow: 0 0 8px rgba(155, 89, 182, 0.7);
-        }
-
-        .friends-carousel {
-            position: relative;
-            overflow: hidden;
-            margin-bottom: 15px;
-            padding: 10px 0;
-        }
-
-        .friends-track {
-            display: flex;
-            gap: 15px;
-            transition: transform 0.3s ease;
-            padding: 5px 0;
-        }
-
-        .friend-avatar-item {
-            flex: 0 0 auto;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-        .friend-avatar-item:hover {
-            transform: translateY(-5px);
-        }
-
-        .friend-avatar-wrapper {
-            position: relative;
-            margin-bottom: 8px;
-        }
-
-        .friend-avatar {
-            width: 50px;
-            height: 50px;
-            border-radius: 50%;
-            background: linear-gradient(45deg, #9b59b6, #e91e63);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.3rem;
-            position: relative;
-            border: 3px solid rgba(155, 89, 182, 0.5);
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-        }
-
-        .friend-avatar-item:hover .friend-avatar {
-            border-color: rgba(155, 89, 182, 0.8);
-            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4), 0 0 15px rgba(155, 89, 182, 0.4);
-        }
-
-        .friend-avatar.offline {
-            opacity: 0.5;
-            filter: grayscale(0.5);
-        }
-
-        .online-indicator {
-            position: absolute;
-            bottom: -2px;
-            right: -2px;
-            width: 14px;
-            height: 14px;
-            background: #4ecdc4;
-            border-radius: 50%;
-            border: 2px solid #0a0a0a;
-            animation: pulse 2s infinite;
-            box-shadow: 0 0 8px rgba(78, 205, 196, 0.8);
-        }
-
-        .offline-indicator {
-            position: absolute;
-            bottom: -2px;
-            right: -2px;
-            width: 14px;
-            height: 14px;
-            background: #666;
-            border-radius: 50%;
-            border: 2px solid #0a0a0a;
-        }
-
-        @keyframes pulse {
-            0% { transform: scale(1); box-shadow: 0 0 8px rgba(78, 205, 196, 0.8); }
-            50% { transform: scale(1.1); box-shadow: 0 0 15px rgba(78, 205, 196, 1); }
-            100% { transform: scale(1); box-shadow: 0 0 8px rgba(78, 205, 196, 0.8); }
-        }
-
-        .friend-name-small {
-            font-size: 0.8rem;
-            font-weight: 500;
-            text-align: center;
-            max-width: 60px;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
-            text-shadow: 0 0 5px rgba(255, 255, 255, 0.3);
-        }
-
-        .carousel-nav {
-            position: absolute;
-            top: 50%;
-            transform: translateY(-50%);
-            background: rgba(0, 0, 0, 0.6);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            color: white;
-            width: 35px;
-            height: 35px;
-            border-radius: 50%;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.1rem;
-            transition: all 0.3s ease;
-            z-index: 10;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-        }
-
-        .carousel-nav:hover {
-            background: rgba(0, 0, 0, 0.8);
-            transform: translateY(-50%) scale(1.1);
-            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.5);
-        }
-
-        .carousel-nav.prev {
-            left: -10px;
-        }
-
-        .carousel-nav.next {
-            right: -10px;
-        }
-
-        .carousel-nav:disabled {
-            opacity: 0.3;
-            cursor: not-allowed;
-        }
-
-        .carousel-nav:disabled:hover {
-            transform: translateY(-50%) scale(1);
-        }
-
-        .friends-actions {
-            display: flex;
-            gap: 10px;
-            justify-content: center;
-            margin-bottom: 15px;
-            flex-wrap: wrap;
-        }
-
-        /* Floating Buttons - Mobile Optimized */
-        .btn {
-            padding: 12px 18px;
-            border: none;
-            border-radius: 20px;
-            cursor: pointer;
-            font-weight: 600;
-            font-size: 0.9rem;
-            transition: all 0.3s ease;
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-            position: relative;
-            overflow: hidden;
-            min-width: 100px;
-            text-align: center;
-        }
-
-        .btn::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
-            transition: left 0.5s;
-        }
-
-        .btn:hover::before {
-            left: 100%;
-        }
-
-        .btn-primary {
-            background: linear-gradient(45deg, #9b59b6, #e91e63);
-            color: white;
-        }
-
-        .btn-secondary {
-            background: rgba(255, 255, 255, 0.1);
-            color: white;
-        }
-
-        .btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
-        }
-
-        .btn:active {
-            transform: translateY(0px);
-        }
-
-        .btn-small {
-            padding: 8px 14px;
-            font-size: 0.8rem;
-            min-width: 80px;
-        }
-
-        /* Friends List - Mobile Optimized */
-        .friends-list {
-            max-height: 300px;
-            overflow-y: auto;
-            display: none;
-            background: rgba(0, 0, 0, 0.3);
-            border-radius: 15px;
-            padding: 15px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-        }
-
-        .friends-list.show {
-            display: block;
-        }
-
-        .friend-item {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            padding: 12px;
-            margin-bottom: 8px;
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 12px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            transition: all 0.3s ease;
-            backdrop-filter: blur(10px);
-        }
-
-        .friend-item:hover {
-            background: rgba(255, 255, 255, 0.1);
-            transform: translateX(3px);
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-        }
-
-        .friend-item .friend-avatar {
-            width: 40px;
-            height: 40px;
-            font-size: 1.1rem;
-        }
-
-        .friend-info {
-            flex: 1;
-            min-width: 0;
-        }
-
-        .friend-name {
-            font-weight: bold;
-            margin-bottom: 4px;
-            text-shadow: 0 0 5px rgba(255, 255, 255, 0.3);
-            font-size: 0.9rem;
-        }
-
-        .friend-status {
-            font-size: 0.8rem;
-            opacity: 0.7;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
-        }
-
-        .friend-actions {
-            display: flex;
-            gap: 8px;
-            flex-shrink: 0;
-        }
-
-        /* Groups Section - Mobile Optimized */
-        .groups-list {
-            max-height: 300px;
-            overflow-y: auto;
-            background: rgba(0, 0, 0, 0.3);
-            border-radius: 15px;
-            padding: 15px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-        }
-
-        .group-item {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            padding: 12px;
-            margin-bottom: 8px;
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 12px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            transition: all 0.3s ease;
-            backdrop-filter: blur(10px);
-        }
-
-        .group-item:hover {
-            background: rgba(255, 255, 255, 0.1);
-            transform: translateX(3px);
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-        }
-
-        .group-avatar {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            background: linear-gradient(45deg, #9b59b6, #e91e63);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.1rem;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-            flex-shrink: 0;
-        }
-
-        .group-info {
-            flex: 1;
-            min-width: 0;
-        }
-
-        .group-name {
-            font-weight: bold;
-            margin-bottom: 4px;
-            text-shadow: 0 0 5px rgba(255, 255, 255, 0.3);
-            font-size: 0.9rem;
-        }
-
-        .group-members {
-            font-size: 0.8rem;
-            opacity: 0.7;
         }
 
         /* Quick Challenge Creator */
@@ -879,10 +324,6 @@
             }
         }
 
-        .quick-input-group {
-            position: relative;
-        }
-
         .quick-input {
             width: 100%;
             padding: 12px 15px;
@@ -916,11 +357,6 @@
             gap: 10px;
         }
 
-        .quick-option-group {
-            display: flex;
-            flex-direction: column;
-        }
-
         .quick-select {
             padding: 10px 12px;
             border: 1px solid rgba(155, 89, 182, 0.3);
@@ -942,34 +378,71 @@
             color: white;
         }
 
-        .quick-proof-requirement {
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 10px;
-            padding: 15px;
-            border: 1px solid rgba(155, 89, 182, 0.2);
+        /* Disaster to Friends */
+        .disaster-creator {
+            margin-bottom: 20px;
+            border: 2px solid rgba(255, 107, 107, 0.3);
+            background: rgba(255, 107, 107, 0.05);
         }
 
-        .proof-header {
+        .disaster-warning {
+            background: rgba(255, 107, 107, 0.2);
+            border: 1px solid rgba(255, 107, 107, 0.3);
+            border-radius: 10px;
+            padding: 12px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .warning-icon {
+            font-size: 1.5rem;
+            animation: pulse 2s infinite;
+        }
+
+        .warning-text {
+            font-size: 0.9rem;
+            color: rgba(255, 255, 255, 0.9);
+            font-weight: 500;
+        }
+
+        .disaster-settings {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+
+        .disaster-survival-tasks {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            padding: 15px;
+            border: 1px solid rgba(155, 89, 182, 0.2);
+            margin-bottom: 15px;
+        }
+
+        .survival-header {
             display: flex;
             align-items: center;
             gap: 8px;
-            margin-bottom: 10px;
-            font-size: 0.9rem;
-            font-weight: 500;
+            margin-bottom: 12px;
+            font-size: 0.95rem;
+            font-weight: 600;
             color: rgba(255, 255, 255, 0.9);
         }
 
-        .proof-options {
+        .survival-task-list {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
             gap: 8px;
         }
 
-        .proof-option {
+        .survival-task {
             background: rgba(255, 255, 255, 0.05);
             border: 1px solid rgba(155, 89, 182, 0.2);
             border-radius: 8px;
-            padding: 8px;
+            padding: 10px 8px;
             text-align: center;
             cursor: pointer;
             transition: all 0.3s ease;
@@ -977,35 +450,246 @@
             flex-direction: column;
             align-items: center;
             gap: 4px;
-            font-size: 0.8rem;
         }
 
-        .proof-option:hover {
+        .survival-task:hover {
             background: rgba(155, 89, 182, 0.1);
             border-color: rgba(155, 89, 182, 0.4);
+            transform: translateY(-1px);
         }
 
-        .proof-option.selected {
+        .survival-task.selected {
             background: rgba(155, 89, 182, 0.2);
             border-color: #9b59b6;
             box-shadow: 0 0 10px rgba(155, 89, 182, 0.3);
         }
 
-        .proof-option span:first-child {
+        .task-icon {
             font-size: 1.2rem;
         }
 
-        .quick-actions {
-            display: flex;
-            justify-content: center;
-            margin-top: 5px;
+        .task-name {
+            font-size: 0.75rem;
+            font-weight: 500;
+            color: white;
         }
 
-        .quick-create-btn {
-            width: 100%;
-            padding: 12px 20px;
+        .disaster-cost {
+            background: rgba(255, 107, 107, 0.1);
+            border: 1px solid rgba(255, 107, 107, 0.2);
+            border-radius: 10px;
+            padding: 12px;
+            text-align: center;
+            margin-bottom: 15px;
+        }
+
+        .cost-warning {
             font-size: 1rem;
             font-weight: 600;
+            color: #ff6b6b;
+            margin-bottom: 4px;
+        }
+
+        .cost-note {
+            font-size: 0.8rem;
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        .disaster-btn {
+            background: linear-gradient(45deg, #ff6b6b, #e91e63);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .disaster-btn:hover {
+            background: linear-gradient(45deg, #e91e63, #ff6b6b);
+            box-shadow: 0 8px 25px rgba(255, 107, 107, 0.4);
+        }
+
+        /* Auth Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.9);
+            backdrop-filter: blur(10px);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .modal.show {
+            display: flex;
+        }
+
+        .modal-content {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(20px);
+            border-radius: 20px;
+            padding: 30px;
+            max-width: 400px;
+            width: 100%;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
+        }
+
+        .auth-welcome {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .auth-logo {
+            font-size: 3rem;
+            margin-bottom: 15px;
+        }
+
+        .auth-title {
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+
+        .auth-subtitle {
+            opacity: 0.8;
+            font-size: 1rem;
+        }
+
+        .auth-tabs {
+            display: flex;
+            margin-bottom: 25px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 5px;
+        }
+
+        .auth-tab {
+            flex: 1;
+            padding: 12px;
+            text-align: center;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .auth-tab.active {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateY(-2px);
+        }
+
+        .auth-form {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .input-group {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+
+        .input-icon {
+            position: absolute;
+            left: 15px;
+            font-size: 1.2rem;
+            z-index: 10;
+        }
+
+        .auth-input {
+            width: 100%;
+            padding: 15px 15px 15px 50px;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 15px;
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .auth-input::placeholder {
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        .auth-input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.3);
+            background: rgba(255, 255, 255, 0.15);
+        }
+
+        .auth-btn {
+            width: 100%;
+            padding: 15px;
+            border: none;
+            border-radius: 15px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .auth-btn-primary {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .auth-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.6);
+        }
+
+        /* Buttons */
+        .btn {
+            padding: 12px 18px;
+            border: none;
+            border-radius: 20px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+            position: relative;
+            overflow: hidden;
+            min-width: 100px;
+            text-align: center;
+        }
+
+        .btn-primary {
+            background: linear-gradient(45deg, #9b59b6, #e91e63);
+            color: white;
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
+        }
+
+        .btn-small {
+            padding: 8px 14px;
+            font-size: 0.8rem;
+            min-width: 80px;
         }
 
         /* Messages */
@@ -1046,6 +730,199 @@
             }
         }
 
+        /* Range Section */
+        .detection-range-section {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            padding: 15px;
+            margin-bottom: 20px;
+            border: 1px solid rgba(63, 81, 181, 0.2);
+        }
+
+        .range-header {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 12px;
+            font-size: 0.95rem;
+            font-weight: 600;
+            color: rgba(63, 81, 181, 0.9);
+        }
+
+        .range-presets {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 8px;
+            margin-bottom: 12px;
+        }
+
+        .range-btn {
+            padding: 10px 12px;
+            border: 1px solid rgba(63, 81, 181, 0.3);
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.05);
+            color: white;
+            font-size: 0.9rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+        }
+
+        .range-btn:hover {
+            background: rgba(63, 81, 181, 0.2);
+            border-color: rgba(63, 81, 181, 0.5);
+            transform: translateY(-1px);
+        }
+
+        .range-btn.active {
+            background: rgba(63, 81, 181, 0.4);
+            border-color: #3f51b5;
+            box-shadow: 0 0 10px rgba(63, 81, 181, 0.3);
+            color: white;
+            font-weight: bold;
+        }
+
+        .range-custom {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            justify-content: center;
+        }
+
+        .range-input {
+            width: 80px;
+            padding: 8px 10px;
+            border: 1px solid rgba(63, 81, 181, 0.3);
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.05);
+            color: white;
+            font-size: 0.9rem;
+            text-align: center;
+        }
+
+        /* Players and Friends Styling */
+        .strangers-section, .friends-section {
+            margin-bottom: 15px;
+        }
+
+        .strangers-header, .friends-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            gap: 10px;
+        }
+
+        .strangers-count, .friends-count {
+            font-size: 0.9rem;
+            opacity: 0.9;
+            padding: 6px 12px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            flex-shrink: 0;
+        }
+
+        .online-count {
+            color: #9b59b6;
+            font-weight: bold;
+            text-shadow: 0 0 8px rgba(155, 89, 182, 0.7);
+        }
+
+        .strangers-carousel, .friends-carousel {
+            position: relative;
+            overflow: hidden;
+            margin-bottom: 15px;
+            padding: 10px 0;
+        }
+
+        .strangers-track, .friends-track {
+            display: flex;
+            gap: 15px;
+            transition: transform 0.3s ease;
+            padding: 5px 0;
+        }
+
+        .stranger-avatar-item, .friend-avatar-item {
+            flex: 0 0 auto;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .stranger-avatar-item:hover, .friend-avatar-item:hover {
+            transform: translateY(-5px);
+        }
+
+        .stranger-avatar, .friend-avatar {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: linear-gradient(45deg, #9b59b6, #e91e63);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.3rem;
+            position: relative;
+            border: 3px solid rgba(155, 89, 182, 0.5);
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+            margin-bottom: 8px;
+        }
+
+        .online-indicator {
+            position: absolute;
+            bottom: -2px;
+            right: -2px;
+            width: 14px;
+            height: 14px;
+            background: #4ecdc4;
+            border-radius: 50%;
+            border: 2px solid #0a0a0a;
+            animation: pulse 2s infinite;
+            box-shadow: 0 0 8px rgba(78, 205, 196, 0.8);
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); box-shadow: 0 0 8px rgba(78, 205, 196, 0.8); }
+            50% { transform: scale(1.1); box-shadow: 0 0 15px rgba(78, 205, 196, 1); }
+            100% { transform: scale(1); box-shadow: 0 0 8px rgba(78, 205, 196, 0.8); }
+        }
+
+        .distance-indicator {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background: rgba(63, 81, 181, 0.9);
+            color: white;
+            font-size: 0.7rem;
+            padding: 2px 6px;
+            border-radius: 10px;
+            font-weight: bold;
+        }
+
+        .stranger-name-small, .friend-name-small {
+            font-size: 0.8rem;
+            font-weight: 500;
+            text-align: center;
+            max-width: 60px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            text-shadow: 0 0 5px rgba(255, 255, 255, 0.3);
+        }
+
+        .strangers-actions, .friends-actions {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+        }
+
         /* Mobile adjustments */
         @media (max-width: 480px) {
             .container {
@@ -1059,41 +936,56 @@
                 gap: 15px;
             }
             
-            .logo-section {
-                text-align: left;
-                order: 1;
-                width: 100%;
-            }
-            
             .user-info {
-                order: 2;
                 width: 100%;
                 justify-content: space-between;
                 align-items: center;
-            }
-            
-            .user-stats {
-                justify-content: center;
-                flex-wrap: wrap;
-                gap: 8px;
             }
             
             .range-presets {
                 grid-template-columns: repeat(2, 1fr);
             }
             
-            .range-custom {
-                flex-wrap: wrap;
-                justify-content: center;
-            }
-            
             .quick-options {
                 grid-template-columns: 1fr;
             }
             
-            .proof-options {
+            .disaster-settings {
                 grid-template-columns: 1fr;
             }
+            
+            .survival-task-list {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        /* Loading and Offline States */
+        .app-content {
+            opacity: 0;
+            transition: opacity 0.5s ease;
+        }
+
+        .app-content.loaded {
+            opacity: 1;
+        }
+
+        .offline-banner {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: #ff6b6b;
+            color: white;
+            padding: 10px;
+            text-align: center;
+            font-weight: 600;
+            z-index: 1001;
+            transform: translateY(100%);
+            transition: transform 0.3s ease;
+        }
+
+        .offline-banner.show {
+            transform: translateY(0);
         }
     </style>
 </head>
@@ -1101,117 +993,218 @@
     <!-- Starfield Background -->
     <div class="starfield" id="starfield"></div>
 
-    <div class="container">
-        <!-- Header -->
-        <div class="header floating-element">
-            <div style="text-align: center;">
-                <div class="logo">JomBro</div>
-                <div class="slogan">Come-on bro, Let's go!</div>
-                <div class="user-name" id="userName">Welcome, Alex!</div>
-            </div>
-            <div class="user-info">
-                <div class="user-avatar" id="userAvatar" onclick="showMessage('👤 Profile editor coming soon!', 'info')">😎</div>
-                <div class="user-stats">
-                    <div class="stat-item">
-                        <div class="stat-number" id="userTokens">2,450</div>
-                        <div class="stat-label">Tokens</div>
-                    </div>
-                    <div class="stat-item">
-                        <div class="stat-number" id="userLevel">5</div>
-                        <div class="stat-label">Level</div>
-                    </div>
-                    <div class="stat-item">
-                        <div class="stat-number" id="userFriends">8</div>
-                        <div class="stat-label">Friends</div>
-                    </div>
-                </div>
-            </div>
-        </div>
+    <!-- Offline Banner -->
+    <div class="offline-banner" id="offlineBanner">
+        📡 Connection lost - Some features may be limited
+    </div>
 
-        <!-- Quick Challenge Creator -->
-        <div class="card floating-element quick-challenge-creator">
-            <div class="quick-challenge-header">
-                <div class="quick-challenge-title">
-                    <span>⚡</span>
-                    <span>Quick Challenge</span>
+    <!-- App Content -->
+    <div class="app-content" id="appContent">
+        <div class="container">
+            <!-- Header -->
+            <div class="header floating-element">
+                <div style="text-align: center;">
+                    <div class="logo">JomBro</div>
+                    <div class="slogan">Come-on bro, Let's go!</div>
+                    <div class="user-name" id="userName">Loading...</div>
                 </div>
-                <div class="quick-toggle-container">
-                    <div class="quick-toggle active" id="quickToggle" onclick="toggleQuickChallenge()">
-                        <div class="toggle-switch"></div>
+                <div class="user-info">
+                    <div class="user-avatar" id="userAvatar" onclick="showMessage('👤 Profile editor coming soon!', 'info')">👤</div>
+                    <div class="user-stats">
+                        <div class="stat-item">
+                            <div class="stat-number" id="userTokens">0</div>
+                            <div class="stat-label">Tokens</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-number" id="userLevel">1</div>
+                            <div class="stat-label">Level</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-number" id="userFriends">0</div>
+                            <div class="stat-label">Friends</div>
+                        </div>
                     </div>
-                    <span class="quick-toggle-label">Create & Send</span>
+                    <button class="btn btn-secondary btn-small" onclick="logoutUser()" id="logoutBtn" style="display: none;">
+                        Logout
+                    </button>
                 </div>
             </div>
-            
-            <div class="quick-challenge-form" id="quickChallengeForm">
-                <div class="quick-input-group">
-                    <input type="text" class="quick-input" id="quickChallengeTitle" placeholder="Challenge title (e.g., Do 10 push-ups)" maxlength="60">
-                </div>
-                <div class="quick-input-group">
-                    <textarea class="quick-input quick-textarea" id="quickChallengeDesc" placeholder="What do they need to do? (They'll need to upload photo/video proof)"></textarea>
-                </div>
-                <div class="quick-options">
-                    <div class="quick-option-group">
-                        <select class="quick-select" id="quickCategory">
-                            <option value="fitness">💪 Fitness</option>
-                            <option value="creative">🎨 Creative</option>
-                            <option value="social">👥 Social</option>
-                            <option value="food">🍕 Food</option>
-                            <option value="adventure">🗺️ Adventure</option>
-                        </select>
-                    </div>
-                    <div class="quick-option-group">
-                        <select class="quick-select" id="quickReward">
-                            <option value="100">🪙 100 Tokens</option>
-                            <option value="200">🪙 200 Tokens</option>
-                            <option value="500">🪙 500 Tokens</option>
-                            <option value="1000">🪙 1000 Tokens</option>
-                        </select>
-                    </div>
-                </div>
-                <div class="quick-proof-requirement">
-                    <div class="proof-header">
-                        <span>📸</span>
-                        <span>Proof Required</span>
-                    </div>
-                    <div class="proof-options">
-                        <div class="proof-option selected" data-type="photo">
-                            <span>📷</span>
-                            <span>Photo</span>
-                        </div>
-                        <div class="proof-option" data-type="video">
-                            <span>🎬</span>
-                            <span>Video</span>
-                        </div>
-                        <div class="proof-option" data-type="both">
-                            <span>📱</span>
-                            <span>Both</span>
-                        </div>
-                    </div>
-                </div>
-                <div class="quick-actions">
-                    <button class="btn btn-primary quick-create-btn" onclick="createQuickChallenge()">Create Challenge (50 tokens)</button>
-                </div>
-            </div>
-        </div>
 
-        <!-- Main Content -->
-        <div class="main-content">
-            <!-- Nearby Players Section -->
-            <div class="card floating-element">
-                <div class="card-title">
-                    <span>🎮</span>
-                    <span>Nearby Players</span>
-                    <span style="font-size: 0.8rem; opacity: 0.7;" id="currentRange">(3km)</span>
+            <!-- Quick Challenge Creator -->
+            <div class="card floating-element quick-challenge-creator">
+                <div class="quick-challenge-header">
+                    <div class="quick-challenge-title">
+                        <span>⚡</span>
+                        <span>Quick Challenge</span>
+                    </div>
+                    <div class="quick-toggle-container">
+                        <div class="quick-toggle active" id="quickToggle" onclick="toggleQuickChallenge()">
+                            <div class="toggle-switch"></div>
+                        </div>
+                        <span class="quick-toggle-label">Create & Send</span>
+                    </div>
                 </div>
                 
-                <!-- Detection Range Selector -->
-                <div class="detection-range-section">
-                    <div class="range-header">
-                        <span>📡</span>
-                        <span>Detection Range</span>
+                <div class="quick-challenge-form" id="quickChallengeForm">
+                    <div class="quick-input-group">
+                        <input type="text" class="quick-input" id="quickChallengeTitle" placeholder="Challenge title (e.g., Do 10 push-ups)" maxlength="60">
                     </div>
-                    <div class="range-options">
+                    <div class="quick-input-group">
+                        <textarea class="quick-input quick-textarea" id="quickChallengeDesc" placeholder="What do they need to do? (They'll need to upload photo/video proof)"></textarea>
+                    </div>
+                    <div class="quick-options">
+                        <div class="quick-option-group">
+                            <select class="quick-select" id="quickCategory">
+                                <option value="fitness">💪 Fitness</option>
+                                <option value="creative">🎨 Creative</option>
+                                <option value="social">👥 Social</option>
+                                <option value="food">🍕 Food</option>
+                                <option value="adventure">🗺️ Adventure</option>
+                            </select>
+                        </div>
+                        <div class="quick-option-group">
+                            <select class="quick-select" id="quickReward">
+                                <option value="100">🪙 100 Tokens</option>
+                                <option value="200">🪙 200 Tokens</option>
+                                <option value="500">🪙 500 Tokens</option>
+                                <option value="1000">🪙 1000 Tokens</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="quick-actions">
+                        <button class="btn btn-primary quick-create-btn" onclick="createQuickChallenge()">Create Challenge (50 tokens)</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Disaster to Friends -->
+            <div class="card floating-element disaster-creator">
+                <div class="quick-challenge-header">
+                    <div class="quick-challenge-title" style="color: #ff6b6b;">
+                        <span>💥</span>
+                        <span>Disaster to Friends</span>
+                    </div>
+                    <div class="quick-toggle-container">
+                        <div class="quick-toggle active" id="disasterToggle" onclick="toggleDisaster()">
+                            <div class="toggle-switch"></div>
+                        </div>
+                        <span class="quick-toggle-label">Activate</span>
+                    </div>
+                </div>
+                
+                <div class="quick-challenge-form" id="disasterForm">
+                    <div class="disaster-warning">
+                        <div class="warning-icon">⚠️</div>
+                        <div class="warning-text">Send fun disasters to challenge your friends!</div>
+                    </div>
+                    
+                    <div class="quick-input-group">
+                        <select class="quick-input" id="disasterType">
+                            <option value="">Select Disaster Type</option>
+                            <option value="zombie">🧟 Zombie Apocalypse</option>
+                            <option value="alien">👽 Alien Invasion</option>
+                            <option value="robot">🤖 Robot Takeover</option>
+                            <option value="monster">🦖 Monster Attack</option>
+                            <option value="weather">🌪️ Extreme Weather</option>
+                            <option value="virus">🦠 Viral Outbreak</option>
+                            <option value="magic">🧙 Magic Chaos</option>
+                            <option value="time">⏰ Time Distortion</option>
+                        </select>
+                    </div>
+                    
+                    <div class="quick-input-group">
+                        <input type="text" class="quick-input" id="disasterTitle" placeholder="Disaster name (e.g., The Great Pizza Shortage)" maxlength="60">
+                    </div>
+                    
+                    <div class="quick-input-group">
+                        <textarea class="quick-input quick-textarea" id="disasterDescription" placeholder="Describe the disaster scenario... (Friends must complete survival challenges)"></textarea>
+                    </div>
+                    
+                    <div class="disaster-settings">
+                        <div class="disaster-setting-group">
+                            <label class="disaster-label">Difficulty Level</label>
+                            <select class="quick-select" id="disasterDifficulty">
+                                <option value="easy">😅 Easy Survival</option>
+                                <option value="medium">😰 Medium Chaos</option>
+                                <option value="hard">😱 Hard Disaster</option>
+                                <option value="nightmare">💀 Nightmare Mode</option>
+                            </select>
+                        </div>
+                        
+                        <div class="disaster-setting-group">
+                            <label class="disaster-label">Duration</label>
+                            <select class="quick-select" id="disasterDuration">
+                                <option value="1">⏱️ 1 Hour</option>
+                                <option value="6">🕕 6 Hours</option>
+                                <option value="24">📅 24 Hours</option>
+                                <option value="72">🗓️ 3 Days</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="disaster-survival-tasks">
+                        <div class="survival-header">
+                            <span>🎯</span>
+                            <span>Survival Tasks</span>
+                        </div>
+                        <div class="survival-task-list">
+                            <div class="survival-task" onclick="toggleTask(this)">
+                                <span class="task-icon">📷</span>
+                                <span class="task-name">Photo Evidence</span>
+                            </div>
+                            <div class="survival-task" onclick="toggleTask(this)">
+                                <span class="task-icon">🎬</span>
+                                <span class="task-name">Video Proof</span>
+                            </div>
+                            <div class="survival-task" onclick="toggleTask(this)">
+                                <span class="task-icon">📝</span>
+                                <span class="task-name">Written Report</span>
+                            </div>
+                            <div class="survival-task" onclick="toggleTask(this)">
+                                <span class="task-icon">📍</span>
+                                <span class="task-name">Location Check-in</span>
+                            </div>
+                            <div class="survival-task" onclick="toggleTask(this)">
+                                <span class="task-icon">👥</span>
+                                <span class="task-name">Team Up</span>
+                            </div>
+                            <div class="survival-task" onclick="toggleTask(this)">
+                                <span class="task-icon">🎨</span>
+                                <span class="task-name">Creative Solution</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="disaster-cost">
+                        <div class="cost-warning">⚡ Disaster Cost: <span id="disasterCost">100</span> tokens</div>
+                        <div class="cost-note">Friends get rewards for surviving!</div>
+                    </div>
+                    
+                    <div class="quick-actions">
+                        <button class="btn btn-primary quick-create-btn disaster-btn" onclick="launchDisaster()">
+                            <span>💥</span>
+                            <span>Launch Disaster</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Main Content -->
+            <div class="main-content">
+                <!-- Nearby Players Section -->
+                <div class="card floating-element">
+                    <div class="card-title">
+                        <span>🎮</span>
+                        <span>Nearby Players</span>
+                        <span style="font-size: 0.8rem; opacity: 0.7;" id="currentRange">(3km)</span>
+                    </div>
+                    
+                    <!-- Detection Range Selector -->
+                    <div class="detection-range-section">
+                        <div class="range-header">
+                            <span>📡</span>
+                            <span>Detection Range</span>
+                        </div>
                         <div class="range-presets">
                             <button class="range-btn" onclick="setDetectionRange(1)">1km</button>
                             <button class="range-btn active" onclick="setDetectionRange(3)" id="defaultRange">3km</button>
@@ -1220,739 +1213,466 @@
                         </div>
                         <div class="range-custom">
                             <input type="number" class="range-input" id="customRange" placeholder="Custom" min="0.1" max="50" step="0.1">
-                            <span class="range-unit">km</span>
+                            <span style="color: rgba(255, 255, 255, 0.7);">km</span>
                             <button class="btn btn-secondary btn-small" onclick="setCustomRange()">Set</button>
                         </div>
                     </div>
-                </div>
-                
-                <div class="strangers-section">
-                    <div class="strangers-header">
-                        <div class="strangers-count">
-                            <span class="online-count" id="strangersOnlineCount">12</span> online nearby
-                        </div>
-                        <button class="btn btn-secondary btn-small" onclick="refreshNearbyPlayers()">Refresh</button>
-                    </div>
                     
-                    <div class="strangers-carousel">
-                        <button class="carousel-nav prev" id="strangersprevBtn" onclick="slideStrangers(-1)">‹</button>
-                        <div class="strangers-track" id="strangersTrack">
-                            <!-- Players avatars populated here -->
+                    <div class="strangers-section">
+                        <div class="strangers-header">
+                            <div class="strangers-count">
+                                <span class="online-count" id="strangersOnlineCount">0</span> online nearby
+                            </div>
+                            <button class="btn btn-secondary btn-small" onclick="refreshNearbyPlayers()">Refresh</button>
                         </div>
-                        <button class="carousel-nav next" id="strangersNextBtn" onclick="slideStrangers(1)">›</button>
-                    </div>
-                    
-                    <div class="strangers-actions">
-                        <button class="btn btn-primary" onclick="sendWaveToNearby()">Send Wave 👋</button>
-                        <button class="btn btn-secondary" onclick="hideFromNearby()">Hide Me</button>
+                        
+                        <div class="strangers-carousel">
+                            <div class="strangers-track" id="strangersTrack">
+                                <!-- Players populated here -->
+                            </div>
+                        </div>
+                        
+                        <div class="strangers-actions">
+                            <button class="btn btn-primary" onclick="sendWaveToNearby()">Send Wave 👋</button>
+                            <button class="btn btn-secondary" onclick="hideFromNearby()">Hide Me</button>
+                        </div>
                     </div>
                 </div>
-            </div>
 
-            <!-- Friends Section -->
-            <div class="card floating-element">
-                <div class="card-title">
-                    <span>👥</span>
-                    <span>Friends</span>
-                </div>
-                
-                <div class="friends-section">
-                    <div class="friends-header">
-                        <div class="friends-count">
-                            <span class="online-count" id="onlineCount">6</span> online • 
-                            <span id="totalFriends">8</span> total
+                <!-- Friends Section -->
+                <div class="card floating-element">
+                    <div class="card-title">
+                        <span>👥</span>
+                        <span>Friends</span>
+                    </div>
+                    
+                    <div class="friends-section">
+                        <div class="friends-header">
+                            <div class="friends-count">
+                                <span class="online-count" id="onlineCount">0</span> online • 
+                                <span id="totalFriends">0</span> total
+                            </div>
+                            <button class="btn btn-secondary btn-small" onclick="showAddFriendModal()">Add Friend</button>
                         </div>
-                        <button class="btn btn-secondary btn-small" onclick="showAddFriendModal()">Add Friend</button>
-                    </div>
-                    
-                    <div class="friends-carousel">
-                        <button class="carousel-nav prev" id="prevBtn" onclick="slideFriends(-1)">‹</button>
-                        <div class="friends-track" id="friendsTrack">
-                            <!-- Friends avatars populated here -->
+                        
+                        <div class="friends-carousel">
+                            <div class="friends-track" id="friendsTrack">
+                                <!-- Friends populated here -->
+                            </div>
                         </div>
-                        <button class="carousel-nav next" id="nextBtn" onclick="slideFriends(1)">›</button>
+                        
+                        <div class="friends-actions">
+                            <button class="btn btn-primary" onclick="challengeAllFriends()">Challenge All</button>
+                            <button class="btn btn-secondary" onclick="showOnlineOnly()">Online Only</button>
+                        </div>
                     </div>
-                    
-                    <div class="friends-actions">
-                        <button class="btn btn-primary" id="viewAllBtn" onclick="toggleViewAll()">View All</button>
-                        <button class="btn btn-secondary" onclick="showOnlineOnly()">Online Only</button>
-                    </div>
-                    
-                    <div class="friends-list" id="friendsList">
-                        <!-- Full friends list populated here -->
-                    </div>
-                </div>
-            </div>
-
-            <!-- Groups Section -->
-            <div class="card floating-element">
-                <div class="card-title">
-                    <span>🏠</span>
-                    <span>Groups</span>
-                    <button class="btn btn-secondary btn-small" onclick="createGroup()">Create Group</button>
-                </div>
-                <div class="groups-list" id="groupsList">
-                    <!-- Groups populated here -->
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- AI Challenge Notification -->
-    <div class="ai-notification" id="aiNotification" style="position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: rgba(255, 255, 255, 0.02); backdrop-filter: blur(2px); border-radius: 20px; padding: 25px; max-width: 90%; width: 350px; text-align: center; border: 2px solid #9b59b6; box-shadow: 0 10px 40px rgba(0, 0, 0, 0.7), 0 0 25px rgba(155, 89, 182, 0.5); z-index: 1000; display: none;">
-        <div style="font-size: 1.5rem; margin-bottom: 12px; color: #9b59b6; text-shadow: 0 0 10px rgba(155, 89, 182, 0.7);">🤖 AI Challenge Alert!</div>
-        <div style="font-size: 1.1rem; font-weight: bold; margin-bottom: 8px; text-shadow: 0 0 5px rgba(255, 255, 255, 0.3);" id="aiChallengeTitle">Street Art Photography Hunt</div>
-        <div style="font-size: 0.9rem; opacity: 0.8; line-height: 1.4; margin-bottom: 20px;" id="aiChallengeDescription">Find and photograph 5 different pieces of street art in your city. Share the story behind each piece!</div>
-        <div style="display: flex; justify-content: space-around; margin-bottom: 20px; gap: 10px;">
-            <div style="text-align: center; padding: 8px; background: rgba(255, 255, 255, 0.05); border-radius: 12px; border: 1px solid rgba(255, 255, 255, 0.1); flex: 1;">
-                <div style="font-size: 1.1rem; font-weight: bold; color: #9b59b6; text-shadow: 0 0 8px rgba(155, 89, 182, 0.7);" id="aiTokens">450</div>
-                <div style="font-size: 0.8rem; opacity: 0.7; margin-top: 3px;">Tokens</div>
+    <!-- Auth Modal -->
+    <div class="modal show" id="authModal">
+        <div class="modal-content">
+            <div class="auth-welcome">
+                <div class="auth-logo">🎮</div>
+                <div class="auth-title">Welcome to JomBro</div>
+                <div class="auth-subtitle">Come-on bro, Let's go!</div>
             </div>
-            <div style="text-align: center; padding: 8px; background: rgba(255, 255, 255, 0.05); border-radius: 12px; border: 1px solid rgba(255, 255, 255, 0.1); flex: 1;">
-                <div style="font-size: 1.1rem; font-weight: bold; color: #9b59b6; text-shadow: 0 0 8px rgba(155, 89, 182, 0.7);" id="aiDifficulty">Medium</div>
-                <div style="font-size: 0.8rem; opacity: 0.7; margin-top: 3px;">Difficulty</div>
+            
+            <div class="auth-tabs">
+                <div class="auth-tab active" onclick="switchAuthTab('login')">
+                    <span>🚀</span>
+                    <span>Login</span>
+                </div>
+                <div class="auth-tab" onclick="switchAuthTab('signup')">
+                    <span>✨</span>
+                    <span>Sign Up</span>
+                </div>
             </div>
-            <div style="text-align: center; padding: 8px; background: rgba(255, 255, 255, 0.05); border-radius: 12px; border: 1px solid rgba(255, 255, 255, 0.1); flex: 1;">
-                <div style="font-size: 1.1rem; font-weight: bold; color: #9b59b6; text-shadow: 0 0 8px rgba(155, 89, 182, 0.7);" id="aiDuration">2h</div>
-                <div style="font-size: 0.8rem; opacity: 0.7; margin-top: 3px;">Duration</div>
+            
+            <div class="auth-form" id="loginForm">
+                <div class="input-group">
+                    <div class="input-icon">📧</div>
+                    <input type="email" class="auth-input" id="loginEmail" placeholder="Email address" autocomplete="email">
+                </div>
+                <div class="input-group">
+                    <div class="input-icon">🔒</div>
+                    <input type="password" class="auth-input" id="loginPassword" placeholder="Password" autocomplete="current-password">
+                </div>
+                <button class="auth-btn auth-btn-primary" onclick="loginUser()">
+                    <span class="btn-text">Login to JomBro</span>
+                </button>
             </div>
-        </div>
-        <div style="display: flex; gap: 10px; justify-content: center; flex-wrap: wrap;">
-            <button class="btn btn-primary" onclick="acceptAIChallenge()">Accept Challenge</button>
-            <button class="btn btn-secondary" onclick="dismissAIChallenge()">Dismiss</button>
+            
+            <div class="auth-form" id="signupForm" style="display: none;">
+                <div class="input-group">
+                    <div class="input-icon">👤</div>
+                    <input type="text" class="auth-input" id="signupName" placeholder="Your awesome username" autocomplete="name">
+                </div>
+                <div class="input-group">
+                    <div class="input-icon">📧</div>
+                    <input type="email" class="auth-input" id="signupEmail" placeholder="Email address" autocomplete="email">
+                </div>
+                <div class="input-group">
+                    <div class="input-icon">🔒</div>
+                    <input type="password" class="auth-input" id="signupPassword" placeholder="Create password (min 6 chars)" autocomplete="new-password">
+                </div>
+                <button class="auth-btn auth-btn-primary" onclick="signupUser()">
+                    <span class="btn-text">Join JomBro</span>
+                </button>
+            </div>
         </div>
     </div>
 
     <script>
-        // Application State with FULL features activated
-        let appState = {
-            user: {
-                id: 'user_1',
-                name: 'Alex',
-                avatar: '😎',
-                tokens: 2450,
-                level: 5,
-                friends: 8,
-                location: { lat: 3.0738, lng: 101.5183 },
-                bio: 'Challenge enthusiast & adventure seeker! 🌟',
-                challengesCompleted: 47,
-                streak: 12,
-                globalRank: 156,
-                badges: 23
-            },
-            friends: [
-                { id: 'f1', name: 'Alex Thompson', avatar: '😎', status: 'Online • Playing challenges', online: true },
-                { id: 'f2', name: 'Maria Garcia', avatar: '🌸', status: 'Online • Creating art', online: true },
-                { id: 'f3', name: 'James Wilson', avatar: '🚀', status: 'Online • Adventure mode', online: true },
-                { id: 'f4', name: 'Sarah Chen', avatar: '💪', status: 'Online • Fitness challenge', online: true },
-                { id: 'f5', name: 'Mike Johnson', avatar: '🎵', status: 'Online • Music challenge', online: true },
-                { id: 'f6', name: 'Emma Davis', avatar: '🧠', status: 'Online • Mindfulness', online: true },
-                { id: 'f7', name: 'Carlos Rodriguez', avatar: '🏃', status: 'Last seen 2h ago', online: false },
-                { id: 'f8', name: 'Lisa Kim', avatar: '🎨', status: 'Last seen yesterday', online: false }
-            ],
-            nearbyStrangers: [
-                { id: 's1', name: 'Ahmad', avatar: '🤠', distance: '0.8km', online: true },
-                { id: 's2', name: 'Siti', avatar: '🌟', distance: '1.2km', online: true },
-                { id: 's3', name: 'Raj', avatar: '🎯', distance: '1.5km', online: true },
-                { id: 's4', name: 'Mei Lin', avatar: '🎭', distance: '1.8km', online: true },
-                { id: 's5', name: 'Hassan', avatar: '🎪', distance: '2.1km', online: true },
-                { id: 's6', name: 'Priya', avatar: '🌈', distance: '2.3km', online: true },
-                { id: 's7', name: 'Omar', avatar: '🎲', distance: '2.5km', online: true },
-                { id: 's8', name: 'Fatima', avatar: '🎨', distance: '2.7km', online: true },
-                { id: 's9', name: 'Kumar', avatar: '🎵', distance: '2.8km', online: true },
-                { id: 's10', name: 'Aisha', avatar: '🎊', distance: '2.9km', online: true },
-                { id: 's11', name: 'Wei', avatar: '🎯', distance: '3.0km', online: true },
-                { id: 's12', name: 'Zara', avatar: '🌺', distance: '3.0km', online: true }
-            ],
-            groups: [
-                { id: 'g1', name: 'Fitness Warriors', avatar: '💪', members: 156, joined: true },
-                { id: 'g2', name: 'Creative Minds', avatar: '🎨', members: 89, joined: true },
-                { id: 'g3', name: 'Adventure Seekers', avatar: '🗺️', members: 234, joined: false },
-                { id: 'g4', name: 'Mindful Moments', avatar: '🧠', members: 178, joined: false },
-                { id: 'g5', name: 'Social Butterflies', avatar: '👥', members: 112, joined: true }
-            ],
-            quickChallengeActive: true,
-            selectedProofType: 'photo',
-            detectionRange: 3,
-            friendsSlideIndex: 0,
-            strangersSlideIndex: 0,
-            showingAllFriends: false
+        // Firebase Configuration - REPLACE WITH YOUR ACTUAL CONFIG
+        const firebaseConfig = {
+            apiKey: "your-api-key-here",
+            authDomain: "your-project.firebaseapp.com",
+            projectId: "your-project-id",
+            storageBucket: "your-project.appspot.com",
+            messagingSenderId: "123456789",
+            appId: "your-app-id"
         };
 
-        // AI Challenge Templates
-        const aiChallengeTemplates = [
-            {
-                title: "Street Art Photography Hunt",
-                description: "Find and photograph 5 different pieces of street art in your city. Share the story behind each piece!",
-                category: "creative",
-                difficulty: "medium",
-                tokens: 450,
-                duration: "2h"
+        // Global variables
+        let app, auth, db, storage;
+        let currentUser = null;
+        let isOnline = navigator.onLine;
+        
+        // Application State
+        let appState = {
+            user: {
+                id: null,
+                name: '',
+                avatar: '👤',
+                tokens: 0,
+                level: 1,
+                friends: 0,
+                online: true
             },
-            {
-                title: "Random Act of Kindness Challenge",
-                description: "Perform 3 random acts of kindness for strangers today. Document their reactions!",
-                category: "social",
-                difficulty: "easy",
-                tokens: 300,
-                duration: "1h"
-            },
-            {
-                title: "Sunrise Workout Adventure",
-                description: "Wake up early and do a 30-minute workout during sunrise. Capture the golden hour!",
-                category: "fitness",
-                difficulty: "hard",
-                tokens: 600,
-                duration: "1h"
-            },
-            {
-                title: "Mystery Location Discovery",
-                description: "Close your eyes, point to a random location on a map, and visit it. Discover something new!",
-                category: "adventure",
-                difficulty: "hard",
-                tokens: 700,
-                duration: "3h"
-            }
-        ];
+            friends: [],
+            nearbyStrangers: [],
+            quickChallengeActive: true,
+            disasterActive: true,
+            selectedSurvivalTasks: [],
+            detectionRange: 3
+        };
 
-        // Create starfield background
-        function createStarfield() {
-            const starfield = document.getElementById('starfield');
-            const numberOfStars = 150;
-
-            for (let i = 0; i < numberOfStars; i++) {
-                const star = document.createElement('div');
-                star.className = 'star';
+        // Initialize Firebase and App
+        function initApp() {
+            try {
+                // Initialize Firebase
+                app = firebase.initializeApp(firebaseConfig);
+                auth = firebase.auth();
+                db = firebase.firestore();
+                storage = firebase.storage();
                 
-                const sizes = ['small', 'medium', 'large'];
-                const randomSize = sizes[Math.floor(Math.random() * sizes.length)];
-                star.classList.add(randomSize);
-                
-                star.style.left = Math.random() * 100 + '%';
-                star.style.top = Math.random() * 100 + '%';
-                star.style.animationDelay = Math.random() * 2 + 's';
-                star.style.animationDuration = (Math.random() * 2 + 1) + 's';
-                
-                starfield.appendChild(star);
-            }
-        }
-
-        // Initialize ALL features immediately
-        function init() {
-            createStarfield();
-            renderNearbyPlayers();
-            renderFriendsCarousel();
-            renderFriends();
-            renderGroups();
-            updateCounts();
-            startAIChallengeGenerator();
-            showWelcomeMessage();
-            
-            // Add event listeners for proof options
-            document.querySelectorAll('.proof-option').forEach(option => {
-                option.addEventListener('click', function() {
-                    document.querySelectorAll('.proof-option').forEach(opt => {
-                        opt.classList.remove('selected');
-                    });
-                    this.classList.add('selected');
-                    appState.selectedProofType = this.getAttribute('data-type');
+                // Monitor authentication state
+                auth.onAuthStateChanged((user) => {
+                    if (user) {
+                        currentUser = user;
+                        loadUserSession(user);
+                    } else {
+                        currentUser = null;
+                        showAuthModal();
+                    }
                 });
-            });
-        }
-
-        // Render nearby players
-        function renderNearbyPlayers() {
-            const strangersTrack = document.getElementById('strangersTrack');
-            strangersTrack.innerHTML = '';
-
-            appState.nearbyStrangers.forEach((player, index) => {
-                const playerElement = document.createElement('div');
-                playerElement.className = 'stranger-avatar-item';
-                playerElement.onclick = () => challengePlayer(player.id);
-                playerElement.innerHTML = `
-                    <div class="stranger-avatar-wrapper">
-                        <div class="stranger-avatar">
-                            ${player.avatar}
-                        </div>
-                        <div class="distance-indicator">${player.distance}</div>
-                        <div class="online-indicator"></div>
-                    </div>
-                    <div class="stranger-name-small">${player.name}</div>
-                `;
-                strangersTrack.appendChild(playerElement);
-            });
-        }
-
-        // Render friends carousel
-        function renderFriendsCarousel() {
-            const friendsTrack = document.getElementById('friendsTrack');
-            friendsTrack.innerHTML = '';
-
-            appState.friends.forEach((friend, index) => {
-                const friendElement = document.createElement('div');
-                friendElement.className = 'friend-avatar-item';
-                friendElement.onclick = () => challengeFriend(friend.id);
-                friendElement.innerHTML = `
-                    <div class="friend-avatar-wrapper">
-                        <div class="friend-avatar ${friend.online ? '' : 'offline'}">
-                            ${friend.avatar}
-                        </div>
-                        ${friend.online ? '<div class="online-indicator"></div>' : '<div class="offline-indicator"></div>'}
-                    </div>
-                    <div class="friend-name-small">${friend.name}</div>
-                `;
-                friendsTrack.appendChild(friendElement);
-            });
-        }
-
-        // Render friends list
-        function renderFriends() {
-            const friendsList = document.getElementById('friendsList');
-            friendsList.innerHTML = '';
-
-            appState.friends.forEach((friend) => {
-                const friendElement = document.createElement('div');
-                friendElement.className = 'friend-item';
-                friendElement.innerHTML = `
-                    <div class="friend-avatar ${friend.online ? '' : 'offline'}">
-                        ${friend.avatar}
-                        ${friend.online ? '<div class="online-indicator"></div>' : '<div class="offline-indicator"></div>'}
-                    </div>
-                    <div class="friend-info">
-                        <div class="friend-name">${friend.name}</div>
-                        <div class="friend-status">${friend.status}</div>
-                    </div>
-                    <div class="friend-actions">
-                        <button class="btn btn-primary btn-small" onclick="challengeFriend('${friend.id}')">Challenge</button>
-                        <button class="btn btn-secondary btn-small" onclick="chatWithFriend('${friend.id}')">Chat</button>
-                    </div>
-                `;
-                friendsList.appendChild(friendElement);
-            });
-        }
-
-        // Render groups
-        function renderGroups() {
-            const groupsList = document.getElementById('groupsList');
-            groupsList.innerHTML = '';
-
-            appState.groups.forEach((group) => {
-                const groupElement = document.createElement('div');
-                groupElement.className = 'group-item';
-                groupElement.innerHTML = `
-                    <div class="group-avatar">${group.avatar}</div>
-                    <div class="group-info">
-                        <div class="group-name">${group.name}</div>
-                        <div class="group-members">${group.members} members</div>
-                    </div>
-                    <button class="btn ${group.joined ? 'btn-secondary' : 'btn-primary'} btn-small" onclick="toggleGroup('${group.id}')">
-                        ${group.joined ? 'Leave' : 'Join'}
-                    </button>
-                `;
-                groupsList.appendChild(groupElement);
-            });
-        }
-
-        // Update counts
-        function updateCounts() {
-            document.getElementById('strangersOnlineCount').textContent = appState.nearbyStrangers.length;
-            document.getElementById('onlineCount').textContent = appState.friends.filter(f => f.online).length;
-            document.getElementById('totalFriends').textContent = appState.friends.length;
-        }
-
-        // Toggle Quick Challenge
-        function toggleQuickChallenge() {
-            appState.quickChallengeActive = !appState.quickChallengeActive;
-            const toggle = document.getElementById('quickToggle');
-            const form = document.getElementById('quickChallengeForm');
-            
-            if (appState.quickChallengeActive) {
-                toggle.classList.add('active');
-                form.style.display = 'flex';
-                showMessage('⚡ Quick Challenge Creator activated!', 'success');
-            } else {
-                toggle.classList.remove('active');
-                form.style.display = 'none';
-                showMessage('⚡ Quick Challenge Creator deactivated', 'info');
-            }
-        }
-
-        // Create Quick Challenge
-        function createQuickChallenge() {
-            const title = document.getElementById('quickChallengeTitle').value;
-            const description = document.getElementById('quickChallengeDesc').value;
-            const category = document.getElementById('quickCategory').value;
-            const reward = parseInt(document.getElementById('quickReward').value);
-            
-            if (!title || !description) {
-                showMessage('❌ Please fill in title and description!', 'error');
-                return;
-            }
-            
-            if (appState.user.tokens < 50) {
-                showMessage('❌ Not enough tokens! You need 50 tokens to create a challenge.', 'error');
-                return;
-            }
-            
-            // Deduct creation cost
-            appState.user.tokens -= 50;
-            document.getElementById('userTokens').textContent = appState.user.tokens.toLocaleString();
-            
-            // Clear form
-            document.getElementById('quickChallengeTitle').value = '';
-            document.getElementById('quickChallengeDesc').value = '';
-            
-            showMessage(`🎯 Challenge "${title}" created and sent to friends! Cost: 50 tokens`, 'success');
-            
-            // Simulate friend accepting challenge after 3 seconds
-            setTimeout(() => {
-                const acceptingFriend = appState.friends[Math.floor(Math.random() * appState.friends.length)];
-                showMessage(`🎉 ${acceptingFriend.name} accepted your challenge!`, 'success');
                 
-                // Award some tokens for successful challenge creation
-                setTimeout(() => {
-                    appState.user.tokens += reward;
-                    document.getElementById('userTokens').textContent = appState.user.tokens.toLocaleString();
-                    showMessage(`💰 Challenge completed! You earned ${reward} tokens!`, 'success');
-                }, 5000);
-            }, 3000);
-        }
-
-        // Set Detection Range
-        function setDetectionRange(range) {
-            appState.detectionRange = range;
-            document.getElementById('currentRange').textContent = `(${range}km)`;
-            
-            // Update active button
-            document.querySelectorAll('.range-btn').forEach(btn => btn.classList.remove('active'));
-            event.target.classList.add('active');
-            
-            // Simulate finding different players based on range
-            const baseStrangers = [
-                { id: 's1', name: 'Ahmad', avatar: '🤠', distance: '0.8km', online: true },
-                { id: 's2', name: 'Siti', avatar: '🌟', distance: '1.2km', online: true },
-                { id: 's3', name: 'Raj', avatar: '🎯', distance: '1.5km', online: true },
-                { id: 's4', name: 'Mei Lin', avatar: '🎭', distance: '1.8km', online: true },
-                { id: 's5', name: 'Hassan', avatar: '🎪', distance: '2.1km', online: true },
-                { id: 's6', name: 'Priya', avatar: '🌈', distance: '2.3km', online: true },
-                { id: 's7', name: 'Omar', avatar: '🎲', distance: '2.5km', online: true },
-                { id: 's8', name: 'Fatima', avatar: '🎨', distance: '2.7km', online: true },
-                { id: 's9', name: 'Kumar', avatar: '🎵', distance: '2.8km', online: true },
-                { id: 's10', name: 'Aisha', avatar: '🎊', distance: '2.9km', online: true },
-                { id: 's11', name: 'Wei', avatar: '🎯', distance: '3.0km', online: true },
-                { id: 's12', name: 'Zara', avatar: '🌺', distance: '3.1km', online: true },
-                { id: 's13', name: 'Lin', avatar: '🎸', distance: '4.2km', online: true },
-                { id: 's14', name: 'Sam', avatar: '🎮', distance: '4.8km', online: true },
-                { id: 's15', name: 'Maya', avatar: '🎪', distance: '5.5km', online: true },
-                { id: 's16', name: 'Zain', avatar: '🌊', distance: '6.1km', online: true },
-                { id: 's17', name: 'Rina', avatar: '🌸', distance: '7.3km', online: true },
-                { id: 's18', name: 'Kris', avatar: '⚡', distance: '8.9km', online: true },
-                { id: 's19', name: 'Yuki', avatar: '🌙', distance: '9.2km', online: true },
-                { id: 's20', name: 'Alex', avatar: '🔥', distance: '9.8km', online: true }
-            ];
-            
-            // Filter strangers based on selected range
-            appState.nearbyStrangers = baseStrangers.filter(stranger => {
-                const distance = parseFloat(stranger.distance.replace('km', ''));
-                return distance <= range;
-            });
-            
-            renderNearbyPlayers();
-            updateCounts();
-            showMessage(`📡 Detection range set to ${range}km. Found ${appState.nearbyStrangers.length} players!`, 'info');
-        }
-
-        // Set Custom Range
-        function setCustomRange() {
-            const customRange = parseFloat(document.getElementById('customRange').value);
-            if (customRange && customRange > 0 && customRange <= 50) {
-                setDetectionRange(customRange);
-                document.getElementById('customRange').value = '';
+                console.log('✅ Firebase initialized successfully');
                 
-                // Remove active class from preset buttons
-                document.querySelectorAll('.range-btn').forEach(btn => btn.classList.remove('active'));
-            } else {
-                showMessage('❌ Please enter a valid range (0.1 - 50 km)', 'error');
+            } catch (error) {
+                console.error('❌ Firebase initialization error:', error);
+                showMessage('⚠️ Running in offline mode - limited features available', 'info');
+                startOfflineMode();
             }
+            
+            // Initialize other components
+            createStarfield();
+            monitorConnection();
+            setupEventListeners();
         }
 
-        // Refresh Nearby Players
-        function refreshNearbyPlayers() {
-            showMessage('🔄 Searching for nearby players...', 'info');
+        // Start offline mode with sample data
+        function startOfflineMode() {
+            // Load sample data
+            appState = {
+                user: {
+                    id: 'offline_user',
+                    name: 'Demo Player',
+                    avatar: '😎',
+                    tokens: 2450,
+                    level: 5,
+                    friends: 8,
+                    online: true
+                },
+                friends: [
+                    { id: 'f1', name: 'Alex Thompson', avatar: '😎', status: 'Online • Playing challenges', online: true },
+                    { id: 'f2', name: 'Maria Garcia', avatar: '🌸', status: 'Online • Creating art', online: true },
+                    { id: 'f3', name: 'James Wilson', avatar: '🚀', status: 'Online • Adventure mode', online: true },
+                    { id: 'f4', name: 'Sarah Chen', avatar: '💪', status: 'Online • Fitness challenge', online: true },
+                    { id: 'f5', name: 'Mike Johnson', avatar: '🎵', status: 'Online • Music challenge', online: true },
+                    { id: 'f6', name: 'Emma Davis', avatar: '🧠', status: 'Online • Mindfulness', online: true },
+                    { id: 'f7', name: 'Carlos Rodriguez', avatar: '🏃', status: 'Last seen 2h ago', online: false },
+                    { id: 'f8', name: 'Lisa Kim', avatar: '🎨', status: 'Last seen yesterday', online: false }
+                ],
+                nearbyStrangers: [
+                    { id: 's1', name: 'Ahmad', avatar: '🤠', distance: '0.8km', online: true },
+                    { id: 's2', name: 'Siti', avatar: '🌟', distance: '1.2km', online: true },
+                    { id: 's3', name: 'Raj', avatar: '🎯', distance: '1.5km', online: true },
+                    { id: 's4', name: 'Mei Lin', avatar: '🎭', distance: '1.8km', online: true },
+                    { id: 's5', name: 'Hassan', avatar: '🎪', distance: '2.1km', online: true },
+                    { id: 's6', name: 'Priya', avatar: '🌈', distance: '2.3km', online: true },
+                    { id: 's7', name: 'Omar', avatar: '🎲', distance: '2.5km', online: true },
+                    { id: 's8', name: 'Fatima', avatar: '🎨', distance: '2.7km', online: true },
+                    { id: 's9', name: 'Kumar', avatar: '🎵', distance: '2.8km', online: true },
+                    { id: 's10', name: 'Aisha', avatar: '🎊', distance: '2.9km', online: true }
+                ],
+                quickChallengeActive: true,
+                disasterActive: true,
+                selectedSurvivalTasks: [],
+                detectionRange: 3
+            };
             
-            setTimeout(() => {
-                // Add some random new players
-                const newPlayers = [
-                    { id: 'new1', name: 'Jordan', avatar: '🌟', distance: (Math.random() * appState.detectionRange).toFixed(1) + 'km', online: true },
-                    { id: 'new2', name: 'Casey', avatar: '🎭', distance: (Math.random() * appState.detectionRange).toFixed(1) + 'km', online: true }
-                ];
+            hideAuthModal();
+            loadAppContent();
+            showWelcomeMessage();
+        }
+
+        // Load user session
+        async function loadUserSession(user) {
+            try {
+                // Load user data from Firestore
+                const userDoc = await db.collection('users').doc(user.uid).get();
                 
-                appState.nearbyStrangers = [...appState.nearbyStrangers, ...newPlayers];
-                renderNearbyPlayers();
-                updateCounts();
-                showMessage(`✅ Found ${newPlayers.length} new players nearby!`, 'success');
-            }, 1500);
-        }
-
-        // Challenge Player
-        function challengePlayer(playerId) {
-            const player = appState.nearbyStrangers.find(p => p.id === playerId);
-            if (player) {
-                showMessage(`🎯 Challenge sent to ${player.name}! They'll receive a notification.`, 'success');
-                
-                setTimeout(() => {
-                    if (Math.random() > 0.5) {
-                        showMessage(`🎉 ${player.name} accepted your challenge!`, 'success');
-                        appState.user.tokens += 25;
-                        document.getElementById('userTokens').textContent = appState.user.tokens.toLocaleString();
-                    } else {
-                        showMessage(`😔 ${player.name} declined your challenge. Try again later!`, 'info');
-                    }
-                }, 3000);
-            }
-        }
-
-        // Challenge Friend
-        function challengeFriend(friendId) {
-            const friend = appState.friends.find(f => f.id === friendId);
-            if (friend) {
-                showMessage(`🎯 Challenge sent to ${friend.name}!`, 'success');
-                
-                setTimeout(() => {
-                    if (friend.online && Math.random() > 0.3) {
-                        showMessage(`🎉 ${friend.name} accepted your challenge!`, 'success');
-                        appState.user.tokens += 50;
-                        document.getElementById('userTokens').textContent = appState.user.tokens.toLocaleString();
-                    } else {
-                        showMessage(`😴 ${friend.name} is ${friend.online ? 'busy' : 'offline'}. They'll see your challenge later!`, 'info');
-                    }
-                }, 2000);
-            }
-        }
-
-        // Chat with Friend
-        function chatWithFriend(friendId) {
-            const friend = appState.friends.find(f => f.id === friendId);
-            if (friend) {
-                showMessage(`💬 Opening chat with ${friend.name}...`, 'info');
-                setTimeout(() => {
-                    showMessage(`${friend.avatar} ${friend.name}: Hey! Ready for some challenges?`, 'success');
-                }, 1000);
-            }
-        }
-
-        // Send Wave to Nearby
-        function sendWaveToNearby() {
-            showMessage('👋 Wave sent to all nearby players!', 'success');
-            
-            setTimeout(() => {
-                const responses = Math.floor(Math.random() * 5) + 1;
-                showMessage(`🌊 ${responses} players waved back!`, 'success');
-                appState.user.tokens += responses * 5;
-                document.getElementById('userTokens').textContent = appState.user.tokens.toLocaleString();
-            }, 2000);
-        }
-
-        // Hide from Nearby
-        function hideFromNearby() {
-            if (appState.isHiddenFromNearby) {
-                appState.isHiddenFromNearby = false;
-                showMessage('👁️ You are now visible to nearby players!', 'info');
-                event.target.textContent = 'Hide Me';
-            } else {
-                appState.isHiddenFromNearby = true;
-                showMessage('👻 You are now hidden from nearby players!', 'info');
-                event.target.textContent = 'Show Me';
-            }
-        }
-
-        // Toggle View All Friends
-        function toggleViewAll() {
-            appState.showingAllFriends = !appState.showingAllFriends;
-            const friendsList = document.getElementById('friendsList');
-            const viewAllBtn = document.getElementById('viewAllBtn');
-            
-            if (appState.showingAllFriends) {
-                friendsList.classList.add('show');
-                viewAllBtn.textContent = 'Hide All';
-                showMessage('👥 Showing all friends', 'info');
-            } else {
-                friendsList.classList.remove('show');
-                viewAllBtn.textContent = 'View All';
-                showMessage('👥 Hiding friends list', 'info');
-            }
-        }
-
-        // Show Online Only
-        function showOnlineOnly() {
-            const onlineFriends = appState.friends.filter(f => f.online);
-            showMessage(`💚 ${onlineFriends.length} friends are currently online!`, 'info');
-            
-            // Highlight online friends in carousel
-            document.querySelectorAll('.friend-avatar-item').forEach((item, index) => {
-                if (appState.friends[index].online) {
-                    item.style.transform = 'scale(1.1)';
-                    setTimeout(() => {
-                        item.style.transform = 'scale(1)';
-                    }, 1000);
-                }
-            });
-        }
-
-        // Show Add Friend Modal
-        function showAddFriendModal() {
-            showMessage('👥 Add friend feature coming soon! Connect with friends through social media or invite codes.', 'info');
-        }
-
-        // Create Group
-        function createGroup() {
-            const groupNames = ['Epic Challengers', 'Adventure Squad', 'Creative Collective', 'Fitness Force', 'Social Circle'];
-            const groupEmojis = ['⚡', '🚀', '🎨', '💪', '👥'];
-            
-            const randomName = groupNames[Math.floor(Math.random() * groupNames.length)];
-            const randomEmoji = groupEmojis[Math.floor(Math.random() * groupEmojis.length)];
-            
-            showMessage(`🏠 Creating group "${randomName}"...`, 'info');
-            
-            setTimeout(() => {
-                const newGroup = {
-                    id: 'g' + Date.now(),
-                    name: randomName,
-                    avatar: randomEmoji,
-                    members: 1,
-                    joined: true
-                };
-                
-                appState.groups.unshift(newGroup);
-                renderGroups();
-                showMessage(`🎉 Group "${randomName}" created! Invite friends to join.`, 'success');
-                appState.user.tokens += 100;
-                document.getElementById('userTokens').textContent = appState.user.tokens.toLocaleString();
-            }, 1500);
-        }
-
-        // Toggle Group
-        function toggleGroup(groupId) {
-            const group = appState.groups.find(g => g.id === groupId);
-            if (group) {
-                group.joined = !group.joined;
-                if (group.joined) {
-                    group.members += 1;
-                    showMessage(`🎉 Joined ${group.name}! Welcome aboard!`, 'success');
-                    appState.user.tokens += 20;
+                if (userDoc.exists) {
+                    const userData = userDoc.data();
+                    appState.user = {
+                        id: user.uid,
+                        name: userData.name || user.displayName || 'JomBro Player',
+                        avatar: userData.avatar || getRandomAvatar(),
+                        tokens: userData.tokens || 1000,
+                        level: userData.level || 1,
+                        friends: userData.friendsCount || 0,
+                        online: true
+                    };
+                    
+                    // Update user's online status
+                    await updateUserOnlineStatus(true);
+                    
                 } else {
-                    group.members -= 1;
-                    showMessage(`👋 Left ${group.name}. You can rejoin anytime!`, 'info');
+                    // Create new user document
+                    const newUserData = {
+                        name: user.displayName || 'JomBro Player',
+                        avatar: getRandomAvatar(),
+                        tokens: 1000,
+                        level: 1,
+                        friendsCount: 0,
+                        createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+                        lastActive: firebase.firestore.FieldValue.serverTimestamp(),
+                        online: true
+                    };
+                    
+                    await db.collection('users').doc(user.uid).set(newUserData);
+                    appState.user = { id: user.uid, ...newUserData };
                 }
-                renderGroups();
-                document.getElementById('userTokens').textContent = appState.user.tokens.toLocaleString();
+                
+                // Load friends and nearby players
+                await loadUserFriends();
+                await loadNearbyPlayers();
+                
+                hideAuthModal();
+                loadAppContent();
+                showWelcomeMessage();
+                
+            } catch (error) {
+                console.error('Error loading user session:', error);
+                showMessage('⚠️ Error loading user data', 'error');
             }
         }
 
-        // Slide Friends Carousel
-        function slideFriends(direction) {
-            const track = document.getElementById('friendsTrack');
-            const itemWidth = 70; // Approximate width of each friend item
-            appState.friendsSlideIndex += direction;
+        // Authentication functions
+        function switchAuthTab(tab) {
+            document.querySelectorAll('.auth-tab').forEach(t => t.classList.remove('active'));
+            document.querySelector(`[onclick="switchAuthTab('${tab}')"]`).classList.add('active');
             
-            const maxSlides = Math.max(0, appState.friends.length - 4);
-            appState.friendsSlideIndex = Math.max(0, Math.min(appState.friendsSlideIndex, maxSlides));
-            
-            track.style.transform = `translateX(-${appState.friendsSlideIndex * itemWidth}px)`;
+            if (tab === 'login') {
+                document.getElementById('loginForm').style.display = 'flex';
+                document.getElementById('signupForm').style.display = 'none';
+            } else {
+                document.getElementById('loginForm').style.display = 'none';
+                document.getElementById('signupForm').style.display = 'flex';
+            }
         }
 
-        // Slide Strangers Carousel
-        function slideStrangers(direction) {
-            const track = document.getElementById('strangersTrack');
-            const itemWidth = 70; // Approximate width of each stranger item
-            appState.strangersSlideIndex += direction;
+        async function loginUser() {
+            const email = document.getElementById('loginEmail').value.trim();
+            const password = document.getElementById('loginPassword').value;
             
-            const maxSlides = Math.max(0, appState.nearbyStrangers.length - 4);
-            appState.strangersSlideIndex = Math.max(0, Math.min(appState.strangersSlideIndex, maxSlides));
+            if (!email || !password) {
+                showMessage('❌ Please fill in all fields!', 'error');
+                return;
+            }
             
-            track.style.transform = `translateX(-${appState.strangersSlideIndex * itemWidth}px)`;
+            try {
+                await auth.signInWithEmailAndPassword(email, password);
+                showMessage('🎉 Welcome back to JomBro!', 'success');
+                clearAuthForm('loginForm');
+                
+            } catch (error) {
+                console.error('Login error:', error);
+                handleAuthError(error);
+            }
         }
 
-        // Start AI Challenge Generator
-        function startAIChallengeGenerator() {
-            // Show initial AI challenge after 5 seconds
-            setTimeout(() => {
-                showAIChallenge();
-            }, 5000);
+        async function signupUser() {
+            const name = document.getElementById('signupName').value.trim();
+            const email = document.getElementById('signupEmail').value.trim();
+            const password = document.getElementById('signupPassword').value;
             
-            // Then show new challenges every 2 minutes
-            setInterval(() => {
-                if (Math.random() > 0.7) { // 30% chance every 2 minutes
-                    showAIChallenge();
+            if (!name || !email || !password) {
+                showMessage('❌ Please fill in all fields!', 'error');
+                return;
+            }
+            
+            if (password.length < 6) {
+                showMessage('❌ Password must be at least 6 characters!', 'error');
+                return;
+            }
+            
+            try {
+                const userCredential = await auth.createUserWithEmailAndPassword(email, password);
+                await userCredential.user.updateProfile({ displayName: name });
+                
+                showMessage('🎉 Welcome to JomBro! You got 1000 starting tokens!', 'success');
+                clearAuthForm('signupForm');
+                
+            } catch (error) {
+                console.error('Signup error:', error);
+                handleAuthError(error);
+            }
+        }
+
+        async function logoutUser() {
+            try {
+                if (currentUser && db) {
+                    await updateUserOnlineStatus(false);
                 }
-            }, 120000);
-        }
-
-        // Show AI Challenge
-        function showAIChallenge() {
-            const challenge = aiChallengeTemplates[Math.floor(Math.random() * aiChallengeTemplates.length)];
-            
-            document.getElementById('aiChallengeTitle').textContent = challenge.title;
-            document.getElementById('aiChallengeDescription').textContent = challenge.description;
-            document.getElementById('aiTokens').textContent = challenge.tokens;
-            document.getElementById('aiDifficulty').textContent = challenge.difficulty.charAt(0).toUpperCase() + challenge.difficulty.slice(1);
-            document.getElementById('aiDuration').textContent = challenge.duration;
-            
-            document.getElementById('aiNotification').style.display = 'block';
-            
-            // Auto-dismiss after 15 seconds
-            setTimeout(() => {
-                dismissAIChallenge();
-            }, 15000);
-        }
-
-        // Accept AI Challenge
-        function acceptAIChallenge() {
-            const tokens = parseInt(document.getElementById('aiTokens').textContent);
-            
-            appState.user.tokens += tokens;
-            appState.user.challengesCompleted += 1;
-            document.getElementById('userTokens').textContent = appState.user.tokens.toLocaleString();
-            
-            document.getElementById('aiNotification').style.display = 'none';
-            showMessage(`🤖 AI Challenge accepted! You earned ${tokens} tokens!`, 'success');
-        }
-
-        // Dismiss AI Challenge
-        function dismissAIChallenge() {
-            document.getElementById('aiNotification').style.display = 'none';
-            showMessage('🤖 AI Challenge dismissed. New challenges will appear later!', 'info');
-        }
-
-        // Show Welcome Message
-        function showWelcomeMessage() {
-            setTimeout(() => {
-                showMessage('🎉 Welcome to JomBro! All features are active and ready!', 'success');
-            }, 1000);
-            
-            setTimeout(() => {
-                showMessage('💡 Try creating a challenge or finding nearby players!', 'info');
-            }, 3000);
-        }
-
-        // Show Message Function
-        function showMessage(message, type = 'info') {
-            // Remove existing messages
-            document.querySelectorAll('.message').forEach(msg => msg.remove());
-            
-            const messageEl = document.createElement('div');
-            messageEl.className = `message ${type}`;
-            messageEl.textContent = message;
-            document.body.appendChild(messageEl);
-            
-            setTimeout(() => {
-                if (messageEl.parentNode) {
-                    messageEl.remove();
+                
+                if (auth) {
+                    await auth.signOut();
+                } else {
+                    // Offline mode logout
+                    currentUser = null;
+                    showAuthModal();
                 }
-            }, 4000);
+                
+                showMessage('👋 Logged out successfully!', 'info');
+                
+            } catch (error) {
+                console.error('Logout error:', error);
+                showMessage('❌ Logout failed', 'error');
+            }
         }
 
-        // Initialize the app when page loads
-        document.addEventListener('DOMContentLoaded', function() {
-            init();
-        });
+        // Load friends from Firebase
+        async function loadUserFriends() {
+            if (!currentUser || !db) return;
+            
+            try {
+                // Listen for real-time friend updates
+                db.collection('friendships')
+                    .where('users', 'array-contains', currentUser.uid)
+                    .where('status', '==', 'accepted')
+                    .onSnapshot(async (snapshot) => {
+                        const friends = [];
+                        
+                        for (const doc of snapshot.docs) {
+                            const friendship = doc.data();
+                            const friendId = friendship.users.find(id => id !== currentUser.uid);
+                            
+                            if (friendId) {
+                                const friendDoc = await db.collection('users').doc(friendId).get();
+                                if (friendDoc.exists) {
+                                    const friendData = friendDoc.data();
+                                    friends.push({
+                                        id: friendId,
+                                        name: friendData.name,
+                                        avatar: friendData.avatar || getRandomAvatar(),
+                                        online: friendData.online || false,
+                                        status: friendData.online ? 'Online • Ready for challenges' : 'Offline',
+                                        lastActive: friendData.lastActive
+                                    });
+                                }
+                            }
+                        }
+                        
+                        appState.friends = friends;
+                        renderFriends();
+                        updateCounts();
+                    });
+                    
+            } catch (error) {
+                console.error('Error loading friends:', error);
+            }
+        }
+
+        // Load nearby players from Firebase
+        async function loadNearbyPlayers() {
+            if (!currentUser || !db) return;
+            
+            try {
+                // Listen for real-time nearby players
+                db.collection('users')
+                    .where('online', '==', true)
+                    .limit(50)
+                    .onSnapshot((snapshot) => {
+                        const nearbyPlayers = [];
+                        
+                        snapshot.forEach(doc => {
+                            if (doc.id !== currentUser.uid) {
+                                const userData = doc.data();
+                                
+                                // Simulate distance calculation
+                                const distance = (Math.random() * appState.detectionRange).toFixed(1);
+                                
+                                nearbyPlayers.push({
+                                    id: doc.id,
+                                    name: userData.name,
+                                    avatar: userData.avatar || getRandomAvatar(),
+                                    distance: distance + 'km',
+                                    online: true
+                                });
+                            }
+                        });
+                        
+                        appState.nearbyStrangers = nearbyPlayers;
+                        renderNearbyPlayers();
+                        updateCounts();
+                    });
+                    
+            } catch (error) {
+                console.error('Error loading nearby players:', error);
+            }
+        }
+
+        // Update user online status
+        async function updateUserOnlineStatus(online) {
+            if (!currentUser || !db) return;
+            
+            try {
+                await db.collection('users').doc(currentUser.uid).update({
+                    online: online,
+                    lastActive: firebase.firestore.FieldValue.serverTimestamp()
+                });
+                
+                appState.user.online = online;
+                
+            } catch (error) {
+                console.error('Error updating online status:', error);
+            }
+        }
+
+        // Challenge functions
+        function createQuickChallenge() {
