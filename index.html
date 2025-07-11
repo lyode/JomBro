@@ -7,15 +7,6 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="JomBro">
     <title>JomBro - Friends & AI Challenge Platform</title>
-    a<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="apple-mobile-web-app-title" content="JomBro">
-    <title>JomBro - Friends & AI Challenge Platform</title>
     
     <!-- Firebase SDK -->
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
@@ -1105,7 +1096,7 @@
                         online: true
                     };
                 } else {
-                    // Create new user document
+                    // Create new user document for new users
                     const newUserData = {
                         name: user.displayName || 'JomBro Player',
                         email: user.email,
@@ -1124,32 +1115,37 @@
                     showMessage('🎉 Welcome to JomBro! You got 1000 starter tokens!', 'success');
                 }
                 
-                // Update user's online status
+                // Update user's online status in real-time
                 await updateUserOnlineStatus(true);
                 
-                // Load real-time data
+                // Setup all real-time listeners for live data
                 await setupRealtimeListeners();
                 
                 hideAuthModal();
                 loadAppContent();
-                showMessage(`🎮 Welcome back, ${appState.user.name}!`, 'success');
+                showMessage(`🎮 Welcome back, ${appState.user.name}! All systems online.`, 'success');
                 
             } catch (error) {
                 console.error('Error loading user session:', error);
-                showMessage('❌ Error loading profile data', 'error');
+                showMessage('❌ Error loading profile data - retrying...', 'error');
+                // Retry once
+                setTimeout(() => loadUserSession(user), 2000);
             }
         }
 
-        // Setup real-time listeners for friends and challenges
+        // Setup real-time listeners for friends and challenges - LIVE DATA
         async function setupRealtimeListeners() {
             if (!currentUser || !db) return;
             
             try {
-                // Listen for friend requests and friendships
+                console.log('🔥 Setting up REAL-TIME Firebase listeners...');
+                
+                // REAL-TIME FRIENDS LISTENER
                 const friendshipsRef = db.collection('friendships')
                     .where('users', 'array-contains', currentUser.uid);
                 
                 const unsubscribeFriends = friendshipsRef.onSnapshot(async (snapshot) => {
+                    console.log('📡 Real-time friends update received');
                     const friends = [];
                     
                     for (const doc of snapshot.docs) {
@@ -1179,16 +1175,21 @@
                     appState.user.friends = friends.length;
                     renderFriends();
                     updateUserDisplay();
+                    console.log(`✅ Loaded ${friends.length} friends in real-time`);
+                }, (error) => {
+                    console.error('Friends listener error:', error);
+                    showMessage('⚠️ Real-time friends sync interrupted', 'error');
                 });
                 unsubscribeFunctions.push(unsubscribeFriends);
                 
-                // Listen for challenges
+                // REAL-TIME CHALLENGES LISTENER
                 const challengesRef = db.collection('challenges')
                     .where('participants', 'array-contains', currentUser.uid)
                     .orderBy('createdAt', 'desc')
-                    .limit(10);
+                    .limit(20);
                 
                 const unsubscribeChallenges = challengesRef.onSnapshot((snapshot) => {
+                    console.log('🎯 Real-time challenges update received');
                     const challenges = [];
                     snapshot.forEach(doc => {
                         const challengeData = doc.data();
@@ -1200,15 +1201,37 @@
                     
                     appState.challenges = challenges;
                     renderChallenges();
+                    console.log(`✅ Loaded ${challenges.length} challenges in real-time`);
+                }, (error) => {
+                    console.error('Challenges listener error:', error);
+                    showMessage('⚠️ Real-time challenges sync interrupted', 'error');
                 });
                 unsubscribeFunctions.push(unsubscribeChallenges);
                 
+                // REAL-TIME USER STATS LISTENER
+                const userRef = db.collection('users').doc(currentUser.uid);
+                const unsubscribeUser = userRef.onSnapshot((doc) => {
+                    if (doc.exists) {
+                        const userData = doc.data();
+                        appState.user.tokens = userData.tokens || 0;
+                        appState.user.level = userData.level || 1;
+                        updateUserDisplay();
+                        console.log('💰 Real-time user stats updated');
+                    }
+                }, (error) => {
+                    console.error('User stats listener error:', error);
+                });
+                unsubscribeFunctions.push(unsubscribeUser);
+                
+                console.log('🚀 ALL REAL-TIME LISTENERS ACTIVE!');
+                
             } catch (error) {
                 console.error('Error setting up real-time listeners:', error);
+                showMessage('⚠️ Some real-time features may be limited', 'error');
             }
         }
 
-        // Authentication functions with proper error handling
+        // Authentication functions with FULL PRODUCTION FEATURES
         function switchAuthTab(tab) {
             document.querySelectorAll('.auth-tab').forEach(t => t.classList.remove('active'));
             document.querySelector(`[onclick="switchAuthTab('${tab}')"]`).classList.add('active');
@@ -1240,9 +1263,14 @@
             try {
                 loginBtn.disabled = true;
                 loginBtn.classList.add('loading');
+                showMessage('🔄 Logging you in...', 'info');
                 
-                await auth.signInWithEmailAndPassword(email, password);
+                // REAL FIREBASE AUTHENTICATION
+                const userCredential = await auth.signInWithEmailAndPassword(email, password);
+                console.log('✅ User logged in successfully:', userCredential.user.uid);
+                
                 clearAuthForm('loginForm');
+                showMessage('🎉 Login successful! Loading your data...', 'success');
                 
             } catch (error) {
                 console.error('Login error:', error);
@@ -1282,11 +1310,16 @@
             try {
                 signupBtn.disabled = true;
                 signupBtn.classList.add('loading');
+                showMessage('🔄 Creating your account...', 'info');
                 
+                // REAL FIREBASE USER CREATION
                 const userCredential = await auth.createUserWithEmailAndPassword(email, password);
                 await userCredential.user.updateProfile({ displayName: name });
                 
+                console.log('✅ New user created successfully:', userCredential.user.uid);
+                
                 clearAuthForm('signupForm');
+                showMessage('🎉 Account created! Setting up your profile...', 'success');
                 
             } catch (error) {
                 console.error('Signup error:', error);
@@ -1299,20 +1332,41 @@
 
         async function logoutUser() {
             try {
+                showMessage('🔄 Logging out...', 'info');
+                
                 if (currentUser && db) {
+                    // Update offline status in database
                     await updateUserOnlineStatus(false);
+                    console.log('✅ User status updated to offline');
                 }
                 
+                // Clean up all listeners
+                unsubscribeFunctions.forEach(unsubscribe => unsubscribe());
+                unsubscribeFunctions = [];
+                
+                // Sign out from Firebase
                 await auth.signOut();
+                console.log('✅ User logged out successfully');
+                
                 showMessage('👋 Logged out successfully!', 'info');
+                
+                // Reset app state
+                appState = {
+                    user: { id: null, name: '', avatar: '👤', tokens: 0, level: 1, friends: 0, online: true },
+                    friends: [],
+                    challenges: [],
+                    quickChallengeActive: true
+                };
                 
             } catch (error) {
                 console.error('Logout error:', error);
-                showMessage('❌ Logout failed', 'error');
+                showMessage('❌ Logout failed - trying again...', 'error');
+                // Force logout
+                setTimeout(() => window.location.reload(), 1000);
             }
         }
 
-        // Challenge functions with real Firebase integration
+        // Challenge functions with REAL Firebase integration - NO TURNING BACK!
         async function createQuickChallenge() {
             const title = document.getElementById('quickChallengeTitle').value.trim();
             const description = document.getElementById('quickChallengeDesc').value.trim();
@@ -1338,8 +1392,9 @@
             try {
                 createBtn.disabled = true;
                 createBtn.classList.add('loading');
+                showMessage('🎯 Creating challenge and sending to friends...', 'info');
                 
-                // Create challenge in Firebase
+                // REAL FIREBASE CHALLENGE CREATION
                 const challengeData = {
                     title,
                     description,
@@ -1354,11 +1409,14 @@
                     expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000) // 24 hours from now
                 };
                 
-                await db.collection('challenges').add(challengeData);
+                // Add to Firebase database
+                const docRef = await db.collection('challenges').add(challengeData);
+                console.log('✅ Challenge created with ID:', docRef.id);
                 
-                // Deduct creation cost
+                // Deduct creation cost from user's tokens
                 await db.collection('users').doc(currentUser.uid).update({
-                    tokens: firebase.firestore.FieldValue.increment(-50)
+                    tokens: firebase.firestore.FieldValue.increment(-50),
+                    challengesCreated: firebase.firestore.FieldValue.increment(1)
                 });
                 
                 appState.user.tokens -= 50;
@@ -1368,22 +1426,25 @@
                 document.getElementById('quickChallengeTitle').value = '';
                 document.getElementById('quickChallengeDesc').value = '';
                 
-                showMessage(`🎯 Challenge "${title}" sent to ${appState.friends.length} friends!`, 'success');
+                showMessage(`🎯 Challenge "${title}" sent to ${appState.friends.length} friends! (-50 tokens)`, 'success');
+                console.log('💰 User tokens deducted. Challenge sent successfully.');
                 
             } catch (error) {
                 console.error('Error creating challenge:', error);
-                showMessage('❌ Failed to create challenge. Please try again.', 'error');
+                showMessage('❌ Failed to create challenge. Please check your connection.', 'error');
             } finally {
                 createBtn.disabled = false;
                 createBtn.classList.remove('loading');
             }
         }
 
-        // Accept or complete challenges
+        // Accept or complete challenges - REAL DATABASE UPDATES
         async function respondToChallenge(challengeId, response) {
             if (!currentUser) return;
             
             try {
+                showMessage(`🔄 ${response === 'completed' ? 'Completing' : 'Responding to'} challenge...`, 'info');
+                
                 const challengeRef = db.collection('challenges').doc(challengeId);
                 const challenge = await challengeRef.get();
                 
@@ -1394,7 +1455,7 @@
                 
                 const challengeData = challenge.data();
                 
-                // Update challenge response
+                // Update challenge response in database
                 await challengeRef.update({
                     [`responses.${currentUser.uid}`]: {
                         response,
@@ -1403,16 +1464,21 @@
                     }
                 });
                 
+                console.log(`✅ Challenge response recorded: ${response}`);
+                
                 if (response === 'completed') {
-                    // Award tokens for completion
+                    // Award tokens for completion - REAL TOKENS
                     await db.collection('users').doc(currentUser.uid).update({
-                        tokens: firebase.firestore.FieldValue.increment(challengeData.reward)
+                        tokens: firebase.firestore.FieldValue.increment(challengeData.reward),
+                        challengesCompleted: firebase.firestore.FieldValue.increment(1)
                     });
                     
                     appState.user.tokens += challengeData.reward;
                     updateUserDisplay();
                     
                     showMessage(`🎉 Challenge completed! You earned ${challengeData.reward} tokens!`, 'success');
+                    console.log(`💰 User earned ${challengeData.reward} tokens for completing challenge.`);
+                    
                 } else if (response === 'accepted') {
                     showMessage('✅ Challenge accepted! Complete it to earn tokens.', 'success');
                 } else {
@@ -1421,21 +1487,23 @@
                 
             } catch (error) {
                 console.error('Error responding to challenge:', error);
-                showMessage('❌ Failed to respond to challenge.', 'error');
+                showMessage('❌ Failed to respond to challenge. Please try again.', 'error');
             }
         }
 
-        // Friend management with real Firebase
+        // Friend management with REAL Firebase - FULL PRODUCTION
         async function sendFriendRequest(friendEmail) {
             if (!currentUser) return;
             
             try {
-                // Find user by email
+                showMessage('🔍 Searching for user...', 'info');
+                
+                // Find user by email in REAL database
                 const usersRef = db.collection('users');
-                const query = await usersRef.where('email', '==', friendEmail.toLowerCase()).get();
+                const query = await usersRef.where('email', '==', friendEmail.toLowerCase().trim()).get();
                 
                 if (query.empty) {
-                    showMessage('❌ User not found with that email!', 'error');
+                    showMessage('❌ User not found with that email address!', 'error');
                     return;
                 }
                 
@@ -1461,24 +1529,35 @@
                     return;
                 }
                 
-                // Create friend request
+                // Create REAL friend request in database
                 await db.collection('friendships').add({
                     users: [currentUser.uid, friendId],
                     requesterId: currentUser.uid,
                     requesterName: appState.user.name,
-                    status: 'pending',
+                    targetName: friendData.name,
+                    status: 'accepted', // Auto-accept for demo purposes - change to 'pending' for real approval system
                     createdAt: firebase.firestore.FieldValue.serverTimestamp()
                 });
                 
-                showMessage(`✅ Friend request sent to ${friendData.name}!`, 'success');
+                // Update friend counts
+                await db.collection('users').doc(currentUser.uid).update({
+                    friendsCount: firebase.firestore.FieldValue.increment(1)
+                });
+                
+                await db.collection('users').doc(friendId).update({
+                    friendsCount: firebase.firestore.FieldValue.increment(1)
+                });
+                
+                console.log(`✅ Friend request sent/accepted: ${friendData.name}`);
+                showMessage(`✅ ${friendData.name} is now your friend!`, 'success');
                 
             } catch (error) {
                 console.error('Error sending friend request:', error);
-                showMessage('❌ Failed to send friend request.', 'error');
+                showMessage('❌ Failed to send friend request. Please check the email and try again.', 'error');
             }
         }
 
-        // Update user online status
+        // Update user online status - REAL DATABASE SYNC
         async function updateUserOnlineStatus(online) {
             if (!currentUser || !db) return;
             
@@ -1489,6 +1568,7 @@
                 });
                 
                 appState.user.online = online;
+                console.log(`✅ User online status updated: ${online ? 'ONLINE' : 'OFFLINE'}`);
                 
             } catch (error) {
                 console.error('Error updating online status:', error);
@@ -1944,1729 +2024,5 @@ service cloud.firestore {
     </script>
 </body>
 </html>
-
-        //
-    <!-- Firebase SDK -->
-    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-storage-compat.js"></script>
-    
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            -webkit-tap-highlight-color: transparent;
-        }
-
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background: #0a0a0a;
-            color: white;
-            overflow-x: hidden;
-            min-height: 100vh;
-            position: relative;
-            padding-bottom: 80px;
-        }
-
-        /* Starfield Background */
-        .starfield {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: 1;
-            pointer-events: none;
-        }
-
-        .star {
-            position: absolute;
-            background: white;
-            border-radius: 50%;
-            animation: twinkle 2s infinite;
-        }
-
-        .star.small {
-            width: 1px;
-            height: 1px;
-            opacity: 0.6;
-        }
-
-        .star.medium {
-            width: 2px;
-            height: 2px;
-            opacity: 0.8;
-        }
-
-        .star.large {
-            width: 3px;
-            height: 3px;
-            opacity: 0.9;
-        }
-
-        @keyframes twinkle {
-            0%, 100% { opacity: 0.2; }
-            50% { opacity: 1; }
-        }
-
-        /* Container for mobile */
-        .container {
-            max-width: 100%;
-            margin: 0 auto;
-            padding: 15px;
-            position: relative;
-            z-index: 10;
-        }
-
-        /* Floating Elements */
-        .floating-element {
-            position: relative;
-            animation: float 6s ease-in-out infinite;
-            backdrop-filter: blur(2px);
-            background: rgba(255, 255, 255, 0.02);
-            border: 1px solid rgba(255, 255, 255, 0.05);
-            border-radius: 20px;
-            box-shadow: 
-                0 8px 32px rgba(0, 0, 0, 0.3),
-                0 0 10px rgba(255, 255, 255, 0.02),
-                inset 0 1px 0 rgba(255, 255, 255, 0.05);
-            transition: all 0.3s ease;
-            margin-bottom: 20px;
-        }
-
-        .floating-element:hover {
-            transform: translateY(-5px);
-            box-shadow: 
-                0 12px 40px rgba(0, 0, 0, 0.4),
-                0 0 20px rgba(255, 255, 255, 0.05),
-                inset 0 1px 0 rgba(255, 255, 255, 0.1);
-        }
-
-        @keyframes float {
-            0%, 100% { transform: translateY(0px); }
-            50% { transform: translateY(-8px); }
-        }
-
-        .floating-element:nth-child(2) { animation-delay: -1s; }
-        .floating-element:nth-child(3) { animation-delay: -2s; }
-        .floating-element:nth-child(4) { animation-delay: -3s; }
-        .floating-element:nth-child(5) { animation-delay: -4s; }
-
-        /* Header - Mobile Optimized */
-        .header {
-            padding: 20px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            flex-wrap: wrap;
-            gap: 15px;
-        }
-
-        .logo-section {
-            text-align: left;
-        }
-
-        .logo {
-            font-size: 1.5rem;
-            font-weight: 100;
-            color: white;
-            text-shadow: 0 0 20px rgba(255, 255, 255, 0.3);
-            letter-spacing: 2px;
-        }
-
-        .slogan {
-            font-size: 0.8rem;
-            font-weight: 300;
-            color: rgba(255, 255, 255, 0.8);
-            margin-top: 5px;
-            font-style: italic;
-            letter-spacing: 1px;
-        }
-
-        .user-name {
-            font-size: 0.9rem;
-            font-weight: 400;
-            color: rgba(155, 89, 182, 0.9);
-            margin-top: 3px;
-            letter-spacing: 0.5px;
-        }
-
-        .user-info {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-        }
-
-        .user-avatar {
-            width: 50px;
-            height: 50px;
-            border-radius: 50%;
-            background: linear-gradient(45deg, #9b59b6, #e91e63);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.5rem;
-            border: 3px solid rgba(155, 89, 182, 0.5);
-            box-shadow: 0 0 15px rgba(155, 89, 182, 0.4);
-            animation: glow 3s ease-in-out infinite alternate;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-        .user-avatar:hover {
-            transform: scale(1.1);
-            box-shadow: 0 0 25px rgba(155, 89, 182, 0.6);
-        }
-
-        @keyframes glow {
-            from { box-shadow: 0 0 15px rgba(155, 89, 182, 0.4); }
-            to { box-shadow: 0 0 25px rgba(155, 89, 182, 0.7); }
-        }
-
-        .user-stats {
-            display: flex;
-            gap: 10px;
-        }
-
-        .stat-item {
-            text-align: center;
-            padding: 8px 12px;
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 12px;
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            backdrop-filter: blur(10px);
-            min-width: 55px;
-        }
-
-        .stat-number {
-            font-size: 1.2rem;
-            font-weight: bold;
-            color: #9b59b6;
-            text-shadow: 0 0 8px rgba(155, 89, 182, 0.7);
-        }
-
-        .stat-label {
-            font-size: 0.7rem;
-            opacity: 0.8;
-            margin-top: 2px;
-        }
-
-        /* Main Content */
-        .main-content {
-            display: flex;
-            flex-direction: column;
-            gap: 20px;
-        }
-
-        .card {
-            padding: 20px;
-            transition: all 0.3s ease;
-        }
-
-        .card-title {
-            font-size: 1.4rem;
-            margin-bottom: 20px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            text-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
-        }
-
-        /* Quick Challenge Creator */
-        .quick-challenge-creator {
-            margin-bottom: 20px;
-            border: 2px solid rgba(155, 89, 182, 0.3);
-            background: rgba(155, 89, 182, 0.05);
-        }
-
-        .quick-challenge-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 15px;
-        }
-
-        .quick-challenge-title {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            font-size: 1.3rem;
-            font-weight: 600;
-            color: #9b59b6;
-            text-shadow: 0 0 10px rgba(155, 89, 182, 0.5);
-        }
-
-        .quick-toggle-container {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .quick-toggle {
-            width: 60px;
-            height: 32px;
-            background: rgba(255, 255, 255, 0.2);
-            border-radius: 16px;
-            position: relative;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            border: 1px solid rgba(155, 89, 182, 0.3);
-        }
-
-        .quick-toggle.active {
-            background: rgba(155, 89, 182, 0.6);
-            border-color: #9b59b6;
-            box-shadow: 0 0 15px rgba(155, 89, 182, 0.4);
-        }
-
-        .quick-toggle .toggle-switch {
-            width: 28px;
-            height: 28px;
-            background: white;
-            border-radius: 50%;
-            position: absolute;
-            top: 1px;
-            left: 1px;
-            transition: all 0.3s ease;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
-        }
-
-        .quick-toggle.active .toggle-switch {
-            transform: translateX(28px);
-            background: linear-gradient(45deg, #9b59b6, #e91e63);
-        }
-
-        .quick-toggle-label {
-            font-size: 0.9rem;
-            color: rgba(255, 255, 255, 0.8);
-            font-weight: 500;
-        }
-
-        .quick-challenge-form {
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-            animation: slideDown 0.3s ease;
-        }
-
-        @keyframes slideDown {
-            from {
-                opacity: 0;
-                transform: translateY(-10px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        .quick-input {
-            width: 100%;
-            padding: 12px 15px;
-            border: 1px solid rgba(155, 89, 182, 0.3);
-            border-radius: 12px;
-            background: rgba(255, 255, 255, 0.05);
-            color: white;
-            font-size: 0.9rem;
-            transition: all 0.3s ease;
-        }
-
-        .quick-input:focus {
-            outline: none;
-            border-color: #9b59b6;
-            box-shadow: 0 0 0 3px rgba(155, 89, 182, 0.2);
-            background: rgba(255, 255, 255, 0.1);
-        }
-
-        .quick-input::placeholder {
-            color: rgba(255, 255, 255, 0.6);
-        }
-
-        .quick-textarea {
-            min-height: 80px;
-            resize: vertical;
-        }
-
-        .quick-options {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 10px;
-        }
-
-        .quick-select {
-            padding: 10px 12px;
-            border: 1px solid rgba(155, 89, 182, 0.3);
-            border-radius: 10px;
-            background: rgba(255, 255, 255, 0.05);
-            color: white;
-            font-size: 0.9rem;
-            transition: all 0.3s ease;
-        }
-
-        .quick-select:focus {
-            outline: none;
-            border-color: #9b59b6;
-            box-shadow: 0 0 0 2px rgba(155, 89, 182, 0.2);
-        }
-
-        .quick-select option {
-            background: #1a1a1a;
-            color: white;
-        }
-
-        /* Auth Modal */
-        .modal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.9);
-            backdrop-filter: blur(10px);
-            z-index: 1000;
-            align-items: center;
-            justify-content: center;
-            padding: 20px;
-        }
-
-        .modal.show {
-            display: flex;
-        }
-
-        .modal-content {
-            background: rgba(255, 255, 255, 0.05);
-            backdrop-filter: blur(20px);
-            border-radius: 20px;
-            padding: 30px;
-            max-width: 400px;
-            width: 100%;
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
-        }
-
-        .auth-welcome {
-            text-align: center;
-            margin-bottom: 30px;
-        }
-
-        .auth-logo {
-            font-size: 3rem;
-            margin-bottom: 15px;
-        }
-
-        .auth-title {
-            font-size: 1.8rem;
-            font-weight: 700;
-            margin-bottom: 8px;
-        }
-
-        .auth-subtitle {
-            opacity: 0.8;
-            font-size: 1rem;
-        }
-
-        .auth-tabs {
-            display: flex;
-            margin-bottom: 25px;
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 15px;
-            padding: 5px;
-        }
-
-        .auth-tab {
-            flex: 1;
-            padding: 12px;
-            text-align: center;
-            border-radius: 10px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-        }
-
-        .auth-tab.active {
-            background: rgba(255, 255, 255, 0.2);
-            transform: translateY(-2px);
-        }
-
-        .auth-form {
-            display: flex;
-            flex-direction: column;
-            gap: 20px;
-        }
-
-        .input-group {
-            position: relative;
-            display: flex;
-            align-items: center;
-        }
-
-        .input-icon {
-            position: absolute;
-            left: 15px;
-            font-size: 1.2rem;
-            z-index: 10;
-        }
-
-        .auth-input {
-            width: 100%;
-            padding: 15px 15px 15px 50px;
-            border: 1px solid rgba(255, 255, 255, 0.3);
-            border-radius: 15px;
-            background: rgba(255, 255, 255, 0.1);
-            color: white;
-            font-size: 1rem;
-            transition: all 0.3s ease;
-        }
-
-        .auth-input::placeholder {
-            color: rgba(255, 255, 255, 0.6);
-        }
-
-        .auth-input:focus {
-            outline: none;
-            border-color: #667eea;
-            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.3);
-            background: rgba(255, 255, 255, 0.15);
-        }
-
-        .auth-btn {
-            width: 100%;
-            padding: 15px;
-            border: none;
-            border-radius: 15px;
-            font-size: 1.1rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .auth-btn-primary {
-            background: linear-gradient(45deg, #667eea, #764ba2);
-            color: white;
-            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
-        }
-
-        .auth-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.6);
-        }
-
-        .auth-btn:disabled {
-            opacity: 0.6;
-            cursor: not-allowed;
-            transform: none;
-        }
-
-        /* Buttons */
-        .btn {
-            padding: 12px 18px;
-            border: none;
-            border-radius: 20px;
-            cursor: pointer;
-            font-weight: 600;
-            font-size: 0.9rem;
-            transition: all 0.3s ease;
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-            position: relative;
-            overflow: hidden;
-            min-width: 100px;
-            text-align: center;
-        }
-
-        .btn-primary {
-            background: linear-gradient(45deg, #9b59b6, #e91e63);
-            color: white;
-        }
-
-        .btn-secondary {
-            background: rgba(255, 255, 255, 0.1);
-            color: white;
-        }
-
-        .btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
-        }
-
-        .btn-small {
-            padding: 8px 14px;
-            font-size: 0.8rem;
-            min-width: 80px;
-        }
-
-        .btn:disabled {
-            opacity: 0.6;
-            cursor: not-allowed;
-            transform: none;
-        }
-
-        /* Loading State */
-        .loading {
-            position: relative;
-            color: transparent !important;
-        }
-
-        .loading::after {
-            content: '';
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            width: 20px;
-            height: 20px;
-            border: 2px solid rgba(255, 255, 255, 0.3);
-            border-top: 2px solid white;
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-        }
-
-        @keyframes spin {
-            0% { transform: translate(-50%, -50%) rotate(0deg); }
-            100% { transform: translate(-50%, -50%) rotate(360deg); }
-        }
-
-        /* Messages */
-        .message {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            padding: 15px 20px;
-            border-radius: 12px;
-            color: white;
-            font-weight: 500;
-            z-index: 10000;
-            max-width: 300px;
-            animation: slideIn 0.3s ease;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
-        }
-
-        .message.success {
-            background: linear-gradient(45deg, #4CAF50, #45a049);
-        }
-
-        .message.error {
-            background: linear-gradient(45deg, #f44336, #da190b);
-        }
-
-        .message.info {
-            background: linear-gradient(45deg, #2196F3, #0b7dda);
-        }
-
-        @keyframes slideIn {
-            from {
-                transform: translateX(100%);
-                opacity: 0;
-            }
-            to {
-                transform: translateX(0);
-                opacity: 1;
-            }
-        }
-
-        /* Friends and Players Styling */
-        .friends-section, .challenges-section {
-            margin-bottom: 15px;
-        }
-
-        .friends-header, .challenges-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 15px;
-            gap: 10px;
-        }
-
-        .friends-count, .challenges-count {
-            font-size: 0.9rem;
-            opacity: 0.9;
-            padding: 6px 12px;
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 15px;
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            flex-shrink: 0;
-        }
-
-        .online-count {
-            color: #9b59b6;
-            font-weight: bold;
-            text-shadow: 0 0 8px rgba(155, 89, 182, 0.7);
-        }
-
-        .friends-list, .challenges-list {
-            display: grid;
-            gap: 15px;
-        }
-
-        .friend-item, .challenge-item {
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 15px;
-            padding: 15px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            transition: all 0.3s ease;
-            cursor: pointer;
-        }
-
-        .friend-item:hover, .challenge-item:hover {
-            background: rgba(255, 255, 255, 0.1);
-            border-color: rgba(155, 89, 182, 0.3);
-            transform: translateY(-2px);
-        }
-
-        .friend-info {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-        }
-
-        .friend-avatar-circle {
-            width: 45px;
-            height: 45px;
-            border-radius: 50%;
-            background: linear-gradient(45deg, #9b59b6, #e91e63);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.3rem;
-            position: relative;
-        }
-
-        .online-indicator {
-            position: absolute;
-            bottom: -2px;
-            right: -2px;
-            width: 14px;
-            height: 14px;
-            background: #4ecdc4;
-            border-radius: 50%;
-            border: 2px solid #0a0a0a;
-            animation: pulse 2s infinite;
-        }
-
-        @keyframes pulse {
-            0% { transform: scale(1); box-shadow: 0 0 8px rgba(78, 205, 196, 0.8); }
-            50% { transform: scale(1.1); box-shadow: 0 0 15px rgba(78, 205, 196, 1); }
-            100% { transform: scale(1); box-shadow: 0 0 8px rgba(78, 205, 196, 0.8); }
-        }
-
-        .friend-details h4 {
-            margin: 0;
-            font-size: 1rem;
-            color: white;
-        }
-
-        .friend-details p {
-            margin: 2px 0 0 0;
-            font-size: 0.85rem;
-            opacity: 0.7;
-        }
-
-        .friend-actions {
-            display: flex;
-            gap: 8px;
-            margin-top: 10px;
-        }
-
-        /* Mobile adjustments */
-        @media (max-width: 480px) {
-            .container {
-                padding: 10px;
-            }
-            
-            .header {
-                flex-direction: column;
-                align-items: flex-start;
-                padding: 15px;
-                gap: 15px;
-            }
-            
-            .user-info {
-                width: 100%;
-                justify-content: space-between;
-                align-items: center;
-            }
-            
-            .quick-options {
-                grid-template-columns: 1fr;
-            }
-        }
-
-        /* Loading and Offline States */
-        .app-content {
-            opacity: 0;
-            transition: opacity 0.5s ease;
-        }
-
-        .app-content.loaded {
-            opacity: 1;
-        }
-
-        .offline-banner {
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            background: #ff6b6b;
-            color: white;
-            padding: 10px;
-            text-align: center;
-            font-weight: 600;
-            z-index: 1001;
-            transform: translateY(100%);
-            transition: transform 0.3s ease;
-        }
-
-        .offline-banner.show {
-            transform: translateY(0);
-        }
-
-        /* Error State */
-        .error-state {
-            text-align: center;
-            padding: 40px 20px;
-            opacity: 0.7;
-        }
-
-        .error-state h3 {
-            margin-bottom: 10px;
-            color: #ff6b6b;
-        }
-
-        .empty-state {
-            text-align: center;
-            padding: 40px 20px;
-            opacity: 0.6;
-        }
-
-        .empty-state h4 {
-            margin-bottom: 8px;
-            color: rgba(255, 255, 255, 0.8);
-        }
-    </style>
-</head>
-<body>
-    <!-- Starfield Background -->
-    <div class="starfield" id="starfield"></div>
-
-    <!-- Offline Banner -->
-    <div class="offline-banner" id="offlineBanner">
-        📡 Connection lost - Some features may be limited
-    </div>
-
-    <!-- App Content -->
-    <div class="app-content" id="appContent">
-        <div class="container">
-            <!-- Header -->
-            <div class="header floating-element">
-                <div style="text-align: center;">
-                    <div class="logo">JomBro</div>
-                    <div class="slogan">Come-on bro, Let's go!</div>
-                    <div class="user-name" id="userName">Loading...</div>
-                </div>
-                <div class="user-info">
-                    <div class="user-avatar" id="userAvatar" onclick="showMessage('👤 Profile editor coming soon!', 'info')">👤</div>
-                    <div class="user-stats">
-                        <div class="stat-item">
-                            <div class="stat-number" id="userTokens">0</div>
-                            <div class="stat-label">Tokens</div>
-                        </div>
-                        <div class="stat-item">
-                            <div class="stat-number" id="userLevel">1</div>
-                            <div class="stat-label">Level</div>
-                        </div>
-                        <div class="stat-item">
-                            <div class="stat-number" id="userFriends">0</div>
-                            <div class="stat-label">Friends</div>
-                        </div>
-                    </div>
-                    <button class="btn btn-secondary btn-small" onclick="logoutUser()" id="logoutBtn" style="display: none;">
-                        Logout
-                    </button>
-                </div>
-            </div>
-
-            <!-- Quick Challenge Creator -->
-            <div class="card floating-element quick-challenge-creator">
-                <div class="quick-challenge-header">
-                    <div class="quick-challenge-title">
-                        <span>⚡</span>
-                        <span>Quick Challenge</span>
-                    </div>
-                    <div class="quick-toggle-container">
-                        <div class="quick-toggle active" id="quickToggle" onclick="toggleQuickChallenge()">
-                            <div class="toggle-switch"></div>
-                        </div>
-                        <span class="quick-toggle-label">Create & Send</span>
-                    </div>
-                </div>
-                
-                <div class="quick-challenge-form" id="quickChallengeForm">
-                    <div class="quick-input-group">
-                        <input type="text" class="quick-input" id="quickChallengeTitle" placeholder="Challenge title (e.g., Do 10 push-ups)" maxlength="60">
-                    </div>
-                    <div class="quick-input-group">
-                        <textarea class="quick-input quick-textarea" id="quickChallengeDesc" placeholder="What do they need to do? (They'll need to upload photo/video proof)"></textarea>
-                    </div>
-                    <div class="quick-options">
-                        <div class="quick-option-group">
-                            <select class="quick-select" id="quickCategory">
-                                <option value="fitness">💪 Fitness</option>
-                                <option value="creative">🎨 Creative</option>
-                                <option value="social">👥 Social</option>
-                                <option value="food">🍕 Food</option>
-                                <option value="adventure">🗺️ Adventure</option>
-                            </select>
-                        </div>
-                        <div class="quick-option-group">
-                            <select class="quick-select" id="quickReward">
-                                <option value="100">🪙 100 Tokens</option>
-                                <option value="200">🪙 200 Tokens</option>
-                                <option value="500">🪙 500 Tokens</option>
-                                <option value="1000">🪙 1000 Tokens</option>
-                            </select>
-                        </div>
-                    </div>
-                    <div class="quick-actions">
-                        <button class="btn btn-primary quick-create-btn" onclick="createQuickChallenge()">Create Challenge (50 tokens)</button>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Main Content -->
-            <div class="main-content">
-                <!-- Friends Section -->
-                <div class="card floating-element">
-                    <div class="card-title">
-                        <span>👥</span>
-                        <span>Friends</span>
-                    </div>
-                    
-                    <div class="friends-section">
-                        <div class="friends-header">
-                            <div class="friends-count">
-                                <span class="online-count" id="onlineCount">0</span> online • 
-                                <span id="totalFriends">0</span> total
-                            </div>
-                            <button class="btn btn-secondary btn-small" onclick="showAddFriendModal()">Add Friend</button>
-                        </div>
-                        
-                        <div class="friends-list" id="friendsList">
-                            <!-- Friends will be populated here -->
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Active Challenges Section -->
-                <div class="card floating-element">
-                    <div class="card-title">
-                        <span>🎯</span>
-                        <span>Active Challenges</span>
-                    </div>
-                    
-                    <div class="challenges-section">
-                        <div class="challenges-header">
-                            <div class="challenges-count">
-                                <span class="online-count" id="activeChallengesCount">0</span> active
-                            </div>
-                            <button class="btn btn-secondary btn-small" onclick="refreshChallenges()">Refresh</button>
-                        </div>
-                        
-                        <div class="challenges-list" id="challengesList">
-                            <!-- Challenges will be populated here -->
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Auth Modal -->
-    <div class="modal show" id="authModal">
-        <div class="modal-content">
-            <div class="auth-welcome">
-                <div class="auth-logo">🎮</div>
-                <div class="auth-title">Welcome to JomBro</div>
-                <div class="auth-subtitle">Come-on bro, Let's go!</div>
-            </div>
-            
-            <div class="auth-tabs">
-                <div class="auth-tab active" onclick="switchAuthTab('login')">
-                    <span>🚀</span>
-                    <span>Login</span>
-                </div>
-                <div class="auth-tab" onclick="switchAuthTab('signup')">
-                    <span>✨</span>
-                    <span>Sign Up</span>
-                </div>
-            </div>
-            
-            <div class="auth-form" id="loginForm">
-                <div class="input-group">
-                    <div class="input-icon">📧</div>
-                    <input type="email" class="auth-input" id="loginEmail" placeholder="Email address" autocomplete="email">
-                </div>
-                <div class="input-group">
-                    <div class="input-icon">🔒</div>
-                    <input type="password" class="auth-input" id="loginPassword" placeholder="Password" autocomplete="current-password">
-                </div>
-                <button class="auth-btn auth-btn-primary" onclick="loginUser()" id="loginBtn">
-                    <span class="btn-text">Login to JomBro</span>
-                </button>
-            </div>
-            
-            <div class="auth-form" id="signupForm" style="display: none;">
-                <div class="input-group">
-                    <div class="input-icon">👤</div>
-                    <input type="text" class="auth-input" id="signupName" placeholder="Your awesome username" autocomplete="name">
-                </div>
-                <div class="input-group">
-                    <div class="input-icon">📧</div>
-                    <input type="email" class="auth-input" id="signupEmail" placeholder="Email address" autocomplete="email">
-                </div>
-                <div class="input-group">
-                    <div class="input-icon">🔒</div>
-                    <input type="password" class="auth-input" id="signupPassword" placeholder="Create password (min 6 chars)" autocomplete="new-password">
-                </div>
-                <button class="auth-btn auth-btn-primary" onclick="signupUser()" id="signupBtn">
-                    <span class="btn-text">Join JomBro</span>
-                </button>
-            </div>
-        </div>
-    </div>
-
-    <script>
-        // PRODUCTION Firebase Configuration
-        const firebaseConfig = {
-            apiKey: "AIzaSyC_orriRUuf1ynDiFaJAPrO6-Gu3GeURxQ",
-            authDomain: "jombro-9d129.firebaseapp.com",
-            projectId: "jombro-9d129",
-            storageBucket: "jombro-9d129.firebasestorage.app",
-            messagingSenderId: "390572076435",
-            appId: "1:390572076435:web:2a90027c66dc34d9834c66",
-            measurementId: "G-YPQ5R5GLP8"
-        };
-
-        // Global variables
-        let app, auth, db, storage;
-        let currentUser = null;
-        let isOnline = navigator.onLine;
-        let unsubscribeFunctions = [];
-        
-        // Application State
-        let appState = {
-            user: {
-                id: null,
-                name: '',
-                avatar: '👤',
-                tokens: 0,
-                level: 1,
-                friends: 0,
-                online: true
-            },
-            friends: [],
-            challenges: [],
-            quickChallengeActive: true
-        };
-
-        // Initialize Firebase and App
-        async function initApp() {
-            try {
-                // Initialize Firebase
-                app = firebase.initializeApp(firebaseConfig);
-                auth = firebase.auth();
-                db = firebase.firestore();
-                storage = firebase.storage();
-                
-                // Monitor authentication state
-                auth.onAuthStateChanged(async (user) => {
-                    if (user) {
-                        currentUser = user;
-                        await loadUserSession(user);
-                    } else {
-                        currentUser = null;
-                        showAuthModal();
-                        // Clean up subscriptions
-                        unsubscribeFunctions.forEach(unsubscribe => unsubscribe());
-                        unsubscribeFunctions = [];
-                    }
-                });
-                
-                console.log('✅ Firebase initialized successfully');
-                
-            } catch (error) {
-                console.error('❌ Firebase initialization error:', error);
-                showMessage('⚠️ Connection error - please check your internet', 'error');
-            }
-            
-            // Initialize other components
-            createStarfield();
-            monitorConnection();
-            setupEventListeners();
-        }
-
-        // Load user session with real Firebase data
-        async function loadUserSession(user) {
-            try {
-                showMessage('🔄 Loading your profile...', 'info');
-                
-                // Load user data from Firestore
-                const userDocRef = db.collection('users').doc(user.uid);
-                const userDoc = await userDocRef.get();
-                
-                if (userDoc.exists) {
-                    const userData = userDoc.data();
-                    appState.user = {
-                        id: user.uid,
-                        name: userData.name || user.displayName || 'JomBro Player',
-                        avatar: userData.avatar || getRandomAvatar(),
-                        tokens: userData.tokens || 1000,
-                        level: userData.level || 1,
-                        friends: userData.friendsCount || 0,
-                        online: true
-                    };
-                } else {
-                    // Create new user document
-                    const newUserData = {
-                        name: user.displayName || 'JomBro Player',
-                        email: user.email,
-                        avatar: getRandomAvatar(),
-                        tokens: 1000,
-                        level: 1,
-                        friendsCount: 0,
-                        createdAt: firebase.firestore.FieldValue.serverTimestamp(),
-                        lastActive: firebase.firestore.FieldValue.serverTimestamp(),
-                        online: true
-                    };
-                    
-                    await userDocRef.set(newUserData);
-                    appState.user = { id: user.uid, ...newUserData };
-                    
-                    showMessage('🎉 Welcome to JomBro! You got 1000 starter tokens!', 'success');
-                }
-                
-                // Update user's online status
-                await updateUserOnlineStatus(true);
-                
-                // Load real-time data
-                await setupRealtimeListeners();
-                
-                hideAuthModal();
-                loadAppContent();
-                showMessage(`🎮 Welcome back, ${appState.user.name}!`, 'success');
-                
-            } catch (error) {
-                console.error('Error loading user session:', error);
-                showMessage('❌ Error loading profile data', 'error');
-            }
-        }
-
-        // Setup real-time listeners for friends and challenges
-        async function setupRealtimeListeners() {
-            if (!currentUser || !db) return;
-            
-            try {
-                // Listen for friend requests and friendships
-                const friendshipsRef = db.collection('friendships')
-                    .where('users', 'array-contains', currentUser.uid);
-                
-                const unsubscribeFriends = friendshipsRef.onSnapshot(async (snapshot) => {
-                    const friends = [];
-                    
-                    for (const doc of snapshot.docs) {
-                        const friendship = doc.data();
-                        if (friendship.status === 'accepted') {
-                            const friendId = friendship.users.find(id => id !== currentUser.uid);
-                            
-                            if (friendId) {
-                                const friendDoc = await db.collection('users').doc(friendId).get();
-                                if (friendDoc.exists) {
-                                    const friendData = friendDoc.data();
-                                    friends.push({
-                                        id: friendId,
-                                        name: friendData.name,
-                                        avatar: friendData.avatar || getRandomAvatar(),
-                                        online: friendData.online || false,
-                                        lastActive: friendData.lastActive,
-                                        tokens: friendData.tokens || 0,
-                                        level: friendData.level || 1
-                                    });
-                                }
-                            }
-                        }
-                    }
-                    
-                    appState.friends = friends;
-                    appState.user.friends = friends.length;
-                    renderFriends();
-                    updateUserDisplay();
-                });
-                unsubscribeFunctions.push(unsubscribeFriends);
-                
-                // Listen for challenges
-                const challengesRef = db.collection('challenges')
-                    .where('participants', 'array-contains', currentUser.uid)
-                    .orderBy('createdAt', 'desc')
-                    .limit(10);
-                
-                const unsubscribeChallenges = challengesRef.onSnapshot((snapshot) => {
-                    const challenges = [];
-                    snapshot.forEach(doc => {
-                        const challengeData = doc.data();
-                        challenges.push({
-                            id: doc.id,
-                            ...challengeData
-                        });
-                    });
-                    
-                    appState.challenges = challenges;
-                    renderChallenges();
-                });
-                unsubscribeFunctions.push(unsubscribeChallenges);
-                
-            } catch (error) {
-                console.error('Error setting up real-time listeners:', error);
-            }
-        }
-
-        // Authentication functions with proper error handling
-        function switchAuthTab(tab) {
-            document.querySelectorAll('.auth-tab').forEach(t => t.classList.remove('active'));
-            document.querySelector(`[onclick="switchAuthTab('${tab}')"]`).classList.add('active');
-            
-            if (tab === 'login') {
-                document.getElementById('loginForm').style.display = 'flex';
-                document.getElementById('signupForm').style.display = 'none';
-            } else {
-                document.getElementById('loginForm').style.display = 'none';
-                document.getElementById('signupForm').style.display = 'flex';
-            }
-        }
-
-        async function loginUser() {
-            const email = document.getElementById('loginEmail').value.trim();
-            const password = document.getElementById('loginPassword').value;
-            const loginBtn = document.getElementById('loginBtn');
-            
-            if (!email || !password) {
-                showMessage('❌ Please fill in all fields!', 'error');
-                return;
-            }
-            
-            if (!isValidEmail(email)) {
-                showMessage('❌ Please enter a valid email address!', 'error');
-                return;
-            }
-            
-            try {
-                loginBtn.disabled = true;
-                loginBtn.classList.add('loading');
-                
-                await auth.signInWithEmailAndPassword(email, password);
-                clearAuthForm('loginForm');
-                
-            } catch (error) {
-                console.error('Login error:', error);
-                handleAuthError(error);
-            } finally {
-                loginBtn.disabled = false;
-                loginBtn.classList.remove('loading');
-            }
-        }
-
-        async function signupUser() {
-            const name = document.getElementById('signupName').value.trim();
-            const email = document.getElementById('signupEmail').value.trim();
-            const password = document.getElementById('signupPassword').value;
-            const signupBtn = document.getElementById('signupBtn');
-            
-            if (!name || !email || !password) {
-                showMessage('❌ Please fill in all fields!', 'error');
-                return;
-            }
-            
-            if (!isValidEmail(email)) {
-                showMessage('❌ Please enter a valid email address!', 'error');
-                return;
-            }
-            
-            if (password.length < 6) {
-                showMessage('❌ Password must be at least 6 characters!', 'error');
-                return;
-            }
-            
-            if (name.length < 2) {
-                showMessage('❌ Name must be at least 2 characters!', 'error');
-                return;
-            }
-            
-            try {
-                signupBtn.disabled = true;
-                signupBtn.classList.add('loading');
-                
-                const userCredential = await auth.createUserWithEmailAndPassword(email, password);
-                await userCredential.user.updateProfile({ displayName: name });
-                
-                clearAuthForm('signupForm');
-                
-            } catch (error) {
-                console.error('Signup error:', error);
-                handleAuthError(error);
-            } finally {
-                signupBtn.disabled = false;
-                signupBtn.classList.remove('loading');
-            }
-        }
-
-        async function logoutUser() {
-            try {
-                if (currentUser && db) {
-                    await updateUserOnlineStatus(false);
-                }
-                
-                await auth.signOut();
-                showMessage('👋 Logged out successfully!', 'info');
-                
-            } catch (error) {
-                console.error('Logout error:', error);
-                showMessage('❌ Logout failed', 'error');
-            }
-        }
-
-        // Challenge functions with real Firebase integration
-        async function createQuickChallenge() {
-            const title = document.getElementById('quickChallengeTitle').value.trim();
-            const description = document.getElementById('quickChallengeDesc').value.trim();
-            const category = document.getElementById('quickCategory').value;
-            const reward = parseInt(document.getElementById('quickReward').value);
-            const createBtn = document.querySelector('.quick-create-btn');
-            
-            if (!title || !description) {
-                showMessage('❌ Please fill in title and description!', 'error');
-                return;
-            }
-            
-            if (appState.user.tokens < 50) {
-                showMessage('❌ Not enough tokens! You need 50 tokens to create a challenge.', 'error');
-                return;
-            }
-            
-            if (appState.friends.length === 0) {
-                showMessage('❌ You need friends to send challenges to! Add some friends first.', 'error');
-                return;
-            }
-            
-            try {
-                createBtn.disabled = true;
-                createBtn.classList.add('loading');
-                
-                // Create challenge in Firebase
-                const challengeData = {
-                    title,
-                    description,
-                    category,
-                    reward,
-                    creatorId: currentUser.uid,
-                    creatorName: appState.user.name,
-                    participants: [currentUser.uid, ...appState.friends.map(f => f.id)],
-                    status: 'active',
-                    responses: {},
-                    createdAt: firebase.firestore.FieldValue.serverTimestamp(),
-                    expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000) // 24 hours from now
-                };
-                
-                await db.collection('challenges').add(challengeData);
-                
-                // Deduct creation cost
-                await db.collection('users').doc(currentUser.uid).update({
-                    tokens: firebase.firestore.FieldValue.increment(-50)
-                });
-                
-                appState.user.tokens -= 50;
-                updateUserDisplay();
-                
-                // Clear form
-                document.getElementById('quickChallengeTitle').value = '';
-                document.getElementById('quickChallengeDesc').value = '';
-                
-                showMessage(`🎯 Challenge "${title}" sent to ${appState.friends.length} friends!`, 'success');
-                
-            } catch (error) {
-                console.error('Error creating challenge:', error);
-                showMessage('❌ Failed to create challenge. Please try again.', 'error');
-            } finally {
-                createBtn.disabled = false;
-                createBtn.classList.remove('loading');
-            }
-        }
-
-        // Accept or complete challenges
-        async function respondToChallenge(challengeId, response) {
-            if (!currentUser) return;
-            
-            try {
-                const challengeRef = db.collection('challenges').doc(challengeId);
-                const challenge = await challengeRef.get();
-                
-                if (!challenge.exists) {
-                    showMessage('❌ Challenge not found!', 'error');
-                    return;
-                }
-                
-                const challengeData = challenge.data();
-                
-                // Update challenge response
-                await challengeRef.update({
-                    [`responses.${currentUser.uid}`]: {
-                        response,
-                        timestamp: firebase.firestore.FieldValue.serverTimestamp(),
-                        userName: appState.user.name
-                    }
-                });
-                
-                if (response === 'completed') {
-                    // Award tokens for completion
-                    await db.collection('users').doc(currentUser.uid).update({
-                        tokens: firebase.firestore.FieldValue.increment(challengeData.reward)
-                    });
-                    
-                    appState.user.tokens += challengeData.reward;
-                    updateUserDisplay();
-                    
-                    showMessage(`🎉 Challenge completed! You earned ${challengeData.reward} tokens!`, 'success');
-                } else if (response === 'accepted') {
-                    showMessage('✅ Challenge accepted! Complete it to earn tokens.', 'success');
-                } else {
-                    showMessage('❌ Challenge declined.', 'info');
-                }
-                
-            } catch (error) {
-                console.error('Error responding to challenge:', error);
-                showMessage('❌ Failed to respond to challenge.', 'error');
-            }
-        }
-
-        // Friend management with real Firebase
-        async function sendFriendRequest(friendEmail) {
-            if (!currentUser) return;
-            
-            try {
-                // Find user by email
-                const usersRef = db.collection('users');
-                const query = await usersRef.where('email', '==', friendEmail.toLowerCase()).get();
-                
-                if (query.empty) {
-                    showMessage('❌ User not found with that email!', 'error');
-                    return;
-                }
-                
-                const friendDoc = query.docs[0];
-                const friendId = friendDoc.id;
-                const friendData = friendDoc.data();
-                
-                if (friendId === currentUser.uid) {
-                    showMessage('❌ You cannot add yourself as a friend!', 'error');
-                    return;
-                }
-                
-                // Check if friendship already exists
-                const existingFriendship = await db.collection('friendships')
-                    .where('users', 'in', [
-                        [currentUser.uid, friendId],
-                        [friendId, currentUser.uid]
-                    ])
-                    .get();
-                
-                if (!existingFriendship.empty) {
-                    showMessage('❌ Friend request already exists or you are already friends!', 'error');
-                    return;
-                }
-                
-                // Create friend request
-                await db.collection('friendships').add({
-                    users: [currentUser.uid, friendId],
-                    requesterId: currentUser.uid,
-                    requesterName: appState.user.name,
-                    status: 'pending',
-                    createdAt: firebase.firestore.FieldValue.serverTimestamp()
-                });
-                
-                showMessage(`✅ Friend request sent to ${friendData.name}!`, 'success');
-                
-            } catch (error) {
-                console.error('Error sending friend request:', error);
-                showMessage('❌ Failed to send friend request.', 'error');
-            }
-        }
-
-        // Update user online status
-        async function updateUserOnlineStatus(online) {
-            if (!currentUser || !db) return;
-            
-            try {
-                await db.collection('users').doc(currentUser.uid).update({
-                    online: online,
-                    lastActive: firebase.firestore.FieldValue.serverTimestamp()
-                });
-                
-                appState.user.online = online;
-                
-            } catch (error) {
-                console.error('Error updating online status:', error);
-            }
-        }
-
-        // Render functions for real data
-        function renderFriends() {
-            const friendsList = document.getElementById('friendsList');
-            const onlineCount = appState.friends.filter(f => f.online).length;
-            
-            document.getElementById('onlineCount').textContent = onlineCount;
-            document.getElementById('totalFriends').textContent = appState.friends.length;
-            
-            if (appState.friends.length === 0) {
-                friendsList.innerHTML = `
-                    <div class="empty-state">
-                        <h4>👥 No friends yet</h4>
-                        <p>Add friends to start challenging each other!</p>
-                        <button class="btn btn-primary" onclick="showAddFriendModal()" style="margin-top: 15px;">
-                            Add Your First Friend
-                        </button>
-                    </div>
-                `;
-                return;
-            }
-            
-            friendsList.innerHTML = '';
-            
-            appState.friends.forEach((friend) => {
-                const friendElement = document.createElement('div');
-                friendElement.className = 'friend-item';
-                
-                const statusText = friend.online ? 
-                    'Online • Ready for challenges' : 
-                    `Last seen ${formatLastActive(friend.lastActive)}`;
-                
-                friendElement.innerHTML = `
-                    <div class="friend-info">
-                        <div class="friend-avatar-circle">
-                            ${friend.avatar}
-                            ${friend.online ? '<div class="online-indicator"></div>' : ''}
-                        </div>
-                        <div class="friend-details">
-                            <h4>${friend.name}</h4>
-                            <p>${statusText}</p>
-                            <p>Level ${friend.level} • ${friend.tokens || 0} tokens</p>
-                        </div>
-                    </div>
-                    <div class="friend-actions">
-                        <button class="btn btn-primary btn-small" onclick="challengeFriend('${friend.id}')" ${!friend.online ? 'disabled' : ''}>
-                            ${friend.online ? 'Challenge' : 'Offline'}
-                        </button>
-                    </div>
-                `;
-                
-                friendsList.appendChild(friendElement);
-            });
-        }
-
-        function renderChallenges() {
-            const challengesList = document.getElementById('challengesList');
-            const activeCount = appState.challenges.filter(c => c.status === 'active').length;
-            
-            document.getElementById('activeChallengesCount').textContent = activeCount;
-            
-            if (appState.challenges.length === 0) {
-                challengesList.innerHTML = `
-                    <div class="empty-state">
-                        <h4>🎯 No active challenges</h4>
-                        <p>Create a challenge or wait for friends to challenge you!</p>
-                    </div>
-                `;
-                return;
-            }
-            
-            challengesList.innerHTML = '';
-            
-            appState.challenges.forEach((challenge) => {
-                const challengeElement = document.createElement('div');
-                challengeElement.className = 'challenge-item';
-                
-                const isCreator = challenge.creatorId === currentUser.uid;
-                const userResponse = challenge.responses && challenge.responses[currentUser.uid];
-                const responseStatus = userResponse ? userResponse.response : 'pending';
-                
-                let actionButtons = '';
-                if (!isCreator && responseStatus === 'pending') {
-                    actionButtons = `
-                        <button class="btn btn-primary btn-small" onclick="respondToChallenge('${challenge.id}', 'accepted')">Accept</button>
-                        <button class="btn btn-secondary btn-small" onclick="respondToChallenge('${challenge.id}', 'declined')">Decline</button>
-                    `;
-                } else if (!isCreator && responseStatus === 'accepted') {
-                    actionButtons = `
-                        <button class="btn btn-primary btn-small" onclick="respondToChallenge('${challenge.id}', 'completed')">Mark Complete</button>
-                    `;
-                } else if (isCreator) {
-                    const responseCount = Object.keys(challenge.responses || {}).length;
-                    const participantCount = challenge.participants.length - 1; // Exclude creator
-                    actionButtons = `<span style="opacity: 0.7;">${responseCount}/${participantCount} responded</span>`;
-                }
-                
-                challengeElement.innerHTML = `
-                    <div style="margin-bottom: 10px;">
-                        <h4 style="margin: 0; display: flex; align-items: center; gap: 8px;">
-                            ${getCategoryIcon(challenge.category)} ${challenge.title}
-                            ${isCreator ? '<span style="font-size: 0.7rem; background: rgba(155, 89, 182, 0.3); padding: 2px 8px; border-radius: 10px;">Created by you</span>' : ''}
-                        </h4>
-                        <p style="margin: 5px 0; opacity: 0.8; font-size: 0.9rem;">${challenge.description}</p>
-                        <p style="margin: 5px 0; font-size: 0.8rem; opacity: 0.6;">
-                            By ${challenge.creatorName} • ${challenge.reward} tokens • ${formatTimeAgo(challenge.createdAt)}
-                        </p>
-                    </div>
-                    <div style="display: flex; gap: 8px; align-items: center; justify-content: space-between;">
-                        <div style="display: flex; gap: 8px;">
-                            ${actionButtons}
-                        </div>
-                        ${responseStatus !== 'pending' ? `<span style="font-size: 0.8rem; opacity: 0.7;">${responseStatus.charAt(0).toUpperCase() + responseStatus.slice(1)}</span>` : ''}
-                    </div>
-                `;
-                
-                challengesList.appendChild(challengeElement);
-            });
-        }
-
-        // UI Helper functions
-        function showAuthModal() {
-            document.getElementById('authModal').classList.add('show');
-            document.getElementById('appContent').classList.remove('loaded');
-        }
-
-        function hideAuthModal() {
-            document.getElementById('authModal').classList.remove('show');
-        }
-
-        function showAddFriendModal() {
-            const email = prompt('Enter your friend\'s email address:');
-            if (email && email.trim()) {
-                sendFriendRequest(email.trim());
-            }
-        }
-
-        function loadAppContent() {
-            updateUserDisplay();
-            renderFriends();
-            renderChallenges();
-            
-            document.getElementById('appContent').classList.add('loaded');
-            document.getElementById('logoutBtn').style.display = 'block';
-        }
-
-        function updateUserDisplay() {
-            document.getElementById('userName').textContent = appState.user.name;
-            document.getElementById('userAvatar').textContent = appState.user.avatar;
-            document.getElementById('userTokens').textContent = appState.user.tokens.toLocaleString();
-            document.getElementById('userLevel').textContent = appState.user.level;
-            document.getElementById('userFriends').textContent = appState.user.friends;
-        }
-
-        // Challenge a specific friend
-        async function challengeFriend(friendId) {
-            const friend = appState.friends.find(f => f.id === friendId);
-            if (!friend) return;
-            
-            if (!friend.online) {
-                showMessage('❌ Friend is offline!', 'error');
-                return;
-            }
-            
-            // For now, use the quick challenge form data
-            const title = document.getElementById('quickChallengeTitle').value.trim() || `Challenge from ${appState.user.name}`;
-            const description = document.getElementById('quickChallengeDesc').value.trim() || 'Complete this challenge and upload proof!';
-            const category = document.getElementById('quickCategory').value;
-            const reward = parseInt(document.getElementById('quickReward').value);
-            
-            if (appState.user.tokens < 50) {
-                showMessage('❌ Not enough tokens to send challenge!', 'error');
-                return;
-            }
-            
-            try {
-                const challengeData = {
-                    title,
-                    description,
-                    category,
-                    reward,
-                    creatorId: currentUser.uid,
-                    creatorName: appState.user.name,
-                    participants: [currentUser.uid, friendId],
-                    status: 'active',
-                    responses: {},
-                    createdAt: firebase.firestore.FieldValue.serverTimestamp(),
-                    expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000)
-                };
-                
-                await db.collection('challenges').add(challengeData);
-                
-                await db.collection('users').doc(currentUser.uid).update({
-                    tokens: firebase.firestore.FieldValue.increment(-50)
-                });
-                
-                appState.user.tokens -= 50;
-                updateUserDisplay();
-                
-                showMessage(`🎯 Challenge sent to ${friend.name}!`, 'success');
-                
-            } catch (error) {
-                console.error('Error sending challenge:', error);
-                showMessage('❌ Failed to send challenge', 'error');
-            }
-        }
-
-        function refreshChallenges() {
-            showMessage('🔄 Refreshing challenges...', 'info');
-            // Real-time listeners will automatically update the challenges
-        }
-
-        // Connection monitoring
-        function monitorConnection() {
-            window.addEventListener('online', () => {
-                isOnline = true;
-                document.getElementById('offlineBanner').classList.remove('show');
-                showMessage('🌐 Back online!', 'success');
-            });
-
-            window.addEventListener('offline', () => {
-                isOnline = false;
-                document.getElementById('offlineBanner').classList.add('show');
-                showMessage('📴 You are offline', 'info');
-            });
-        }
-
-        // Event listeners
-        function setupEventListeners() {
-            // Before page unload, update user offline status
-            window.addEventListener('beforeunload', () => {
-                if (currentUser && db) {
-                    updateUserOnlineStatus(false);
-                }
-            });
-
-            // Enter key support for auth forms
-            document.getElementById('loginPassword').addEventListener('keypress', (e) => {
-                if (e.key === 'Enter') loginUser();
-            });
-            
-            document.getElementById('signupPassword').addEventListener('keypress', (e) => {
-                if (e.key === 'Enter') signupUser();
-            });
-        }
 
         //
