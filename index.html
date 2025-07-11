@@ -810,6 +810,3534 @@
 
         // Start the app when page loads
         document.addEventListener('DOMContentLoaded', waitForFirebase);
+        <!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>JomBro - Friends & AI Challenge Platform</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #0a0a0a;
+            color: white;
+            overflow-x: hidden;
+            min-height: 100vh;
+            position: relative;
+            padding-bottom: 80px;
+        }
+
+        /* Starfield Background */
+        .starfield {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+            pointer-events: none;
+        }
+
+        .star {
+            position: absolute;
+            background: white;
+            border-radius: 50%;
+            animation: twinkle 2s infinite;
+        }
+
+        .star.small {
+            width: 1px;
+            height: 1px;
+            opacity: 0.6;
+        }
+
+        .star.medium {
+            width: 2px;
+            height: 2px;
+            opacity: 0.8;
+        }
+
+        .star.large {
+            width: 3px;
+            height: 3px;
+            opacity: 0.9;
+        }
+
+        @keyframes twinkle {
+            0%, 100% { opacity: 0.2; }
+            50% { opacity: 1; }
+        }
+
+        /* Container for mobile */
+        .container {
+            max-width: 100%;
+            margin: 0 auto;
+            padding: 15px;
+            position: relative;
+            z-index: 10;
+        }
+
+        /* Floating Elements */
+        .floating-element {
+            position: relative;
+            animation: float 6s ease-in-out infinite;
+            backdrop-filter: blur(2px);
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 20px;
+            box-shadow: 
+                0 8px 32px rgba(0, 0, 0, 0.3),
+                0 0 10px rgba(255, 255, 255, 0.02),
+                inset 0 1px 0 rgba(255, 255, 255, 0.05);
+            transition: all 0.3s ease;
+            margin-bottom: 20px;
+        }
+
+        .floating-element:hover {
+            transform: translateY(-5px);
+            box-shadow: 
+                0 12px 40px rgba(0, 0, 0, 0.4),
+                0 0 20px rgba(255, 255, 255, 0.05),
+                inset 0 1px 0 rgba(255, 255, 255, 0.1);
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-8px); }
+        }
+
+        .floating-element:nth-child(2) { animation-delay: -1s; }
+        .floating-element:nth-child(3) { animation-delay: -2s; }
+        .floating-element:nth-child(4) { animation-delay: -3s; }
+        .floating-element:nth-child(5) { animation-delay: -4s; }
+
+        /* Header - Mobile Optimized */
+        .header {
+            padding: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .logo-section {
+            text-align: left;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 100;
+            color: white;
+            text-shadow: 0 0 20px rgba(255, 255, 255, 0.3);
+            letter-spacing: 2px;
+        }
+
+        .slogan {
+            font-size: 0.8rem;
+            font-weight: 300;
+            color: rgba(255, 255, 255, 0.8);
+            margin-top: 5px;
+            font-style: italic;
+            letter-spacing: 1px;
+        }
+
+        .user-name {
+            font-size: 0.9rem;
+            font-weight: 400;
+            color: rgba(155, 89, 182, 0.9);
+            margin-top: 3px;
+            letter-spacing: 0.5px;
+        }
+
+        @keyframes gradient {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .user-avatar {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: linear-gradient(45deg, #9b59b6, #e91e63);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            border: 3px solid rgba(155, 89, 182, 0.5);
+            box-shadow: 0 0 15px rgba(155, 89, 182, 0.4);
+            animation: glow 3s ease-in-out infinite alternate;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .user-avatar:hover {
+            transform: scale(1.1);
+            box-shadow: 0 0 25px rgba(155, 89, 182, 0.6);
+        }
+
+        @keyframes glow {
+            from { box-shadow: 0 0 15px rgba(155, 89, 182, 0.4); }
+            to { box-shadow: 0 0 25px rgba(155, 89, 182, 0.7); }
+        }
+
+        .user-stats {
+            display: flex;
+            gap: 10px;
+        }
+
+        .stat-item {
+            text-align: center;
+            padding: 8px 12px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(10px);
+            min-width: 55px;
+        }
+
+        .stat-number {
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: #9b59b6;
+            text-shadow: 0 0 8px rgba(155, 89, 182, 0.7);
+        }
+
+        .stat-label {
+            font-size: 0.7rem;
+            opacity: 0.8;
+            margin-top: 2px;
+        }
+
+        /* Mobile-First Layout */
+        .main-content {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .card {
+            padding: 20px;
+            transition: all 0.3s ease;
+        }
+
+        .card-title {
+            font-size: 1.4rem;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            text-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
+        }
+
+        /* Detection Range Section */
+        .detection-range-section {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            padding: 15px;
+            margin-bottom: 20px;
+            border: 1px solid rgba(63, 81, 181, 0.2);
+        }
+
+        .range-header {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 12px;
+            font-size: 0.95rem;
+            font-weight: 600;
+            color: rgba(63, 81, 181, 0.9);
+        }
+
+        .range-options {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .range-presets {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 8px;
+        }
+
+        .range-btn {
+            padding: 10px 12px;
+            border: 1px solid rgba(63, 81, 181, 0.3);
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.05);
+            color: white;
+            font-size: 0.9rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+        }
+
+        .range-btn:hover {
+            background: rgba(63, 81, 181, 0.2);
+            border-color: rgba(63, 81, 181, 0.5);
+            transform: translateY(-1px);
+        }
+
+        .range-btn.active {
+            background: rgba(63, 81, 181, 0.4);
+            border-color: #3f51b5;
+            box-shadow: 0 0 10px rgba(63, 81, 181, 0.3);
+            color: white;
+            font-weight: bold;
+        }
+
+        .range-custom {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            justify-content: center;
+        }
+
+        .range-input {
+            width: 80px;
+            padding: 8px 10px;
+            border: 1px solid rgba(63, 81, 181, 0.3);
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.05);
+            color: white;
+            font-size: 0.9rem;
+            text-align: center;
+        }
+
+        .range-input:focus {
+            outline: none;
+            border-color: #3f51b5;
+            box-shadow: 0 0 0 2px rgba(63, 81, 181, 0.2);
+        }
+
+        .range-input::placeholder {
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        .range-unit {
+            font-size: 0.9rem;
+            color: rgba(255, 255, 255, 0.7);
+            font-weight: 500;
+        }
+
+        /* Mobile adjustments for range section */
+        @media (max-width: 480px) {
+            .range-presets {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .range-custom {
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+        }
+        .strangers-section {
+            margin-bottom: 15px;
+        }
+
+        .strangers-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            gap: 10px;
+        }
+
+        .strangers-count {
+            font-size: 0.9rem;
+            opacity: 0.9;
+            padding: 6px 12px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            flex-shrink: 0;
+        }
+
+        .strangers-carousel {
+            position: relative;
+            overflow: hidden;
+            margin-bottom: 15px;
+            padding: 10px 0;
+        }
+
+        .strangers-track {
+            display: flex;
+            gap: 15px;
+            transition: transform 0.3s ease;
+            padding: 5px 0;
+        }
+
+        .stranger-avatar-item {
+            flex: 0 0 auto;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .stranger-avatar-item:hover {
+            transform: translateY(-5px);
+        }
+
+        .stranger-avatar-wrapper {
+            position: relative;
+            margin-bottom: 8px;
+        }
+
+        .stranger-avatar {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: linear-gradient(45deg, #3f51b5, #8e44ad);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.3rem;
+            position: relative;
+            border: 3px solid rgba(63, 81, 181, 0.5);
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        }
+
+        .stranger-avatar-item:hover .stranger-avatar {
+            border-color: rgba(63, 81, 181, 0.8);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4), 0 0 15px rgba(63, 81, 181, 0.4);
+        }
+
+        .distance-indicator {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background: rgba(63, 81, 181, 0.9);
+            color: white;
+            font-size: 0.7rem;
+            padding: 2px 6px;
+            border-radius: 10px;
+            font-weight: bold;
+        }
+
+        .stranger-name-small {
+            font-size: 0.8rem;
+            font-weight: 500;
+            text-align: center;
+            max-width: 60px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            text-shadow: 0 0 5px rgba(255, 255, 255, 0.3);
+        }
+
+        .strangers-actions {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+        }
+        .friends-section {
+            margin-bottom: 15px;
+        }
+
+        .friends-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            gap: 10px;
+        }
+
+        .friends-count {
+            font-size: 0.9rem;
+            opacity: 0.9;
+            padding: 6px 12px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            flex-shrink: 0;
+        }
+
+        .online-count {
+            color: #9b59b6;
+            font-weight: bold;
+            text-shadow: 0 0 8px rgba(155, 89, 182, 0.7);
+        }
+
+        .friends-carousel {
+            position: relative;
+            overflow: hidden;
+            margin-bottom: 15px;
+            padding: 10px 0;
+        }
+
+        .friends-track {
+            display: flex;
+            gap: 15px;
+            transition: transform 0.3s ease;
+            padding: 5px 0;
+        }
+
+        .friend-avatar-item {
+            flex: 0 0 auto;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .friend-avatar-item:hover {
+            transform: translateY(-5px);
+        }
+
+        .friend-avatar-wrapper {
+            position: relative;
+            margin-bottom: 8px;
+        }
+
+        .friend-avatar {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: linear-gradient(45deg, #9b59b6, #e91e63);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.3rem;
+            position: relative;
+            border: 3px solid rgba(155, 89, 182, 0.5);
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        }
+
+        .friend-avatar-item:hover .friend-avatar {
+            border-color: rgba(155, 89, 182, 0.8);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4), 0 0 15px rgba(155, 89, 182, 0.4);
+        }
+
+        .friend-avatar.offline {
+            opacity: 0.5;
+            filter: grayscale(0.5);
+        }
+
+        .online-indicator {
+            position: absolute;
+            bottom: -2px;
+            right: -2px;
+            width: 14px;
+            height: 14px;
+            background: #4ecdc4;
+            border-radius: 50%;
+            border: 2px solid #0a0a0a;
+            animation: pulse 2s infinite;
+            box-shadow: 0 0 8px rgba(78, 205, 196, 0.8);
+        }
+
+        .offline-indicator {
+            position: absolute;
+            bottom: -2px;
+            right: -2px;
+            width: 14px;
+            height: 14px;
+            background: #666;
+            border-radius: 50%;
+            border: 2px solid #0a0a0a;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); box-shadow: 0 0 8px rgba(78, 205, 196, 0.8); }
+            50% { transform: scale(1.1); box-shadow: 0 0 15px rgba(78, 205, 196, 1); }
+            100% { transform: scale(1); box-shadow: 0 0 8px rgba(78, 205, 196, 0.8); }
+        }
+
+        .friend-name-small {
+            font-size: 0.8rem;
+            font-weight: 500;
+            text-align: center;
+            max-width: 60px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            text-shadow: 0 0 5px rgba(255, 255, 255, 0.3);
+        }
+
+        .carousel-nav {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: white;
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.1rem;
+            transition: all 0.3s ease;
+            z-index: 10;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        }
+
+        .carousel-nav:hover {
+            background: rgba(0, 0, 0, 0.8);
+            transform: translateY(-50%) scale(1.1);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.5);
+        }
+
+        .carousel-nav.prev {
+            left: -10px;
+        }
+
+        .carousel-nav.next {
+            right: -10px;
+        }
+
+        .carousel-nav:disabled {
+            opacity: 0.3;
+            cursor: not-allowed;
+        }
+
+        .carousel-nav:disabled:hover {
+            transform: translateY(-50%) scale(1);
+        }
+
+        .friends-actions {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+        }
+
+        /* Floating Buttons - Mobile Optimized */
+        .btn {
+            padding: 12px 18px;
+            border: none;
+            border-radius: 20px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+            position: relative;
+            overflow: hidden;
+            min-width: 100px;
+            text-align: center;
+        }
+
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.5s;
+        }
+
+        .btn:hover::before {
+            left: 100%;
+        }
+
+        .btn-primary {
+            background: linear-gradient(45deg, #9b59b6, #e91e63);
+            color: white;
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
+        }
+
+        .btn:active {
+            transform: translateY(0px);
+        }
+
+        .btn-small {
+            padding: 8px 14px;
+            font-size: 0.8rem;
+            min-width: 80px;
+        }
+
+        /* Friends List - Mobile Optimized */
+        .friends-list {
+            max-height: 300px;
+            overflow-y: auto;
+            display: none;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 15px;
+            padding: 15px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .friends-list.show {
+            display: block;
+        }
+
+        .friend-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px;
+            margin-bottom: 8px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+        }
+
+        .friend-item:hover {
+            background: rgba(255, 255, 255, 0.1);
+            transform: translateX(3px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        }
+
+        .friend-item .friend-avatar {
+            width: 40px;
+            height: 40px;
+            font-size: 1.1rem;
+        }
+
+        .friend-info {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .friend-name {
+            font-weight: bold;
+            margin-bottom: 4px;
+            text-shadow: 0 0 5px rgba(255, 255, 255, 0.3);
+            font-size: 0.9rem;
+        }
+
+        .friend-status {
+            font-size: 0.8rem;
+            opacity: 0.7;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .friend-actions {
+            display: flex;
+            gap: 8px;
+            flex-shrink: 0;
+        }
+
+        /* Groups Section - Mobile Optimized */
+        .groups-list {
+            max-height: 300px;
+            overflow-y: auto;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 15px;
+            padding: 15px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .group-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px;
+            margin-bottom: 8px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+        }
+
+        .group-item:hover {
+            background: rgba(255, 255, 255, 0.1);
+            transform: translateX(3px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        }
+
+        .group-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(45deg, #9b59b6, #e91e63);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.1rem;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+            flex-shrink: 0;
+        }
+
+        .group-info {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .group-name {
+            font-weight: bold;
+            margin-bottom: 4px;
+            text-shadow: 0 0 5px rgba(255, 255, 255, 0.3);
+            font-size: 0.9rem;
+        }
+
+        .group-members {
+            font-size: 0.8rem;
+            opacity: 0.7;
+        }
+
+        /* Challenge Creation - Mobile Optimized */
+        .challenge-creation {
+            margin-bottom: 20px;
+        }
+
+        .challenge-form {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .form-label {
+            font-weight: 600;
+            opacity: 0.9;
+            text-shadow: 0 0 5px rgba(255, 255, 255, 0.3);
+            font-size: 0.9rem;
+        }
+
+        .form-input {
+            padding: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            color: white;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+        }
+
+        .form-input::placeholder {
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: #9b59b6;
+            box-shadow: 0 0 0 3px rgba(155, 89, 182, 0.3), 0 0 15px rgba(155, 89, 182, 0.3);
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .form-textarea {
+            min-height: 80px;
+            resize: vertical;
+        }
+
+        .form-select {
+            padding: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            color: white;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+        }
+
+        .form-select option {
+            background: #1a1a1a;
+            color: white;
+        }
+
+        .challenge-cost {
+            text-align: center;
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            margin-bottom: 15px;
+            backdrop-filter: blur(10px);
+        }
+
+        .cost-label {
+            font-size: 0.9rem;
+            opacity: 0.8;
+            margin-bottom: 5px;
+        }
+
+        .cost-amount {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #e91e63;
+            text-shadow: 0 0 10px rgba(233, 30, 99, 0.7);
+        }
+
+        .challenge-actions {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        /* AI Challenge Notification - Mobile Optimized */
+        .ai-notification {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(255, 255, 255, 0.02);
+            backdrop-filter: blur(2px);
+            border-radius: 20px;
+            padding: 25px;
+            max-width: 90%;
+            width: 350px;
+            text-align: center;
+            border: 2px solid #9b59b6;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.7), 0 0 25px rgba(155, 89, 182, 0.5);
+            z-index: 1000;
+            animation: slideIn 0.5s ease;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translate(-50%, -50%) scale(0.8);
+            }
+            to {
+                opacity: 1;
+                transform: translate(-50%, -50%) scale(1);
+            }
+        }
+
+        .ai-notification.hide {
+            animation: slideOut 0.5s ease forwards;
+        }
+
+        @keyframes slideOut {
+            from {
+                opacity: 1;
+                transform: translate(-50%, -50%) scale(1);
+            }
+            to {
+                opacity: 0;
+                transform: translate(-50%, -50%) scale(0.8);
+            }
+        }
+
+        .ai-title {
+            font-size: 1.5rem;
+            margin-bottom: 12px;
+            color: #9b59b6;
+            text-shadow: 0 0 10px rgba(155, 89, 182, 0.7);
+        }
+
+        .ai-challenge-title {
+            font-size: 1.1rem;
+            font-weight: bold;
+            margin-bottom: 8px;
+            text-shadow: 0 0 5px rgba(255, 255, 255, 0.3);
+        }
+
+        .ai-challenge-description {
+            font-size: 0.9rem;
+            opacity: 0.8;
+            line-height: 1.4;
+            margin-bottom: 20px;
+        }
+
+        .ai-challenge-details {
+            display: flex;
+            justify-content: space-around;
+            margin-bottom: 20px;
+            gap: 10px;
+        }
+
+        .ai-detail {
+            text-align: center;
+            padding: 8px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            flex: 1;
+        }
+
+        .ai-detail-number {
+            font-size: 1.1rem;
+            font-weight: bold;
+            color: #9b59b6;
+            text-shadow: 0 0 8px rgba(155, 89, 182, 0.7);
+        }
+
+        .ai-detail-label {
+            font-size: 0.8rem;
+            opacity: 0.7;
+            margin-top: 3px;
+        }
+
+        .ai-actions {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        /* Modals - Mobile Optimized */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(5px);
+            z-index: 1000;
+        }
+
+        .modal.show {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .modal-content {
+            background: rgba(0, 0, 0, 0.95);
+            backdrop-filter: blur(20px);
+            border-radius: 20px;
+            padding: 25px;
+            max-width: 100%;
+            width: 400px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            max-height: 80vh;
+            overflow-y: auto;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.7);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .modal-title {
+            font-size: 1.3rem;
+            font-weight: bold;
+            text-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
+        }
+
+        .close-btn {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 1.5rem;
+            cursor: pointer;
+            padding: 5px;
+            opacity: 0.7;
+            transition: opacity 0.3s ease;
+        }
+
+        .close-btn:hover {
+            opacity: 1;
+        }
+
+        .friend-select-list {
+            max-height: 250px;
+            overflow-y: auto;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 15px;
+            padding: 15px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .friend-select-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px;
+            margin-bottom: 8px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+        }
+
+        .friend-select-item:hover {
+            background: rgba(255, 255, 255, 0.1);
+            transform: translateX(3px);
+        }
+
+        .friend-select-item.selected {
+            background: rgba(155, 89, 182, 0.3);
+            border: 2px solid #9b59b6;
+            box-shadow: 0 0 15px rgba(155, 89, 182, 0.5);
+        }
+
+        /* Scrollbar Styling */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 10px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(255, 255, 255, 0.5);
+        }
+
+        /* Quick Challenge Creator */
+        .quick-challenge-creator {
+            margin-bottom: 20px;
+            border: 2px solid rgba(155, 89, 182, 0.3);
+            background: rgba(155, 89, 182, 0.05);
+        }
+
+        .quick-challenge-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .quick-challenge-title {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: #9b59b6;
+            text-shadow: 0 0 10px rgba(155, 89, 182, 0.5);
+        }
+
+        .quick-toggle-container {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .quick-toggle {
+            width: 60px;
+            height: 32px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 16px;
+            position: relative;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 1px solid rgba(155, 89, 182, 0.3);
+        }
+
+        .quick-toggle.active {
+            background: rgba(155, 89, 182, 0.6);
+            border-color: #9b59b6;
+            box-shadow: 0 0 15px rgba(155, 89, 182, 0.4);
+        }
+
+        .quick-toggle .toggle-switch {
+            width: 28px;
+            height: 28px;
+            background: white;
+            border-radius: 50%;
+            position: absolute;
+            top: 1px;
+            left: 1px;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+        }
+
+        .quick-toggle.active .toggle-switch {
+            transform: translateX(28px);
+            background: linear-gradient(45deg, #9b59b6, #e91e63);
+        }
+
+        .quick-toggle-label {
+            font-size: 0.9rem;
+            color: rgba(255, 255, 255, 0.8);
+            font-weight: 500;
+        }
+
+        .quick-challenge-form {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            animation: slideDown 0.3s ease;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .quick-input-group {
+            position: relative;
+        }
+
+        .quick-input {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid rgba(155, 89, 182, 0.3);
+            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.05);
+            color: white;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+        }
+
+        .quick-input:focus {
+            outline: none;
+            border-color: #9b59b6;
+            box-shadow: 0 0 0 3px rgba(155, 89, 182, 0.2);
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .quick-input::placeholder {
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        .quick-textarea {
+            min-height: 80px;
+            resize: vertical;
+        }
+
+        .quick-options {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+
+        .quick-option-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .quick-select {
+            padding: 10px 12px;
+            border: 1px solid rgba(155, 89, 182, 0.3);
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.05);
+            color: white;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+        }
+
+        .quick-select:focus {
+            outline: none;
+            border-color: #9b59b6;
+            box-shadow: 0 0 0 2px rgba(155, 89, 182, 0.2);
+        }
+
+        .quick-select option {
+            background: #1a1a1a;
+            color: white;
+        }
+
+        .quick-proof-requirement {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+            padding: 15px;
+            border: 1px solid rgba(155, 89, 182, 0.2);
+        }
+
+        .proof-header {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 10px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            color: rgba(255, 255, 255, 0.9);
+        }
+
+        .proof-options {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
+        }
+
+        .proof-option {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(155, 89, 182, 0.2);
+            border-radius: 8px;
+            padding: 8px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            font-size: 0.8rem;
+        }
+
+        .proof-option:hover {
+            background: rgba(155, 89, 182, 0.1);
+            border-color: rgba(155, 89, 182, 0.4);
+        }
+
+        .proof-option.selected {
+            background: rgba(155, 89, 182, 0.2);
+            border-color: #9b59b6;
+            box-shadow: 0 0 10px rgba(155, 89, 182, 0.3);
+        }
+
+        .proof-option span:first-child {
+            font-size: 1.2rem;
+        }
+
+        .quick-actions {
+            display: flex;
+            justify-content: center;
+            margin-top: 5px;
+        }
+
+        .quick-create-btn {
+            width: 100%;
+            padding: 12px 20px;
+            font-size: 1rem;
+            font-weight: 600;
+        }
+
+        /* Challenge Submission Modal */
+        .submission-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.9);
+            backdrop-filter: blur(10px);
+            z-index: 1000;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .submission-modal.show {
+            display: flex;
+        }
+
+        .submission-content {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(20px);
+            border-radius: 20px;
+            padding: 25px;
+            max-width: 400px;
+            width: 100%;
+            border: 2px solid rgba(155, 89, 182, 0.3);
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.7);
+        }
+
+        .submission-header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .submission-title {
+            font-size: 1.4rem;
+            font-weight: bold;
+            color: #9b59b6;
+            margin-bottom: 10px;
+        }
+
+        .submission-challenge {
+            font-size: 1rem;
+            color: white;
+            margin-bottom: 15px;
+        }
+
+        .submission-area {
+            border: 2px dashed rgba(155, 89, 182, 0.3);
+            border-radius: 15px;
+            padding: 30px;
+            text-align: center;
+            background: rgba(255, 255, 255, 0.05);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-bottom: 20px;
+        }
+
+        .submission-area:hover {
+            border-color: rgba(155, 89, 182, 0.6);
+            background: rgba(155, 89, 182, 0.1);
+        }
+
+        .submission-area.drag-over {
+            border-color: #9b59b6;
+            background: rgba(155, 89, 182, 0.2);
+        }
+
+        .submission-icon {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+
+        .submission-text {
+            font-size: 0.9rem;
+            color: rgba(255, 255, 255, 0.8);
+            margin-bottom: 5px;
+        }
+
+        .submission-hint {
+            font-size: 0.8rem;
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        .ai-analysis {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            padding: 15px;
+            margin-bottom: 20px;
+            border: 1px solid rgba(155, 89, 182, 0.2);
+            display: none;
+        }
+
+        .ai-analysis.show {
+            display: block;
+            animation: fadeIn 0.5s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .ai-score {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+
+        .ai-score-number {
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: #9b59b6;
+        }
+
+        .ai-score-label {
+            font-size: 0.9rem;
+            color: rgba(255, 255, 255, 0.8);
+        }
+
+        .ai-feedback {
+            font-size: 0.9rem;
+            color: rgba(255, 255, 255, 0.8);
+            line-height: 1.4;
+            margin-bottom: 10px;
+        }
+
+        .ai-reward {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px;
+            background: rgba(155, 89, 182, 0.2);
+            border-radius: 8px;
+            font-weight: 500;
+        }
+
+        .submission-actions {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+        }
+
+        /* Mobile adjustments */
+        @media (max-width: 480px) {
+            .quick-options {
+                grid-template-columns: 1fr;
+            }
+            
+            .proof-options {
+                grid-template-columns: 1fr;
+            }
+        }
+        .profile-section {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .profile-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .profile-avatar-large {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: linear-gradient(45deg, #9b59b6, #e91e63);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            border: 3px solid rgba(155, 89, 182, 0.5);
+            box-shadow: 0 0 15px rgba(155, 89, 182, 0.3);
+            flex-shrink: 0;
+        }
+
+        .profile-info {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .profile-name {
+            font-size: 1.3rem;
+            font-weight: bold;
+            color: white;
+            margin-bottom: 5px;
+            text-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
+        }
+
+        .profile-bio {
+            font-size: 0.9rem;
+            color: rgba(255, 255, 255, 0.8);
+            margin-bottom: 5px;
+            line-height: 1.4;
+        }
+
+        .profile-location {
+            font-size: 0.8rem;
+            color: rgba(155, 89, 182, 0.9);
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .profile-stats-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+
+        .profile-stat-card {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            padding: 15px;
+            text-align: center;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        .profile-stat-card:hover {
+            background: rgba(255, 255, 255, 0.1);
+            transform: translateY(-2px);
+        }
+
+        .profile-stat-number {
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: #9b59b6;
+            text-shadow: 0 0 10px rgba(155, 89, 182, 0.5);
+            margin-bottom: 5px;
+        }
+
+        .profile-stat-label {
+            font-size: 0.8rem;
+            color: rgba(255, 255, 255, 0.7);
+            font-weight: 500;
+        }
+
+        .profile-actions {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        /* Disaster to Friends */
+        .disaster-warning {
+            background: rgba(255, 107, 107, 0.2);
+            border: 1px solid rgba(255, 107, 107, 0.3);
+            border-radius: 10px;
+            padding: 12px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .warning-icon {
+            font-size: 1.5rem;
+            animation: pulse 2s infinite;
+        }
+
+        .warning-text {
+            font-size: 0.9rem;
+            color: rgba(255, 255, 255, 0.9);
+            font-weight: 500;
+        }
+
+        .disaster-settings {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+
+        .disaster-setting-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .disaster-label {
+            font-size: 0.9rem;
+            font-weight: 500;
+            color: rgba(255, 255, 255, 0.8);
+        }
+
+        .disaster-survival-tasks {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            padding: 15px;
+            border: 1px solid rgba(155, 89, 182, 0.2);
+            margin-bottom: 15px;
+        }
+
+        .survival-header {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 12px;
+            font-size: 0.95rem;
+            font-weight: 600;
+            color: rgba(255, 255, 255, 0.9);
+        }
+
+        .survival-task-list {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
+        }
+
+        .survival-task {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(155, 89, 182, 0.2);
+            border-radius: 8px;
+            padding: 10px 8px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .survival-task:hover {
+            background: rgba(155, 89, 182, 0.1);
+            border-color: rgba(155, 89, 182, 0.4);
+            transform: translateY(-1px);
+        }
+
+        .survival-task.selected {
+            background: rgba(155, 89, 182, 0.2);
+            border-color: #9b59b6;
+            box-shadow: 0 0 10px rgba(155, 89, 182, 0.3);
+        }
+
+        .task-icon {
+            font-size: 1.2rem;
+        }
+
+        .task-name {
+            font-size: 0.75rem;
+            font-weight: 500;
+            color: white;
+        }
+
+        .disaster-cost {
+            background: rgba(255, 107, 107, 0.1);
+            border: 1px solid rgba(255, 107, 107, 0.2);
+            border-radius: 10px;
+            padding: 12px;
+            text-align: center;
+            margin-bottom: 15px;
+        }
+
+        .cost-warning {
+            font-size: 1rem;
+            font-weight: 600;
+            color: #ff6b6b;
+            margin-bottom: 4px;
+        }
+
+        .cost-note {
+            font-size: 0.8rem;
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        .disaster-btn {
+            background: linear-gradient(45deg, #ff6b6b, #e91e63);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .disaster-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+            transition: left 0.5s;
+        }
+
+        .disaster-btn:hover::before {
+            left: 100%;
+        }
+
+        .disaster-btn:hover {
+            background: linear-gradient(45deg, #e91e63, #ff6b6b);
+            box-shadow: 0 8px 25px rgba(255, 107, 107, 0.4);
+        }
+
+        /* Disaster Notification */
+        .disaster-notification {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(255, 255, 255, 0.02);
+            backdrop-filter: blur(2px);
+            border-radius: 20px;
+            padding: 25px;
+            max-width: 90%;
+            width: 400px;
+            text-align: center;
+            border: 2px solid #ff6b6b;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.7), 0 0 25px rgba(255, 107, 107, 0.5);
+            z-index: 1000;
+            animation: slideIn 0.5s ease;
+            display: none;
+        }
+
+        .disaster-notification.show {
+            display: block;
+        }
+
+        .disaster-alert-title {
+            font-size: 1.6rem;
+            margin-bottom: 15px;
+            color: #ff6b6b;
+            text-shadow: 0 0 10px rgba(255, 107, 107, 0.7);
+            animation: pulse 2s infinite;
+        }
+
+        .disaster-scenario {
+            font-size: 1.1rem;
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: white;
+        }
+
+        .disaster-brief {
+            font-size: 0.9rem;
+            opacity: 0.8;
+            line-height: 1.4;
+            margin-bottom: 20px;
+        }
+
+        .disaster-stats {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .disaster-stat {
+            text-align: center;
+            padding: 10px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            border: 1px solid rgba(255, 107, 107, 0.2);
+        }
+
+        .disaster-stat-number {
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: #ff6b6b;
+        }
+
+        .disaster-stat-label {
+            font-size: 0.8rem;
+            opacity: 0.7;
+            margin-top: 3px;
+        }
+
+        .disaster-actions {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        /* Mobile adjustments for disaster */
+        @media (max-width: 480px) {
+            .disaster-settings {
+                grid-template-columns: 1fr;
+            }
+            
+            .survival-task-list {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .disaster-stats {
+                grid-template-columns: 1fr;
+            }
+        }
+        .add-friend-options {
+            display: flex;
+            flex-direction: column;
+            gap: 25px;
+        }
+
+        .add-friend-method {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .method-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #9b59b6;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            text-shadow: 0 0 10px rgba(155, 89, 182, 0.3);
+        }
+
+        .social-connect-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+        }
+
+        .social-connect-item {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(155, 89, 182, 0.2);
+            border-radius: 12px;
+            padding: 15px 10px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .social-connect-item:hover {
+            background: rgba(155, 89, 182, 0.1);
+            border-color: rgba(155, 89, 182, 0.4);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(155, 89, 182, 0.2);
+        }
+
+        .social-connect-item.connecting {
+            background: rgba(155, 89, 182, 0.2);
+            border-color: #9b59b6;
+            animation: pulse 1s infinite;
+        }
+
+        .social-connect-icon {
+            font-size: 1.8rem;
+            margin-bottom: 5px;
+        }
+
+        .social-connect-name {
+            font-size: 0.8rem;
+            font-weight: 500;
+            color: white;
+        }
+
+        .add-friend-divider {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin: 10px 0;
+        }
+
+        .divider-line {
+            flex: 1;
+            height: 1px;
+            background: rgba(155, 89, 182, 0.3);
+        }
+
+        .divider-text {
+            font-size: 0.9rem;
+            color: rgba(255, 255, 255, 0.6);
+            font-weight: 500;
+        }
+
+        /* Mobile adjustments for add friend modal */
+        @media (max-width: 480px) {
+            .social-connect-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .social-connect-item {
+                padding: 12px 8px;
+            }
+            
+            .social-connect-icon {
+                font-size: 1.5rem;
+            }
+            
+            .social-connect-name {
+                font-size: 0.7rem;
+            }
+        }
+        @media (max-width: 480px) {
+            .container {
+                padding: 10px;
+            }
+            
+            .header {
+                flex-direction: column;
+                align-items: flex-start;
+                padding: 15px;
+                gap: 15px;
+            }
+            
+            .logo-section {
+                text-align: left;
+                order: 1;
+                width: 100%;
+            }
+            
+            .user-info {
+                order: 2;
+                width: 100%;
+                justify-content: space-between;
+                align-items: center;
+            }
+            
+            .user-stats {
+                justify-content: center;
+                flex-wrap: wrap;
+                gap: 8px;
+            }
+            
+            .friends-actions {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .btn {
+                width: 100%;
+                max-width: 200px;
+            }
+            
+            .challenge-actions {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .ai-notification {
+                width: 95%;
+                padding: 20px;
+            }
+        }
+        @media (max-width: 480px) {
+            .profile-header {
+                flex-direction: column;
+                text-align: center;
+                gap: 10px;
+            }
+            
+            .profile-avatar-large {
+                width: 70px;
+                height: 70px;
+                font-size: 2rem;
+            }
+            
+            .profile-stats-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .profile-actions {
+                flex-direction: column;
+                align-items: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Starfield Background -->
+    <div class="starfield" id="starfield"></div>
+
+    <div class="container">
+        <!-- Header -->
+        <div class="header floating-element">
+            <div style="text-align: center;">
+                <div class="logo">JomBro</div>
+                <div class="slogan">Come-on bro, Let's go!</div>
+                <div class="user-name" id="userName">Please Login</div>
+            </div>
+            <div class="user-info">
+                <div class="user-avatar" id="userAvatar" onclick="openProfile()">👤</div>
+                <div class="user-stats">
+                    <div class="stat-item">
+                        <div class="stat-number" id="userLevel">5</div>
+                        <div class="stat-label">Level</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-number" id="userFriends">8</div>
+                        <div class="stat-label">Friends</div>
+                    </div>
+                </div>
+                <button class="logout-btn" onclick="logoutUser()" id="logoutBtn" style="display: none;">
+                    Logout
+                </button>
+            </div>
+        </div>
+
+        <!-- Quick Challenge Creator -->
+        <div class="card floating-element quick-challenge-creator">
+            <div class="quick-challenge-header">
+                <div class="quick-challenge-title">
+                    <span>⚡</span>
+                    <span>Quick Challenge</span>
+                </div>
+                <div class="quick-toggle-container">
+                    <div class="quick-toggle" id="quickToggle" onclick="toggleQuickChallenge()">
+                        <div class="toggle-switch"></div>
+                    </div>
+                    <span class="quick-toggle-label">Create & Send</span>
+                </div>
+            </div>
+            
+            <div class="quick-challenge-form" id="quickChallengeForm" style="display: none;">
+                <div class="quick-input-group">
+                    <input type="text" class="quick-input" id="quickChallengeTitle" placeholder="Challenge title (e.g., Do 10 push-ups)" maxlength="60">
+                </div>
+                <div class="quick-input-group">
+                    <textarea class="quick-input quick-textarea" id="quickChallengeDesc" placeholder="What do they need to do? (They'll need to upload photo/video proof)"></textarea>
+                </div>
+                <div class="quick-options">
+                    <div class="quick-option-group">
+                        <select class="quick-select" id="quickCategory">
+                            <option value="fitness">💪 Fitness</option>
+                            <option value="creative">🎨 Creative</option>
+                            <option value="social">👥 Social</option>
+                            <option value="food">🍕 Food</option>
+                            <option value="adventure">🗺️ Adventure</option>
+                        </select>
+                    </div>
+                    <div class="quick-option-group">
+                        <select class="quick-select" id="quickReward">
+                            <option value="100">🪙 100 Tokens</option>
+                            <option value="200">🪙 200 Tokens</option>
+                            <option value="500">🪙 500 Tokens</option>
+                            <option value="1000">🪙 1000 Tokens</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="quick-proof-requirement">
+                    <div class="proof-header">
+                        <span>📸</span>
+                        <span>Proof Required</span>
+                    </div>
+                    <div class="proof-options">
+                        <div class="proof-option selected" data-type="photo">
+                            <span>📷</span>
+                            <span>Photo</span>
+                        </div>
+                        <div class="proof-option" data-type="video">
+                            <span>🎬</span>
+                            <span>Video</span>
+                        </div>
+                        <div class="proof-option" data-type="both">
+                            <span>📱</span>
+                            <span>Both</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="quick-actions">
+                    <button class="btn btn-primary quick-create-btn" onclick="createQuickChallenge()">Create Challenge (50 tokens)</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Disaster to Friends -->
+        <div class="card floating-element quick-challenge-creator">
+            <div class="quick-challenge-header">
+                <div class="quick-challenge-title">
+                    <span>💥</span>
+                    <span>Disaster to Friends</span>
+                </div>
+                <div class="quick-toggle-container">
+                    <div class="quick-toggle" id="disasterToggle" onclick="toggleDisaster()">
+                        <div class="toggle-switch"></div>
+                    </div>
+                    <span class="quick-toggle-label">Activate</span>
+                </div>
+            </div>
+            
+            <div class="quick-challenge-form" id="disasterForm" style="display: none;">
+                <div class="disaster-warning">
+                    <div class="warning-icon">⚠️</div>
+                    <div class="warning-text">Send fun disasters to challenge your friends!</div>
+                </div>
+                
+                <div class="quick-input-group">
+                    <select class="quick-input" id="disasterType">
+                        <option value="">Select Disaster Type</option>
+                        <option value="zombie">🧟 Zombie Apocalypse</option>
+                        <option value="alien">👽 Alien Invasion</option>
+                        <option value="robot">🤖 Robot Takeover</option>
+                        <option value="monster">🦖 Monster Attack</option>
+                        <option value="weather">🌪️ Extreme Weather</option>
+                        <option value="virus">🦠 Viral Outbreak</option>
+                        <option value="magic">🧙 Magic Chaos</option>
+                        <option value="time">⏰ Time Distortion</option>
+                    </select>
+                </div>
+                
+                <div class="quick-input-group">
+                    <input type="text" class="quick-input" id="disasterTitle" placeholder="Disaster name (e.g., The Great Pizza Shortage)" maxlength="60">
+                </div>
+                
+                <div class="quick-input-group">
+                    <textarea class="quick-input quick-textarea" id="disasterDescription" placeholder="Describe the disaster scenario... (Friends must complete survival challenges)"></textarea>
+                </div>
+                
+                <div class="disaster-settings">
+                    <div class="disaster-setting-group">
+                        <label class="disaster-label">Difficulty Level</label>
+                        <select class="quick-select" id="disasterDifficulty">
+                            <option value="easy">😅 Easy Survival</option>
+                            <option value="medium">😰 Medium Chaos</option>
+                            <option value="hard">😱 Hard Disaster</option>
+                            <option value="nightmare">💀 Nightmare Mode</option>
+                        </select>
+                    </div>
+                    
+                    <div class="disaster-setting-group">
+                        <label class="disaster-label">Duration</label>
+                        <select class="quick-select" id="disasterDuration">
+                            <option value="1">⏱️ 1 Hour</option>
+                            <option value="6">🕕 6 Hours</option>
+                            <option value="24">📅 24 Hours</option>
+                            <option value="72">🗓️ 3 Days</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="disaster-survival-tasks">
+                    <div class="survival-header">
+                        <span>🎯</span>
+                        <span>Survival Tasks</span>
+                    </div>
+                    <div class="survival-task-list">
+                        <div class="survival-task" onclick="toggleTask(this)">
+                            <span class="task-icon">📷</span>
+                            <span class="task-name">Photo Evidence</span>
+                        </div>
+                        <div class="survival-task" onclick="toggleTask(this)">
+                            <span class="task-icon">🎬</span>
+                            <span class="task-name">Video Proof</span>
+                        </div>
+                        <div class="survival-task" onclick="toggleTask(this)">
+                            <span class="task-icon">📝</span>
+                            <span class="task-name">Written Report</span>
+                        </div>
+                        <div class="survival-task" onclick="toggleTask(this)">
+                            <span class="task-icon">📍</span>
+                            <span class="task-name">Location Check-in</span>
+                        </div>
+                        <div class="survival-task" onclick="toggleTask(this)">
+                            <span class="task-icon">👥</span>
+                            <span class="task-name">Team Up</span>
+                        </div>
+                        <div class="survival-task" onclick="toggleTask(this)">
+                            <span class="task-icon">🎨</span>
+                            <span class="task-name">Creative Solution</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="disaster-cost">
+                    <div class="cost-warning">⚡ Disaster Cost: <span id="disasterCost">100</span> tokens</div>
+                    <div class="cost-note">Friends get rewards for surviving!</div>
+                </div>
+                
+                <div class="quick-actions">
+                    <button class="btn btn-primary quick-create-btn disaster-btn" onclick="launchDisaster()">
+                        <span>💥</span>
+                        <span>Launch Disaster</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Nearby Players Section -->
+            <div class="card floating-element">
+                <div class="card-title">
+                    <span>🎮</span>
+                    <span>Nearby Players</span>
+                    <span style="font-size: 0.8rem; opacity: 0.7;" id="currentRange">(3km)</span>
+                </div>
+                
+                <!-- Detection Range Selector -->
+                <div class="detection-range-section">
+                    <div class="range-header">
+                        <span>📡</span>
+                        <span>Detection Range</span>
+                    </div>
+                    <div class="range-options">
+                        <div class="range-presets">
+                            <button class="range-btn" onclick="setDetectionRange(1)">1km</button>
+                            <button class="range-btn" onclick="setDetectionRange(3)" id="defaultRange">3km</button>
+                            <button class="range-btn" onclick="setDetectionRange(5)">5km</button>
+                            <button class="range-btn" onclick="setDetectionRange(10)">10km</button>
+                        </div>
+                        <div class="range-custom">
+                            <input type="number" class="range-input" id="customRange" placeholder="Custom" min="0.1" max="50" step="0.1">
+                            <span class="range-unit">km</span>
+                            <button class="btn btn-secondary btn-small" onclick="setCustomRange()">Set</button>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="strangers-section">
+                    <div class="strangers-header">
+                        <div class="strangers-count">
+                            <span class="online-count" id="strangersOnlineCount">0</span> online nearby
+                        </div>
+                        <button class="btn btn-secondary btn-small" onclick="refreshNearbyPlayers()">Refresh</button>
+                    </div>
+                    
+                    <div class="strangers-carousel">
+                        <button class="carousel-nav prev" id="strangersprevBtn" onclick="slideStrangers(-1)">‹</button>
+                        <div class="strangers-track" id="strangersTrack">
+                            <!-- Players avatars will be populated here -->
+                        </div>
+                        <button class="carousel-nav next" id="strangersNextBtn" onclick="slideStrangers(1)">›</button>
+                    </div>
+                    
+                    <div class="strangers-actions">
+                        <button class="btn btn-primary" onclick="sendWaveToNearby()">Send Wave 👋</button>
+                        <button class="btn btn-secondary" onclick="hideFromNearby()">Hide Me</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Friends Section -->
+            <div class="card floating-element">
+                <div class="card-title">
+                    <span>👥</span>
+                    <span>Friends</span>
+                </div>
+                
+                <div class="friends-section">
+                    <div class="friends-header">
+                        <div class="friends-count">
+                            <span class="online-count" id="onlineCount">0</span> online • 
+                            <span id="totalFriends">0</span> total
+                        </div>
+                        <button class="btn btn-secondary btn-small" onclick="showAddFriendModal()">Add Friend</button>
+                    </div>
+                    
+                    <div class="friends-carousel">
+                        <button class="carousel-nav prev" id="prevBtn" onclick="slideFriends(-1)">‹</button>
+                        <div class="friends-track" id="friendsTrack">
+                            <!-- Friends avatars will be populated here -->
+                        </div>
+                        <button class="carousel-nav next" id="nextBtn" onclick="slideFriends(1)">›</button>
+                    </div>
+                    
+                    <div class="friends-actions">
+                        <button class="btn btn-primary" id="viewAllBtn" onclick="toggleViewAll()">View All</button>
+                        <button class="btn btn-secondary" onclick="showOnlineOnly()">Online Only</button>
+                    </div>
+                    
+                    <div class="friends-list" id="friendsList">
+                        <!-- Full friends list will be populated here -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Groups Section -->
+            <div class="card floating-element">
+                <div class="card-title">
+                    <span>🏠</span>
+                    <span>Groups</span>
+                    <button class="btn btn-secondary btn-small" onclick="createGroup()">Create Group</button>
+                </div>
+                <div class="groups-list" id="groupsList">
+                    <!-- Groups will be populated here -->
+                </div>
+            </div>
+
+            <!-- Profile Section -->
+            <div class="card floating-element">
+                <div class="card-title">
+                    <span>👤</span>
+                    <span>Profile</span>
+                    <button class="btn btn-secondary btn-small" onclick="editProfile()">Edit</button>
+                </div>
+                
+                <div class="profile-section">
+                    <div class="profile-header">
+                        <div class="profile-avatar-large" id="profileAvatarLarge">👤</div>
+                        <div class="profile-info">
+                            <div class="profile-name" id="profileName">New Player</div>
+                            <div class="profile-bio" id="profileBio">New JomBro player!</div>
+                            <div class="profile-location" id="profileLocation">📍 Shah Alam, Malaysia</div>
+                        </div>
+                    </div>
+                    
+                    <div class="profile-stats-grid">
+                        <div class="profile-stat-card">
+                            <div class="profile-stat-number" id="profileChallengesCompleted">0</div>
+                            <div class="profile-stat-label">Challenges Completed</div>
+                        </div>
+                        <div class="profile-stat-card">
+                            <div class="profile-stat-number" id="profileStreak">0</div>
+                            <div class="profile-stat-label">Day Streak</div>
+                        </div>
+                        <div class="profile-stat-card">
+                            <div class="profile-stat-number" id="profileRank">#0</div>
+                            <div class="profile-stat-label">Global Rank</div>
+                        </div>
+                        <div class="profile-stat-card">
+                            <div class="profile-stat-number" id="profileBadges">0</div>
+                            <div class="profile-stat-label">Badges Earned</div>
+                        </div>
+                    </div>
+                    
+                    <div class="profile-actions">
+                        <button class="btn btn-primary" onclick="shareProfile()">Share Profile</button>
+                        <button class="btn btn-secondary" onclick="viewAchievements()">View All Achievements</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- AI Challenge Notification -->
+    <div class="ai-notification" id="aiNotification" style="display: none;">
+        <div class="ai-title">🤖 AI Challenge Alert!</div>
+        <div class="ai-challenge-title" id="aiChallengeTitle"></div>
+        <div class="ai-challenge-description" id="aiChallengeDescription"></div>
+        <div class="ai-challenge-details">
+            <div class="ai-detail">
+                <div class="ai-detail-number" id="aiTokens">500</div>
+                <div class="ai-detail-label">Tokens</div>
+            </div>
+            <div class="ai-detail">
+                <div class="ai-detail-number" id="aiDifficulty">Medium</div>
+                <div class="ai-detail-label">Difficulty</div>
+            </div>
+            <div class="ai-detail">
+                <div class="ai-detail-number" id="aiDuration">30m</div>
+                <div class="ai-detail-label">Duration</div>
+            </div>
+        </div>
+        <div class="ai-actions">
+            <button class="btn btn-primary" onclick="acceptAIChallenge()">Accept Challenge</button>
+            <button class="btn btn-secondary" onclick="dismissAIChallenge()">Dismiss</button>
+        </div>
+    </div>
+
+    <!-- Auth Modal -->
+    <div class="modal" id="authModal">
+        <div class="modal-content auth-modal-content">
+            <div class="auth-welcome">
+                <div class="auth-logo">🎮</div>
+                <div class="auth-title">Welcome to JomBro</div>
+                <div class="auth-subtitle">Come-on bro, Let's go!</div>
+            </div>
+            
+            <div class="auth-tabs">
+                <div class="auth-tab active" onclick="switchAuthTab('login')">
+                    <span class="tab-icon">🚀</span>
+                    <span>Login</span>
+                </div>
+                <div class="auth-tab" onclick="switchAuthTab('signup')">
+                    <span class="tab-icon">✨</span>
+                    <span>Sign Up</span>
+                </div>
+            </div>
+            
+            <div class="auth-form" id="loginForm">
+                <div class="input-group">
+                    <div class="input-icon">📧</div>
+                    <input type="email" class="auth-input" id="loginEmail" placeholder="Email address" autocomplete="email">
+                </div>
+                <div class="input-group">
+                    <div class="input-icon">🔒</div>
+                    <input type="password" class="auth-input" id="loginPassword" placeholder="Password" autocomplete="current-password">
+                </div>
+                <button class="auth-btn auth-btn-primary" onclick="loginUser()">
+                    <span class="btn-icon">🚀</span>
+                    <span class="btn-text">Login to JomBro</span>
+                    <span class="btn-loading" style="display: none;">
+                        <span class="loading-spinner"></span>
+                        <span>Logging in...</span>
+                    </span>
+                </button>
+            </div>
+            
+            <div class="auth-form" id="signupForm" style="display: none;">
+                <div class="input-group">
+                    <div class="input-icon">👤</div>
+                    <input type="text" class="auth-input" id="signupName" placeholder="Your awesome username" autocomplete="name">
+                </div>
+                <div class="input-group">
+                    <div class="input-icon">📧</div>
+                    <input type="email" class="auth-input" id="signupEmail" placeholder="Email address" autocomplete="email">
+                </div>
+                <div class="input-group">
+                    <div class="input-icon">🔒</div>
+                    <input type="password" class="auth-input" id="signupPassword" placeholder="Create password (min 6 chars)" autocomplete="new-password">
+                </div>
+                <button class="auth-btn auth-btn-primary" onclick="signupUser()">
+                    <span class="btn-icon">✨</span>
+                    <span class="btn-text">Join JomBro</span>
+                    <span class="btn-loading" style="display: none;">
+                        <span class="loading-spinner"></span>
+                        <span>Creating account...</span>
+                    </span>
+                </button>
+            </div>
+            
+            <div class="auth-footer">
+                <div class="auth-benefits">
+                    <div class="benefit-item">
+                        <span class="benefit-icon">🎯</span>
+                        <span>Challenge friends</span>
+                    </div>
+                    <div class="benefit-item">
+                        <span class="benefit-icon">🪙</span>
+                        <span>Earn tokens</span>
+                    </div>
+                    <div class="benefit-item">
+                        <span class="benefit-icon">🏆</span>
+                        <span>Unlock badges</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal" id="addFriendModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-title">Add Friend</div>
+                <button class="close-btn" onclick="hideModal('addFriendModal')">&times;</button>
+            </div>
+            
+            <div class="add-friend-options">
+                <div class="add-friend-method">
+                    <div class="method-title">📱 Via Social Media</div>
+                    <div class="social-connect-grid">
+                        <div class="social-connect-item" onclick="connectSocial('facebook')">
+                            <div class="social-connect-icon">📘</div>
+                            <div class="social-connect-name">Facebook</div>
+                        </div>
+                        <div class="social-connect-item" onclick="connectSocial('instagram')">
+                            <div class="social-connect-icon">📸</div>
+                            <div class="social-connect-name">Instagram</div>
+                        </div>
+                        <div class="social-connect-item" onclick="connectSocial('tiktok')">
+                            <div class="social-connect-icon">🎵</div>
+                            <div class="social-connect-name">TikTok</div>
+                        </div>
+                        <div class="social-connect-item" onclick="connectSocial('whatsapp')">
+                            <div class="social-connect-icon">💬</div>
+                            <div class="social-connect-name">WhatsApp</div>
+                        </div>
+                        <div class="social-connect-item" onclick="connectSocial('telegram')">
+                            <div class="social-connect-icon">✈️</div>
+                            <div class="social-connect-name">Telegram</div>
+                        </div>
+                        <div class="social-connect-item" onclick="connectSocial('discord')">
+                            <div class="social-connect-icon">🎮</div>
+                            <div class="social-connect-name">Discord</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="add-friend-divider">
+                    <div class="divider-line"></div>
+                    <div class="divider-text">OR</div>
+                    <div class="divider-line"></div>
+                </div>
+                
+                <div class="add-friend-method">
+                    <div class="method-title">👤 Manual Search</div>
+                    <div class="form-group">
+                        <label class="form-label">Friend's Email or Username</label>
+                        <input type="text" class="form-input" id="friendEmail" placeholder="Enter email or username...">
+                    </div>
+                    <button class="btn btn-primary" onclick="addFriendManually()">Send Friend Request</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Disaster Notification -->
+    <div class="disaster-notification" id="disasterNotification">
+        <div class="disaster-alert-title">🚨 DISASTER ALERT! 🚨</div>
+        <div class="disaster-scenario" id="disasterScenario">Zombie Apocalypse</div>
+        <div class="disaster-brief" id="disasterBrief">
+            The dead have risen! Complete survival tasks to prove you can survive the apocalypse.
+        </div>
+        <div class="disaster-stats">
+            <div class="disaster-stat">
+                <div class="disaster-stat-number" id="disasterTime">24h</div>
+                <div class="disaster-stat-label">Time Limit</div>
+            </div>
+            <div class="disaster-stat">
+                <div class="disaster-stat-number" id="disasterReward">500</div>
+                <div class="disaster-stat-label">Survival Reward</div>
+            </div>
+        </div>
+        <div class="disaster-actions">
+            <button class="btn btn-primary" onclick="acceptDisaster()">Accept Challenge</button>
+            <button class="btn btn-secondary" onclick="dismissDisaster()">Ignore Risk</button>
+        </div>
+    </div>
+
+    <div class="submission-modal" id="submissionModal">
+        <div class="submission-content">
+            <div class="submission-header">
+                <div class="submission-title">📸 Submit Proof</div>
+                <div class="submission-challenge" id="submissionChallenge">Complete your challenge</div>
+            </div>
+            
+            <div class="submission-area" id="submissionArea" onclick="selectFile()">
+                <div class="submission-icon" id="submissionIcon">📷</div>
+                <div class="submission-text">Tap to upload photo/video</div>
+                <div class="submission-hint">AI will analyze your submission</div>
+            </div>
+            
+            <div class="ai-analysis" id="aiAnalysis">
+                <div class="ai-score">
+                    <div class="ai-score-number" id="aiScore">85%</div>
+                    <div class="ai-score-label">Match Score</div>
+                </div>
+                <div class="ai-feedback" id="aiFeedback">
+                    Great job! The AI detected proper form and completion of the challenge.
+                </div>
+                <div class="ai-reward">
+                    <span>Reward:</span>
+                    <span id="aiRewardAmount">🪙 850 Tokens</span>
+                </div>
+            </div>
+            
+            <div class="submission-actions">
+                <button class="btn btn-primary" id="submitBtn" onclick="submitProof()" style="display: none;">Submit Proof</button>
+                <button class="btn btn-secondary" onclick="closeSubmissionModal()">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal" id="friendSelectModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-title">Send Challenge to Friend</div>
+                <button class="close-btn" onclick="hideModal('friendSelectModal')">&times;</button>
+            </div>
+            <div class="friend-select-list" id="friendSelectList">
+                <!-- Friends will be populated here -->
+            </div>
+            <div style="margin-top: 20px;">
+                <button class="btn btn-primary" onclick="sendChallengeToFriend()">Send Challenge</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Application State - Start with empty real user data
+        let appState = {
+            user: {
+                id: null,
+                name: '',
+                avatar: '👤',
+                tokens: 0,
+                level: 1,
+                friends: 0,
+                location: { lat: 3.0738, lng: 101.5183 }, // Shah Alam coordinates
+                bio: 'New JomBro player!',
+                challengesCompleted: 0,
+                streak: 0,
+                globalRank: 0,
+                badges: 0
+            },
+            friends: [],
+            nearbyStrangers: [],
+            groups: [
+                { id: 'g1', name: 'Fitness Warriors', avatar: '💪', members: 156, joined: true },
+                { id: 'g2', name: 'Creative Minds', avatar: '🎨', members: 89, joined: true },
+                { id: 'g3', name: 'Adventure Seekers', avatar: '🗺️', members: 234, joined: false },
+                { id: 'g4', name: 'Mindful Moments', avatar: '🧠', members: 178, joined: false },
+                { id: 'g5', name: 'Social Butterflies', avatar: '👥', members: 112, joined: true }
+            ],
+            aiChallenges: [],
+            selectedFriend: null,
+            friendsSlideIndex: 0,
+            strangersSlideIndex: 0,
+            showingAllFriends: false,
+            showingOnlineOnly: false,
+            isHiddenFromNearby: false,
+            challengeHistory: [],
+            unreadNotifications: 3,
+            quickChallengeActive: false,
+            disasterActive: false,
+            selectedProofType: 'photo',
+            selectedSurvivalTasks: [],
+            currentChallenge: null,
+            pendingSubmission: null,
+            currentDisaster: null,
+            detectionRange: 3 // Default 3km detection range
+        };
+
+
+            // Add sample friends
+            appState.friends = [
+                { id: 'f1', name: 'Alex Thompson', avatar: '😎', status: 'Online • Playing challenges', online: true },
+                { id: 'f2', name: 'Maria Garcia', avatar: '🌸', status: 'Online • Creating art', online: true },
+                { id: 'f3', name: 'James Wilson', avatar: '🚀', status: 'Online • Adventure mode', online: true },
+                { id: 'f4', name: 'Sarah Chen', avatar: '💪', status: 'Online • Fitness challenge', online: true },
+                { id: 'f5', name: 'Mike Johnson', avatar: '🎵', status: 'Online • Music challenge', online: true },
+                { id: 'f6', name: 'Emma Davis', avatar: '🧠', status: 'Online • Mindfulness', online: true },
+                { id: 'f7', name: 'Carlos Rodriguez', avatar: '🏃', status: 'Last seen 2h ago', online: false },
+                { id: 'f8', name: 'Lisa Kim', avatar: '🎨', status: 'Last seen yesterday', online: false }
+            ];
+
+            // Add sample nearby strangers
+            appState.nearbyStrangers = [
+                { id: 's1', name: 'Ahmad', avatar: '🤠', distance: '0.8km', online: true },
+                { id: 's2', name: 'Siti', avatar: '🌟', distance: '1.2km', online: true },
+                { id: 's3', name: 'Raj', avatar: '🎯', distance: '1.5km', online: true },
+                { id: 's4', name: 'Mei Lin', avatar: '🎭', distance: '1.8km', online: true },
+                { id: 's5', name: 'Hassan', avatar: '🎪', distance: '2.1km', online: true },
+                { id: 's6', name: 'Priya', avatar: '🌈', distance: '2.3km', online: true },
+                { id: 's7', name: 'Omar', avatar: '🎲', distance: '2.5km', online: true },
+                { id: 's8', name: 'Fatima', avatar: '🎨', distance: '2.7km', online: true },
+                { id: 's9', name: 'Kumar', avatar: '🎵', distance: '2.8km', online: true },
+                { id: 's10', name: 'Aisha', avatar: '🎊', distance: '2.9km', online: true },
+                { id: 's11', name: 'Wei', avatar: '🎯', distance: '3.0km', online: true },
+                { id: 's12', name: 'Zara', avatar: '🌺', distance: '3.0km', online: true }
+            ];
+        }
+
+        // AI Challenge Templates
+        const aiChallengeTemplates = [
+            {
+                title: "Street Art Photography Hunt",
+                description: "Find and photograph 5 different pieces of street art in your city. Share the story behind each piece!",
+                category: "creative",
+                difficulty: "medium",
+                tokens: 450,
+                duration: "2h"
+            },
+            {
+                title: "Random Act of Kindness Challenge",
+                description: "Perform 3 random acts of kindness for strangers today. Document their reactions!",
+                category: "social",
+                difficulty: "easy",
+                tokens: 300,
+                duration: "1h"
+            },
+            {
+                title: "Sunrise Workout Adventure",
+                description: "Wake up early and do a 30-minute workout during sunrise. Capture the golden hour!",
+                category: "fitness",
+                difficulty: "hard",
+                tokens: 600,
+                duration: "1h"
+            },
+            {
+                title: "Language Learning Café",
+                description: "Visit a café and learn 10 new words in a foreign language from a native speaker.",
+                category: "learning",
+                difficulty: "medium",
+                tokens: 400,
+                duration: "45m"
+            },
+            {
+                title: "Mindful Nature Walk",
+                description: "Take a 1-hour walk in nature without any digital devices. Write down 10 observations.",
+                category: "mindfulness",
+                difficulty: "easy",
+                tokens: 250,
+                duration: "1h"
+            },
+            {
+                title: "Mystery Location Discovery",
+                description: "Close your eyes, point to a random location on a map, and visit it. Discover something new!",
+                category: "adventure",
+                difficulty: "hard",
+                tokens: 700,
+                duration: "3h"
+            },
+            {
+                title: "One-Minute Story Creator",
+                description: "Create and record a complete story in exactly 60 seconds. Make it engaging and memorable!",
+                category: "creative",
+                difficulty: "medium",
+                tokens: 350,
+                duration: "30m"
+            },
+            {
+                title: "Compliment Chain Reaction",
+                description: "Give genuine compliments to 5 strangers and ask them to pass it forward. Track the chain!",
+                category: "social",
+                difficulty: "medium",
+                tokens: 500,
+                duration: "1h"
+            },
+            {
+                title: "Digital Detox Challenge",
+                description: "Go 4 hours without using any digital devices. Focus on real-world interactions only.",
+                category: "mindfulness",
+                difficulty: "hard",
+                tokens: 650,
+                duration: "4h"
+            },
+            {
+                title: "Food Art Masterpiece",
+                description: "Create an artistic masterpiece using only food ingredients. Share your creation!",
+                category: "creative",
+                difficulty: "easy",
+                tokens: 300,
+                duration: "45m"
+            }
+        ];
+
+        // Create starfield background
+        function createStarfield() {
+            const starfield = document.getElementById('starfield');
+            const numberOfStars = 150;
+
+            for (let i = 0; i < numberOfStars; i++) {
+                const star = document.createElement('div');
+                star.className = 'star';
+                
+                // Random star size
+                const sizes = ['small', 'medium', 'large'];
+                const randomSize = sizes[Math.floor(Math.random() * sizes.length)];
+                star.classList.add(randomSize);
+                
+                // Random position
+                star.style.left = Math.random() * 100 + '%';
+                star.style.top = Math.random() * 100 + '%';
+                
+                // Random animation delay
+                star.style.animationDelay = Math.random() * 2 + 's';
+                
+                // Random animation duration
+                star.style.animationDuration = (Math.random() * 2 + 1) + 's';
+                
+                starfield.appendChild(star);
+            }
+        }
+
+        // Show welcome message for new users
+        function showWelcomeMessage() {
+            setTimeout(() => {
+                showMessage('🎉 Welcome to JomBro! Start by adding friends and creating challenges!', 'success');
+            }, 1000);
+            
+            setTimeout(() => {
+                showMessage('💡 Tip: Toggle Quick Challenge Creator and Disaster Mode for epic fun!', 'info');
+            }, 3000);
+            
+            setTimeout(() => {
+                showMessage('🚀 AI challenges will start appearing once you\'re active!', 'info');
+            }, 5000);
+        }
+
+        // Initialize the application
+        function init() {
+            // Don't start the app until user is authenticated
+            // initializeFirebase() will handle calling startApp()
+            initializeFirebase();
+        }
+
+        // Start the main app after authentication
+        function startApp() {
+            createStarfield();
+            initRealUserData();
+            initDetectionRange(); // Initialize detection range
+            renderProfile();
+            renderNearbyPlayers();
+            renderFriendsCarousel();
+            renderFriends();
+            renderGroups();
+            updateUserStats();
+            updateFriendsCounts();
+            updatePlayersCount();
+            startAIChallengeGenerator();
+            startRandomEvents();
+            startDisasterEvents();
+            showWelcomeMessage();
+        }
+
+        // Firebase Authentication Functions
+        function initializeFirebase() {
+            // Check if Firebase is loaded
+            if (typeof window.auth === 'undefined') {
+                setTimeout(initializeFirebase, 100);
+                return;
+            }
+
+            // Monitor authentication state
+            window.onAuthStateChanged(window.auth, (user) => {
+                if (user) {
+                    // User is signed in
+                    loadUserData(user);
+                    hideModal('authModal');
+                    document.getElementById('logoutBtn').style.display = 'block';
+                    startApp();
+                } else {
+                    // User is signed out
+                    showModal('authModal');
+                    document.getElementById('logoutBtn').style.display = 'none';
+                }
+            });
+        }
+
+        // Authentication functions
+        function switchAuthTab(tab) {
+            document.querySelectorAll('.auth-tab').forEach(t => t.classList.remove('active'));
+            document.querySelector(`[onclick="switchAuthTab('${tab}')"]`).classList.add('active');
+            
+            if (tab === 'login') {
+                document.getElementById('loginForm').style.display = 'flex';
+                document.getElementById('signupForm').style.display = 'none';
+            } else {
+                document.getElementById('loginForm').style.display = 'none';
+                document.getElementById('signupForm').style.display = 'flex';
+            }
+        }
+
+        async function loginUser() {
+            const email = document.getElementById('loginEmail').value;
+            const password = document.getElementById('loginPassword').value;
+            
+            if (!email || !password) {
+                showMessage('❌ Please fill in all fields!', 'error');
+                return;
+            }
+            
+            try {
+                const btn = event.target;
+                const btnText = btn.querySelector('.btn-text');
+                const btnLoading = btn.querySelector('.btn-loading');
+                
+                btnText.style.display = 'none';
+                btnLoading.style.display = 'flex';
+                btn.disabled = true;
+                
+                await window.signInWithEmailAndPassword(window.auth, email, password);
+                showMessage('🎉 Welcome back to JomBro!', 'success');
+                
+                // Clear form
+                document.getElementById('loginEmail').value = '';
+                document.getElementById('loginPassword').value = '';
+                
+            } catch (error) {
+                showMessage('❌ Login failed: ' + error.message, 'error');
+                
+                // Restore button
+                const btn = event.target;
+                const btnText = btn.querySelector('.btn-text');
+                const btnLoading = btn.querySelector('.btn-loading');
+                
+                btnText.style.display = 'block';
+                btnLoading.style.display = 'none';
+                btn.disabled = false;
+            }
+        }
+
+        async function signupUser() {
+            const name = document.getElementById('signupName').value;
+            const email = document.getElementById('signupEmail').value;
+            const password = document.getElementById('signupPassword').value;
+            
+            if (!name || !email || !password) {
+                showMessage('❌ Please fill in all fields!', 'error');
+                return;
+            }
+            
+            if (password.length < 6) {
+                showMessage('❌ Password must be at least 6 characters!', 'error');
+                return;
+            }
+            
+            try {
+                const btn = event.target;
+                const btnText = btn.querySelector('.btn-text');
+                const btnLoading = btn.querySelector('.btn-loading');
+                
+                btnText.style.display = 'none';
+                btnLoading.style.display = 'flex';
+                btn.disabled = true;
+                
+                const userCredential = await window.createUserWithEmailAndPassword(window.auth, email, password);
+                
+                // Store basic user info in app state (no database needed)
+                appState.user = {
+                    ...appState.user,
+                    id: userCredential.user.uid,
+                    name: name,
+                    email: email,
+                    tokens: 1000, // Starting tokens
+                    level: 1,
+                    challengesCompleted: 0,
+                    streak: 0,
+                    globalRank: 999,
+                    badges: 0
+                };
+                
+                showMessage('🎉 Welcome to JomBro! You got 1000 starting tokens!', 'success');
+                
+                // Clear form
+                document.getElementById('signupName').value = '';
+                document.getElementById('signupEmail').value = '';
+                document.getElementById('signupPassword').value = '';
+                
+            } catch (error) {
+                showMessage('❌ Signup failed: ' + error.message, 'error');
+                
+                // Restore button
+                const btn = event.target;
+                const btnText = btn.querySelector('.btn-text');
+                const btnLoading = btn.querySelector('.btn-loading');
+                
+                btnText.style.display = 'block';
+                btnLoading.style.display = 'none';
+                btn.disabled = false;
+            }
+        }
+
+        async function loadUserData(user) {
+            // For auth-only mode, set user info with random avatar for new users
+            appState.user = {
+                ...appState.user,
+                id: user.uid,
+                name: user.displayName || user.email?.split('@')[0] || 'JomBro Player',
+                email: user.email,
+                avatar: generateRandomAvatar(), // Assign random avatar
+                tokens: appState.user.tokens || 1000, // Keep existing tokens or start with 1000
+                level: appState.user.level || 1,
+                challengesCompleted: appState.user.challengesCompleted || 0,
+                streak: appState.user.streak || 0,
+                globalRank: appState.user.globalRank || Math.floor(Math.random() * 1000) + 100, // Random rank
+                badges: appState.user.badges || 0,
+                bio: `${appState.user.name} • Adventure seeker & challenge enthusiast 🌟`
+            };
+            
+            updateUserStats();
+            renderProfile();
+        }
+
+        async function saveUserData() {
+            // In auth-only mode, we don't save to database
+            // Data persists in browser session only
+            console.log('Auth-only mode: Data saved locally');
+        }
+
+        async function logoutUser() {
+            try {
+                await window.signOut(window.auth);
+                showMessage('👋 Logged out successfully!', 'info');
+                
+                // Reset app state to initial values
+                appState.user = {
+                    id: null,
+                    name: '',
+                    avatar: '👤',
+                    tokens: 0,
+                    level: 1,
+                    friends: 0,
+                    bio: 'New JomBro player!',
+                    challengesCompleted: 0,
+                    streak: 0,
+                    globalRank: 0,
+                    badges: 0
+                };
+                appState.friends = [];
+                appState.nearbyStrangers = [];
+                
+            } catch (error) {
+                showMessage('❌ Logout failed: ' + error.message, 'error');
+            }
+        }
+
+        function showModal(modalId) {
+            document.getElementById(modalId).classList.add('show');
+        }
+
+        // Override updateUserStats to save data
+        const originalUpdateUserStats = updateUserStats;
+        updateUserStats = function() {
+            originalUpdateUserStats();
+            saveUserData(); // Save to Firebase whenever stats update
+        };
+
+        // Render nearby players carousel
+        function renderNearbyPlayers() {
+            const strangersTrack = document.getElementById('strangersTrack');
+            strangersTrack.innerHTML = '';
+
+            appState.nearbyStrangers.forEach((player, index) => {
+                const playerElement = document.createElement('div');
+                playerElement.className = 'stranger-avatar-item';
+                playerElement.onclick = () => selectPlayerFromCarousel(player.id);
+                playerElement.innerHTML = `
+                    <div class="stranger-avatar-wrapper">
+                        <div class="stranger-avatar">
+                            ${player.avatar}
+                        </div>
+                        <div class="distance-indicator">${player.distance}</div>
+                        <div class="online-indicator"></div>
+                    </div>
+                    <div class="stranger-name-small">${player.name}</div>
+                `;
+                strangersTrack.appendChild(playerElement);
+            });
+
+            // Reset slide position
+            appState.strangersSlideIndex = 0;
+            updateStrangersCarouselPosition();
+        }
+
+        // Select player from carousel
+        function selectPlayerFromCarousel(playerId) {
+            const player = appState.nearbyStrangers.find(s => s.id === playerId);
+            if (player) {
+                showMessage(`🎮 Say hi to ${player.name} (${player.distance} away)!`, 'info');
+            }
+        }
+
+        // Update players count
+        function updatePlayersCount() {
+            document.getElementById('strangersOnlineCount').textContent = appState.nearbyStrangers.length;
+        }
+
+        // Refresh nearby players - simulate finding real players
+        function refreshNearbyPlayers() {
+            showMessage('🔄 Searching for nearby players...', 'info');
+            
+            // Use current detection range to simulate finding players
+            setTimeout(() => {
+                simulatePlayersInRange(appState.detectionRange);
+                
+                if (appState.nearbyStrangers.length === 0) {
+                    showMessage(`😔 No players found within ${appState.detectionRange}km. Try increasing your detection range!`, 'info');
+                } else {
+                    showMessage(`✅ Found ${appState.nearbyStrangers.length} players within ${appState.detectionRange}km!`, 'success');
+                }
+            }, 1500);
+        }
+
+        // Enhanced social connection functions
+        function connectSocial(platform) {
+            const socialItem = event.target.closest('.social-connect-item');
+            socialItem.classList.add('connecting');
+            
+            const platformNames = {
+                'facebook': 'Facebook',
+                'instagram': 'Instagram', 
+                'tiktok': 'TikTok',
+                'whatsapp': 'WhatsApp',
+                'telegram': 'Telegram',
+                'discord': 'Discord'
+            };
+            
+            const platformName = platformNames[platform];
+            showMessage(`🔗 Connecting to ${platformName}...`, 'info');
+            
+            // Simulate connection process
+            setTimeout(() => {
+                socialItem.classList.remove('connecting');
+                
+                // Simulate finding friends
+                const friendsFound = Math.floor(Math.random() * 8) + 3; // 3-10 friends
+                
+                setTimeout(() => {
+                    appState.user.tokens += 20; // Reward for connecting
+                    updateUserStats();
+                    showMessage(`🎉 Found ${friendsFound} friends on ${platformName}! +20 tokens`, 'success');
+                    
+                    // Add some of them to friends list
+                    const newFriends = [
+                        { id: 'social_1', name: 'Sarah Connect', avatar: '🌸', status: `Online via ${platformName}`, online: true },
+                        { id: 'social_2', name: 'Mike Social', avatar: '🤘', status: `Online via ${platformName}`, online: true }
+                    ];
+                    
+                    // Add to friends list
+                    newFriends.forEach(friend => {
+                        if (!appState.friends.find(f => f.id === friend.id)) {
+                            appState.friends.push(friend);
+                        }
+                    });
+                    
+                    renderFriendsCarousel();
+                    renderFriends();
+                    updateFriendsCounts();
+                    
+                    hideModal('addFriendModal');
+                }, 1500);
+            }, 2000);
+        }
+
+        // Manual friend addition
+        function addFriendManually() {
+            const email = document.getElementById('friendEmail').value;
+            if (email && email.trim()) {
+                showMessage(`📤 Friend request sent to ${email}!`, 'success');
+                
+                // Simulate friend accepting
+                setTimeout(() => {
+                    const newFriend = {
+                        id: 'manual_' + Date.now(),
+                        name: email.split('@')[0] || 'New Friend',
+                        avatar: '👤',
+                        status: 'Online • Just joined',
+                        online: true
+                    };
+                    
+                    appState.friends.push(newFriend);
+                    appState.user.tokens += 30;
+                    updateUserStats();
+                    renderFriendsCarousel();
+                    renderFriends();
+                    updateFriendsCounts();
+                    
+                    showMessage(`🎉 ${newFriend.name} accepted your friend request! +30 tokens`, 'success');
+                }, 3000);
+                
+                hideModal('addFriendModal');
+                document.getElementById('friendEmail').value = '';
+            } else {
+                showMessage('❌ Please enter a valid email or username!', 'error');
+            }
+        }
+
+        // Legacy function for backward compatibility
+        function addFriend() {
+            addFriendManually();
+        }
+
+        // Legacy function names updated
+        function renderNearbyStrangers() {
+            renderNearbyPlayers();
+        }
+
+        function updateStrangersCount() {
+            updatePlayersCount();
+        }
+
+        function refreshNearbyStrangers() {
+            refreshNearbyPlayers();
+        }
+
+        function selectStrangerFromCarousel(playerId) {
+            selectPlayerFromCarousel(playerId);
+        }
+
+        // Disaster Functions
+        function toggleDisaster() {
+            appState.disasterActive = !appState.disasterActive;
+            const toggle = document.getElementById('disasterToggle');
+            const form = document.getElementById('disasterForm');
+            
+            if (appState.disasterActive) {
+                toggle.classList.add('active');
+                form.style.display = 'flex';
+                showMessage('💥 Disaster Mode activated! Prepare for chaos!', 'success');
+            } else {
+                toggle.classList.remove('active');
+                form.style.display = 'none';
+                showMessage('💥 Disaster Mode deactivated', 'info');
+            }
+        }
+
+        function toggleTask(taskElement) {
+            taskElement.classList.toggle('selected');
+            
+            // Update cost based on selected tasks
+            const selectedTasks = document.querySelectorAll('.survival-task.selected');
+            const baseCost = 100;
+            const taskCost = selectedTasks.length * 25;
+            const totalCost = baseCost + taskCost;
+            
+            document.getElementById('disasterCost').textContent = totalCost;
+            
+            // Store selected tasks
+            appState.selectedSurvivalTasks = Array.from(selectedTasks).map(task => 
+                task.querySelector('.task-name').textContent
+            );
+        }
+
+        function launchDisaster() {
+            const disasterType = document.getElementById('disasterType').value;
+            const disasterTitle = document.getElementById('disasterTitle').value;
+            const disasterDescription = document.getElementById('disasterDescription').value;
+            const difficulty = document.getElementById('disasterDifficulty').value;
+            const duration = document.getElementById('disasterDuration').value;
+            
+            if (!disasterType || !disasterTitle || !disasterDescription) {
+                showMessage('❌ Please fill in all disaster details!', 'error');
+                return;
+            }
+            
+            if (appState.selectedSurvivalTasks.length === 0) {
+                showMessage('❌ Please select at least one survival task!', 'error');
+                return;
+            }
+            
+            const totalCost = parseInt(document.getElementById('disasterCost').textContent);
+            
+            if (appState.user.tokens < totalCost) {
+                showMessage(`❌ Not enough tokens! You need ${totalCost} tokens to launch this disaster.`, 'error');
+                return;
+            }
+            
+            // Deduct cost
+            appState.user.tokens -= totalCost;
+            updateUserStats();
+            
+            // Create disaster object
+            const disaster = {
+                id: 'disaster_' + Date.now(),
+                type: disasterType,
+                title: disasterTitle,
+                description: disasterDescription,
+                difficulty: difficulty,
+                duration: duration,
+                tasks: appState.selectedSurvivalTasks,
+                creator: appState.user.name,
+                reward: totalCost * 2, // Double the cost as reward
+                launchedAt: new Date().toISOString()
+            };
+            
+            // Clear form
+            document.getElementById('disasterType').value = '';
+            document.getElementById('disasterTitle').value = '';
+            document.getElementById('disasterDescription').value = '';
+            document.querySelectorAll('.survival-task').forEach(task => task.classList.remove('selected'));
+            document.getElementById('disasterCost').textContent = '100';
+            appState.selectedSurvivalTasks = [];
+            
+            showMessage(`💥 Disaster "${disasterTitle}" launched! Cost: ${totalCost} tokens`, 'success');
+            
+            // Simulate disaster hitting friends
+            setTimeout(() => {
+                showDisasterAlert(disaster);
+            }, 2000);
+        }
+
+        function showDisasterAlert(disaster) {
+            const disasterTypes = {
+                'zombie': { emoji: '🧟', name: 'Zombie Apocalypse' },
+                'alien': { emoji: '👽', name: 'Alien Invasion' },
+                'robot': { emoji: '🤖', name: 'Robot Takeover' },
+                'monster': { emoji: '🦖', name: 'Monster Attack' },
+                'weather': { emoji: '🌪️', name: 'Extreme Weather' },
+                'virus': { emoji: '🦠', name: 'Viral Outbreak' },
+                'magic': { emoji: '🧙', name: 'Magic Chaos' },
+                'time': { emoji: '⏰', name: 'Time Distortion' }
+            };
+            
+            const disasterInfo = disasterTypes[disaster.type] || { emoji: '💥', name: 'Unknown Disaster' };
+            
+            // Store current disaster
+            appState.currentDisaster = disaster;
+            
+            // Update notification content
+            document.getElementById('disasterScenario').textContent = `${disasterInfo.emoji} ${disaster.title}`;
+            document.getElementById('disasterBrief').textContent = disaster.description;
+            document.getElementById('disasterTime').textContent = disaster.duration + 'h';
+            document.getElementById('disasterReward').textContent = disaster.reward;
+            
+            // Show notification
+            const notification = document.getElementById('disasterNotification');
+            notification.classList.add('show');
+            
+            // Auto-dismiss after 20 seconds
+            setTimeout(() => {
+                dismissDisaster();
+            }, 20000);
+        }
+
+        function acceptDisaster() {
+            if (!appState.currentDisaster) return;
+            
+            const disaster = appState.currentDisaster;
+            
+            // Award tokens for accepting
+            appState.user.tokens += disaster.reward;
+            appState.user.challengesCompleted += 1;
+            
+            // Bonus for brave acceptance
+            if (disaster.difficulty === 'nightmare') {
+                appState.user.tokens += 100;
+                showMessage('💀 Nightmare Mode bonus! +100 tokens for being brave!', 'success');
+            }
+            
+            updateUserStats();
+            
+            // Close notification
+            document.getElementById('disasterNotification').classList.remove('show');
+            
+            showMessage(`💥 Disaster accepted! You survived and earned ${disaster.reward} tokens!`, 'success');
+            
+            // Simulate completing survival tasks
+            setTimeout(() => {
+                const bonusTokens = Math.floor(Math.random() * 200) + 100;
+                appState.user.tokens += bonusTokens;
+                updateUserStats();
+                showMessage(`🎯 Survival tasks completed! Bonus: +${bonusTokens} tokens!`, 'success');
+            }, 5000);
+            
+            appState.currentDisaster = null;
+        }
+
+        function dismissDisaster() {
+            const notification = document.getElementById('disasterNotification');
+            notification.classList.remove('show');
+            
+            if (appState.currentDisaster) {
+                showMessage('😰 You chose to ignore the disaster. Stay safe!', 'info');
+                appState.currentDisaster = null;
+            }
+        }
+
+        // Add disaster events to random events
+        function startDisasterEvents() {
+            setInterval(() => {
+                // Random disaster events
+                const disasters = [
+                    {
+                        type: 'zombie',
+                        title: 'Midnight Zombie Walk',
+                        description: 'Zombies are roaming the streets! Take a photo of yourself in a safe location.',
+                        difficulty: 'easy',
+                        duration: '1',
+                        tasks: ['Photo Evidence'],
+                        reward: 200
+                    },
+                    {
+                        type: 'alien',
+                        title: 'UFO Sighting',
+                        description: 'Aliens have been spotted! Record a video of the sky and share your findings.',
+                        difficulty: 'medium',
+                        duration: '6',
+                        tasks: ['Video Proof'],
+                        reward: 400
+                    },
+                    {
+                        type: 'monster',
+                        title: 'Kaiju Attack',
+                        description: 'A giant monster is attacking the city! Team up with friends to survive.',
+                        difficulty: 'hard',
+                        duration: '24',
+                        tasks: ['Team Up', 'Photo Evidence'],
+                        reward: 800
+                    }
+                ];
+                
+                // 20% chance of random disaster every 2 minutes
+                if (Math.random() < 0.2) {
+                    const randomDisaster = disasters[Math.floor(Math.random() * disasters.length)];
+                    setTimeout(() => {
+                        showDisasterAlert(randomDisaster);
+                    }, Math.random() * 60000); // Random delay up to 1 minute
+                }
+            }, 120000); // Check every 2 minutes
+        }
+        function toggleQuickChallenge() {
+            appState.quickChallengeActive = !appState.quickChallengeActive;
+            const toggle = document.getElementById('quickToggle');
+            const form = document.getElementById('quickChallengeForm');
+            
+            if (appState.quickChallengeActive) {
+                toggle.classList.add('active');
+                form.style.display = 'flex';
+                showMessage('⚡ Quick Challenge Creator activated!', 'success');
+            } else {
+                toggle.classList.remove('active');
+                form.style.display = 'none';
+                showMessage('⚡ Quick Challenge Creator deactivated', 'info');
+            }
+        }
+
+        function createQuickChallenge() {
+            const title = document.getElementById('quickChallengeTitle').value;
+            const description = document.getElementById('quickChallengeDesc').value;
+            const category = document.getElementById('quickCategory').value;
+            const reward = parseInt(document.getElementById('quickReward').value);
+            
+            if (!title || !description) {
+                showMessage('❌ Please fill in title and description!', 'error');
+                return;
+            }
+            
+            if (appState.user.tokens < 50) {
+                showMessage('❌ Not enough tokens! You need 50 tokens to create a challenge.', 'error');
+                return;
+            }
+            
+            // Deduct creation cost
+            appState.user.tokens -= 50;
+            updateUserStats();
+            
+            // Create challenge object
+            const challenge = {
+                id: 'qc_' + Date.now(),
+                title: title,
+                description: description,
+                category: category,
+                reward: reward,
+                proofType: appState.selectedProofType,
+                creator: appState.user.name,
+                createdAt: new Date().toISOString(),
+                status: 'active'
+            };
+            
+            // Clear form
+            document.getElementById('quickChallengeTitle').value = '';
+            document.getElementById('quickChallengeDesc').value = '';
+            
+            // Simulate sending to friends
+            setTimeout(() => {
+                showMessage(`🎯 Challenge "${title}" sent to all online friends! They can now submit proof.`, 'success');
+                
+                // Simulate friend accepting challenge
+                setTimeout(() => {
+                    showChallengeSubmission(challenge);
+                }, 5000);
+            }, 1000);
+            
+            showMessage('⚡ Challenge created and sent! Cost: 50 tokens', 'success');
+        }
+
+        // Proof type selection
+        document.addEventListener('DOMContentLoaded', function() {
+            // Add event listeners for proof options
+            document.querySelectorAll('.proof-option').forEach(option => {
+                option.addEventListener('click', function() {
+                    // Remove previous selection
+                    document.querySelectorAll('.proof-option').forEach(opt => {
+                        opt.classList.remove('selected');
+                    });
+                    
+                    // Add selection to clicked option
+                    this.classList.add('selected');
+                    appState.selectedProofType = this.getAttribute('data-type');
+                });
+            });
+        });
+
+        // Challenge submission functions
+        function showChallengeSubmission(challenge) {
+            appState.currentChallenge = challenge;
+            document.getElementById('submissionChallenge').textContent = challenge.title;
+            document.getElementById('submissionModal').classList.add('show');
+            
+            // Set appropriate icon based on proof type
+            const icon = document.getElementById('submissionIcon');
+            switch(challenge.proofType) {
+                case 'video':
+                    icon.textContent = '🎬';
+                    break;
+                case 'both':
+                    icon.textContent = '📱';
+                    break;
+                default:
+                    icon.textContent = '📷';
+            }
+        }
+
+        function selectFile() {
+            // Simulate file selection
+            const submissionArea = document.getElementById('submissionArea');
+            submissionArea.style.borderColor = '#9b59b6';
+            submissionArea.style.background = 'rgba(155, 89, 182, 0.2)';
+            
+            document.getElementById('submissionIcon').textContent = '📸';
+            document.querySelector('.submission-text').textContent = 'Analyzing submission...';
+            document.querySelector('.submission-hint').textContent = 'Please wait while AI reviews your proof';
+            
+            // Simulate AI analysis
+            setTimeout(() => {
+                analyzeSubmission();
+            }, 2000); class="stat-number" id="userTokens">2,450</div>
+                        <div class="stat-label">Tokens</div>
+                    </div>
+                    <div class="stat-item">
+                        <div
     </script>
 </body>
 </html>
