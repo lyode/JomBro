@@ -1328,7 +1328,7 @@
     <script>
         // Firebase Configuration - REPLACE WITH YOUR ACTUAL CONFIG
         const firebaseConfig = {
-            // For Firebase JS SDK v7.20.0 and later, measurementId is optional
+           // For Firebase JS SDK v7.20.0 and later, measurementId is optional
 const firebaseConfig = {
   apiKey: "AIzaSyDAgSczYCYTXq21o10X7ccUzpGpkUU6ZoY",
   authDomain: "jombro-14ddb.firebaseapp.com",
@@ -1679,3 +1679,601 @@ const firebaseConfig = {
 
         // Challenge functions
         function createQuickChallenge() {
+            const title = document.getElementById('quickChallengeTitle').value.trim();
+            const description = document.getElementById('quickChallengeDesc').value.trim();
+            const category = document.getElementById('quickCategory').value;
+            const reward = parseInt(document.getElementById('quickReward').value);
+            
+            if (!title || !description) {
+                showMessage('❌ Please fill in title and description!', 'error');
+                return;
+            }
+            
+            if (appState.user.tokens < 50) {
+                showMessage('❌ Not enough tokens! You need 50 tokens to create a challenge.', 'error');
+                return;
+            }
+            
+            // Deduct creation cost
+            appState.user.tokens -= 50;
+            updateUserDisplay();
+            
+            // Clear form
+            document.getElementById('quickChallengeTitle').value = '';
+            document.getElementById('quickChallengeDesc').value = '';
+            
+            showMessage(`🎯 Challenge "${title}" created and sent to friends! Cost: 50 tokens`, 'success');
+            
+            // Save challenge to Firebase if online
+            if (currentUser && db) {
+                saveChallenge({
+                    title,
+                    description,
+                    category,
+                    reward,
+                    creatorId: currentUser.uid,
+                    creatorName: appState.user.name,
+                    createdAt: firebase.firestore.FieldValue.serverTimestamp()
+                });
+            }
+            
+            // Simulate friend accepting challenge
+            setTimeout(() => {
+                const acceptingFriend = appState.friends[Math.floor(Math.random() * appState.friends.length)];
+                if (acceptingFriend) {
+                    showMessage(`🎉 ${acceptingFriend.name} accepted your challenge!`, 'success');
+                    
+                    setTimeout(() => {
+                        appState.user.tokens += reward;
+                        updateUserDisplay();
+                        showMessage(`💰 Challenge completed! You earned ${reward} tokens!`, 'success');
+                    }, 3000);
+                }
+            }, 2000);
+        }
+
+        // Disaster functions
+        function toggleDisaster() {
+            appState.disasterActive = !appState.disasterActive;
+            const toggle = document.getElementById('disasterToggle');
+            const form = document.getElementById('disasterForm');
+            
+            if (appState.disasterActive) {
+                toggle.classList.add('active');
+                form.style.display = 'flex';
+                showMessage('💥 Disaster Mode activated! Prepare for chaos!', 'success');
+            } else {
+                toggle.classList.remove('active');
+                form.style.display = 'none';
+                showMessage('💥 Disaster Mode deactivated', 'info');
+            }
+        }
+
+        function toggleTask(taskElement) {
+            taskElement.classList.toggle('selected');
+            
+            // Update cost based on selected tasks
+            const selectedTasks = document.querySelectorAll('.survival-task.selected');
+            const baseCost = 100;
+            const taskCost = selectedTasks.length * 25;
+            const totalCost = baseCost + taskCost;
+            
+            document.getElementById('disasterCost').textContent = totalCost;
+            
+            // Store selected tasks
+            appState.selectedSurvivalTasks = Array.from(selectedTasks).map(task => 
+                task.querySelector('.task-name').textContent
+            );
+        }
+
+        function launchDisaster() {
+            const disasterType = document.getElementById('disasterType').value;
+            const disasterTitle = document.getElementById('disasterTitle').value.trim();
+            const disasterDescription = document.getElementById('disasterDescription').value.trim();
+            const difficulty = document.getElementById('disasterDifficulty').value;
+            const duration = document.getElementById('disasterDuration').value;
+            
+            if (!disasterType || !disasterTitle || !disasterDescription) {
+                showMessage('❌ Please fill in all disaster details!', 'error');
+                return;
+            }
+            
+            if (appState.selectedSurvivalTasks.length === 0) {
+                showMessage('❌ Please select at least one survival task!', 'error');
+                return;
+            }
+            
+            const totalCost = parseInt(document.getElementById('disasterCost').textContent);
+            
+            if (appState.user.tokens < totalCost) {
+                showMessage(`❌ Not enough tokens! You need ${totalCost} tokens to launch this disaster.`, 'error');
+                return;
+            }
+            
+            // Deduct cost
+            appState.user.tokens -= totalCost;
+            updateUserDisplay();
+            
+            // Create disaster object
+            const disaster = {
+                id: 'disaster_' + Date.now(),
+                type: disasterType,
+                title: disasterTitle,
+                description: disasterDescription,
+                difficulty: difficulty,
+                duration: duration,
+                tasks: appState.selectedSurvivalTasks,
+                creator: appState.user.name,
+                reward: totalCost * 2,
+                launchedAt: new Date().toISOString()
+            };
+            
+            // Clear form
+            document.getElementById('disasterType').value = '';
+            document.getElementById('disasterTitle').value = '';
+            document.getElementById('disasterDescription').value = '';
+            document.querySelectorAll('.survival-task').forEach(task => task.classList.remove('selected'));
+            document.getElementById('disasterCost').textContent = '100';
+            appState.selectedSurvivalTasks = [];
+            
+            showMessage(`💥 Disaster "${disasterTitle}" launched! Cost: ${totalCost} tokens`, 'success');
+            
+            // Save disaster to Firebase if online
+            if (currentUser && db) {
+                saveDisaster(disaster);
+            }
+            
+            // Simulate disaster hitting friends
+            setTimeout(() => {
+                showDisasterAlert(disaster);
+            }, 2000);
+        }
+
+        // Detection range functions
+        function setDetectionRange(range) {
+            appState.detectionRange = range;
+            document.getElementById('currentRange').textContent = `(${range}km)`;
+            
+            // Update active button
+            document.querySelectorAll('.range-btn').forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+            
+            // Filter nearby players based on range
+            filterNearbyPlayersByRange(range);
+            showMessage(`📡 Detection range set to ${range}km. Found ${appState.nearbyStrangers.length} players!`, 'info');
+        }
+
+        function setCustomRange() {
+            const customRange = parseFloat(document.getElementById('customRange').value);
+            if (customRange && customRange > 0 && customRange <= 50) {
+                setDetectionRange(customRange);
+                document.getElementById('customRange').value = '';
+                
+                // Remove active class from preset buttons
+                document.querySelectorAll('.range-btn').forEach(btn => btn.classList.remove('active'));
+            } else {
+                showMessage('❌ Please enter a valid range (0.1 - 50 km)', 'error');
+            }
+        }
+
+        function filterNearbyPlayersByRange(range) {
+            // In real app, this would query Firebase with geospatial queries
+            // For now, simulate filtering by distance
+            appState.nearbyStrangers = appState.nearbyStrangers.filter(player => {
+                const distance = parseFloat(player.distance.replace('km', ''));
+                return distance <= range;
+            });
+            
+            // Add some new players if range increased
+            if (range > 3) {
+                const additionalPlayers = [
+                    { id: 'long1', name: 'Zain', avatar: '🌊', distance: '4.2km', online: true },
+                    { id: 'long2', name: 'Maya', avatar: '🎪', distance: '5.8km', online: true },
+                    { id: 'long3', name: 'Kris', avatar: '⚡', distance: '7.1km', online: true },
+                    { id: 'long4', name: 'Yuki', avatar: '🌙', distance: '9.5km', online: true }
+                ].filter(player => {
+                    const distance = parseFloat(player.distance.replace('km', ''));
+                    return distance <= range;
+                });
+                
+                appState.nearbyStrangers = [...appState.nearbyStrangers, ...additionalPlayers];
+            }
+            
+            renderNearbyPlayers();
+            updateCounts();
+        }
+
+        // Refresh nearby players
+        function refreshNearbyPlayers() {
+            showMessage('🔄 Searching for nearby players...', 'info');
+            
+            setTimeout(() => {
+                // Add some random new players
+                const newPlayers = [
+                    { id: 'new1', name: 'Jordan', avatar: '🌟', distance: (Math.random() * appState.detectionRange).toFixed(1) + 'km', online: true },
+                    { id: 'new2', name: 'Casey', avatar: '🎭', distance: (Math.random() * appState.detectionRange).toFixed(1) + 'km', online: true }
+                ];
+                
+                appState.nearbyStrangers = [...appState.nearbyStrangers, ...newPlayers];
+                renderNearbyPlayers();
+                updateCounts();
+                showMessage(`✅ Found ${newPlayers.length} new players nearby!`, 'success');
+            }, 1500);
+        }
+
+        // Player interaction functions
+        function challengePlayer(playerId) {
+            const player = appState.nearbyStrangers.find(p => p.id === playerId);
+            if (player) {
+                showMessage(`🎯 Challenge sent to ${player.name}! They'll receive a notification.`, 'success');
+                
+                setTimeout(() => {
+                    if (Math.random() > 0.5) {
+                        showMessage(`🎉 ${player.name} accepted your challenge!`, 'success');
+                        appState.user.tokens += 25;
+                        updateUserDisplay();
+                    } else {
+                        showMessage(`😔 ${player.name} declined your challenge. Try again later!`, 'info');
+                    }
+                }, 3000);
+            }
+        }
+
+        function challengeFriend(friendId) {
+            const friend = appState.friends.find(f => f.id === friendId);
+            if (friend) {
+                showMessage(`🎯 Challenge sent to ${friend.name}!`, 'success');
+                
+                setTimeout(() => {
+                    if (friend.online && Math.random() > 0.3) {
+                        showMessage(`🎉 ${friend.name} accepted your challenge!`, 'success');
+                        appState.user.tokens += 50;
+                        updateUserDisplay();
+                    } else {
+                        showMessage(`😴 ${friend.name} is ${friend.online ? 'busy' : 'offline'}. They'll see your challenge later!`, 'info');
+                    }
+                }, 2000);
+            }
+        }
+
+        function challengeAllFriends() {
+            const onlineFriends = appState.friends.filter(f => f.online);
+            if (onlineFriends.length === 0) {
+                showMessage('😔 No friends are currently online!', 'info');
+                return;
+            }
+            
+            showMessage(`🎯 Challenge sent to ${onlineFriends.length} online friends!`, 'success');
+            
+            setTimeout(() => {
+                const acceptedCount = onlineFriends.filter(() => Math.random() > 0.4).length;
+                if (acceptedCount > 0) {
+                    showMessage(`🎉 ${acceptedCount} friends accepted your challenge!`, 'success');
+                    appState.user.tokens += acceptedCount * 30;
+                    updateUserDisplay();
+                }
+            }, 3000);
+        }
+
+        function sendWaveToNearby() {
+            showMessage('👋 Wave sent to all nearby players!', 'success');
+            
+            setTimeout(() => {
+                const responses = Math.floor(Math.random() * 5) + 1;
+                showMessage(`🌊 ${responses} players waved back!`, 'success');
+                appState.user.tokens += responses * 5;
+                updateUserDisplay();
+            }, 2000);
+        }
+
+        function hideFromNearby() {
+            if (appState.isHiddenFromNearby) {
+                appState.isHiddenFromNearby = false;
+                showMessage('👁️ You are now visible to nearby players!', 'info');
+                event.target.textContent = 'Hide Me';
+            } else {
+                appState.isHiddenFromNearby = true;
+                showMessage('👻 You are now hidden from nearby players!', 'info');
+                event.target.textContent = 'Show Me';
+            }
+        }
+
+        function showOnlineOnly() {
+            const onlineFriends = appState.friends.filter(f => f.online);
+            showMessage(`💚 ${onlineFriends.length} friends are currently online!`, 'info');
+            
+            // Highlight online friends
+            document.querySelectorAll('.friend-avatar-item').forEach((item, index) => {
+                if (appState.friends[index]?.online) {
+                    item.style.transform = 'scale(1.1)';
+                    setTimeout(() => {
+                        item.style.transform = 'scale(1)';
+                    }, 1000);
+                }
+            });
+        }
+
+        // Render functions
+        function renderNearbyPlayers() {
+            const strangersTrack = document.getElementById('strangersTrack');
+            strangersTrack.innerHTML = '';
+
+            appState.nearbyStrangers.forEach((player) => {
+                const playerElement = document.createElement('div');
+                playerElement.className = 'stranger-avatar-item';
+                playerElement.onclick = () => challengePlayer(player.id);
+                playerElement.innerHTML = `
+                    <div class="stranger-avatar">
+                        ${player.avatar}
+                        <div class="distance-indicator">${player.distance}</div>
+                        <div class="online-indicator"></div>
+                    </div>
+                    <div class="stranger-name-small">${player.name}</div>
+                `;
+                strangersTrack.appendChild(playerElement);
+            });
+        }
+
+        function renderFriends() {
+            const friendsTrack = document.getElementById('friendsTrack');
+            friendsTrack.innerHTML = '';
+
+            appState.friends.forEach((friend) => {
+                const friendElement = document.createElement('div');
+                friendElement.className = 'friend-avatar-item';
+                friendElement.onclick = () => challengeFriend(friend.id);
+                friendElement.innerHTML = `
+                    <div class="friend-avatar">
+                        ${friend.avatar}
+                        ${friend.online ? '<div class="online-indicator"></div>' : ''}
+                    </div>
+                    <div class="friend-name-small">${friend.name}</div>
+                `;
+                friendsTrack.appendChild(friendElement);
+            });
+        }
+
+        function updateCounts() {
+            document.getElementById('strangersOnlineCount').textContent = appState.nearbyStrangers.length;
+            document.getElementById('onlineCount').textContent = appState.friends.filter(f => f.online).length;
+            document.getElementById('totalFriends').textContent = appState.friends.length;
+        }
+
+        function updateUserDisplay() {
+            document.getElementById('userName').textContent = appState.user.name;
+            document.getElementById('userAvatar').textContent = appState.user.avatar;
+            document.getElementById('userTokens').textContent = appState.user.tokens.toLocaleString();
+            document.getElementById('userLevel').textContent = appState.user.level;
+            document.getElementById('userFriends').textContent = appState.user.friends;
+        }
+
+        // Firebase helper functions
+        async function saveChallenge(challengeData) {
+            try {
+                await db.collection('challenges').add(challengeData);
+                
+                // Update user stats
+                await db.collection('users').doc(currentUser.uid).update({
+                    tokens: firebase.firestore.FieldValue.increment(-50),
+                    challengesCreated: firebase.firestore.FieldValue.increment(1)
+                });
+                
+            } catch (error) {
+                console.error('Error saving challenge:', error);
+            }
+        }
+
+        async function saveDisaster(disasterData) {
+            try {
+                await db.collection('disasters').add({
+                    ...disasterData,
+                    createdAt: firebase.firestore.FieldValue.serverTimestamp()
+                });
+                
+                // Update user stats
+                await db.collection('users').doc(currentUser.uid).update({
+                    tokens: firebase.firestore.FieldValue.increment(-disasterData.reward / 2),
+                    disastersCreated: firebase.firestore.FieldValue.increment(1)
+                });
+                
+            } catch (error) {
+                console.error('Error saving disaster:', error);
+            }
+        }
+
+        // Disaster alert
+        function showDisasterAlert(disaster) {
+            const alertHtml = `
+                <div style="position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: rgba(255, 107, 107, 0.1); backdrop-filter: blur(20px); border-radius: 20px; padding: 25px; max-width: 90%; width: 400px; text-align: center; border: 2px solid #ff6b6b; box-shadow: 0 10px 40px rgba(0, 0, 0, 0.7), 0 0 25px rgba(255, 107, 107, 0.5); z-index: 1000; animation: slideIn 0.5s ease;" id="disasterAlert">
+                    <div style="font-size: 1.6rem; margin-bottom: 15px; color: #ff6b6b; text-shadow: 0 0 10px rgba(255, 107, 107, 0.7); animation: pulse 2s infinite;">🚨 DISASTER ALERT! 🚨</div>
+                    <div style="font-size: 1.1rem; font-weight: bold; margin-bottom: 10px; color: white;">${disaster.title}</div>
+                    <div style="font-size: 0.9rem; opacity: 0.8; line-height: 1.4; margin-bottom: 20px;">${disaster.description}</div>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 20px;">
+                        <div style="text-align: center; padding: 10px; background: rgba(255, 255, 255, 0.05); border-radius: 12px; border: 1px solid rgba(255, 107, 107, 0.2);">
+                            <div style="font-size: 1.2rem; font-weight: bold; color: #ff6b6b;">${disaster.duration}h</div>
+                            <div style="font-size: 0.8rem; opacity: 0.7; margin-top: 3px;">Time Limit</div>
+                        </div>
+                        <div style="text-align: center; padding: 10px; background: rgba(255, 255, 255, 0.05); border-radius: 12px; border: 1px solid rgba(255, 107, 107, 0.2);">
+                            <div style="font-size: 1.2rem; font-weight: bold; color: #ff6b6b;">${disaster.reward}</div>
+                            <div style="font-size: 0.8rem; opacity: 0.7; margin-top: 3px;">Survival Reward</div>
+                        </div>
+                    </div>
+                    <div style="display: flex; gap: 10px; justify-content: center; flex-wrap: wrap;">
+                        <button class="btn btn-primary" onclick="acceptDisaster(${JSON.stringify(disaster).replace(/"/g, '&quot;')})">Accept Challenge</button>
+                        <button class="btn btn-secondary" onclick="dismissDisasterAlert()">Ignore Risk</button>
+                    </div>
+                </div>
+            `;
+            
+            document.body.insertAdjacentHTML('beforeend', alertHtml);
+            
+            // Auto-dismiss after 20 seconds
+            setTimeout(() => {
+                dismissDisasterAlert();
+            }, 20000);
+        }
+
+        function acceptDisaster(disaster) {
+            appState.user.tokens += disaster.reward;
+            updateUserDisplay();
+            
+            dismissDisasterAlert();
+            showMessage(`💥 Disaster accepted! You survived and earned ${disaster.reward} tokens!`, 'success');
+        }
+
+        function dismissDisasterAlert() {
+            const alert = document.getElementById('disasterAlert');
+            if (alert) {
+                alert.remove();
+            }
+        }
+
+        // UI Helper functions
+        function showAuthModal() {
+            document.getElementById('authModal').classList.add('show');
+        }
+
+        function hideAuthModal() {
+            document.getElementById('authModal').classList.remove('show');
+        }
+
+        function showAddFriendModal() {
+            showMessage('👥 Add friend feature coming soon! Connect with friends through challenges.', 'info');
+        }
+
+        function loadAppContent() {
+            updateUserDisplay();
+            renderNearbyPlayers();
+            renderFriends();
+            updateCounts();
+            
+            document.getElementById('appContent').classList.add('loaded');
+            document.getElementById('logoutBtn').style.display = 'block';
+        }
+
+        function showWelcomeMessage() {
+            setTimeout(() => {
+                showMessage('🎉 Welcome to JomBro! All features are active and ready!', 'success');
+            }, 1000);
+            
+            setTimeout(() => {
+                showMessage('💡 Try creating challenges or launching disasters!', 'info');
+            }, 3000);
+        }
+
+        // Connection monitoring
+        function monitorConnection() {
+            window.addEventListener('online', () => {
+                isOnline = true;
+                document.getElementById('offlineBanner').classList.remove('show');
+                showMessage('🌐 Back online!', 'success');
+            });
+
+            window.addEventListener('offline', () => {
+                isOnline = false;
+                document.getElementById('offlineBanner').classList.add('show');
+                showMessage('📴 You are offline - limited features available', 'info');
+            });
+        }
+
+        // Event listeners
+        function setupEventListeners() {
+            // Before page unload, update user offline status
+            window.addEventListener('beforeunload', () => {
+                if (currentUser && db) {
+                    updateUserOnlineStatus(false);
+                }
+            });
+        }
+
+        // Utility functions
+        function createStarfield() {
+            const starfield = document.getElementById('starfield');
+            const numberOfStars = 150;
+
+            for (let i = 0; i < numberOfStars; i++) {
+                const star = document.createElement('div');
+                star.className = 'star';
+                
+                const sizes = ['small', 'medium', 'large'];
+                const randomSize = sizes[Math.floor(Math.random() * sizes.length)];
+                star.classList.add(randomSize);
+                
+                star.style.left = Math.random() * 100 + '%';
+                star.style.top = Math.random() * 100 + '%';
+                star.style.animationDelay = Math.random() * 2 + 's';
+                star.style.animationDuration = (Math.random() * 2 + 1) + 's';
+                
+                starfield.appendChild(star);
+            }
+        }
+
+        function getRandomAvatar() {
+            const avatars = ['😎', '🌸', '🚀', '💪', '🎵', '🎨', '🤠', '🌟', '🎯', '🎭', '🎪', '🌈', '🎲', '🎊', '🌺', '⚡', '🌙', '🔥'];
+            return avatars[Math.floor(Math.random() * avatars.length)];
+        }
+
+        function handleAuthError(error) {
+            let errorMessage = 'Authentication failed. Please try again.';
+            switch (error.code) {
+                case 'auth/user-not-found':
+                    errorMessage = 'No account found with this email.';
+                    break;
+                case 'auth/wrong-password':
+                    errorMessage = 'Incorrect password.';
+                    break;
+                case 'auth/email-already-in-use':
+                    errorMessage = 'An account with this email already exists.';
+                    break;
+                case 'auth/weak-password':
+                    errorMessage = 'Password is too weak.';
+                    break;
+                case 'auth/invalid-email':
+                    errorMessage = 'Invalid email address.';
+                    break;
+            }
+            showMessage(`❌ ${errorMessage}`, 'error');
+        }
+
+        function clearAuthForm(formId) {
+            const form = document.getElementById(formId);
+            const inputs = form.querySelectorAll('input');
+            inputs.forEach(input => input.value = '');
+        }
+
+        function showMessage(message, type = 'info') {
+            // Remove existing messages
+            document.querySelectorAll('.message').forEach(msg => msg.remove());
+            
+            const messageEl = document.createElement('div');
+            messageEl.className = `message ${type}`;
+            messageEl.textContent = message;
+            document.body.appendChild(messageEl);
+            
+            setTimeout(() => {
+                if (messageEl.parentNode) {
+                    messageEl.remove();
+                }
+            }, 4000);
+        }
+
+        function toggleQuickChallenge() {
+            appState.quickChallengeActive = !appState.quickChallengeActive;
+            const toggle = document.getElementById('quickToggle');
+            const form = document.getElementById('quickChallengeForm');
+            
+            if (appState.quickChallengeActive) {
+                toggle.classList.add('active');
+                form.style.display = 'flex';
+                showMessage('⚡ Quick Challenge Creator activated!', 'success');
+            } else {
+                toggle.classList.remove('active');
+                form.style.display = 'none';
+                showMessage('⚡ Quick Challenge Creator deactivated', 'info');
+            }
+        }
+
+        // Initialize the app when page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            initApp();
+        });
