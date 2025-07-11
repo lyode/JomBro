@@ -1705,10 +1705,510 @@
         }
 
         function showAddFriendModal() {
-            const email = prompt('Enter your friend\'s email address:');
-            if (email && email.trim()) {
-                sendFriendRequest(email.trim());
+            const modalHtml = `
+                <div class="modal show" id="addFriendModal" style="z-index: 2000;">
+                    <div class="modal-content" style="max-width: 450px;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                            <h3 style="margin: 0; color: #9b59b6;">👥 Add Friends</h3>
+                            <button onclick="closeAddFriendModal()" style="background: none; border: none; color: white; font-size: 1.5rem; cursor: pointer;">✕</button>
+                        </div>
+                        
+                        <!-- Social Media Import -->
+                        <div style="margin-bottom: 25px;">
+                            <h4 style="margin: 0 0 15px 0; color: white; font-size: 1rem;">📱 Import from Social Media</h4>
+                            <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px;">
+                                <button class="btn btn-primary" onclick="importFromWhatsApp()" style="background: linear-gradient(45deg, #25D366, #128C7E); display: flex; align-items: center; gap: 8px; justify-content: center;">
+                                    <span>📱</span>
+                                    <span>WhatsApp</span>
+                                </button>
+                                <button class="btn btn-primary" onclick="importFromInstagram()" style="background: linear-gradient(45deg, #E4405F, #C13584); display: flex; align-items: center; gap: 8px; justify-content: center;">
+                                    <span>📷</span>
+                                    <span>Instagram</span>
+                                </button>
+                                <button class="btn btn-primary" onclick="importFromFacebook()" style="background: linear-gradient(45deg, #1877F2, #42A5F5); display: flex; align-items: center; gap: 8px; justify-content: center;">
+                                    <span>📘</span>
+                                    <span>Facebook</span>
+                                </button>
+                                <button class="btn btn-primary" onclick="importFromTwitter()" style="background: linear-gradient(45deg, #1DA1F2, #0d8bd9); display: flex; align-items: center; gap: 8px; justify-content: center;">
+                                    <span>🐦</span>
+                                    <span>Twitter</span>
+                                </button>
+                                <button class="btn btn-primary" onclick="importFromTikTok()" style="background: linear-gradient(45deg, #000000, #ff0050); display: flex; align-items: center; gap: 8px; justify-content: center;">
+                                    <span>🎵</span>
+                                    <span>TikTok</span>
+                                </button>
+                                <button class="btn btn-primary" onclick="importFromLinkedIn()" style="background: linear-gradient(45deg, #0077B5, #005885); display: flex; align-items: center; gap: 8px; justify-content: center;">
+                                    <span>💼</span>
+                                    <span>LinkedIn</span>
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <!-- QR Code Sharing -->
+                        <div style="margin-bottom: 25px; text-align: center;">
+                            <h4 style="margin: 0 0 15px 0; color: white; font-size: 1rem;">📱 Share Your Profile</h4>
+                            <div style="background: rgba(255, 255, 255, 0.1); border-radius: 15px; padding: 20px; border: 1px solid rgba(255, 255, 255, 0.2);">
+                                <div id="qrCodeContainer" style="margin-bottom: 15px;">
+                                    <!-- QR Code will be generated here -->
+                                    <div style="width: 150px; height: 150px; margin: 0 auto; background: white; border-radius: 10px; display: flex; align-items: center; justify-content: center; color: black; font-weight: bold; font-size: 0.9rem; text-align: center;">
+                                        QR Code<br/>Coming Soon
+                                    </div>
+                                </div>
+                                <div style="display: flex; gap: 10px; justify-content: center; flex-wrap: wrap;">
+                                    <button class="btn btn-secondary btn-small" onclick="shareViaWhatsApp()">
+                                        📱 WhatsApp
+                                    </button>
+                                    <button class="btn btn-secondary btn-small" onclick="shareViaMessenger()">
+                                        💬 Messenger
+                                    </button>
+                                    <button class="btn btn-secondary btn-small" onclick="copyInviteLink()">
+                                        🔗 Copy Link
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Nearby Users -->
+                        <div style="margin-bottom: 25px;">
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                                <h4 style="margin: 0; color: white; font-size: 1rem;">📍 Nearby Players</h4>
+                                <button class="btn btn-secondary btn-small" onclick="scanNearbyUsers()">
+                                    🔄 Scan
+                                </button>
+                            </div>
+                            <div id="nearbyUsersList" style="max-height: 150px; overflow-y: auto;">
+                                <!-- Nearby users will be populated here -->
+                                <div style="text-align: center; opacity: 0.6; padding: 20px;">
+                                    <p>🔍 Click "Scan" to find nearby JomBro players</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Manual Email Add -->
+                        <div style="margin-bottom: 20px;">
+                            <h4 style="margin: 0 0 15px 0; color: white; font-size: 1rem;">📧 Add by Email</h4>
+                            <div style="display: flex; gap: 10px;">
+                                <input type="email" id="friendEmailInput" placeholder="friend@example.com" style="flex: 1; padding: 12px; border: 1px solid rgba(255, 255, 255, 0.3); border-radius: 10px; background: rgba(255, 255, 255, 0.1); color: white;">
+                                <button class="btn btn-primary" onclick="addFriendByEmail()" style="flex-shrink: 0;">
+                                    Add Friend
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <!-- Phone Contacts -->
+                        <div style="margin-bottom: 20px;">
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                                <h4 style="margin: 0; color: white; font-size: 1rem;">📞 Phone Contacts</h4>
+                                <button class="btn btn-secondary btn-small" onclick="importPhoneContacts()">
+                                    📱 Import
+                                </button>
+                            </div>
+                            <div id="phoneContactsList" style="max-height: 120px; overflow-y: auto;">
+                                <div style="text-align: center; opacity: 0.6; padding: 15px;">
+                                    <p>📱 Import contacts to find friends on JomBro</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            document.body.insertAdjacentHTML('beforeend', modalHtml);
+            
+            // Generate user invite link
+            generateInviteLink();
+        }
+
+        function closeAddFriendModal() {
+            const modal = document.getElementById('addFriendModal');
+            if (modal) {
+                modal.remove();
             }
+        }
+
+        // Social Media Import Functions
+        async function importFromWhatsApp() {
+            showMessage('📱 Opening WhatsApp integration...', 'info');
+            
+            // In a real app, this would use WhatsApp Business API or Web API
+            // For now, we'll simulate and provide sharing functionality
+            try {
+                if (navigator.share) {
+                    await navigator.share({
+                        title: 'Join me on JomBro!',
+                        text: `Hey! I'm challenging friends on JomBro. Join me: ${generateInviteLink()}`,
+                        url: window.location.origin
+                    });
+                } else {
+                    // Fallback to WhatsApp Web
+                    const message = encodeURIComponent(`Hey! I'm challenging friends on JomBro. Join me: ${generateInviteLink()}`);
+                    window.open(`https://wa.me/?text=${message}`, '_blank');
+                }
+                
+                showMessage('📱 WhatsApp invitation sent!', 'success');
+                setTimeout(() => {
+                    simulateContactImport('whatsapp', [
+                        { name: 'Ahmad Rahman', phone: '+60123456789' },
+                        { name: 'Siti Nurhaliza', phone: '+60187654321' },
+                        { name: 'Raj Kumar', phone: '+60196789012' }
+                    ]);
+                }, 2000);
+                
+            } catch (error) {
+                console.error('WhatsApp sharing error:', error);
+                showMessage('❌ WhatsApp sharing not available on this device', 'error');
+            }
+        }
+
+        async function importFromInstagram() {
+            showMessage('📷 Connecting to Instagram...', 'info');
+            
+            // Simulate Instagram API integration
+            setTimeout(() => {
+                simulateContactImport('instagram', [
+                    { name: 'maya_photographer', platform: 'instagram' },
+                    { name: 'kl_foodie_2024', platform: 'instagram' },
+                    { name: 'adventure_malaysia', platform: 'instagram' }
+                ]);
+                showMessage('📷 Instagram friends imported!', 'success');
+            }, 1500);
+        }
+
+        async function importFromFacebook() {
+            showMessage('📘 Connecting to Facebook...', 'info');
+            
+            // Simulate Facebook API integration
+            setTimeout(() => {
+                simulateContactImport('facebook', [
+                    { name: 'Wei Lin Tan', platform: 'facebook' },
+                    { name: 'Hassan Abdullah', platform: 'facebook' },
+                    { name: 'Priya Sharma', platform: 'facebook' }
+                ]);
+                showMessage('📘 Facebook friends imported!', 'success');
+            }, 1500);
+        }
+
+        async function importFromTwitter() {
+            showMessage('🐦 Connecting to Twitter...', 'info');
+            
+            setTimeout(() => {
+                simulateContactImport('twitter', [
+                    { name: '@techie_malaysia', platform: 'twitter' },
+                    { name: '@foodie_kl', platform: 'twitter' },
+                    { name: '@startup_guy', platform: 'twitter' }
+                ]);
+                showMessage('🐦 Twitter followers imported!', 'success');
+            }, 1500);
+        }
+
+        async function importFromTikTok() {
+            showMessage('🎵 Connecting to TikTok...', 'info');
+            
+            setTimeout(() => {
+                simulateContactImport('tiktok', [
+                    { name: 'dance_queen_my', platform: 'tiktok' },
+                    { name: 'comedy_king_kl', platform: 'tiktok' },
+                    { name: 'creative_content', platform: 'tiktok' }
+                ]);
+                showMessage('🎵 TikTok friends imported!', 'success');
+            }, 1500);
+        }
+
+        async function importFromLinkedIn() {
+            showMessage('💼 Connecting to LinkedIn...', 'info');
+            
+            setTimeout(() => {
+                simulateContactImport('linkedin', [
+                    { name: 'Alex Thompson', platform: 'linkedin', title: 'Software Engineer' },
+                    { name: 'Sarah Chen', platform: 'linkedin', title: 'Product Manager' },
+                    { name: 'Kumar Patel', platform: 'linkedin', title: 'Data Scientist' }
+                ]);
+                showMessage('💼 LinkedIn connections imported!', 'success');
+            }, 1500);
+        }
+
+        // Contact Import Simulation
+        function simulateContactImport(platform, contacts) {
+            const platformIcons = {
+                whatsapp: '📱',
+                instagram: '📷',
+                facebook: '📘',
+                twitter: '🐦',
+                tiktok: '🎵',
+                linkedin: '💼'
+            };
+            
+            const nearbyList = document.getElementById('nearbyUsersList');
+            if (!nearbyList) return;
+            
+            nearbyList.innerHTML = '';
+            
+            contacts.forEach((contact, index) => {
+                const contactEl = document.createElement('div');
+                contactEl.style.cssText = `
+                    display: flex;
+                    justify-content: space-between;
+                    align-items: center;
+                    padding: 10px;
+                    background: rgba(255, 255, 255, 0.05);
+                    border-radius: 10px;
+                    margin-bottom: 8px;
+                    border: 1px solid rgba(255, 255, 255, 0.1);
+                `;
+                
+                contactEl.innerHTML = `
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                        <div style="font-size: 1.2rem;">${platformIcons[platform]}</div>
+                        <div>
+                            <div style="font-weight: 500;">${contact.name}</div>
+                            <div style="font-size: 0.8rem; opacity: 0.7;">
+                                ${contact.title || contact.phone || `From ${platform}`}
+                            </div>
+                        </div>
+                    </div>
+                    <button class="btn btn-primary btn-small" onclick="inviteContact('${contact.name}', '${platform}')" style="font-size: 0.8rem;">
+                        Invite
+                    </button>
+                `;
+                
+                nearbyList.appendChild(contactEl);
+            });
+        }
+
+        // Nearby Users Scanning
+        async function scanNearbyUsers() {
+            showMessage('🔍 Scanning for nearby JomBro players...', 'info');
+            
+            const nearbyList = document.getElementById('nearbyUsersList');
+            if (!nearbyList) return;
+            
+            nearbyList.innerHTML = '<div style="text-align: center; padding: 20px;"><div class="loading"></div></div>';
+            
+            // Simulate nearby users discovery
+            setTimeout(() => {
+                const nearbyUsers = [
+                    { name: 'Zain Ahmed', distance: '0.2km', avatar: '🌟', online: true },
+                    { name: 'Lisa Wong', distance: '0.5km', avatar: '🎨', online: true },
+                    { name: 'Omar Hassan', distance: '0.8km', avatar: '🚀', online: false },
+                    { name: 'Mei Lin', distance: '1.1km', avatar: '💫', online: true }
+                ];
+                
+                nearbyList.innerHTML = '';
+                
+                nearbyUsers.forEach(user => {
+                    const userEl = document.createElement('div');
+                    userEl.style.cssText = `
+                        display: flex;
+                        justify-content: space-between;
+                        align-items: center;
+                        padding: 10px;
+                        background: rgba(255, 255, 255, 0.05);
+                        border-radius: 10px;
+                        margin-bottom: 8px;
+                        border: 1px solid rgba(155, 89, 182, 0.2);
+                    `;
+                    
+                    userEl.innerHTML = `
+                        <div style="display: flex; align-items: center; gap: 10px;">
+                            <div style="position: relative;">
+                                <div style="font-size: 1.5rem;">${user.avatar}</div>
+                                ${user.online ? '<div style="position: absolute; bottom: 0; right: 0; width: 10px; height: 10px; background: #4ecdc4; border-radius: 50%; border: 2px solid #0a0a0a;"></div>' : ''}
+                            </div>
+                            <div>
+                                <div style="font-weight: 500;">${user.name}</div>
+                                <div style="font-size: 0.8rem; opacity: 0.7;">
+                                    ${user.distance} away • ${user.online ? 'Online' : 'Offline'}
+                                </div>
+                            </div>
+                        </div>
+                        <button class="btn btn-primary btn-small" onclick="sendFriendRequestToNearby('${user.name}')" style="font-size: 0.8rem;">
+                            Add Friend
+                        </button>
+                    `;
+                    
+                    nearbyList.appendChild(userEl);
+                });
+                
+                showMessage(`📍 Found ${nearbyUsers.length} nearby players!`, 'success');
+            }, 2000);
+        }
+
+        // Phone Contacts Import
+        async function importPhoneContacts() {
+            showMessage('📱 Accessing phone contacts...', 'info');
+            
+            // In a real app, this would use Contacts API
+            setTimeout(() => {
+                const phoneContacts = [
+                    { name: 'Mom', phone: '+60123456789', hasJomBro: false },
+                    { name: 'Ahmad (Work)', phone: '+60187654321', hasJomBro: true },
+                    { name: 'Siti Neighbor', phone: '+60196789012', hasJomBro: true },
+                    { name: 'Raj College', phone: '+60134567890', hasJomBro: false }
+                ];
+                
+                const contactsList = document.getElementById('phoneContactsList');
+                if (!contactsList) return;
+                
+                contactsList.innerHTML = '';
+                
+                phoneContacts.forEach(contact => {
+                    const contactEl = document.createElement('div');
+                    contactEl.style.cssText = `
+                        display: flex;
+                        justify-content: space-between;
+                        align-items: center;
+                        padding: 10px;
+                        background: rgba(255, 255, 255, 0.05);
+                        border-radius: 10px;
+                        margin-bottom: 8px;
+                        border: 1px solid rgba(255, 255, 255, 0.1);
+                    `;
+                    
+                    contactEl.innerHTML = `
+                        <div style="display: flex; align-items: center; gap: 10px;">
+                            <div style="font-size: 1.2rem;">📱</div>
+                            <div>
+                                <div style="font-weight: 500;">${contact.name}</div>
+                                <div style="font-size: 0.8rem; opacity: 0.7;">
+                                    ${contact.phone} ${contact.hasJomBro ? '• On JomBro' : ''}
+                                </div>
+                            </div>
+                        </div>
+                        <button class="btn ${contact.hasJomBro ? 'btn-primary' : 'btn-secondary'} btn-small" 
+                                onclick="${contact.hasJomBro ? `addFriendByPhone('${contact.phone}')` : `inviteViaText('${contact.phone}')`}" 
+                                style="font-size: 0.8rem;">
+                            ${contact.hasJomBro ? 'Add' : 'Invite'}
+                        </button>
+                    `;
+                    
+                    contactsList.appendChild(contactEl);
+                });
+                
+                showMessage('📱 Phone contacts imported!', 'success');
+            }, 1500);
+        }
+
+        // Helper Functions
+        function generateInviteLink() {
+            const inviteCode = currentUser ? currentUser.uid.slice(0, 8) : 'demo123';
+            return `${window.location.origin}?invite=${inviteCode}&ref=${appState.user.name}`;
+        }
+
+        async function shareViaWhatsApp() {
+            const inviteLink = generateInviteLink();
+            const message = encodeURIComponent(`🎮 Join me on JomBro! Let's challenge each other: ${inviteLink}`);
+            window.open(`https://wa.me/?text=${message}`, '_blank');
+            showMessage('📱 WhatsApp share opened!', 'success');
+        }
+
+        async function shareViaMessenger() {
+            const inviteLink = generateInviteLink();
+            const message = encodeURIComponent(`🎮 Join me on JomBro! Let's challenge each other: ${inviteLink}`);
+            window.open(`https://m.me/?text=${message}`, '_blank');
+            showMessage('💬 Messenger share opened!', 'success');
+        }
+
+        async function copyInviteLink() {
+            const inviteLink = generateInviteLink();
+            try {
+                await navigator.clipboard.writeText(inviteLink);
+                showMessage('🔗 Invite link copied to clipboard!', 'success');
+            } catch (error) {
+                console.error('Clipboard error:', error);
+                showMessage('❌ Could not copy link', 'error');
+            }
+        }
+
+        async function addFriendByEmail() {
+            const email = document.getElementById('friendEmailInput').value.trim();
+            if (email) {
+                await sendFriendRequest(email);
+                document.getElementById('friendEmailInput').value = '';
+            } else {
+                showMessage('❌ Please enter an email address!', 'error');
+            }
+        }
+
+        async function inviteContact(name, platform) {
+            showMessage(`📤 Invitation sent to ${name} via ${platform}!`, 'success');
+            
+            // In a real app, this would send actual invitations
+            // For now, we'll simulate the process
+            setTimeout(() => {
+                if (Math.random() > 0.7) {
+                    showMessage(`🎉 ${name} joined JomBro from your ${platform} invitation!`, 'success');
+                    
+                    // Add as friend automatically
+                    const newFriend = {
+                        id: 'friend_' + Date.now(),
+                        name: name,
+                        avatar: getRandomAvatar(),
+                        online: true,
+                        tokens: 1000,
+                        level: 1
+                    };
+                    
+                    appState.friends.push(newFriend);
+                    appState.user.friends = appState.friends.length;
+                    renderFriends();
+                    updateUserDisplay();
+                }
+            }, 3000);
+        }
+
+        async function sendFriendRequestToNearby(name) {
+            showMessage(`👥 Friend request sent to ${name}!`, 'success');
+            
+            // Simulate nearby friend acceptance
+            setTimeout(() => {
+                const newFriend = {
+                    id: 'nearby_' + Date.now(),
+                    name: name,
+                    avatar: getRandomAvatar(),
+                    online: true,
+                    tokens: Math.floor(Math.random() * 2000) + 500,
+                    level: Math.floor(Math.random() * 5) + 1
+                };
+                
+                appState.friends.push(newFriend);
+                appState.user.friends = appState.friends.length;
+                renderFriends();
+                updateUserDisplay();
+                
+                showMessage(`🎉 ${name} accepted your friend request!`, 'success');
+            }, 2000);
+        }
+
+        async function addFriendByPhone(phone) {
+            showMessage(`📱 Sending friend request to ${phone}...`, 'info');
+            
+            // Simulate adding friend by phone number
+            setTimeout(() => {
+                const newFriend = {
+                    id: 'phone_' + Date.now(),
+                    name: 'Phone Contact',
+                    avatar: getRandomAvatar(),
+                    online: Math.random() > 0.5,
+                    tokens: Math.floor(Math.random() * 1500) + 500,
+                    level: Math.floor(Math.random() * 3) + 1
+                };
+                
+                appState.friends.push(newFriend);
+                appState.user.friends = appState.friends.length;
+                renderFriends();
+                updateUserDisplay();
+                
+                showMessage('📱 Friend added via phone contact!', 'success');
+            }, 1500);
+        }
+
+        async function inviteViaText(phone) {
+            const inviteLink = generateInviteLink();
+            const message = encodeURIComponent(`🎮 Hey! Join me on JomBro for fun challenges: ${inviteLink}`);
+            
+            // Try to open SMS app
+            window.open(`sms:${phone}?body=${message}`, '_self');
+            showMessage(`📱 SMS invitation sent to ${phone}!`, 'success');
         }
 
         function loadAppContent() {
