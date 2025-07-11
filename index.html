@@ -1254,6 +1254,55 @@
 
             <!-- Main Content -->
             <div class="main-content">
+                <!-- Nearby Players Section -->
+                <div class="card floating-element">
+                    <div class="card-title">
+                        <span>🎮</span>
+                        <span>Nearby Players</span>
+                        <span style="font-size: 0.8rem; opacity: 0.7;" id="currentRange">(3km)</span>
+                    </div>
+                    
+                    <!-- Detection Range Selector -->
+                    <div class="detection-range-section">
+                        <div class="range-header">
+                            <span>📡</span>
+                            <span>Detection Range</span>
+                        </div>
+                        <div class="range-presets">
+                            <button class="range-btn" onclick="setDetectionRange(1)">1km</button>
+                            <button class="range-btn active" onclick="setDetectionRange(3)" id="defaultRange">3km</button>
+                            <button class="range-btn" onclick="setDetectionRange(5)">5km</button>
+                            <button class="range-btn" onclick="setDetectionRange(10)">10km</button>
+                        </div>
+                        <div class="range-custom">
+                            <input type="number" class="range-input" id="customRange" placeholder="Custom" min="0.1" max="50" step="0.1">
+                            <span style="color: rgba(255, 255, 255, 0.7);">km</span>
+                            <button class="btn btn-secondary btn-small" onclick="setCustomRange()">Set</button>
+                        </div>
+                    </div>
+                    
+                    <div class="nearby-section">
+                        <div class="nearby-header">
+                            <div class="nearby-count">
+                                <span class="online-count" id="nearbyOnlineCount">0</span> players nearby
+                            </div>
+                            <button class="btn btn-secondary btn-small" onclick="refreshNearbyPlayers()">🔄 Scan</button>
+                        </div>
+                        
+                        <div class="nearby-carousel">
+                            <div class="nearby-track" id="nearbyTrack">
+                                <!-- Nearby players populated here -->
+                            </div>
+                        </div>
+                        
+                        <div class="nearby-actions">
+                            <button class="btn btn-primary" onclick="sendWaveToNearby()">Send Wave 👋</button>
+                            <button class="btn btn-secondary" onclick="toggleVisibility()" id="visibilityBtn">Hide Me</button>
+                            <button class="btn btn-secondary" onclick="challengeRandomNearby()">Random Challenge</button>
+                        </div>
+                    </div>
+                </div>
+
                 <!-- Friends Section -->
                 <div class="card floating-element">
                     <div class="card-title">
@@ -1384,11 +1433,14 @@
                 online: true
             },
             friends: [],
+            nearbyPlayers: [],
             challenges: [],
             quickChallengeActive: true,
             disasterActive: true,
             selectedSurvivalTasks: [],
-            selectedTargetFriends: []
+            selectedTargetFriends: [],
+            detectionRange: 3,
+            isHiddenFromNearby: false
         };
 
         // Initialize Firebase and App
@@ -1533,6 +1585,55 @@
                     showMessage('⚠️ Real-time friends sync interrupted', 'error');
                 });
                 unsubscribeFunctions.push(unsubscribeFriends);
+                
+                // REAL-TIME NEARBY PLAYERS LISTENER
+                const nearbyPlayersRef = db.collection('users')
+                    .where('online', '==', true)
+                    .limit(50);
+                
+                const unsubscribeNearby = nearbyPlayersRef.onSnapshot((snapshot) => {
+                    console.log('🎮 Real-time nearby players update received');
+                    const nearbyPlayers = [];
+                    
+                    snapshot.forEach(doc => {
+                        if (doc.id !== currentUser.uid && !appState.isHiddenFromNearby) {
+                            const userData = doc.data();
+                            
+                            // Simulate distance calculation based on detection range
+                            const distance = (Math.random() * appState.detectionRange).toFixed(1);
+                            
+                            if (parseFloat(distance) <= appState.detectionRange) {
+                                nearbyPlayers.push({
+                                    id: doc.id,
+                                    name: userData.name,
+                                    avatar: userData.avatar || getRandomAvatar(),
+                                    distance: distance + 'km',
+                                    online: true,
+                                    level: userData.level || 1,
+                                    tokens: userData.tokens || 0
+                                });
+                            }
+                        }
+                    });
+                    
+                    // Add some simulated nearby players for demo
+                    const simulatedPlayers = [
+                        { id: 'sim1', name: 'Ahmad', avatar: '🤠', distance: '0.8km', online: true, level: 3, tokens: 1200 },
+                        { id: 'sim2', name: 'Siti', avatar: '🌟', distance: '1.2km', online: true, level: 2, tokens: 800 },
+                        { id: 'sim3', name: 'Raj', avatar: '🎯', distance: '1.5km', online: true, level: 4, tokens: 1500 },
+                        { id: 'sim4', name: 'Mei Lin', avatar: '🎭', distance: '1.8km', online: true, level: 1, tokens: 600 },
+                        { id: 'sim5', name: 'Hassan', avatar: '🎪', distance: '2.1km', online: true, level: 5, tokens: 2000 }
+                    ].filter(player => parseFloat(player.distance) <= appState.detectionRange);
+                    
+                    appState.nearbyPlayers = [...nearbyPlayers, ...simulatedPlayers];
+                    renderNearbyPlayers();
+                    updateNearbyCounts();
+                    console.log(`✅ Loaded ${appState.nearbyPlayers.length} nearby players in real-time`);
+                }, (error) => {
+                    console.error('Nearby players listener error:', error);
+                    showMessage('⚠️ Real-time nearby sync interrupted', 'error');
+                });
+                unsubscribeFunctions.push(unsubscribeNearby);
                 
                 // REAL-TIME CHALLENGES LISTENER
                 const challengesRef = db.collection('challenges')
@@ -1984,6 +2085,38 @@
             renderTargetFriends();
         }
 
+        function renderNearbyPlayers() {
+            const nearbyTrack = document.getElementById('nearbyTrack');
+            if (!nearbyTrack) return;
+            
+            nearbyTrack.innerHTML = '';
+
+            if (appState.nearbyPlayers.length === 0) {
+                nearbyTrack.innerHTML = `
+                    <div class="empty-state" style="width: 100%; text-align: center; padding: 20px;">
+                        <h4>🔍 No players nearby</h4>
+                        <p>Increase range or wait for players to come online</p>
+                    </div>
+                `;
+                return;
+            }
+
+            appState.nearbyPlayers.forEach((player) => {
+                const playerElement = document.createElement('div');
+                playerElement.className = 'nearby-avatar-item';
+                playerElement.onclick = () => challengeNearbyPlayer(player.id);
+                playerElement.innerHTML = `
+                    <div class="nearby-avatar">
+                        ${player.avatar}
+                        <div class="distance-indicator">${player.distance}</div>
+                        <div class="online-indicator"></div>
+                    </div>
+                    <div class="nearby-name-small">${player.name}</div>
+                `;
+                nearbyTrack.appendChild(playerElement);
+            });
+        }
+
         function renderTargetFriends() {
             const targetFriendsList = document.getElementById('targetFriendsList');
             if (!targetFriendsList) return;
@@ -2012,6 +2145,119 @@
                 
                 targetFriendsList.appendChild(friendElement);
             });
+        }
+
+        function updateNearbyCounts() {
+            document.getElementById('nearbyOnlineCount').textContent = appState.nearbyPlayers.length;
+        }
+
+        // Detection range functions
+        function setDetectionRange(range) {
+            appState.detectionRange = range;
+            document.getElementById('currentRange').textContent = `(${range}km)`;
+            
+            // Update active button
+            document.querySelectorAll('.range-btn').forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+            
+            // Refresh nearby players with new range
+            refreshNearbyPlayers();
+            showMessage(`📡 Detection range set to ${range}km`, 'info');
+        }
+
+        function setCustomRange() {
+            const customRange = parseFloat(document.getElementById('customRange').value);
+            if (customRange && customRange > 0 && customRange <= 50) {
+                setDetectionRange(customRange);
+                document.getElementById('customRange').value = '';
+                
+                // Remove active class from preset buttons
+                document.querySelectorAll('.range-btn').forEach(btn => btn.classList.remove('active'));
+            } else {
+                showMessage('❌ Please enter a valid range (0.1 - 50 km)', 'error');
+            }
+        }
+
+        // Nearby player interaction functions
+        async function refreshNearbyPlayers() {
+            showMessage('🔄 Scanning for nearby players...', 'info');
+            
+            // The real-time listener will automatically update the nearby players
+            // But we can simulate finding new players
+            setTimeout(() => {
+                const additionalPlayers = [
+                    { id: 'new1', name: 'Jordan', avatar: '🌟', distance: (Math.random() * appState.detectionRange).toFixed(1) + 'km', online: true, level: 2, tokens: 900 },
+                    { id: 'new2', name: 'Casey', avatar: '🎭', distance: (Math.random() * appState.detectionRange).toFixed(1) + 'km', online: true, level: 3, tokens: 1100 }
+                ];
+                
+                // Add new players that aren't already in the list
+                additionalPlayers.forEach(newPlayer => {
+                    if (!appState.nearbyPlayers.find(p => p.name === newPlayer.name)) {
+                        appState.nearbyPlayers.push(newPlayer);
+                    }
+                });
+                
+                renderNearbyPlayers();
+                updateNearbyCounts();
+                showMessage(`✅ Scan complete! Found ${appState.nearbyPlayers.length} players nearby.`, 'success');
+            }, 1500);
+        }
+
+        async function challengeNearbyPlayer(playerId) {
+            const player = appState.nearbyPlayers.find(p => p.id === playerId);
+            if (!player) return;
+            
+            showMessage(`🎯 Challenge sent to ${player.name}! They'll receive a notification.`, 'success');
+            
+            setTimeout(() => {
+                if (Math.random() > 0.3) {
+                    showMessage(`🎉 ${player.name} accepted your challenge!`, 'success');
+                    appState.user.tokens += 50;
+                    updateUserDisplay();
+                } else {
+                    showMessage(`😔 ${player.name} declined your challenge. Try again later!`, 'info');
+                }
+            }, 3000);
+        }
+
+        async function sendWaveToNearby() {
+            if (appState.nearbyPlayers.length === 0) {
+                showMessage('❌ No nearby players to wave to!', 'error');
+                return;
+            }
+            
+            showMessage(`👋 Wave sent to ${appState.nearbyPlayers.length} nearby players!`, 'success');
+            
+            setTimeout(() => {
+                const responses = Math.floor(Math.random() * appState.nearbyPlayers.length) + 1;
+                showMessage(`🌊 ${responses} players waved back!`, 'success');
+                appState.user.tokens += responses * 10;
+                updateUserDisplay();
+            }, 2000);
+        }
+
+        function toggleVisibility() {
+            appState.isHiddenFromNearby = !appState.isHiddenFromNearby;
+            const btn = document.getElementById('visibilityBtn');
+            
+            if (appState.isHiddenFromNearby) {
+                btn.textContent = 'Show Me';
+                showMessage('👻 You are now hidden from nearby players!', 'info');
+            } else {
+                btn.textContent = 'Hide Me';
+                showMessage('👁️ You are now visible to nearby players!', 'info');
+                refreshNearbyPlayers();
+            }
+        }
+
+        async function challengeRandomNearby() {
+            if (appState.nearbyPlayers.length === 0) {
+                showMessage('❌ No nearby players available!', 'error');
+                return;
+            }
+            
+            const randomPlayer = appState.nearbyPlayers[Math.floor(Math.random() * appState.nearbyPlayers.length)];
+            challengeNearbyPlayer(randomPlayer.id);
         }
 
         function renderChallenges() {
