@@ -1198,13 +1198,22 @@
     </div>
 </div>
 
-<!-- Auth Modal -->
+        <!-- Auth Modal -->
 <div class="modal show" id="authModal">
     <div class="modal-content">
         <div class="auth-welcome">
             <div class="auth-logo">🎮</div>
             <div class="auth-title">Welcome to JomBro</div>
             <div class="auth-subtitle">Come-on bro, Let's go!</div>
+        </div>
+        
+        <!-- Demo Mode Banner -->
+        <div style="background: rgba(155, 89, 182, 0.2); border: 1px solid rgba(155, 89, 182, 0.4); border-radius: 12px; padding: 15px; margin-bottom: 20px; text-align: center;">
+            <div style="font-size: 1.1rem; font-weight: 600; margin-bottom: 8px; color: #9b59b6;">🚀 Quick Demo Access</div>
+            <div style="font-size: 0.9rem; opacity: 0.8; margin-bottom: 12px;">Skip authentication and try the app instantly!</div>
+            <button class="btn btn-primary" onclick="enterDemoMode()" style="background: linear-gradient(45deg, #9b59b6, #e91e63); font-size: 0.9rem;">
+                🎮 Enter Demo Mode
+            </button>
         </div>
         
         <div class="auth-tabs">
@@ -1219,6 +1228,16 @@
         </div>
         
         <div class="auth-form" id="loginForm">
+            <!-- Test Credentials Helper -->
+            <div style="background: rgba(63, 81, 181, 0.1); border: 1px solid rgba(63, 81, 181, 0.3); border-radius: 10px; padding: 12px; margin-bottom: 15px; font-size: 0.85rem; text-align: center;">
+                <div style="font-weight: 600; margin-bottom: 5px; color: #3f51b5;">🧪 Test Credentials</div>
+                <div style="opacity: 0.8;">Email: demo@jombro.com</div>
+                <div style="opacity: 0.8;">Password: demo123</div>
+                <button class="btn btn-secondary btn-small" onclick="fillTestCredentials()" style="margin-top: 8px; font-size: 0.8rem;">
+                    Auto-Fill
+                </button>
+            </div>
+            
             <div class="input-group">
                 <div class="input-icon">📧</div>
                 <input type="email" class="auth-input" id="loginEmail" placeholder="Email address" autocomplete="email">
@@ -1247,6 +1266,14 @@
             </div>
             <button class="auth-btn auth-btn-primary" onclick="signupUser()" id="signupBtn">
                 <span class="btn-text">Join JomBro</span>
+            </button>
+        </div>
+        
+        <!-- Force Login Button -->
+        <div style="text-align: center; margin-top: 20px; padding-top: 15px; border-top: 1px solid rgba(255, 255, 255, 0.1);">
+            <div style="font-size: 0.8rem; opacity: 0.6; margin-bottom: 10px;">Having connection issues?</div>
+            <button class="btn btn-secondary btn-small" onclick="forceLogin()" style="font-size: 0.8rem;">
+                🔓 Force Login (Bypass)
             </button>
         </div>
     </div>
@@ -1289,24 +1316,33 @@
         isHiddenFromNearby: false
     };
 
-    // Initialize Firebase and App with ROBUST ERROR HANDLING
+    // Initialize Firebase and App with FLEXIBLE ERROR HANDLING
     async function initApp() {
         try {
             console.log('🔄 Initializing Firebase...');
             
             // Check if Firebase SDK is loaded
             if (typeof firebase === 'undefined') {
-                throw new Error('Firebase SDK not loaded');
+                console.warn('⚠️ Firebase SDK not loaded - enabling offline mode');
+                enableOfflineMode();
+                return;
             }
             
-            // Initialize Firebase
-            app = firebase.initializeApp(firebaseConfig);
-            auth = firebase.auth();
-            db = firebase.firestore();
-            storage = firebase.storage();
-            
-            // Set persistence for offline support
-            await auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL);
+            // Initialize Firebase with error handling
+            try {
+                app = firebase.initializeApp(firebaseConfig);
+                auth = firebase.auth();
+                db = firebase.firestore();
+                storage = firebase.storage();
+                
+                // Set persistence for offline support
+                await auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL);
+                console.log('✅ Firebase persistence enabled');
+            } catch (firebaseError) {
+                console.warn('⚠️ Firebase initialization failed:', firebaseError);
+                enableOfflineMode();
+                return;
+            }
             
             // Monitor authentication state with better error handling
             auth.onAuthStateChanged(async (user) => {
@@ -1333,62 +1369,75 @@
                     }
                 } catch (error) {
                     console.error('Auth state change error:', error);
-                    showMessage('⚠️ Authentication error. Please refresh the page.', 'error');
+                    showMessage('⚠️ Authentication error. Using offline mode.', 'error');
+                    enableOfflineMode();
                 }
             });
             
-            // Test Firebase connection
-            await testFirebaseConnection();
+            // Test Firebase connection (optional - if it fails, continue anyway)
+            try {
+                await testFirebaseConnection();
+                console.log('✅ Firebase connection test passed');
+            } catch (connectionError) {
+                console.warn('⚠️ Firebase connection test failed, but continuing:', connectionError);
+                // Don't fail the entire app - just show a warning
+                showMessage('⚠️ Limited connectivity - some features may be unavailable', 'info');
+            }
             
             console.log('✅ Firebase initialized successfully');
             
         } catch (error) {
             console.error('❌ Firebase initialization error:', error);
-            
-            let errorMessage = '⚠️ Failed to initialize app. ';
-            if (error.message.includes('not loaded')) {
-                errorMessage += 'Firebase SDK failed to load.';
-            } else if (error.code === 'auth/network-request-failed') {
-                errorMessage += 'Please check your internet connection.';
-            } else {
-                errorMessage += 'Please refresh the page.';
-            }
-            
-            showMessage(errorMessage, 'error');
-            
-            // Show offline mode
-            document.body.innerHTML = `
-                <div style="display: flex; align-items: center; justify-content: center; min-height: 100vh; background: #0a0a0a; color: white; text-align: center; padding: 20px;">
-                    <div>
-                        <h1 style="font-size: 2rem; margin-bottom: 20px;">🚫 Connection Error</h1>
-                        <p style="margin-bottom: 20px; opacity: 0.8;">Unable to connect to JomBro servers.</p>
-                        <button onclick="window.location.reload()" style="padding: 12px 24px; background: #9b59b6; color: white; border: none; border-radius: 10px; cursor: pointer; font-size: 1rem;">
-                            🔄 Retry
-                        </button>
-                    </div>
-                </div>
-            `;
-            return;
+            enableOfflineMode();
         }
         
-        // Initialize other components
+        // Initialize other components regardless of Firebase status
         createStarfield();
         monitorConnection();
         setupEventListeners();
     }
 
-    // Test Firebase connection
+    // Enable offline mode when Firebase is unavailable
+    function enableOfflineMode() {
+        console.log('🔌 Enabling offline mode...');
+        
+        // Show offline mode indicator
+        const offlineIndicator = document.createElement('div');
+        offlineIndicator.innerHTML = `
+            <div style="background: rgba(255, 193, 7, 0.9); color: #000; padding: 10px; text-align: center; font-weight: 600; border-radius: 0 0 10px 10px; position: fixed; top: 0; left: 50%; transform: translateX(-50%); z-index: 10001; backdrop-filter: blur(10px);">
+                🔌 Offline Mode - Data won't be saved
+            </div>
+        `;
+        document.body.appendChild(offlineIndicator);
+        
+        // Show auth modal with prominent offline options
+        showAuthModal();
+        
+        // Auto-hide Firebase error messages and show offline options
+        setTimeout(() => {
+            const authModal = document.getElementById('authModal');
+            if (authModal && authModal.classList.contains('show')) {
+                showMessage('🔌 Offline mode enabled - click Demo Mode or Force Login to continue', 'info');
+            }
+        }, 1000);
+    }
+
+    // Test Firebase connection with timeout
     async function testFirebaseConnection() {
+        const timeoutPromise = new Promise((_, reject) => 
+            setTimeout(() => reject(new Error('Connection test timeout')), 5000)
+        );
+        
+        const testPromise = db.collection('test').limit(1).get();
+        
         try {
-            // Test Firestore connection
-            await db.collection('test').limit(1).get();
+            await Promise.race([testPromise, timeoutPromise]);
             console.log('✅ Firestore connection successful');
         } catch (error) {
-            console.warn('⚠️ Firestore connection test failed:', error);
             if (error.code === 'permission-denied') {
                 console.log('ℹ️ Firestore rules are working (permission denied expected)');
             } else {
-                throw new Error('Firestore connection failed');
+                throw error;
             }
         }
     }
@@ -1555,7 +1604,143 @@
         }
     }
 
-    // Authentication functions with ROBUST ERROR HANDLING
+    // DEMO MODE AND BYPASS FUNCTIONS
+    function enterDemoMode() {
+        showMessage('🎮 Entering Demo Mode...', 'info');
+        
+        // Create mock user
+        const mockUser = {
+            uid: 'demo_user_' + Date.now(),
+            email: 'demo@jombro.com',
+            displayName: 'Demo Player',
+            emailVerified: true
+        };
+        
+        // Set up demo state
+        currentUser = mockUser;
+        appState.user = {
+            id: mockUser.uid,
+            name: 'Demo Player',
+            avatar: '🎮',
+            tokens: 2500,
+            level: 5,
+            friends: 0,
+            online: true
+        };
+        
+        // Add demo friends
+        appState.friends = [
+            { id: 'f1', name: 'Ahmad', avatar: '🤠', online: true, tokens: 1200, level: 3 },
+            { id: 'f2', name: 'Siti', avatar: '🌟', online: true, tokens: 1800, level: 4 },
+            { id: 'f3', name: 'Raj', avatar: '🎯', online: false, tokens: 950, level: 2 },
+            { id: 'f4', name: 'Maya', avatar: '🎨', online: true, tokens: 2200, level: 6 }
+        ];
+        
+        // Add demo challenges
+        appState.challenges = [
+            {
+                id: 'c1',
+                title: 'Do 20 Push-ups',
+                description: 'Complete 20 push-ups and upload a video!',
+                category: 'fitness',
+                reward: 200,
+                creatorId: 'f1',
+                creatorName: 'Ahmad',
+                participants: [currentUser.uid, 'f1'],
+                status: 'active',
+                responses: {},
+                createdAt: new Date(Date.now() - 30*60*1000) // 30 minutes ago
+            },
+            {
+                id: 'c2',
+                title: 'Draw a Self-Portrait',
+                description: 'Create an artistic self-portrait using any medium!',
+                category: 'creative',
+                reward: 300,
+                creatorId: 'f2',
+                creatorName: 'Siti',
+                participants: [currentUser.uid, 'f2'],
+                status: 'active',
+                responses: {},
+                createdAt: new Date(Date.now() - 2*60*60*1000) // 2 hours ago
+            }
+        ];
+        
+        appState.user.friends = appState.friends.length;
+        
+        // Skip Firebase initialization
+        hideAuthModal();
+        loadAppContent();
+        
+        // Initialize nearby players
+        filterNearbyPlayersByRange(appState.detectionRange);
+        renderNearbyPlayers();
+        
+        showMessage('🎮 Demo Mode Active! All features unlocked!', 'success');
+        
+        // Show demo info
+        setTimeout(() => {
+            showMessage('ℹ️ Demo mode - changes won\'t be saved', 'info');
+        }, 2000);
+    }
+
+    function fillTestCredentials() {
+        const loginEmail = document.getElementById('loginEmail');
+        const loginPassword = document.getElementById('loginPassword');
+        
+        if (loginEmail && loginPassword) {
+            loginEmail.value = 'demo@jombro.com';
+            loginPassword.value = 'demo123';
+            
+            // Clear any error styling
+            loginEmail.style.borderColor = '';
+            loginPassword.style.borderColor = '';
+            
+            showMessage('📝 Test credentials filled! Click Login.', 'info');
+        }
+    }
+
+    function forceLogin() {
+        showMessage('🔓 Forcing login bypass...', 'info');
+        
+        // Create mock user for forced login
+        const mockUser = {
+            uid: 'forced_user_' + Date.now(),
+            email: 'forced@jombro.com',
+            displayName: 'Forced User',
+            emailVerified: true
+        };
+        
+        // Set up forced login state
+        currentUser = mockUser;
+        appState.user = {
+            id: mockUser.uid,
+            name: 'Forced User',
+            avatar: '🔓',
+            tokens: 1000,
+            level: 1,
+            friends: 0,
+            online: true
+        };
+        
+        // Add basic demo data
+        appState.friends = [
+            { id: 'f1', name: 'Test Friend', avatar: '🧪', online: true, tokens: 500, level: 1 }
+        ];
+        
+        appState.challenges = [];
+        appState.user.friends = appState.friends.length;
+        
+        // Skip Firebase and go straight to app
+        hideAuthModal();
+        loadAppContent();
+        
+        // Initialize nearby players
+        filterNearbyPlayersByRange(appState.detectionRange);
+        renderNearbyPlayers();
+        
+        showMessage('🔓 Forced login successful! Limited demo mode.', 'success');
+    }
     function switchAuthTab(tab) {
         try {
             document.querySelectorAll('.auth-tab').forEach(t => t.classList.remove('active'));
@@ -1596,6 +1781,13 @@
         emailEl.style.borderColor = '';
         passwordEl.style.borderColor = '';
         
+        // Check for demo credentials first
+        if (email === 'demo@jombro.com' && password === 'demo123') {
+            showMessage('🎮 Demo credentials detected! Entering demo mode...', 'info');
+            enterDemoMode();
+            return;
+        }
+        
         // Validation
         if (!email) {
             showMessage('❌ Please enter your email address!', 'error');
@@ -1620,7 +1812,8 @@
         
         // Check if Firebase is initialized
         if (!auth) {
-            showMessage('❌ Authentication service not available. Please refresh the page.', 'error');
+            showMessage('⚠️ Firebase not available. Using offline mode...', 'info');
+            forceLogin();
             return;
         }
         
@@ -1645,9 +1838,28 @@
         } catch (error) {
             console.error('Login error:', error);
             
-            // Handle specific errors
+            // Handle specific errors with fallback options
             if (error.message === 'Login timeout') {
                 showMessage('❌ Login timeout. Please check your connection and try again.', 'error');
+            } else if (error.code === 'auth/network-request-failed') {
+                showMessage('🌐 Network error detected. Would you like to try offline mode?', 'error');
+                setTimeout(() => {
+                    const offlineBtn = document.createElement('button');
+                    offlineBtn.textContent = '🔓 Try Offline Mode';
+                    offlineBtn.className = 'btn btn-secondary';
+                    offlineBtn.onclick = forceLogin;
+                    offlineBtn.style.position = 'fixed';
+                    offlineBtn.style.bottom = '20px';
+                    offlineBtn.style.right = '20px';
+                    offlineBtn.style.zIndex = '10002';
+                    document.body.appendChild(offlineBtn);
+                    
+                    setTimeout(() => {
+                        if (offlineBtn.parentNode) {
+                            offlineBtn.remove();
+                        }
+                    }, 10000);
+                }, 2000);
             } else {
                 handleAuthError(error);
             }
@@ -1727,7 +1939,35 @@
         
         // Check if Firebase is initialized
         if (!auth) {
-            showMessage('❌ Authentication service not available. Please refresh the page.', 'error');
+            showMessage('⚠️ Firebase not available. Creating offline account...', 'info');
+            // Create offline account with provided details
+            const mockUser = {
+                uid: 'offline_' + Date.now(),
+                email: email,
+                displayName: name,
+                emailVerified: false
+            };
+            
+            currentUser = mockUser;
+            appState.user = {
+                id: mockUser.uid,
+                name: name,
+                avatar: getRandomAvatar(),
+                tokens: 1000,
+                level: 1,
+                friends: 0,
+                online: true
+            };
+            
+            appState.friends = [];
+            appState.challenges = [];
+            
+            hideAuthModal();
+            loadAppContent();
+            filterNearbyPlayersByRange(appState.detectionRange);
+            renderNearbyPlayers();
+            
+            showMessage('🎉 Offline account created! Welcome to JomBro!', 'success');
             return;
         }
         
@@ -1754,9 +1994,55 @@
         } catch (error) {
             console.error('Signup error:', error);
             
-            // Handle specific errors
+            // Handle specific errors with fallback options
             if (error.message === 'Signup timeout') {
                 showMessage('❌ Signup timeout. Please check your connection and try again.', 'error');
+            } else if (error.code === 'auth/network-request-failed') {
+                showMessage('🌐 Network error. Would you like to create an offline account?', 'error');
+                setTimeout(() => {
+                    const offlineBtn = document.createElement('button');
+                    offlineBtn.textContent = '📱 Create Offline Account';
+                    offlineBtn.className = 'btn btn-primary';
+                    offlineBtn.onclick = () => {
+                        // Create offline account with form data
+                        const mockUser = {
+                            uid: 'offline_' + Date.now(),
+                            email: email,
+                            displayName: name,
+                            emailVerified: false
+                        };
+                        
+                        currentUser = mockUser;
+                        appState.user = {
+                            id: mockUser.uid,
+                            name: name,
+                            avatar: getRandomAvatar(),
+                            tokens: 1000,
+                            level: 1,
+                            friends: 0,
+                            online: true
+                        };
+                        
+                        hideAuthModal();
+                        loadAppContent();
+                        filterNearbyPlayersByRange(appState.detectionRange);
+                        renderNearbyPlayers();
+                        
+                        showMessage('📱 Offline account created! Welcome to JomBro!', 'success');
+                        offlineBtn.remove();
+                    };
+                    offlineBtn.style.position = 'fixed';
+                    offlineBtn.style.bottom = '20px';
+                    offlineBtn.style.right = '20px';
+                    offlineBtn.style.zIndex = '10002';
+                    document.body.appendChild(offlineBtn);
+                    
+                    setTimeout(() => {
+                        if (offlineBtn.parentNode) {
+                            offlineBtn.remove();
+                        }
+                    }, 10000);
+                }, 2000);
             } else {
                 handleAuthError(error);
             }
