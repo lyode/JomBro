@@ -1315,6 +1315,60 @@
             }
         }
 
+        /* Authentication Loading States */
+        .auth-btn.loading {
+            position: relative;
+            color: transparent !important;
+        }
+
+        .auth-btn.loading::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 20px;
+            height: 20px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-top: 2px solid white;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        .auth-input:invalid {
+            border-color: #f44336 !important;
+            box-shadow: 0 0 0 2px rgba(244, 67, 54, 0.2) !important;
+        }
+
+        .auth-input:valid {
+            border-color: #4CAF50 !important;
+        }
+
+        .auth-form {
+            opacity: 1;
+            transition: opacity 0.3s ease;
+        }
+
+        .auth-form.submitting {
+            opacity: 0.7;
+            pointer-events: none;
+        }
+
+        /* Demo button styling */
+        .demo-section {
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            padding-top: 15px;
+            margin-top: 15px;
+            text-align: center;
+        }
+
+        .demo-info {
+            font-size: 0.8rem;
+            opacity: 0.7;
+            margin-bottom: 10px;
+            color: rgba(255, 255, 255, 0.8);
+        }
+
         /* Loading and Offline States */
         .app-content {
             opacity: 0;
@@ -1728,6 +1782,13 @@
                 <button class="auth-btn auth-btn-primary" onclick="loginUser()" id="loginBtn">
                     <span class="btn-text">Login to JomBro</span>
                 </button>
+                
+                <div style="text-align: center; margin-top: 15px; padding-top: 15px; border-top: 1px solid rgba(255, 255, 255, 0.1);">
+                    <p style="margin: 0 0 10px 0; font-size: 0.9rem; opacity: 0.7;">Quick Demo Access:</p>
+                    <button class="btn btn-secondary" onclick="demoLogin()" style="width: 100%; padding: 10px; font-size: 0.9rem;">
+                        🚀 Try Demo Account
+                    </button>
+                </div>
             </div>
             
             <div class="auth-form" id="signupForm" style="display: none;">
@@ -1751,7 +1812,7 @@
     </div>
 
     <script>
-        // PRODUCTION Firebase Configuration
+        // PRODUCTION Firebase Configuration - ACTIVE
         const firebaseConfig = {
             apiKey: "AIzaSyC_orriRUuf1ynDiFaJAPrO6-Gu3GeURxQ",
             authDomain: "jombro-9d129.firebaseapp.com",
@@ -1767,6 +1828,7 @@
         let currentUser = null;
         let isOnline = navigator.onLine;
         let unsubscribeFunctions = [];
+        let authInitialized = false;
         
         // AI Challenge System Variables
         let aiChallengeTimer = null;
@@ -2222,23 +2284,47 @@
             ]
         };
 
-        // Initialize Firebase and App
+        // Initialize Firebase and App - FORCED ACTIVATION
         async function initApp() {
             try {
-                // Initialize Firebase
-                app = firebase.initializeApp(firebaseConfig);
+                console.log('🚀 Initializing JomBro Firebase App...');
+                
+                // Force initialize Firebase
+                if (!firebase.apps.length) {
+                    app = firebase.initializeApp(firebaseConfig);
+                } else {
+                    app = firebase.app();
+                }
+                
+                // Initialize Firebase services
                 auth = firebase.auth();
                 db = firebase.firestore();
                 storage = firebase.storage();
                 
-                // Monitor authentication state
+                console.log('✅ Firebase services initialized');
+                
+                // Enable persistence for offline support
+                try {
+                    await db.enablePersistence();
+                    console.log('✅ Firestore persistence enabled');
+                } catch (err) {
+                    console.warn('Firestore persistence failed:', err);
+                }
+                
+                // Force authentication state monitoring
                 auth.onAuthStateChanged(async (user) => {
+                    console.log('🔐 Auth state changed:', user ? user.uid : 'No user');
+                    
                     if (user) {
                         currentUser = user;
+                        console.log('✅ User authenticated:', user.email);
+                        authInitialized = true;
                         await loadUserSession(user);
                         initializeAIChallenge();
                     } else {
                         currentUser = null;
+                        console.log('❌ No user authenticated');
+                        authInitialized = true;
                         showAuthModal();
                         stopAIChallenge();
                         // Clean up subscriptions
@@ -2247,17 +2333,32 @@
                     }
                 });
                 
-                console.log('✅ Firebase initialized successfully');
+                // Wait for auth to initialize
+                await new Promise((resolve) => {
+                    const unsubscribe = auth.onAuthStateChanged(() => {
+                        unsubscribe();
+                        resolve();
+                    });
+                });
+                
+                console.log('✅ Firebase authentication ready');
                 
             } catch (error) {
                 console.error('❌ Firebase initialization error:', error);
-                showMessage('⚠️ Connection error - please check your internet', 'error');
+                showMessage('⚠️ Firebase connection error. Please refresh the page.', 'error');
+                
+                // Force show auth modal even if Firebase fails
+                setTimeout(() => {
+                    showAuthModal();
+                }, 2000);
             }
             
             // Initialize other components
             createStarfield();
             setupNetworkMonitoring();
             setupEventListeners();
+            
+            console.log('✅ JomBro initialization complete');
         }
 
         // AI Challenge System Functions
@@ -2866,8 +2967,9 @@
             }
         }
 
-        // Authentication functions with FULL PRODUCTION FEATURES
+        // Authentication functions - FORCED ACTIVATION
         function switchAuthTab(tab) {
+            console.log('🔄 Switching auth tab to:', tab);
             document.querySelectorAll('.auth-tab').forEach(t => t.classList.remove('active'));
             document.querySelector(`[onclick="switchAuthTab('${tab}')"]`).classList.add('active');
             
@@ -2881,10 +2983,13 @@
         }
 
         async function loginUser() {
+            console.log('🔐 Login attempt started');
+            
             const email = document.getElementById('loginEmail').value.trim();
             const password = document.getElementById('loginPassword').value;
             const loginBtn = document.getElementById('loginBtn');
             
+            // Validation
             if (!email || !password) {
                 showMessage('❌ Please fill in all fields!', 'error');
                 return;
@@ -2895,33 +3000,45 @@
                 return;
             }
             
+            if (!auth) {
+                showMessage('❌ Authentication service not ready. Please refresh the page.', 'error');
+                return;
+            }
+            
             try {
                 loginBtn.disabled = true;
                 loginBtn.classList.add('loading');
                 showMessage('🔄 Logging you in...', 'info');
                 
-                // REAL FIREBASE AUTHENTICATION
-                const userCredential = await auth.signInWithEmailAndPassword(email, password);
-                console.log('✅ User logged in successfully:', userCredential.user.uid);
+                console.log('🔑 Attempting Firebase login for:', email);
                 
+                // Force Firebase authentication
+                const userCredential = await auth.signInWithEmailAndPassword(email, password);
+                console.log('✅ Login successful:', userCredential.user.uid);
+                
+                // Clear form
                 clearAuthForm('loginForm');
                 showMessage('🎉 Login successful! Loading your data...', 'success');
                 
             } catch (error) {
-                console.error('Login error:', error);
+                console.error('❌ Login error:', error);
                 handleAuthError(error);
-            } finally {
+                
+                // Re-enable button
                 loginBtn.disabled = false;
                 loginBtn.classList.remove('loading');
             }
         }
 
         async function signupUser() {
+            console.log('📝 Signup attempt started');
+            
             const name = document.getElementById('signupName').value.trim();
             const email = document.getElementById('signupEmail').value.trim();
             const password = document.getElementById('signupPassword').value;
             const signupBtn = document.getElementById('signupBtn');
             
+            // Validation
             if (!name || !email || !password) {
                 showMessage('❌ Please fill in all fields!', 'error');
                 return;
@@ -2942,24 +3059,37 @@
                 return;
             }
             
+            if (!auth) {
+                showMessage('❌ Authentication service not ready. Please refresh the page.', 'error');
+                return;
+            }
+            
             try {
                 signupBtn.disabled = true;
                 signupBtn.classList.add('loading');
                 showMessage('🔄 Creating your account...', 'info');
                 
-                // REAL FIREBASE USER CREATION
+                console.log('📝 Attempting Firebase signup for:', email);
+                
+                // Force Firebase user creation
                 const userCredential = await auth.createUserWithEmailAndPassword(email, password);
-                await userCredential.user.updateProfile({ displayName: name });
                 
-                console.log('✅ New user created successfully:', userCredential.user.uid);
+                // Update profile with display name
+                await userCredential.user.updateProfile({ 
+                    displayName: name 
+                });
                 
+                console.log('✅ Signup successful:', userCredential.user.uid);
+                
+                // Clear form
                 clearAuthForm('signupForm');
                 showMessage('🎉 Account created! Setting up your profile...', 'success');
                 
             } catch (error) {
-                console.error('Signup error:', error);
+                console.error('❌ Signup error:', error);
                 handleAuthError(error);
-            } finally {
+                
+                // Re-enable button
                 signupBtn.disabled = false;
                 signupBtn.classList.remove('loading');
             }
@@ -2982,7 +3112,7 @@
                 unsubscribeFunctions.forEach(unsubscribe => unsubscribe());
                 unsubscribeFunctions = [];
                 
-                // Sign out from Firebase
+                // Force sign out from Firebase
                 await auth.signOut();
                 console.log('✅ User logged out successfully');
                 
@@ -2990,10 +3120,14 @@
                 
                 // Reset app state
                 appState = {
-                    user: { id: null, name: '', avatar: '👤', tokens: 0, level: 1, friends: 0, online: true },
+                    user: { id: null, name: '', avatar: '👤', tokens: 0, level: 1, friends: 0, online: true, location: null },
                     friends: [],
+                    nearbyStrangers: [],
                     challenges: [],
-                    quickChallengeActive: true
+                    quickChallengeActive: true,
+                    detectionRange: 3,
+                    isHiddenFromNearby: false,
+                    userLocation: null
                 };
                 
                 // Reset AI challenge state
@@ -3001,10 +3135,15 @@
                 selectedAIChallenge = null;
                 selectedTargets = [];
                 
+                // Force show auth modal
+                setTimeout(() => {
+                    showAuthModal();
+                }, 500);
+                
             } catch (error) {
-                console.error('Logout error:', error);
+                console.error('❌ Logout error:', error);
                 showMessage('❌ Logout failed - trying again...', 'error');
-                // Force logout
+                // Force logout by reloading
                 setTimeout(() => window.location.reload(), 1000);
             }
         }
@@ -3557,14 +3696,228 @@
             });
         }
 
-        // UI Helper functions
+        // UI Helper functions - FORCED ACTIVATION
         function showAuthModal() {
-            document.getElementById('authModal').classList.add('show');
-            document.getElementById('appContent').classList.remove('loaded');
+            console.log('🔐 Showing authentication modal');
+            const authModal = document.getElementById('authModal');
+            const appContent = document.getElementById('appContent');
+            
+            if (authModal) {
+                authModal.classList.add('show');
+            }
+            if (appContent) {
+                appContent.classList.remove('loaded');
+            }
+            
+            // Ensure form is visible
+            setTimeout(() => {
+                const loginForm = document.getElementById('loginForm');
+                const signupForm = document.getElementById('signupForm');
+                
+                if (loginForm) loginForm.style.display = 'flex';
+                if (signupForm) signupForm.style.display = 'none';
+                
+                // Focus on email field
+                const emailInput = document.getElementById('loginEmail');
+                if (emailInput) emailInput.focus();
+            }, 100);
         }
 
         function hideAuthModal() {
-            document.getElementById('authModal').classList.remove('show');
+            console.log('✅ Hiding authentication modal');
+            const authModal = document.getElementById('authModal');
+            if (authModal) {
+                authModal.classList.remove('show');
+            }
+        }
+
+        // Enhanced error handling for authentication
+        function handleAuthError(error) {
+            console.error('🔥 Auth error:', error.code, error.message);
+            
+            let errorMessage = 'Authentication failed. Please try again.';
+            
+            switch (error.code) {
+                case 'auth/user-not-found':
+                    errorMessage = '❌ No account found with this email address. Please sign up first.';
+                    break;
+                case 'auth/wrong-password':
+                    errorMessage = '❌ Incorrect password. Please try again.';
+                    break;
+                case 'auth/email-already-in-use':
+                    errorMessage = '❌ An account with this email already exists. Please login instead.';
+                    break;
+                case 'auth/weak-password':
+                    errorMessage = '❌ Password is too weak. Please use at least 6 characters.';
+                    break;
+                case 'auth/invalid-email':
+                    errorMessage = '❌ Please enter a valid email address.';
+                    break;
+                case 'auth/too-many-requests':
+                    errorMessage = '⏱️ Too many failed attempts. Please wait a few minutes and try again.';
+                    break;
+                case 'auth/network-request-failed':
+                    errorMessage = '🌐 Network error. Please check your internet connection.';
+                    break;
+                case 'auth/operation-not-allowed':
+                    errorMessage = '❌ Email/password authentication is not enabled. Please contact support.';
+                    break;
+                case 'auth/user-disabled':
+                    errorMessage = '❌ This account has been disabled. Please contact support.';
+                    break;
+                default:
+                    errorMessage = `❌ ${error.message || 'An error occurred. Please try again.'}`;
+            }
+            
+            showMessage(errorMessage, 'error');
+        }
+
+        // Event listeners - FORCED ACTIVATION
+        function setupEventListeners() {
+            console.log('📱 Setting up event listeners');
+            
+            // Before page unload, update user offline status
+            window.addEventListener('beforeunload', () => {
+                if (currentUser && db) {
+                    updateUserOnlineStatus(false);
+                }
+            });
+
+            // Enhanced enter key support for auth forms
+            document.addEventListener('DOMContentLoaded', () => {
+                const loginEmail = document.getElementById('loginEmail');
+                const loginPassword = document.getElementById('loginPassword');
+                const signupName = document.getElementById('signupName');
+                const signupEmail = document.getElementById('signupEmail');
+                const signupPassword = document.getElementById('signupPassword');
+                
+                if (loginPassword) {
+                    loginPassword.addEventListener('keypress', (e) => {
+                        if (e.key === 'Enter') {
+                            e.preventDefault();
+                            loginUser();
+                        }
+                    });
+                }
+                
+                if (loginEmail) {
+                    loginEmail.addEventListener('keypress', (e) => {
+                        if (e.key === 'Enter') {
+                            e.preventDefault();
+                            const passwordField = document.getElementById('loginPassword');
+                            if (passwordField) passwordField.focus();
+                        }
+                    });
+                }
+                
+                if (signupPassword) {
+                    signupPassword.addEventListener('keypress', (e) => {
+                        if (e.key === 'Enter') {
+                            e.preventDefault();
+                            signupUser();
+                        }
+                    });
+                }
+                
+                if (signupEmail) {
+                    signupEmail.addEventListener('keypress', (e) => {
+                        if (e.key === 'Enter') {
+                            e.preventDefault();
+                            const passwordField = document.getElementById('signupPassword');
+                            if (passwordField) passwordField.focus();
+                        }
+                    });
+                }
+                
+                if (signupName) {
+                    signupName.addEventListener('keypress', (e) => {
+                        if (e.key === 'Enter') {
+                            e.preventDefault();
+                            const emailField = document.getElementById('signupEmail');
+                            if (emailField) emailField.focus();
+                        }
+                    });
+                }
+                
+                // Auto-focus on email field when modal shows
+                const authModal = document.getElementById('authModal');
+                if (authModal) {
+                    authModal.addEventListener('transitionend', () => {
+                        if (authModal.classList.contains('show')) {
+                            const emailInput = document.getElementById('loginEmail');
+                            if (emailInput) {
+                                setTimeout(() => emailInput.focus(), 100);
+                            }
+                        }
+                    });
+                }
+                
+                console.log('✅ Event listeners attached');
+            });
+            
+            // Form validation
+            document.addEventListener('input', (e) => {
+                if (e.target.classList.contains('auth-input')) {
+                    // Remove error styling on input
+                    e.target.style.borderColor = '';
+                }
+            });
+        }
+
+        // Utility functions - ENHANCED
+        function clearAuthForm(formId) {
+            console.log('🧹 Clearing auth form:', formId);
+            const form = document.getElementById(formId);
+            if (form) {
+                const inputs = form.querySelectorAll('input');
+                inputs.forEach(input => {
+                    input.value = '';
+                    input.style.borderColor = '';
+                });
+            }
+        }
+
+        function isValidEmail(email) {
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            return emailRegex.test(email);
+        }
+
+        // Force authentication check on page load
+        function forceAuthCheck() {
+            console.log('🔄 Force checking authentication state');
+            
+            if (!authInitialized) {
+                console.log('⏳ Auth not yet initialized, waiting...');
+                setTimeout(forceAuthCheck, 1000);
+                return;
+            }
+            
+            if (!currentUser) {
+                console.log('❌ No authenticated user found, showing auth modal');
+                showAuthModal();
+            } else {
+                console.log('✅ User authenticated:', currentUser.email);
+                hideAuthModal();
+            }
+        }
+
+        // Test authentication functions
+        function testAuth() {
+            console.log('🧪 Testing authentication system');
+            console.log('Firebase app:', app);
+            console.log('Firebase auth:', auth);
+            console.log('Firebase db:', db);
+            console.log('Current user:', currentUser);
+            console.log('Auth initialized:', authInitialized);
+            
+            if (!auth) {
+                console.error('❌ Firebase auth not initialized');
+                showMessage('❌ Authentication system not ready. Please refresh the page.', 'error');
+                return false;
+            }
+            
+            console.log('✅ Authentication system ready');
+            return true;
         }
 
         function showAddFriendModal() {
@@ -4690,24 +5043,7 @@
             }
         }
 
-        // Event listeners
-        function setupEventListeners() {
-            // Before page unload, update user offline status
-            window.addEventListener('beforeunload', () => {
-                if (currentUser && db) {
-                    updateUserOnlineStatus(false);
-                }
-            });
-
-            // Enter key support for auth forms
-            document.getElementById('loginPassword').addEventListener('keypress', (e) => {
-                if (e.key === 'Enter') loginUser();
-            });
-            
-            document.getElementById('signupPassword').addEventListener('keypress', (e) => {
-                if (e.key === 'Enter') signupUser();
-            });
-        }
+        // Event listeners - Already defined above
 
         // Utility functions
         function createStarfield() {
@@ -4946,11 +5282,251 @@ service cloud.firestore {
             `);
         }
 
-        // Initialize the app when page loads
+        // Initialize the app when page loads - FORCED ACTIVATION
         document.addEventListener('DOMContentLoaded', function() {
-            initApp();
+            console.log('🚀 DOM Content Loaded - Starting JomBro initialization');
+            
+            // Ensure Firebase is available
+            if (typeof firebase === 'undefined') {
+                console.error('❌ Firebase SDK not loaded');
+                showMessage('❌ Firebase SDK not loaded. Please check your internet connection and refresh.', 'error');
+                return;
+            }
+            
+            console.log('✅ Firebase SDK loaded');
+            
+            // Initialize the app
+            initApp().then(() => {
+                console.log('✅ App initialization complete');
+                
+                // Force auth check after a short delay
+                setTimeout(() => {
+                    forceAuthCheck();
+                }, 2000);
+                
+                // Show loading message
+                showMessage('🔄 JomBro is loading...', 'info');
+                
+            }).catch((error) => {
+                console.error('❌ App initialization failed:', error);
+                showMessage('❌ Failed to initialize JomBro. Please refresh the page.', 'error');
+                
+                // Force show auth modal even if init fails
+                setTimeout(() => {
+                    showAuthModal();
+                }, 3000);
+            });
+            
+            // Security rules logging for developers
             logSecurityRulesNeeded();
+            
+            // Test authentication system
+            setTimeout(() => {
+                testAuth();
+            }, 3000);
         });
+
+        // Additional safety checks
+        window.addEventListener('load', function() {
+            console.log('🌐 Window loaded');
+            
+            // Backup auth check
+            setTimeout(() => {
+                if (!authInitialized) {
+                    console.warn('⚠️ Auth still not initialized after page load');
+                    showAuthModal();
+                }
+            }, 5000);
+        });
+
+        // Error handling for unhandled promises
+        window.addEventListener('unhandledrejection', function(event) {
+            console.error('🔥 Unhandled promise rejection:', event.reason);
+            
+            if (event.reason && event.reason.code && event.reason.code.startsWith('auth/')) {
+                handleAuthError(event.reason);
+                event.preventDefault();
+            }
+        });
+
+        // Global error handler
+        window.addEventListener('error', function(event) {
+            console.error('🔥 Global error:', event.error);
+            
+            if (event.error && event.error.message && event.error.message.includes('auth')) {
+                showMessage('❌ Authentication error occurred. Please try again.', 'error');
+            }
+        });
+
+        // Debug helper functions (for development)
+        function debugAuth() {
+            console.log('🔍 Authentication Debug Info:');
+            console.log('- Firebase app initialized:', !!app);
+            console.log('- Firebase auth initialized:', !!auth);
+            console.log('- Firebase db initialized:', !!db);
+            console.log('- Current user:', currentUser);
+            console.log('- Auth initialized:', authInitialized);
+            console.log('- Is online:', isOnline);
+            
+            if (auth) {
+                console.log('- Auth current user:', auth.currentUser);
+            }
+            
+            return {
+                app: !!app,
+                auth: !!auth,
+                db: !!db,
+                currentUser: currentUser,
+                authInitialized: authInitialized,
+                isOnline: isOnline
+            };
+        }
+
+        // Demo and testing functions
+        async function demoLogin() {
+            console.log('🚀 Demo login attempt');
+            
+            const demoEmail = 'demo@jombro.com';
+            const demoPassword = 'demo123456';
+            
+            // Fill in the form
+            document.getElementById('loginEmail').value = demoEmail;
+            document.getElementById('loginPassword').value = demoPassword;
+            
+            showMessage('🎮 Logging in with demo account...', 'info');
+            
+            // Attempt login
+            await loginUser();
+        }
+
+        async function createDemoAccount() {
+            console.log('📝 Creating demo account');
+            
+            const demoName = 'Demo Player';
+            const demoEmail = 'demo@jombro.com';
+            const demoPassword = 'demo123456';
+            
+            try {
+                if (!auth) {
+                    showMessage('❌ Authentication not ready', 'error');
+                    return;
+                }
+                
+                // Check if demo account already exists
+                try {
+                    await auth.signInWithEmailAndPassword(demoEmail, demoPassword);
+                    console.log('✅ Demo account already exists and logged in');
+                    return;
+                } catch (error) {
+                    if (error.code !== 'auth/user-not-found') {
+                        console.error('Demo account error:', error);
+                        return;
+                    }
+                }
+                
+                // Create demo account
+                console.log('Creating new demo account...');
+                const userCredential = await auth.createUserWithEmailAndPassword(demoEmail, demoPassword);
+                
+                // Update profile
+                await userCredential.user.updateProfile({ 
+                    displayName: demoName 
+                });
+                
+                console.log('✅ Demo account created successfully');
+                
+            } catch (error) {
+                console.error('❌ Demo account creation failed:', error);
+                handleAuthError(error);
+            }
+        }
+
+        // Enhanced authentication debugging
+        function debugAuthState() {
+            const authState = {
+                firebaseLoaded: typeof firebase !== 'undefined',
+                appInitialized: !!app,
+                authInitialized: !!auth,
+                dbInitialized: !!db,
+                currentUser: currentUser,
+                authReady: authInitialized
+            };
+            
+            console.table(authState);
+            return authState;
+        }
+
+        // Force authentication initialization if needed
+        async function forceInitAuth() {
+            console.log('🔄 Force initializing authentication');
+            
+            try {
+                if (!firebase.apps.length) {
+                    app = firebase.initializeApp(firebaseConfig);
+                } else {
+                    app = firebase.app();
+                }
+                
+                auth = firebase.auth();
+                db = firebase.firestore();
+                storage = firebase.storage();
+                
+                console.log('✅ Firebase services force initialized');
+                
+                // Create demo account if needed
+                setTimeout(async () => {
+                    try {
+                        await createDemoAccount();
+                    } catch (error) {
+                        console.log('Demo account creation skipped:', error.message);
+                    }
+                }, 2000);
+                
+                return true;
+            } catch (error) {
+                console.error('❌ Force auth init failed:', error);
+                return false;
+            }
+        }
+
+        // Make all debug and helper functions globally available
+        window.jombroDebug = {
+            debugAuth: debugAuth,
+            testAuth: testAuth,
+            forceAuthCheck: forceAuthCheck,
+            demoLogin: demoLogin,
+            createDemoAccount: createDemoAccount,
+            debugAuthState: debugAuthState,
+            forceInitAuth: forceInitAuth,
+            showAuthModal: showAuthModal,
+            hideAuthModal: hideAuthModal
+        };
+        
+        // Console helper message
+        console.log(`
+🎮 JomBro Debug Commands Available:
+- window.jombroDebug.debugAuth() - Show auth debug info
+- window.jombroDebug.testAuth() - Test authentication system
+- window.jombroDebug.demoLogin() - Login with demo account
+- window.jombroDebug.forceAuthCheck() - Force check auth state
+- window.jombroDebug.showAuthModal() - Show login modal
+- window.jombroDebug.createDemoAccount() - Create demo account
+
+🚀 Demo Credentials:
+Email: demo@jombro.com
+Password: demo123456
+        `);
+        
+        // Auto-create demo account on load if needed
+        setTimeout(async () => {
+            if (authInitialized && !currentUser) {
+                try {
+                    await createDemoAccount();
+                } catch (error) {
+                    console.log('Demo account setup skipped');
+                }
+            }
+        }, 5000);
     </script>
 </body>
 </html>
