@@ -1289,46 +1289,108 @@
         isHiddenFromNearby: false
     };
 
-    // Initialize Firebase and App
+    // Initialize Firebase and App with ROBUST ERROR HANDLING
     async function initApp() {
         try {
+            console.log('🔄 Initializing Firebase...');
+            
+            // Check if Firebase SDK is loaded
+            if (typeof firebase === 'undefined') {
+                throw new Error('Firebase SDK not loaded');
+            }
+            
             // Initialize Firebase
             app = firebase.initializeApp(firebaseConfig);
             auth = firebase.auth();
             db = firebase.firestore();
             storage = firebase.storage();
             
-            // Monitor authentication state
+            // Set persistence for offline support
+            await auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL);
+            
+            // Monitor authentication state with better error handling
             auth.onAuthStateChanged(async (user) => {
-                if (user) {
-                    currentUser = user;
-                    await loadUserSession(user);
-                } else {
-                    currentUser = null;
-                    showAuthModal();
-                    // Clean up subscriptions
-                    unsubscribeFunctions.forEach(unsubscribe => {
-                        try {
-                            unsubscribe();
-                        } catch (error) {
-                            console.warn('Error unsubscribing:', error);
-                        }
-                    });
-                    unsubscribeFunctions = [];
+                try {
+                    if (user) {
+                        console.log('🔥 User signed in:', user.uid);
+                        currentUser = user;
+                        await loadUserSession(user);
+                    } else {
+                        console.log('👤 No user signed in');
+                        currentUser = null;
+                        showAuthModal();
+                        // Clean up subscriptions safely
+                        unsubscribeFunctions.forEach(unsubscribe => {
+                            try {
+                                if (typeof unsubscribe === 'function') {
+                                    unsubscribe();
+                                }
+                            } catch (error) {
+                                console.warn('Error unsubscribing:', error);
+                            }
+                        });
+                        unsubscribeFunctions = [];
+                    }
+                } catch (error) {
+                    console.error('Auth state change error:', error);
+                    showMessage('⚠️ Authentication error. Please refresh the page.', 'error');
                 }
             });
+            
+            // Test Firebase connection
+            await testFirebaseConnection();
             
             console.log('✅ Firebase initialized successfully');
             
         } catch (error) {
             console.error('❌ Firebase initialization error:', error);
-            showMessage('⚠️ Connection error - please check your internet', 'error');
+            
+            let errorMessage = '⚠️ Failed to initialize app. ';
+            if (error.message.includes('not loaded')) {
+                errorMessage += 'Firebase SDK failed to load.';
+            } else if (error.code === 'auth/network-request-failed') {
+                errorMessage += 'Please check your internet connection.';
+            } else {
+                errorMessage += 'Please refresh the page.';
+            }
+            
+            showMessage(errorMessage, 'error');
+            
+            // Show offline mode
+            document.body.innerHTML = `
+                <div style="display: flex; align-items: center; justify-content: center; min-height: 100vh; background: #0a0a0a; color: white; text-align: center; padding: 20px;">
+                    <div>
+                        <h1 style="font-size: 2rem; margin-bottom: 20px;">🚫 Connection Error</h1>
+                        <p style="margin-bottom: 20px; opacity: 0.8;">Unable to connect to JomBro servers.</p>
+                        <button onclick="window.location.reload()" style="padding: 12px 24px; background: #9b59b6; color: white; border: none; border-radius: 10px; cursor: pointer; font-size: 1rem;">
+                            🔄 Retry
+                        </button>
+                    </div>
+                </div>
+            `;
+            return;
         }
         
         // Initialize other components
         createStarfield();
         monitorConnection();
         setupEventListeners();
+    }
+
+    // Test Firebase connection
+    async function testFirebaseConnection() {
+        try {
+            // Test Firestore connection
+            await db.collection('test').limit(1).get();
+            console.log('✅ Firestore connection successful');
+        } catch (error) {
+            console.warn('⚠️ Firestore connection test failed:', error);
+            if (error.code === 'permission-denied') {
+                console.log('ℹ️ Firestore rules are working (permission denied expected)');
+            } else {
+                throw new Error('Firestore connection failed');
+            }
+        }
     }
 
     // Load user session with real Firebase data
@@ -1493,51 +1555,107 @@
         }
     }
 
-    // Authentication functions with FULL PRODUCTION FEATURES
+    // Authentication functions with ROBUST ERROR HANDLING
     function switchAuthTab(tab) {
-        document.querySelectorAll('.auth-tab').forEach(t => t.classList.remove('active'));
-        const tabElement = document.querySelector(`[onclick*="${tab}"]`);
-        if (tabElement) tabElement.classList.add('active');
-        
-        if (tab === 'login') {
-            document.getElementById('loginForm').style.display = 'flex';
-            document.getElementById('signupForm').style.display = 'none';
-        } else {
-            document.getElementById('loginForm').style.display = 'none';
-            document.getElementById('signupForm').style.display = 'flex';
+        try {
+            document.querySelectorAll('.auth-tab').forEach(t => t.classList.remove('active'));
+            const tabElement = document.querySelector(`[onclick*="${tab}"]`);
+            if (tabElement) tabElement.classList.add('active');
+            
+            const loginForm = document.getElementById('loginForm');
+            const signupForm = document.getElementById('signupForm');
+            
+            if (loginForm && signupForm) {
+                if (tab === 'login') {
+                    loginForm.style.display = 'flex';
+                    signupForm.style.display = 'none';
+                } else {
+                    loginForm.style.display = 'none';
+                    signupForm.style.display = 'flex';
+                }
+            }
+        } catch (error) {
+            console.error('Error switching auth tab:', error);
         }
     }
 
     async function loginUser() {
-        const email = document.getElementById('loginEmail').value.trim();
-        const password = document.getElementById('loginPassword').value;
+        const emailEl = document.getElementById('loginEmail');
+        const passwordEl = document.getElementById('loginPassword');
         const loginBtn = document.getElementById('loginBtn');
         
-        if (!email || !password) {
-            showMessage('❌ Please fill in all fields!', 'error');
+        if (!emailEl || !passwordEl || !loginBtn) {
+            showMessage('❌ Login form elements not found!', 'error');
+            return;
+        }
+        
+        const email = emailEl.value.trim();
+        const password = passwordEl.value;
+        
+        // Clear any previous error states
+        emailEl.style.borderColor = '';
+        passwordEl.style.borderColor = '';
+        
+        // Validation
+        if (!email) {
+            showMessage('❌ Please enter your email address!', 'error');
+            emailEl.style.borderColor = '#ff6b6b';
+            emailEl.focus();
+            return;
+        }
+        
+        if (!password) {
+            showMessage('❌ Please enter your password!', 'error');
+            passwordEl.style.borderColor = '#ff6b6b';
+            passwordEl.focus();
             return;
         }
         
         if (!isValidEmail(email)) {
             showMessage('❌ Please enter a valid email address!', 'error');
+            emailEl.style.borderColor = '#ff6b6b';
+            emailEl.focus();
+            return;
+        }
+        
+        // Check if Firebase is initialized
+        if (!auth) {
+            showMessage('❌ Authentication service not available. Please refresh the page.', 'error');
             return;
         }
         
         try {
+            // Disable button and show loading
             loginBtn.disabled = true;
             loginBtn.classList.add('loading');
             showMessage('🔄 Logging you in...', 'info');
             
-            // REAL FIREBASE AUTHENTICATION
-            const userCredential = await auth.signInWithEmailAndPassword(email, password);
-            console.log('✅ User logged in successfully:', userCredential.user.uid);
+            // Firebase Authentication with timeout
+            const loginPromise = auth.signInWithEmailAndPassword(email, password);
+            const timeoutPromise = new Promise((_, reject) => 
+                setTimeout(() => reject(new Error('Login timeout')), 15000)
+            );
             
+            const userCredential = await Promise.race([loginPromise, timeoutPromise]);
+            
+            console.log('✅ User logged in successfully:', userCredential.user.uid);
             clearAuthForm('loginForm');
             showMessage('🎉 Login successful! Loading your data...', 'success');
             
         } catch (error) {
             console.error('Login error:', error);
-            handleAuthError(error);
+            
+            // Handle specific errors
+            if (error.message === 'Login timeout') {
+                showMessage('❌ Login timeout. Please check your connection and try again.', 'error');
+            } else {
+                handleAuthError(error);
+            }
+            
+            // Reset form state
+            emailEl.style.borderColor = '';
+            passwordEl.style.borderColor = '';
+            
         } finally {
             loginBtn.disabled = false;
             loginBtn.classList.remove('loading');
@@ -1545,28 +1663,71 @@
     }
 
     async function signupUser() {
-        const name = document.getElementById('signupName').value.trim();
-        const email = document.getElementById('signupEmail').value.trim();
-        const password = document.getElementById('signupPassword').value;
+        const nameEl = document.getElementById('signupName');
+        const emailEl = document.getElementById('signupEmail');
+        const passwordEl = document.getElementById('signupPassword');
         const signupBtn = document.getElementById('signupBtn');
         
-        if (!name || !email || !password) {
-            showMessage('❌ Please fill in all fields!', 'error');
+        if (!nameEl || !emailEl || !passwordEl || !signupBtn) {
+            showMessage('❌ Signup form elements not found!', 'error');
             return;
         }
         
-        if (!isValidEmail(email)) {
-            showMessage('❌ Please enter a valid email address!', 'error');
-            return;
-        }
+        const name = nameEl.value.trim();
+        const email = emailEl.value.trim();
+        const password = passwordEl.value;
         
-        if (password.length < 6) {
-            showMessage('❌ Password must be at least 6 characters!', 'error');
+        // Clear any previous error states
+        nameEl.style.borderColor = '';
+        emailEl.style.borderColor = '';
+        passwordEl.style.borderColor = '';
+        
+        // Validation
+        if (!name) {
+            showMessage('❌ Please enter your name!', 'error');
+            nameEl.style.borderColor = '#ff6b6b';
+            nameEl.focus();
             return;
         }
         
         if (name.length < 2) {
             showMessage('❌ Name must be at least 2 characters!', 'error');
+            nameEl.style.borderColor = '#ff6b6b';
+            nameEl.focus();
+            return;
+        }
+        
+        if (!email) {
+            showMessage('❌ Please enter your email address!', 'error');
+            emailEl.style.borderColor = '#ff6b6b';
+            emailEl.focus();
+            return;
+        }
+        
+        if (!isValidEmail(email)) {
+            showMessage('❌ Please enter a valid email address!', 'error');
+            emailEl.style.borderColor = '#ff6b6b';
+            emailEl.focus();
+            return;
+        }
+        
+        if (!password) {
+            showMessage('❌ Please enter a password!', 'error');
+            passwordEl.style.borderColor = '#ff6b6b';
+            passwordEl.focus();
+            return;
+        }
+        
+        if (password.length < 6) {
+            showMessage('❌ Password must be at least 6 characters!', 'error');
+            passwordEl.style.borderColor = '#ff6b6b';
+            passwordEl.focus();
+            return;
+        }
+        
+        // Check if Firebase is initialized
+        if (!auth) {
+            showMessage('❌ Authentication service not available. Please refresh the page.', 'error');
             return;
         }
         
@@ -1575,18 +1736,36 @@
             signupBtn.classList.add('loading');
             showMessage('🔄 Creating your account...', 'info');
             
-            // REAL FIREBASE USER CREATION
-            const userCredential = await auth.createUserWithEmailAndPassword(email, password);
+            // Firebase User Creation with timeout
+            const signupPromise = auth.createUserWithEmailAndPassword(email, password);
+            const timeoutPromise = new Promise((_, reject) => 
+                setTimeout(() => reject(new Error('Signup timeout')), 15000)
+            );
+            
+            const userCredential = await Promise.race([signupPromise, timeoutPromise]);
+            
+            // Update user profile
             await userCredential.user.updateProfile({ displayName: name });
             
             console.log('✅ New user created successfully:', userCredential.user.uid);
-            
             clearAuthForm('signupForm');
             showMessage('🎉 Account created! Setting up your profile...', 'success');
             
         } catch (error) {
             console.error('Signup error:', error);
-            handleAuthError(error);
+            
+            // Handle specific errors
+            if (error.message === 'Signup timeout') {
+                showMessage('❌ Signup timeout. Please check your connection and try again.', 'error');
+            } else {
+                handleAuthError(error);
+            }
+            
+            // Reset form state
+            nameEl.style.borderColor = '';
+            emailEl.style.borderColor = '';
+            passwordEl.style.borderColor = '';
+            
         } finally {
             signupBtn.disabled = false;
             signupBtn.classList.remove('loading');
