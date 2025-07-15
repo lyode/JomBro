@@ -1185,11 +1185,18 @@
             align-items: center;
             cursor: pointer;
             transition: all 0.3s ease;
-            min-width: 70px;
+            min-width: 90px;
+            padding: 8px;
+            border-radius: 15px;
+            background: rgba(255, 255, 255, 0.02);
+            backdrop-filter: blur(5px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
         }
 
         .stranger-avatar-item:hover {
             transform: translateY(-5px);
+            background: rgba(255, 255, 255, 0.05);
+            border-color: rgba(155, 89, 182, 0.3);
         }
 
         .stranger-avatar {
@@ -1303,6 +1310,62 @@
 
         .offline-banner.show {
             transform: translateY(0);
+        }
+
+        /* Tutorial Modal Styles */
+        .tutorial-header {
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            padding-bottom: 20px;
+            margin-bottom: 25px !important;
+        }
+        
+        .tutorial-content {
+            min-height: 400px;
+            max-height: 500px;
+            overflow-y: auto;
+        }
+        
+        .tutorial-content::-webkit-scrollbar {
+            width: 6px;
+        }
+        
+        .tutorial-content::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 3px;
+        }
+        
+        .tutorial-content::-webkit-scrollbar-thumb {
+            background: rgba(155, 89, 182, 0.6);
+            border-radius: 3px;
+        }
+        
+        .tutorial-navigation {
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            padding-top: 20px;
+            margin-top: 25px !important;
+        }
+        
+        .tutorial-content h3 {
+            color: white;
+            margin-bottom: 15px;
+        }
+        
+        .tutorial-content h4 {
+            color: white;
+            margin-bottom: 10px;
+        }
+        
+        .tutorial-content p {
+            color: rgba(255, 255, 255, 0.9);
+            line-height: 1.6;
+        }
+        
+        .tutorial-content ul, .tutorial-content ol {
+            color: rgba(255, 255, 255, 0.9);
+        }
+        
+        .tutorial-content li {
+            margin-bottom: 5px;
         }
 
         /* Error State */
@@ -1419,6 +1482,7 @@
                             <button class="btn btn-primary" onclick="sendWaveToNearby()">Send Wave 👋</button>
                             <button class="btn btn-secondary" onclick="toggleHideFromNearby()" id="hideBtn">Hide Me</button>
                             <button class="btn btn-secondary" onclick="challengeRandomNearby()">Random Challenge</button>
+                            <button class="btn btn-ai" onclick="sendAIChallengeToNearby()">🤖 AI Challenge</button>
                         </div>
                     </div>
                 </div>
@@ -1566,6 +1630,36 @@
                         </div>
                     </div>
                 </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- How To Play Guide Modal -->
+    <div class="modal" id="howToPlayModal">
+        <div class="modal-content" style="max-width: 500px; max-height: 90vh; overflow-y: auto;">
+            <div class="tutorial-header" style="text-align: center; margin-bottom: 25px;">
+                <div style="font-size: 3rem; margin-bottom: 10px;" id="tutorialIcon">🎮</div>
+                <h2 style="margin: 0; color: #9b59b6;" id="tutorialTitle">Welcome to JomBro!</h2>
+                <p style="margin: 10px 0 0 0; opacity: 0.8;" id="tutorialSubtitle">Let's learn how to play step by step</p>
+            </div>
+            
+            <div class="tutorial-content" id="tutorialContent">
+                <!-- Tutorial steps will be populated here -->
+            </div>
+            
+            <div class="tutorial-navigation" style="display: flex; justify-content: space-between; align-items: center; margin-top: 25px;">
+                <button class="btn btn-secondary" onclick="previousTutorialStep()" id="prevBtn" style="display: none;">
+                    ← Previous
+                </button>
+                <div class="tutorial-progress" style="display: flex; gap: 8px; align-items: center;">
+                    <span style="font-size: 0.9rem; opacity: 0.7;" id="stepCounter">Step 1 of 8</span>
+                    <div style="display: flex; gap: 4px;" id="progressDots">
+                        <!-- Progress dots will be populated here -->
+                    </div>
+                </div>
+                <button class="btn btn-primary" onclick="nextTutorialStep()" id="nextBtn">
+                    Next →
+                </button>
             </div>
         </div>
     </div>
@@ -2480,6 +2574,14 @@
                 
                 hideAuthModal();
                 loadAppContent();
+                
+                // Show tutorial for new users
+                if (appState.user.isNewUser) {
+                    setTimeout(() => {
+                        showHowToPlayGuide();
+                    }, 1500);
+                }
+                
                 showMessage(`🎮 Welcome back, ${appState.user.name}! All systems online.`, 'success');
                 
             } catch (error) {
@@ -3027,14 +3129,21 @@
             appState.nearbyStrangers.forEach((player) => {
                 const playerElement = document.createElement('div');
                 playerElement.className = 'stranger-avatar-item';
-                playerElement.onclick = () => challengeNearbyPlayer(player.id);
                 playerElement.innerHTML = `
-                    <div class="stranger-avatar">
+                    <div class="stranger-avatar" onclick="showPlayerActionModal('${player.id}')">
                         ${player.avatar}
                         <div class="distance-indicator">${player.distance}</div>
                         <div class="online-indicator"></div>
                     </div>
                     <div class="stranger-name-small">${player.name}</div>
+                    <div class="stranger-actions" style="display: flex; gap: 4px; margin-top: 8px; justify-content: center;">
+                        <button class="btn btn-primary" style="font-size: 0.7rem; padding: 4px 8px; min-width: 50px;" onclick="quickChallengePlayer('${player.id}')">
+                            Challenge
+                        </button>
+                        <button class="btn btn-secondary" style="font-size: 0.7rem; padding: 4px 8px; min-width: 40px;" onclick="addNearbyPlayerAsFriend('${player.id}')">
+                            Add
+                        </button>
+                    </div>
                 `;
                 strangersTrack.appendChild(playerElement);
             });
@@ -3338,20 +3447,134 @@
         function showAddFriendModal() {
             const modalHtml = `
                 <div class="modal show" id="addFriendModal" style="z-index: 2000;">
-                    <div class="modal-content" style="max-width: 450px;">
-                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                    <div class="modal-content" style="max-width: 500px; max-height: 90vh; overflow-y: auto;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px;">
                             <h3 style="margin: 0; color: #9b59b6;">👥 Add Friends</h3>
                             <button onclick="closeAddFriendModal()" style="background: none; border: none; color: white; font-size: 1.5rem; cursor: pointer;">✕</button>
                         </div>
                         
-                        <!-- Manual Email Add -->
-                        <div style="margin-bottom: 20px;">
-                            <h4 style="margin: 0 0 15px 0; color: white; font-size: 1rem;">📧 Add by Email</h4>
-                            <div style="display: flex; gap: 10px;">
-                                <input type="email" id="friendEmailInput" placeholder="friend@example.com" style="flex: 1; padding: 12px; border: 1px solid rgba(255, 255, 255, 0.3); border-radius: 10px; background: rgba(255, 255, 255, 0.1); color: white;">
-                                <button class="btn btn-primary" onclick="addFriendByEmail()" style="flex-shrink: 0;">
-                                    Add Friend
+                        <!-- Social Media Import -->
+                        <div style="margin-bottom: 30px;">
+                            <h4 style="margin: 0 0 15px 0; color: white; font-size: 1.1rem;">📱 Connect Social Media</h4>
+                            <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px;">
+                                <button class="btn btn-primary" onclick="importFromFacebook()" style="background: linear-gradient(45deg, #1877F2, #42A5F5); display: flex; align-items: center; gap: 8px; justify-content: center; padding: 12px;">
+                                    <span style="font-size: 1.2rem;">📘</span>
+                                    <span>Facebook</span>
                                 </button>
+                                <button class="btn btn-primary" onclick="importFromInstagram()" style="background: linear-gradient(45deg, #E4405F, #C13584); display: flex; align-items: center; gap: 8px; justify-content: center; padding: 12px;">
+                                    <span style="font-size: 1.2rem;">📷</span>
+                                    <span>Instagram</span>
+                                </button>
+                                <button class="btn btn-primary" onclick="importFromWhatsApp()" style="background: linear-gradient(45deg, #25D366, #128C7E); display: flex; align-items: center; gap: 8px; justify-content: center; padding: 12px;">
+                                    <span style="font-size: 1.2rem;">💬</span>
+                                    <span>WhatsApp</span>
+                                </button>
+                                <button class="btn btn-primary" onclick="importFromTwitter()" style="background: linear-gradient(45deg, #1DA1F2, #0d8bd9); display: flex; align-items: center; gap: 8px; justify-content: center; padding: 12px;">
+                                    <span style="font-size: 1.2rem;">🐦</span>
+                                    <span>Twitter</span>
+                                </button>
+                                <button class="btn btn-primary" onclick="importFromTikTok()" style="background: linear-gradient(45deg, #000000, #ff0050); display: flex; align-items: center; gap: 8px; justify-content: center; padding: 12px;">
+                                    <span style="font-size: 1.2rem;">🎵</span>
+                                    <span>TikTok</span>
+                                </button>
+                                <button class="btn btn-primary" onclick="importFromLinkedIn()" style="background: linear-gradient(45deg, #0077B5, #005885); display: flex; align-items: center; gap: 8px; justify-content: center; padding: 12px;">
+                                    <span style="font-size: 1.2rem;">💼</span>
+                                    <span>LinkedIn</span>
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <!-- Phone Contacts -->
+                        <div style="margin-bottom: 30px;">
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                                <h4 style="margin: 0; color: white; font-size: 1.1rem;">📞 Phone Contacts</h4>
+                                <button class="btn btn-ai btn-small" onclick="importPhoneContacts()">
+                                    <span style="font-size: 1rem;">📱</span> Import All
+                                </button>
+                            </div>
+                            <div id="phoneContactsList" style="max-height: 160px; overflow-y: auto; background: rgba(255, 255, 255, 0.02); border-radius: 12px; padding: 15px; border: 1px solid rgba(255, 255, 255, 0.1);">
+                                <div style="text-align: center; opacity: 0.6; padding: 20px;">
+                                    <p style="margin: 0;">📱 Click "Import All" to sync your contacts</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- QR Code Sharing -->
+                        <div style="margin-bottom: 30px;">
+                            <h4 style="margin: 0 0 15px 0; color: white; font-size: 1.1rem;">📱 Share Your Profile</h4>
+                            <div style="background: rgba(255, 255, 255, 0.02); border-radius: 15px; padding: 20px; border: 1px solid rgba(255, 255, 255, 0.1); text-align: center;">
+                                <div id="qrCodeContainer" style="margin-bottom: 15px;">
+                                    <div style="width: 120px; height: 120px; margin: 0 auto; background: white; border-radius: 10px; display: flex; align-items: center; justify-content: center; color: black; font-weight: bold; font-size: 0.8rem; text-align: center;">
+                                        <div>
+                                            <div style="font-size: 2rem; margin-bottom: 5px;">📱</div>
+                                            <div>QR Code</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div style="display: flex; gap: 8px; justify-content: center; flex-wrap: wrap;">
+                                    <button class="btn btn-secondary btn-small" onclick="shareViaWhatsApp()">
+                                        💬 WhatsApp
+                                    </button>
+                                    <button class="btn btn-secondary btn-small" onclick="shareViaMessenger()">
+                                        💬 Messenger
+                                    </button>
+                                    <button class="btn btn-secondary btn-small" onclick="copyInviteLink()">
+                                        🔗 Copy Link
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Manual Search Options -->
+                        <div style="margin-bottom: 30px;">
+                            <h4 style="margin: 0 0 15px 0; color: white; font-size: 1.1rem;">🔍 Manual Search</h4>
+                            
+                            <!-- Email Search -->
+                            <div style="margin-bottom: 15px;">
+                                <label style="display: block; margin-bottom: 8px; font-size: 0.9rem; opacity: 0.8;">📧 Email Address</label>
+                                <div style="display: flex; gap: 10px;">
+                                    <input type="email" id="friendEmailInput" placeholder="friend@example.com" style="flex: 1; padding: 12px; border: 1px solid rgba(255, 255, 255, 0.3); border-radius: 10px; background: rgba(255, 255, 255, 0.1); color: white; font-size: 0.9rem;">
+                                    <button class="btn btn-primary" onclick="addFriendByEmail()">
+                                        Add Friend
+                                    </button>
+                                </div>
+                            </div>
+                            
+                            <!-- Phone Number Search -->
+                            <div style="margin-bottom: 15px;">
+                                <label style="display: block; margin-bottom: 8px; font-size: 0.9rem; opacity: 0.8;">📞 Phone Number</label>
+                                <div style="display: flex; gap: 10px;">
+                                    <input type="tel" id="friendPhoneInput" placeholder="+60123456789" style="flex: 1; padding: 12px; border: 1px solid rgba(255, 255, 255, 0.3); border-radius: 10px; background: rgba(255, 255, 255, 0.1); color: white; font-size: 0.9rem;">
+                                    <button class="btn btn-primary" onclick="addFriendByPhone()">
+                                        Find & Add
+                                    </button>
+                                </div>
+                            </div>
+                            
+                            <!-- Username Search -->
+                            <div style="margin-bottom: 15px;">
+                                <label style="display: block; margin-bottom: 8px; font-size: 0.9rem; opacity: 0.8;">👤 Username</label>
+                                <div style="display: flex; gap: 10px;">
+                                    <input type="text" id="friendUsernameInput" placeholder="@username" style="flex: 1; padding: 12px; border: 1px solid rgba(255, 255, 255, 0.3); border-radius: 10px; background: rgba(255, 255, 255, 0.1); color: white; font-size: 0.9rem;">
+                                    <button class="btn btn-primary" onclick="addFriendByUsername()">
+                                        Search
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Nearby Players -->
+                        <div style="margin-bottom: 20px;">
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                                <h4 style="margin: 0; color: white; font-size: 1.1rem;">📍 Nearby Players</h4>
+                                <button class="btn btn-ai btn-small" onclick="scanNearbyForFriends()">
+                                    🔄 Scan
+                                </button>
+                            </div>
+                            <div id="nearbyFriendsList" style="max-height: 160px; overflow-y: auto; background: rgba(255, 255, 255, 0.02); border-radius: 12px; padding: 15px; border: 1px solid rgba(255, 255, 255, 0.1);">
+                                <div style="text-align: center; opacity: 0.6; padding: 20px;">
+                                    <p style="margin: 0;">🔍 Click "Scan" to find nearby JomBro players</p>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -3359,6 +3582,11 @@
             `;
             
             document.body.insertAdjacentHTML('beforeend', modalHtml);
+            
+            // Auto-load some demo contacts
+            setTimeout(() => {
+                simulatePhoneContacts();
+            }, 500);
         }
 
         function closeAddFriendModal() {
@@ -3368,14 +3596,674 @@
             }
         }
 
-        async function addFriendByEmail() {
-            const email = document.getElementById('friendEmailInput').value.trim();
-            if (email) {
-                await sendFriendRequest(email);
-                document.getElementById('friendEmailInput').value = '';
-            } else {
-                showMessage('❌ Please enter an email address!', 'error');
+        // Tutorial System
+        let currentTutorialStep = 0;
+        const tutorialSteps = [
+            {
+                icon: "🎮",
+                title: "Welcome to JomBro!",
+                subtitle: "Let's Go! Let's Go!",
+                content: `
+                    <div style="text-align: center; padding: 20px;">
+                        <div style="font-size: 4rem; margin-bottom: 20px;">🏆</div>
+                        <h3 style="margin-bottom: 15px; color: white;">Ready to Challenge Your Friends?</h3>
+                        <p style="margin-bottom: 15px; line-height: 1.6;">JomBro is a social challenge platform where you can:</p>
+                        <div style="text-align: left; max-width: 300px; margin: 0 auto;">
+                            <p style="margin: 8px 0;">🎯 Send fun challenges to friends</p>
+                            <p style="margin: 8px 0;">🤖 Get AI-generated challenges</p>
+                            <p style="margin: 8px 0;">🏃‍♂️ Challenge nearby players</p>
+                            <p style="margin: 8px 0;">🪙 Earn tokens for completing challenges</p>
+                            <p style="margin: 8px 0;">📈 Level up and become a legend!</p>
+                        </div>
+                        <p style="margin-top: 20px; color: #9b59b6; font-weight: bold;">You start with 1000 tokens!</p>
+                    </div>
+                `
+            },
+            {
+                icon: "🎮",
+                title: "Step 1: Find Nearby Players",
+                subtitle: "Discover other JomBro players around you",
+                content: `
+                    <div style="padding: 20px;">
+                        <div style="background: rgba(74, 144, 226, 0.1); padding: 15px; border-radius: 12px; margin-bottom: 20px; border: 1px solid rgba(74, 144, 226, 0.3);">
+                            <h4 style="margin: 0 0 10px 0; color: #4a90e2;">📍 Online Nearby Players</h4>
+                            <p style="margin: 0; font-size: 0.9rem; line-height: 1.5;">This section shows other JomBro players within your detection range (1-50km).</p>
+                        </div>
+                        <div style="margin-bottom: 20px;">
+                            <h4 style="margin: 0 0 10px 0; color: white;">What you can do:</h4>
+                            <ul style="margin: 0; padding-left: 20px; line-height: 1.6;">
+                                <li>👋 Send waves to nearby players</li>
+                                <li>🎯 Challenge them with quick challenges</li>
+                                <li>🤖 Send AI-generated challenges</li>
+                                <li>👥 Add them as friends</li>
+                                <li>📡 Adjust your detection range</li>
+                            </ul>
+                        </div>
+                        <div style="background: rgba(155, 89, 182, 0.1); padding: 12px; border-radius: 8px; border: 1px solid rgba(155, 89, 182, 0.3);">
+                            <p style="margin: 0; font-size: 0.8rem; color: #9b59b6;"><strong>💡 Tip:</strong> Each challenge to nearby players costs 25 tokens!</p>
+                        </div>
+                    </div>
+                `
+            },
+            {
+                icon: "👥",
+                title: "Step 2: Add Friends",
+                subtitle: "Build your challenge network",
+                content: `
+                    <div style="padding: 20px;">
+                        <div style="background: rgba(155, 89, 182, 0.1); padding: 15px; border-radius: 12px; margin-bottom: 20px; border: 1px solid rgba(155, 89, 182, 0.3);">
+                            <h4 style="margin: 0 0 10px 0; color: #9b59b6;">👥 Friends Section</h4>
+                            <p style="margin: 0; font-size: 0.9rem; line-height: 1.5;">Connect with friends to send challenges back and forth!</p>
+                        </div>
+                        <div style="margin-bottom: 20px;">
+                            <h4 style="margin: 0 0 10px 0; color: white;">Ways to add friends:</h4>
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 15px;">
+                                <div style="background: rgba(255, 255, 255, 0.05); padding: 10px; border-radius: 8px; text-align: center;">
+                                    <div style="font-size: 1.5rem; margin-bottom: 5px;">📱</div>
+                                    <div style="font-size: 0.8rem;">Social Media</div>
+                                </div>
+                                <div style="background: rgba(255, 255, 255, 0.05); padding: 10px; border-radius: 8px; text-align: center;">
+                                    <div style="font-size: 1.5rem; margin-bottom: 5px;">📞</div>
+                                    <div style="font-size: 0.8rem;">Phone Contacts</div>
+                                </div>
+                                <div style="background: rgba(255, 255, 255, 0.05); padding: 10px; border-radius: 8px; text-align: center;">
+                                    <div style="font-size: 1.5rem; margin-bottom: 5px;">📧</div>
+                                    <div style="font-size: 0.8rem;">Email/Phone</div>
+                                </div>
+                                <div style="background: rgba(255, 255, 255, 0.05); padding: 10px; border-radius: 8px; text-align: center;">
+                                    <div style="font-size: 1.5rem; margin-bottom: 5px;">📍</div>
+                                    <div style="font-size: 0.8rem;">Nearby Scan</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div style="background: rgba(74, 144, 226, 0.1); padding: 12px; border-radius: 8px; border: 1px solid rgba(74, 144, 226, 0.3);">
+                            <p style="margin: 0; font-size: 0.8rem; color: #4a90e2;"><strong>💡 Tip:</strong> Friends can challenge each other for free!</p>
+                        </div>
+                    </div>
+                `
+            },
+            {
+                icon: "🤖",
+                title: "Step 3: AI Challenge Generator",
+                subtitle: "Get fresh challenges every 2 minutes",
+                content: `
+                    <div style="padding: 20px;">
+                        <div style="background: rgba(74, 144, 226, 0.1); padding: 15px; border-radius: 12px; margin-bottom: 20px; border: 1px solid rgba(74, 144, 226, 0.3);">
+                            <h4 style="margin: 0 0 10px 0; color: #4a90e2;">🤖 AI Challenge Generator</h4>
+                            <p style="margin: 0; font-size: 0.9rem; line-height: 1.5;">Our AI creates 3 new challenges every 2 minutes from our database of 40+ unique challenges!</p>
+                        </div>
+                        <div style="margin-bottom: 20px;">
+                            <h4 style="margin: 0 0 10px 0; color: white;">How it works:</h4>
+                            <ol style="margin: 0; padding-left: 20px; line-height: 1.6;">
+                                <li>🎯 Click on any AI-generated challenge card</li>
+                                <li>👥 Choose who to send it to (Friends/Nearby/Random)</li>
+                                <li>💸 Pay 25 tokens per recipient</li>
+                                <li>🏆 Earn tokens when they complete it!</li>
+                            </ol>
+                        </div>
+                        <div style="margin-bottom: 15px;">
+                            <h4 style="margin: 0 0 10px 0; color: white;">Challenge Categories:</h4>
+                            <div style="display: flex; flex-wrap: wrap; gap: 8px;">
+                                <span style="background: rgba(255, 255, 255, 0.1); padding: 4px 8px; border-radius: 12px; font-size: 0.8rem;">💪 Fitness</span>
+                                <span style="background: rgba(255, 255, 255, 0.1); padding: 4px 8px; border-radius: 12px; font-size: 0.8rem;">🎨 Creative</span>
+                                <span style="background: rgba(255, 255, 255, 0.1); padding: 4px 8px; border-radius: 12px; font-size: 0.8rem;">👥 Social</span>
+                                <span style="background: rgba(255, 255, 255, 0.1); padding: 4px 8px; border-radius: 12px; font-size: 0.8rem;">🍕 Food</span>
+                                <span style="background: rgba(255, 255, 255, 0.1); padding: 4px 8px; border-radius: 12px; font-size: 0.8rem;">🗺️ Adventure</span>
+                            </div>
+                        </div>
+                        <div style="background: rgba(155, 89, 182, 0.1); padding: 12px; border-radius: 8px; border: 1px solid rgba(155, 89, 182, 0.3);">
+                            <p style="margin: 0; font-size: 0.8rem; color: #9b59b6;"><strong>⏰ Timer:</strong> You can pause/resume the 2-minute timer anytime!</p>
+                        </div>
+                    </div>
+                `
+            },
+            {
+                icon: "⚡",
+                title: "Step 4: Quick Challenge Creator",
+                subtitle: "Create your own custom challenges",
+                content: `
+                    <div style="padding: 20px;">
+                        <div style="background: rgba(155, 89, 182, 0.1); padding: 15px; border-radius: 12px; margin-bottom: 20px; border: 1px solid rgba(155, 89, 182, 0.3);">
+                            <h4 style="margin: 0 0 10px 0; color: #9b59b6;">⚡ Quick Challenge Creator</h4>
+                            <p style="margin: 0; font-size: 0.9rem; line-height: 1.5;">Create personalized challenges and send them to all your friends at once!</p>
+                        </div>
+                        <div style="margin-bottom: 20px;">
+                            <h4 style="margin: 0 0 10px 0; color: white;">How to create:</h4>
+                            <ol style="margin: 0; padding-left: 20px; line-height: 1.6;">
+                                <li>✍️ Write a catchy challenge title</li>
+                                <li>📝 Describe what they need to do</li>
+                                <li>🏷️ Choose a category (Fitness, Creative, etc.)</li>
+                                <li>🪙 Set the reward tokens (100-1000)</li>
+                                <li>🚀 Send to ALL your friends for 50 tokens</li>
+                            </ol>
+                        </div>
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 15px;">
+                            <div style="background: rgba(76, 175, 80, 0.1); padding: 10px; border-radius: 8px; border: 1px solid rgba(76, 175, 80, 0.3);">
+                                <div style="font-size: 1.2rem; margin-bottom: 5px;">💡</div>
+                                <div style="font-size: 0.8rem; color: #4CAF50;">Be creative with your challenges!</div>
+                            </div>
+                            <div style="background: rgba(255, 193, 7, 0.1); padding: 10px; border-radius: 8px; border: 1px solid rgba(255, 193, 7, 0.3);">
+                                <div style="font-size: 1.2rem; margin-bottom: 5px;">📸</div>
+                                <div style="font-size: 0.8rem; color: #FFC107;">Require photo/video proof!</div>
+                            </div>
+                        </div>
+                    </div>
+                `
+            },
+            {
+                icon: "🪙",
+                title: "Step 5: Earning & Spending Tokens",
+                subtitle: "The JomBro economy explained",
+                content: `
+                    <div style="padding: 20px;">
+                        <div style="background: rgba(255, 193, 7, 0.1); padding: 15px; border-radius: 12px; margin-bottom: 20px; border: 1px solid rgba(255, 193, 7, 0.3);">
+                            <h4 style="margin: 0 0 10px 0; color: #FFC107;">🪙 Token System</h4>
+                            <p style="margin: 0; font-size: 0.9rem; line-height: 1.5;">Tokens are JomBro's currency. Use them wisely!</p>
+                        </div>
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 20px;">
+                            <div>
+                                <h4 style="margin: 0 0 10px 0; color: #4CAF50;">💰 Earn Tokens:</h4>
+                                <ul style="margin: 0; padding-left: 20px; line-height: 1.5; font-size: 0.9rem;">
+                                    <li>✅ Complete challenges</li>
+                                    <li>👋 Wave exchanges (+5)</li>
+                                    <li>🎯 When others complete your challenges</li>
+                                    <li>🏆 Daily login bonuses</li>
+                                </ul>
+                            </div>
+                            <div>
+                                <h4 style="margin: 0 0 10px 0; color: #f44336;">💸 Spend Tokens:</h4>
+                                <ul style="margin: 0; padding-left: 20px; line-height: 1.5; font-size: 0.9rem;">
+                                    <li>🎯 Nearby challenges (-25)</li>
+                                    <li>🤖 AI challenges (-25 each)</li>
+                                    <li>⚡ Quick challenges (-50)</li>
+                                    <li>🛍️ Future: Shop items</li>
+                                </ul>
+                            </div>
+                        </div>
+                        <div style="background: rgba(74, 144, 226, 0.1); padding: 12px; border-radius: 8px; border: 1px solid rgba(74, 144, 226, 0.3);">
+                            <p style="margin: 0; font-size: 0.8rem; color: #4a90e2;"><strong>💡 Pro Tip:</strong> Start by adding friends - challenging friends is FREE!</p>
+                        </div>
+                    </div>
+                `
+            },
+            {
+                icon: "🎯",
+                title: "Step 6: Active Challenges",
+                subtitle: "Track and respond to challenges",
+                content: `
+                    <div style="padding: 20px;">
+                        <div style="background: rgba(155, 89, 182, 0.1); padding: 15px; border-radius: 12px; margin-bottom: 20px; border: 1px solid rgba(155, 89, 182, 0.3);">
+                            <h4 style="margin: 0 0 10px 0; color: #9b59b6;">🎯 Active Challenges</h4>
+                            <p style="margin: 0; font-size: 0.9rem; line-height: 1.5;">See all incoming and outgoing challenges in one place!</p>
+                        </div>
+                        <div style="margin-bottom: 20px;">
+                            <h4 style="margin: 0 0 10px 0; color: white;">When you receive a challenge:</h4>
+                            <div style="display: flex; gap: 10px; margin-bottom: 15px;">
+                                <button class="btn btn-primary btn-small" style="flex: 1; padding: 8px;">✅ Accept</button>
+                                <button class="btn btn-secondary btn-small" style="flex: 1; padding: 8px;">❌ Decline</button>
+                            </div>
+                            <p style="margin: 0 0 15px 0; font-size: 0.9rem; line-height: 1.5;">After accepting, complete the challenge and click "Mark Complete" to earn your tokens!</p>
+                        </div>
+                        <div style="margin-bottom: 15px;">
+                            <h4 style="margin: 0 0 10px 0; color: white;">Challenge types you'll see:</h4>
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
+                                <span style="background: rgba(74, 144, 226, 0.2); padding: 8px; border-radius: 8px; font-size: 0.8rem; text-align: center;">🤖 AI Generated</span>
+                                <span style="background: rgba(155, 89, 182, 0.2); padding: 8px; border-radius: 8px; font-size: 0.8rem; text-align: center;">⚡ Custom Made</span>
+                            </div>
+                        </div>
+                        <div style="background: rgba(76, 175, 80, 0.1); padding: 12px; border-radius: 8px; border: 1px solid rgba(76, 175, 80, 0.3);">
+                            <p style="margin: 0; font-size: 0.8rem; color: #4CAF50;"><strong>🏆 Remember:</strong> Most challenges require photo or video proof!</p>
+                        </div>
+                    </div>
+                `
+            },
+            {
+                icon: "🚀",
+                title: "Ready to Play!",
+                subtitle: "You're all set to start challenging!",
+                content: `
+                    <div style="text-align: center; padding: 20px;">
+                        <div style="font-size: 4rem; margin-bottom: 20px;">🎉</div>
+                        <h3 style="margin-bottom: 15px; color: white;">You're Ready to JomBro!</h3>
+                        <p style="margin-bottom: 20px; line-height: 1.6;">You now know everything you need to start challenging friends and earning tokens!</p>
+                        
+                        <div style="background: rgba(155, 89, 182, 0.1); padding: 20px; border-radius: 12px; margin-bottom: 20px; border: 1px solid rgba(155, 89, 182, 0.3);">
+                            <h4 style="margin: 0 0 15px 0; color: #9b59b6;">🎯 Quick Start Suggestions:</h4>
+                            <div style="text-align: left; max-width: 300px; margin: 0 auto;">
+                                <p style="margin: 8px 0;">1. 👥 Add your first friend</p>
+                                <p style="margin: 8px 0;">2. 🔍 Scan for nearby players</p>
+                                <p style="margin: 8px 0;">3. 🤖 Try an AI challenge</p>
+                                <p style="margin: 8px 0;">4. ⚡ Create your own challenge</p>
+                                <p style="margin: 8px 0;">5. 🏆 Start earning tokens!</p>
+                            </div>
+                        </div>
+                        
+                        <div style="display: flex; gap: 10px; justify-content: center; margin-top: 20px;">
+                            <div style="background: rgba(74, 144, 226, 0.2); padding: 12px; border-radius: 8px; font-size: 0.9rem;">
+                                <div style="font-weight: bold; color: #4a90e2;">1000 🪙</div>
+                                <div style="font-size: 0.8rem; opacity: 0.8;">Starting Tokens</div>
+                            </div>
+                            <div style="background: rgba(76, 175, 80, 0.2); padding: 12px; border-radius: 8px; font-size: 0.9rem;">
+                                <div style="font-weight: bold; color: #4CAF50;">Level 1</div>
+                                <div style="font-size: 0.8rem; opacity: 0.8;">Beginner</div>
+                            </div>
+                        </div>
+                        
+                        <p style="margin-top: 20px; color: #9b59b6; font-weight: bold; font-size: 1.1rem;">Let's Go! Let's Go! 🚀</p>
+                    </div>
+                `
             }
+        ];
+        
+        function showHowToPlayGuide() {
+            currentTutorialStep = 0;
+            document.getElementById('howToPlayModal').classList.add('show');
+            updateTutorialContent();
+            updateTutorialNavigation();
+        }
+        
+        function updateTutorialContent() {
+            const step = tutorialSteps[currentTutorialStep];
+            document.getElementById('tutorialIcon').textContent = step.icon;
+            document.getElementById('tutorialTitle').textContent = step.title;
+            document.getElementById('tutorialSubtitle').textContent = step.subtitle;
+            document.getElementById('tutorialContent').innerHTML = step.content;
+        }
+        
+        function updateTutorialNavigation() {
+            const prevBtn = document.getElementById('prevBtn');
+            const nextBtn = document.getElementById('nextBtn');
+            const stepCounter = document.getElementById('stepCounter');
+            const progressDots = document.getElementById('progressDots');
+            
+            // Update step counter
+            stepCounter.textContent = `Step ${currentTutorialStep + 1} of ${tutorialSteps.length}`;
+            
+            // Update progress dots
+            progressDots.innerHTML = '';
+            tutorialSteps.forEach((_, index) => {
+                const dot = document.createElement('div');
+                dot.style.cssText = `
+                    width: 8px;
+                    height: 8px;
+                    border-radius: 50%;
+                    background: ${index === currentTutorialStep ? '#9b59b6' : 'rgba(255, 255, 255, 0.3)'};
+                    transition: all 0.3s ease;
+                `;
+                progressDots.appendChild(dot);
+            });
+            
+            // Update buttons
+            if (currentTutorialStep === 0) {
+                prevBtn.style.display = 'none';
+            } else {
+                prevBtn.style.display = 'block';
+            }
+            
+            if (currentTutorialStep === tutorialSteps.length - 1) {
+                nextBtn.textContent = 'Start Playing! 🚀';
+                nextBtn.onclick = finishTutorial;
+            } else {
+                nextBtn.textContent = 'Next →';
+                nextBtn.onclick = nextTutorialStep;
+            }
+        }
+        
+        function nextTutorialStep() {
+            if (currentTutorialStep < tutorialSteps.length - 1) {
+                currentTutorialStep++;
+                updateTutorialContent();
+                updateTutorialNavigation();
+            }
+        }
+        
+        function previousTutorialStep() {
+            if (currentTutorialStep > 0) {
+                currentTutorialStep--;
+                updateTutorialContent();
+                updateTutorialNavigation();
+            }
+        }
+        
+        async function finishTutorial() {
+            // Mark user as no longer new
+            if (currentUser && db) {
+                try {
+                    await db.collection('users').doc(currentUser.uid).update({
+                        isNewUser: false,
+                        tutorialCompleted: firebase.firestore.FieldValue.serverTimestamp()
+                    });
+                    appState.user.isNewUser = false;
+                } catch (error) {
+                    console.error('Error updating tutorial status:', error);
+                }
+            }
+            
+            // Close tutorial
+            document.getElementById('howToPlayModal').classList.remove('show');
+            
+            // Show completion message
+            showMessage('🎉 Tutorial completed! Welcome to JomBro!', 'success');
+            
+            // Give bonus tokens for completing tutorial
+            if (currentUser && db) {
+                try {
+                    await db.collection('users').doc(currentUser.uid).update({
+                        tokens: firebase.firestore.FieldValue.increment(200)
+                    });
+                    appState.user.tokens += 200;
+                    updateUserDisplay();
+                    
+                    setTimeout(() => {
+                        showMessage('🎁 Bonus! +200 tokens for completing the tutorial!', 'success');
+                    }, 2000);
+                } catch (error) {
+                    console.error('Error giving tutorial bonus:', error);
+                }
+            }
+        }
+        
+        // Add button to reopen tutorial
+        function showHowToPlayButton() {
+            const headerActions = document.querySelector('.user-info');
+            if (headerActions && !document.getElementById('howToPlayBtn')) {
+                const howToPlayBtn = document.createElement('button');
+                howToPlayBtn.id = 'howToPlayBtn';
+                howToPlayBtn.className = 'btn btn-secondary btn-small';
+                howToPlayBtn.textContent = '❓ How to Play';
+                howToPlayBtn.onclick = showHowToPlayGuide;
+                howToPlayBtn.style.fontSize = '0.8rem';
+                headerActions.insertBefore(howToPlayBtn, document.getElementById('logoutBtn'));
+            }
+        }
+        function showPlayerActionModal(playerId) {
+            const player = appState.nearbyStrangers.find(p => p.id === playerId);
+            if (!player) return;
+            
+            const modalHtml = `
+                <div class="modal show" id="playerActionModal" style="z-index: 2000;">
+                    <div class="modal-content" style="max-width: 400px;">
+                        <div style="text-align: center; margin-bottom: 20px;">
+                            <div style="font-size: 4rem; margin-bottom: 10px;">${player.avatar}</div>
+                            <h3 style="margin: 0; color: white;">${player.name}</h3>
+                            <p style="margin: 5px 0 0 0; opacity: 0.8; font-size: 0.9rem;">${player.distance} away • Online</p>
+                        </div>
+                        
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 20px;">
+                            <button class="btn btn-primary" onclick="quickChallengePlayer('${player.id}'); closePlayerActionModal()">
+                                🎯 Quick Challenge
+                            </button>
+                            <button class="btn btn-ai" onclick="sendAIChallengeToPlayer('${player.id}'); closePlayerActionModal()">
+                                🤖 AI Challenge
+                            </button>
+                            <button class="btn btn-secondary" onclick="sendWaveToPlayer('${player.id}'); closePlayerActionModal()">
+                                👋 Send Wave
+                            </button>
+                            <button class="btn btn-secondary" onclick="addNearbyPlayerAsFriend('${player.id}'); closePlayerActionModal()">
+                                👥 Add Friend
+                            </button>
+                        </div>
+                        
+                        <button class="btn btn-secondary" onclick="closePlayerActionModal()" style="width: 100%;">
+                            Cancel
+                        </button>
+                    </div>
+                </div>
+            `;
+            
+            document.body.insertAdjacentHTML('beforeend', modalHtml);
+        }
+        
+        function closePlayerActionModal() {
+            const modal = document.getElementById('playerActionModal');
+            if (modal) modal.remove();
+        }
+        
+        function quickChallengePlayer(playerId) {
+            const player = appState.nearbyStrangers.find(p => p.id === playerId);
+            if (!player) return;
+            
+            if (appState.user.tokens < 25) {
+                showMessage('❌ Not enough tokens! Need 25 tokens to challenge nearby players.', 'error');
+                return;
+            }
+            
+            // Show quick challenge options
+            const modalHtml = `
+                <div class="modal show" id="quickChallengeModal" style="z-index: 2100;">
+                    <div class="modal-content" style="max-width: 450px;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                            <h3 style="margin: 0; color: #9b59b6;">🎯 Challenge ${player.name}</h3>
+                            <button onclick="closeQuickChallengeModal()" style="background: none; border: none; color: white; font-size: 1.5rem; cursor: pointer;">✕</button>
+                        </div>
+                        
+                        <div style="margin-bottom: 20px;">
+                            <h4 style="margin: 0 0 15px 0; color: white;">⚡ Quick Challenges</h4>
+                            <div style="display: grid; gap: 10px;">
+                                <button class="btn btn-primary" onclick="sendQuickChallenge('${player.id}', 'fitness', 'Do 15 push-ups right now!', 'Show me your strength with 15 perfect push-ups!', 100)">
+                                    💪 15 Push-ups (100 tokens)
+                                </button>
+                                <button class="btn btn-primary" onclick="sendQuickChallenge('${player.id}', 'creative', 'Take a selfie with something blue!', 'Find something blue nearby and take a creative selfie!', 75)">
+                                    📸 Blue Selfie (75 tokens)
+                                </button>
+                                <button class="btn btn-primary" onclick="sendQuickChallenge('${player.id}', 'social', 'Compliment a stranger!', 'Give a genuine compliment to someone you don\\'t know!', 125)">
+                                    😊 Compliment Challenge (125 tokens)
+                                </button>
+                                <button class="btn btn-primary" onclick="sendQuickChallenge('${player.id}', 'food', 'Make a healthy snack!', 'Create a healthy snack under 100 calories!', 100)">
+                                    🍎 Healthy Snack (100 tokens)
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div style="margin-bottom: 20px;">
+                            <h4 style="margin: 0 0 15px 0; color: white;">✍️ Custom Challenge</h4>
+                            <input type="text" id="customChallengeTitle" placeholder="Challenge title..." style="width: 100%; padding: 12px; border: 1px solid rgba(255, 255, 255, 0.3); border-radius: 10px; background: rgba(255, 255, 255, 0.1); color: white; margin-bottom: 10px;">
+                            <textarea id="customChallengeDesc" placeholder="Challenge description..." style="width: 100%; padding: 12px; border: 1px solid rgba(255, 255, 255, 0.3); border-radius: 10px; background: rgba(255, 255, 255, 0.1); color: white; min-height: 80px; resize: vertical;"></textarea>
+                            <div style="display: flex; gap: 10px; margin-top: 10px;">
+                                <select id="customChallengeCategory" style="flex: 1; padding: 10px; border: 1px solid rgba(255, 255, 255, 0.3); border-radius: 8px; background: rgba(255, 255, 255, 0.1); color: white;">
+                                    <option value="fitness">💪 Fitness</option>
+                                    <option value="creative">🎨 Creative</option>
+                                    <option value="social">👥 Social</option>
+                                    <option value="food">🍕 Food</option>
+                                    <option value="adventure">🗺️ Adventure</option>
+                                </select>
+                                <select id="customChallengeReward" style="flex: 1; padding: 10px; border: 1px solid rgba(255, 255, 255, 0.3); border-radius: 8px; background: rgba(255, 255, 255, 0.1); color: white;">
+                                    <option value="50">🪙 50 Tokens</option>
+                                    <option value="100">🪙 100 Tokens</option>
+                                    <option value="150">🪙 150 Tokens</option>
+                                    <option value="200">🪙 200 Tokens</option>
+                                </select>
+                            </div>
+                            <button class="btn btn-primary" onclick="sendCustomChallenge('${player.id}')" style="width: 100%; margin-top: 15px;">
+                                Send Custom Challenge (25 tokens)
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            document.body.insertAdjacentHTML('beforeend', modalHtml);
+        }
+        
+        function closeQuickChallengeModal() {
+            const modal = document.getElementById('quickChallengeModal');
+            if (modal) modal.remove();
+        }
+        
+        async function sendQuickChallenge(playerId, category, title, description, reward) {
+            const player = appState.nearbyStrangers.find(p => p.id === playerId);
+            if (!player) return;
+            
+            if (appState.user.tokens < 25) {
+                showMessage('❌ Not enough tokens!', 'error');
+                return;
+            }
+            
+            try {
+                // Simulate sending challenge
+                appState.user.tokens -= 25;
+                updateUserDisplay();
+                
+                closeQuickChallengeModal();
+                showMessage(`🎯 "${title}" challenge sent to ${player.name}! (-25 tokens)`, 'success');
+                
+                // Simulate response
+                setTimeout(() => {
+                    if (Math.random() > 0.3) {
+                        appState.user.tokens += reward;
+                        updateUserDisplay();
+                        showMessage(`🎉 ${player.name} completed your challenge! You earned ${reward} tokens!`, 'success');
+                    } else {
+                        showMessage(`😔 ${player.name} declined your challenge`, 'info');
+                    }
+                }, Math.random() * 5000 + 2000);
+                
+            } catch (error) {
+                console.error('Error sending quick challenge:', error);
+                showMessage('❌ Failed to send challenge', 'error');
+            }
+        }
+        
+        async function sendCustomChallenge(playerId) {
+            const title = document.getElementById('customChallengeTitle').value.trim();
+            const description = document.getElementById('customChallengeDesc').value.trim();
+            const category = document.getElementById('customChallengeCategory').value;
+            const reward = parseInt(document.getElementById('customChallengeReward').value);
+            
+            if (!title || !description) {
+                showMessage('❌ Please fill in title and description!', 'error');
+                return;
+            }
+            
+            const player = appState.nearbyStrangers.find(p => p.id === playerId);
+            if (!player) return;
+            
+            if (appState.user.tokens < 25) {
+                showMessage('❌ Not enough tokens!', 'error');
+                return;
+            }
+            
+            try {
+                appState.user.tokens -= 25;
+                updateUserDisplay();
+                
+                closeQuickChallengeModal();
+                showMessage(`🎯 Custom challenge "${title}" sent to ${player.name}! (-25 tokens)`, 'success');
+                
+                // Simulate response
+                setTimeout(() => {
+                    if (Math.random() > 0.2) {
+                        appState.user.tokens += reward;
+                        updateUserDisplay();
+                        showMessage(`🎉 ${player.name} completed your custom challenge! You earned ${reward} tokens!`, 'success');
+                    } else {
+                        showMessage(`😔 ${player.name} declined your challenge`, 'info');
+                    }
+                }, Math.random() * 5000 + 2000);
+                
+            } catch (error) {
+                console.error('Error sending custom challenge:', error);
+                showMessage('❌ Failed to send challenge', 'error');
+            }
+        }
+        
+        async function sendAIChallengeToPlayer(playerId) {
+            const player = appState.nearbyStrangers.find(p => p.id === playerId);
+            if (!player) return;
+            
+            if (appState.user.tokens < 25) {
+                showMessage('❌ Not enough tokens!', 'error');
+                return;
+            }
+            
+            // Get random AI challenge
+            const categories = Object.keys(aiChallengeDatabase);
+            const randomCategory = categories[Math.floor(Math.random() * categories.length)];
+            const categoryPool = aiChallengeDatabase[randomCategory];
+            const randomChallenge = categoryPool[Math.floor(Math.random() * categoryPool.length)];
+            
+            try {
+                appState.user.tokens -= 25;
+                updateUserDisplay();
+                
+                showMessage(`🤖 AI Challenge "${randomChallenge.title}" sent to ${player.name}! (-25 tokens)`, 'success');
+                
+                // Simulate response
+                setTimeout(() => {
+                    if (Math.random() > 0.25) {
+                        appState.user.tokens += randomChallenge.reward;
+                        updateUserDisplay();
+                        showMessage(`🎉 ${player.name} completed the AI challenge! You earned ${randomChallenge.reward} tokens!`, 'success');
+                    } else {
+                        showMessage(`😔 ${player.name} declined the AI challenge`, 'info');
+                    }
+                }, Math.random() * 5000 + 2000);
+                
+            } catch (error) {
+                console.error('Error sending AI challenge:', error);
+                showMessage('❌ Failed to send AI challenge', 'error');
+            }
+        }
+        
+        async function sendWaveToPlayer(playerId) {
+            const player = appState.nearbyStrangers.find(p => p.id === playerId);
+            if (!player) return;
+            
+            showMessage(`👋 Wave sent to ${player.name}!`, 'success');
+            
+            setTimeout(() => {
+                if (Math.random() > 0.3) {
+                    appState.user.tokens += 5;
+                    updateUserDisplay();
+                    showMessage(`🌊 ${player.name} waved back! +5 tokens`, 'success');
+                } else {
+                    showMessage(`😔 ${player.name} didn't wave back`, 'info');
+                }
+            }, Math.random() * 3000 + 1000);
+        }
+        
+        async function addNearbyPlayerAsFriend(playerId) {
+            const player = appState.nearbyStrangers.find(p => p.id === playerId);
+            if (!player) return;
+            
+            showMessage(`👥 Friend request sent to ${player.name}!`, 'success');
+            
+            setTimeout(() => {
+                if (Math.random() > 0.4) {
+                    const newFriend = {
+                        id: player.id,
+                        name: player.name,
+                        avatar: player.avatar,
+                        online: true,
+                        tokens: Math.floor(Math.random() * 1000) + 500,
+                        level: Math.floor(Math.random() * 5) + 1
+                    };
+                    
+                    appState.friends.push(newFriend);
+                    appState.user.friends = appState.friends.length;
+                    renderFriends();
+                    updateUserDisplay();
+                    
+                    showMessage(`🎉 ${player.name} accepted your friend request!`, 'success');
+                } else {
+                    showMessage(`😔 ${player.name} declined your friend request`, 'info');
+                }
+            }, Math.random() * 3000 + 1000);
+        }
+        
+        async function sendAIChallengeToNearby() {
+            if (appState.nearbyStrangers.length === 0) {
+                showMessage('🔍 No nearby players found!', 'info');
+                return;
+            }
+            
+            if (appState.user.tokens < 25) {
+                showMessage('❌ Not enough tokens!', 'error');
+                return;
+            }
+            
+            const randomPlayer = appState.nearbyStrangers[Math.floor(Math.random() * appState.nearbyStrangers.length)];
+            await sendAIChallengeToPlayer(randomPlayer.id);
         }
 
         function loadAppContent() {
@@ -3386,6 +4274,9 @@
             // Initialize nearby players
             filterNearbyPlayersByRange(appState.detectionRange);
             renderNearbyPlayers();
+            
+            // Add How to Play button
+            showHowToPlayButton();
             
             document.getElementById('appContent').classList.add('loaded');
             document.getElementById('logoutBtn').style.display = 'block';
