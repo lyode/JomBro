@@ -6,7 +6,7 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="JomBro">
-    <title>JomBro - Friends & AI Challenge Platform</title>
+    <title>JomBro - AI Challenge System</title>
     
     <!-- Firebase SDK -->
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
@@ -234,6 +234,284 @@
             align-items: center;
             gap: 10px;
             text-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
+        }
+
+        /* AI Challenge Generator Section */
+        .ai-challenges-section {
+            margin-bottom: 20px;
+            border: 2px solid rgba(74, 144, 226, 0.3);
+            background: rgba(74, 144, 226, 0.05);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .ai-challenges-section::before {
+            content: '';
+            position: absolute;
+            top: -2px;
+            left: -2px;
+            right: -2px;
+            bottom: -2px;
+            background: linear-gradient(45deg, #4a90e2, #5c7cfa, #7c3aed, #4a90e2);
+            border-radius: 20px;
+            z-index: -1;
+            animation: borderGlow 3s ease-in-out infinite;
+        }
+
+        @keyframes borderGlow {
+            0%, 100% { opacity: 0.5; }
+            50% { opacity: 1; }
+        }
+
+        .ai-challenges-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .ai-challenges-title {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: #4a90e2;
+            text-shadow: 0 0 10px rgba(74, 144, 226, 0.5);
+        }
+
+        .ai-timer {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.9rem;
+            color: rgba(74, 144, 226, 0.8);
+            padding: 6px 12px;
+            background: rgba(74, 144, 226, 0.1);
+            border-radius: 15px;
+            border: 1px solid rgba(74, 144, 226, 0.3);
+        }
+
+        .ai-timer-count {
+            font-weight: bold;
+            color: #4a90e2;
+            text-shadow: 0 0 5px rgba(74, 144, 226, 0.7);
+        }
+
+        .ai-challenges-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .ai-challenge-card {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+            padding: 15px;
+            border: 1px solid rgba(74, 144, 226, 0.2);
+            transition: all 0.3s ease;
+            cursor: pointer;
+            position: relative;
+        }
+
+        .ai-challenge-card:hover {
+            background: rgba(74, 144, 226, 0.1);
+            border-color: rgba(74, 144, 226, 0.4);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(74, 144, 226, 0.2);
+        }
+
+        .ai-challenge-card.selected {
+            background: rgba(74, 144, 226, 0.2);
+            border-color: #4a90e2;
+            box-shadow: 0 0 20px rgba(74, 144, 226, 0.3);
+        }
+
+        .ai-challenge-category {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: rgba(74, 144, 226, 0.6);
+            color: white;
+            padding: 4px 8px;
+            border-radius: 10px;
+            font-size: 0.7rem;
+            font-weight: bold;
+        }
+
+        .ai-challenge-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: white;
+            padding-right: 80px;
+        }
+
+        .ai-challenge-description {
+            font-size: 0.9rem;
+            opacity: 0.8;
+            margin-bottom: 10px;
+            line-height: 1.4;
+        }
+
+        .ai-challenge-details {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.8rem;
+            opacity: 0.7;
+        }
+
+        .ai-challenge-reward {
+            color: #4a90e2;
+            font-weight: bold;
+            text-shadow: 0 0 5px rgba(74, 144, 226, 0.5);
+        }
+
+        .ai-challenge-actions {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .ai-challenge-target-selector {
+            display: none;
+            margin-top: 15px;
+            padding: 15px;
+            background: rgba(74, 144, 226, 0.1);
+            border-radius: 10px;
+            border: 1px solid rgba(74, 144, 226, 0.3);
+            animation: slideDown 0.3s ease;
+        }
+
+        .ai-challenge-target-selector.show {
+            display: block;
+        }
+
+        .target-selector-title {
+            font-size: 1rem;
+            font-weight: 600;
+            margin-bottom: 15px;
+            color: #4a90e2;
+        }
+
+        .target-tabs {
+            display: flex;
+            margin-bottom: 15px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            padding: 3px;
+        }
+
+        .target-tab {
+            flex: 1;
+            padding: 8px 12px;
+            text-align: center;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.9rem;
+        }
+
+        .target-tab.active {
+            background: rgba(74, 144, 226, 0.6);
+            color: white;
+        }
+
+        .target-list {
+            max-height: 200px;
+            overflow-y: auto;
+            margin-bottom: 15px;
+        }
+
+        .target-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+            margin-bottom: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .target-item:hover {
+            background: rgba(74, 144, 226, 0.1);
+        }
+
+        .target-item.selected {
+            background: rgba(74, 144, 226, 0.2);
+            border: 1px solid rgba(74, 144, 226, 0.5);
+        }
+
+        .target-checkbox {
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            border: 2px solid rgba(74, 144, 226, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+        }
+
+        .target-checkbox.checked {
+            background: #4a90e2;
+            border-color: #4a90e2;
+        }
+
+        .target-checkbox.checked::after {
+            content: '✓';
+            color: white;
+            font-size: 0.8rem;
+            font-weight: bold;
+        }
+
+        .target-avatar {
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            background: linear-gradient(45deg, #4a90e2, #5c7cfa);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            position: relative;
+        }
+
+        .target-online-indicator {
+            position: absolute;
+            bottom: -2px;
+            right: -2px;
+            width: 12px;
+            height: 12px;
+            background: #4ecdc4;
+            border-radius: 50%;
+            border: 2px solid #0a0a0a;
+        }
+
+        .target-info {
+            flex: 1;
+        }
+
+        .target-name {
+            font-size: 0.9rem;
+            font-weight: 500;
+            margin-bottom: 2px;
+        }
+
+        .target-status {
+            font-size: 0.8rem;
+            opacity: 0.7;
+        }
+
+        .send-challenge-actions {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
         }
 
         /* Quick Challenge Creator */
@@ -552,6 +830,11 @@
 
         .btn-secondary {
             background: rgba(255, 255, 255, 0.1);
+            color: white;
+        }
+
+        .btn-ai {
+            background: linear-gradient(45deg, #4a90e2, #5c7cfa);
             color: white;
         }
 
@@ -951,6 +1234,10 @@
             .quick-options {
                 grid-template-columns: 1fr;
             }
+            
+            .ai-challenges-grid {
+                grid-template-columns: 1fr;
+            }
         }
 
         /* Loading and Offline States */
@@ -1044,6 +1331,60 @@
                     <button class="btn btn-secondary btn-small" onclick="logoutUser()" id="logoutBtn" style="display: none;">
                         Logout
                     </button>
+                </div>
+            </div>
+
+            <!-- AI Challenge Generator -->
+            <div class="card floating-element ai-challenges-section">
+                <div class="ai-challenges-header">
+                    <div class="ai-challenges-title">
+                        <span>🤖</span>
+                        <span>AI Challenge Generator</span>
+                    </div>
+                    <div class="ai-timer">
+                        <span>⏱️</span>
+                        <span>Next: <span class="ai-timer-count" id="aiTimerCount">2:00</span></span>
+                    </div>
+                </div>
+                
+                <div class="ai-challenges-grid" id="aiChallengesGrid">
+                    <!-- AI Generated challenges will be populated here -->
+                </div>
+                
+                <div class="ai-challenge-actions">
+                    <button class="btn btn-ai" onclick="generateAIChallenges()" id="generateBtn">
+                        🎯 Generate New Challenges
+                    </button>
+                    <button class="btn btn-secondary" onclick="toggleAIChallenge()" id="toggleAIBtn">
+                        ⏸️ Pause Timer
+                    </button>
+                </div>
+                
+                <!-- Target Selector (Hidden by default) -->
+                <div class="ai-challenge-target-selector" id="targetSelector">
+                    <div class="target-selector-title">
+                        <span>🎯</span>
+                        <span>Send Challenge To:</span>
+                    </div>
+                    
+                    <div class="target-tabs">
+                        <div class="target-tab active" onclick="switchTargetTab('friends')">Friends</div>
+                        <div class="target-tab" onclick="switchTargetTab('nearby')">Nearby</div>
+                        <div class="target-tab" onclick="switchTargetTab('random')">Random</div>
+                    </div>
+                    
+                    <div class="target-list" id="targetList">
+                        <!-- Target list will be populated here -->
+                    </div>
+                    
+                    <div class="send-challenge-actions">
+                        <button class="btn btn-primary" onclick="sendSelectedAIChallenge()" id="sendChallengeBtn">
+                            Send Challenge (25 tokens)
+                        </button>
+                        <button class="btn btn-secondary" onclick="cancelChallengeSelection()">
+                            Cancel
+                        </button>
+                    </div>
                 </div>
             </div>
 
@@ -1265,6 +1606,16 @@
         let isOnline = navigator.onLine;
         let unsubscribeFunctions = [];
         
+        // AI Challenge System Variables
+        let aiChallengeTimer = null;
+        let aiChallengeInterval = 120000; // 2 minutes in milliseconds
+        let aiChallengeActive = true;
+        let currentAIChallenges = [];
+        let selectedAIChallenge = null;
+        let selectedTargets = [];
+        let aiTimerCountdown = 120; // 2 minutes in seconds
+        let aiTimerInterval = null;
+        
         // Application State
         let appState = {
             user: {
@@ -1284,6 +1635,300 @@
             isHiddenFromNearby: false
         };
 
+        // AI Challenge Database - Comprehensive challenges for all categories
+        const aiChallengeDatabase = {
+            fitness: [
+                {
+                    title: "Perfect Plank Challenge",
+                    description: "Hold a plank position for 60 seconds with perfect form. Show your stopwatch!",
+                    difficulty: "medium",
+                    reward: 150,
+                    timeLimit: 24
+                },
+                {
+                    title: "Stairs Sprint",
+                    description: "Run up and down a flight of stairs 5 times. Record your time!",
+                    difficulty: "hard",
+                    reward: 200,
+                    timeLimit: 12
+                },
+                {
+                    title: "Push-Up Power",
+                    description: "Do 20 push-ups in under 2 minutes. Show your form!",
+                    difficulty: "medium",
+                    reward: 125,
+                    timeLimit: 18
+                },
+                {
+                    title: "Squat Squad",
+                    description: "Complete 30 squats with proper form. Film yourself!",
+                    difficulty: "easy",
+                    reward: 100,
+                    timeLimit: 24
+                },
+                {
+                    title: "Yoga Flow",
+                    description: "Do a 5-minute yoga flow. Show your best poses!",
+                    difficulty: "easy",
+                    reward: 75,
+                    timeLimit: 36
+                },
+                {
+                    title: "Jumping Jacks Jam",
+                    description: "Do 50 jumping jacks non-stop. Show your energy!",
+                    difficulty: "easy",
+                    reward: 100,
+                    timeLimit: 24
+                },
+                {
+                    title: "Wall Sit Challenge",
+                    description: "Hold a wall sit for 90 seconds. Show your determination!",
+                    difficulty: "medium",
+                    reward: 175,
+                    timeLimit: 18
+                },
+                {
+                    title: "Burpee Blast",
+                    description: "Complete 15 burpees. Show your full-body workout!",
+                    difficulty: "hard",
+                    reward: 225,
+                    timeLimit: 12
+                }
+            ],
+            creative: [
+                {
+                    title: "Doodle Master",
+                    description: "Draw a self-portrait using only your non-dominant hand!",
+                    difficulty: "medium",
+                    reward: 150,
+                    timeLimit: 24
+                },
+                {
+                    title: "Origami Expert",
+                    description: "Fold a paper crane and take a photo with it on your head!",
+                    difficulty: "easy",
+                    reward: 100,
+                    timeLimit: 36
+                },
+                {
+                    title: "Poetry Slam",
+                    description: "Write and perform a 30-second poem about your day!",
+                    difficulty: "medium",
+                    reward: 175,
+                    timeLimit: 18
+                },
+                {
+                    title: "Craft Creation",
+                    description: "Make something useful from recycled materials!",
+                    difficulty: "hard",
+                    reward: 250,
+                    timeLimit: 48
+                },
+                {
+                    title: "Photo Story",
+                    description: "Tell a story using only 5 photos you take today!",
+                    difficulty: "medium",
+                    reward: 125,
+                    timeLimit: 24
+                },
+                {
+                    title: "Quick Sketch",
+                    description: "Draw your favorite animal in under 5 minutes!",
+                    difficulty: "easy",
+                    reward: 75,
+                    timeLimit: 24
+                },
+                {
+                    title: "Music Maker",
+                    description: "Create a 15-second beat using only household items!",
+                    difficulty: "medium",
+                    reward: 150,
+                    timeLimit: 18
+                },
+                {
+                    title: "Digital Art",
+                    description: "Create digital art using only your phone!",
+                    difficulty: "medium",
+                    reward: 175,
+                    timeLimit: 36
+                }
+            ],
+            social: [
+                {
+                    title: "Random Act of Kindness",
+                    description: "Do something nice for a stranger and share the story!",
+                    difficulty: "easy",
+                    reward: 200,
+                    timeLimit: 24
+                },
+                {
+                    title: "Compliment Chain",
+                    description: "Give genuine compliments to 5 different people today!",
+                    difficulty: "medium",
+                    reward: 150,
+                    timeLimit: 12
+                },
+                {
+                    title: "New Friend Quest",
+                    description: "Start a conversation with someone new and learn their name!",
+                    difficulty: "medium",
+                    reward: 175,
+                    timeLimit: 18
+                },
+                {
+                    title: "Family Time",
+                    description: "Spend 30 minutes doing something fun with family!",
+                    difficulty: "easy",
+                    reward: 100,
+                    timeLimit: 24
+                },
+                {
+                    title: "Thank You Note",
+                    description: "Write a heartfelt thank you message to someone special!",
+                    difficulty: "easy",
+                    reward: 125,
+                    timeLimit: 36
+                },
+                {
+                    title: "Community Helper",
+                    description: "Help someone in your neighborhood or community!",
+                    difficulty: "medium",
+                    reward: 200,
+                    timeLimit: 24
+                },
+                {
+                    title: "Share Your Skills",
+                    description: "Teach someone something you're good at!",
+                    difficulty: "hard",
+                    reward: 225,
+                    timeLimit: 48
+                },
+                {
+                    title: "Group Activity",
+                    description: "Organize a fun activity with friends or family!",
+                    difficulty: "hard",
+                    reward: 250,
+                    timeLimit: 36
+                }
+            ],
+            food: [
+                {
+                    title: "Smoothie Master",
+                    description: "Create a healthy smoothie with at least 3 fruits!",
+                    difficulty: "easy",
+                    reward: 100,
+                    timeLimit: 24
+                },
+                {
+                    title: "No-Cook Creation",
+                    description: "Make a delicious meal without using heat!",
+                    difficulty: "medium",
+                    reward: 150,
+                    timeLimit: 18
+                },
+                {
+                    title: "Pancake Art",
+                    description: "Make pancakes in fun shapes or designs!",
+                    difficulty: "medium",
+                    reward: 175,
+                    timeLimit: 24
+                },
+                {
+                    title: "Spice Master",
+                    description: "Cook something using a spice you've never used before!",
+                    difficulty: "hard",
+                    reward: 200,
+                    timeLimit: 36
+                },
+                {
+                    title: "Healthy Snack",
+                    description: "Create a nutritious snack under 100 calories!",
+                    difficulty: "easy",
+                    reward: 75,
+                    timeLimit: 24
+                },
+                {
+                    title: "Leftover Magic",
+                    description: "Transform leftovers into something completely new!",
+                    difficulty: "medium",
+                    reward: 125,
+                    timeLimit: 18
+                },
+                {
+                    title: "Baking Challenge",
+                    description: "Bake something sweet from scratch!",
+                    difficulty: "hard",
+                    reward: 225,
+                    timeLimit: 48
+                },
+                {
+                    title: "Fusion Cuisine",
+                    description: "Combine two different cuisines in one dish!",
+                    difficulty: "hard",
+                    reward: 250,
+                    timeLimit: 36
+                }
+            ],
+            adventure: [
+                {
+                    title: "Local Explorer",
+                    description: "Visit a place in your city you've never been to!",
+                    difficulty: "easy",
+                    reward: 150,
+                    timeLimit: 24
+                },
+                {
+                    title: "Nature Walk",
+                    description: "Take a 30-minute walk in nature and photograph 5 different plants!",
+                    difficulty: "easy",
+                    reward: 100,
+                    timeLimit: 36
+                },
+                {
+                    title: "Photo Hunt",
+                    description: "Find and photograph 10 different colored objects in your area!",
+                    difficulty: "medium",
+                    reward: 125,
+                    timeLimit: 18
+                },
+                {
+                    title: "Sunrise/Sunset",
+                    description: "Watch and photograph either sunrise or sunset today!",
+                    difficulty: "easy",
+                    reward: 175,
+                    timeLimit: 24
+                },
+                {
+                    title: "Geocaching",
+                    description: "Find a hidden treasure using GPS coordinates (or hide one)!",
+                    difficulty: "hard",
+                    reward: 250,
+                    timeLimit: 48
+                },
+                {
+                    title: "Transportation Adventure",
+                    description: "Use a mode of transport you don't usually use!",
+                    difficulty: "medium",
+                    reward: 150,
+                    timeLimit: 24
+                },
+                {
+                    title: "Weather Challenge",
+                    description: "Do an outdoor activity despite the weather!",
+                    difficulty: "medium",
+                    reward: 200,
+                    timeLimit: 12
+                },
+                {
+                    title: "Night Adventure",
+                    description: "Safely explore your neighborhood after dark!",
+                    difficulty: "hard",
+                    reward: 225,
+                    timeLimit: 18
+                }
+            ]
+        };
+
         // Initialize Firebase and App
         async function initApp() {
             try {
@@ -1298,9 +1943,11 @@
                     if (user) {
                         currentUser = user;
                         await loadUserSession(user);
+                        initializeAIChallenge();
                     } else {
                         currentUser = null;
                         showAuthModal();
+                        stopAIChallenge();
                         // Clean up subscriptions
                         unsubscribeFunctions.forEach(unsubscribe => unsubscribe());
                         unsubscribeFunctions = [];
@@ -1318,6 +1965,435 @@
             createStarfield();
             monitorConnection();
             setupEventListeners();
+        }
+
+        // AI Challenge System Functions
+        function initializeAIChallenge() {
+            console.log('🤖 Initializing AI Challenge System...');
+            
+            // Generate initial challenges
+            generateAIChallenges();
+            
+            // Start the timer
+            startAITimer();
+            
+            // Start countdown display
+            startTimerCountdown();
+            
+            showMessage('🤖 AI Challenge System activated!', 'success');
+        }
+
+        function generateAIChallenges() {
+            console.log('🎯 Generating AI Challenges...');
+            
+            // Clear previous challenges
+            currentAIChallenges = [];
+            
+            // Get all categories
+            const categories = Object.keys(aiChallengeDatabase);
+            
+            // Generate 3 random challenges from different categories
+            for (let i = 0; i < 3; i++) {
+                const randomCategory = categories[Math.floor(Math.random() * categories.length)];
+                const categoryPool = aiChallengeDatabase[randomCategory];
+                const randomChallenge = categoryPool[Math.floor(Math.random() * categoryPool.length)];
+                
+                // Add some randomness to rewards
+                const rewardVariation = Math.floor(Math.random() * 50) - 25; // -25 to +25
+                const adjustedReward = Math.max(50, randomChallenge.reward + rewardVariation);
+                
+                const challenge = {
+                    id: `ai_${Date.now()}_${i}`,
+                    title: randomChallenge.title,
+                    description: randomChallenge.description,
+                    category: randomCategory,
+                    difficulty: randomChallenge.difficulty,
+                    reward: adjustedReward,
+                    timeLimit: randomChallenge.timeLimit,
+                    createdAt: new Date(),
+                    isAI: true
+                };
+                
+                currentAIChallenges.push(challenge);
+            }
+            
+            renderAIChallenges();
+            console.log(`✅ Generated ${currentAIChallenges.length} AI challenges`);
+        }
+
+        function renderAIChallenges() {
+            const aiChallengesGrid = document.getElementById('aiChallengesGrid');
+            if (!aiChallengesGrid) return;
+            
+            aiChallengesGrid.innerHTML = '';
+            
+            currentAIChallenges.forEach((challenge, index) => {
+                const challengeCard = document.createElement('div');
+                challengeCard.className = 'ai-challenge-card';
+                challengeCard.setAttribute('data-challenge-id', challenge.id);
+                challengeCard.onclick = () => selectAIChallenge(challenge.id);
+                
+                const difficultyColor = {
+                    'easy': '#4CAF50',
+                    'medium': '#FF9800',
+                    'hard': '#F44336'
+                };
+                
+                challengeCard.innerHTML = `
+                    <div class="ai-challenge-category" style="background: ${difficultyColor[challenge.difficulty]};">
+                        ${getCategoryIcon(challenge.category)} ${challenge.difficulty.toUpperCase()}
+                    </div>
+                    <div class="ai-challenge-title">${challenge.title}</div>
+                    <div class="ai-challenge-description">${challenge.description}</div>
+                    <div class="ai-challenge-details">
+                        <span>⏱️ ${challenge.timeLimit}h limit</span>
+                        <span class="ai-challenge-reward">+${challenge.reward} tokens</span>
+                    </div>
+                `;
+                
+                aiChallengesGrid.appendChild(challengeCard);
+            });
+        }
+
+        function selectAIChallenge(challengeId) {
+            // Remove previous selection
+            document.querySelectorAll('.ai-challenge-card').forEach(card => {
+                card.classList.remove('selected');
+            });
+            
+            // Select new challenge
+            const challengeCard = document.querySelector(`[data-challenge-id="${challengeId}"]`);
+            if (challengeCard) {
+                challengeCard.classList.add('selected');
+                selectedAIChallenge = currentAIChallenges.find(c => c.id === challengeId);
+                
+                // Show target selector
+                document.getElementById('targetSelector').classList.add('show');
+                
+                // Load targets
+                loadTargets('friends');
+                
+                showMessage(`🎯 Selected: ${selectedAIChallenge.title}`, 'success');
+            }
+        }
+
+        function switchTargetTab(tabType) {
+            // Update active tab
+            document.querySelectorAll('.target-tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            event.target.classList.add('active');
+            
+            // Load targets for selected tab
+            loadTargets(tabType);
+        }
+
+        function loadTargets(tabType) {
+            const targetList = document.getElementById('targetList');
+            if (!targetList) return;
+            
+            targetList.innerHTML = '';
+            selectedTargets = [];
+            
+            if (tabType === 'friends') {
+                if (appState.friends.length === 0) {
+                    targetList.innerHTML = `
+                        <div class="empty-state">
+                            <p>👥 No friends available</p>
+                            <p style="font-size: 0.8rem; opacity: 0.7;">Add some friends first!</p>
+                        </div>
+                    `;
+                    return;
+                }
+                
+                appState.friends.forEach(friend => {
+                    const targetItem = document.createElement('div');
+                    targetItem.className = 'target-item';
+                    targetItem.onclick = () => toggleTarget(friend.id, targetItem);
+                    
+                    targetItem.innerHTML = `
+                        <div class="target-checkbox"></div>
+                        <div class="target-avatar">
+                            ${friend.avatar}
+                            ${friend.online ? '<div class="target-online-indicator"></div>' : ''}
+                        </div>
+                        <div class="target-info">
+                            <div class="target-name">${friend.name}</div>
+                            <div class="target-status">
+                                ${friend.online ? 'Online • Ready' : 'Offline'} • Level ${friend.level}
+                            </div>
+                        </div>
+                    `;
+                    
+                    targetList.appendChild(targetItem);
+                });
+                
+            } else if (tabType === 'nearby') {
+                if (appState.nearbyStrangers.length === 0) {
+                    targetList.innerHTML = `
+                        <div class="empty-state">
+                            <p>🔍 No nearby players</p>
+                            <p style="font-size: 0.8rem; opacity: 0.7;">Try refreshing or increasing range!</p>
+                        </div>
+                    `;
+                    return;
+                }
+                
+                appState.nearbyStrangers.forEach(stranger => {
+                    const targetItem = document.createElement('div');
+                    targetItem.className = 'target-item';
+                    targetItem.onclick = () => toggleTarget(stranger.id, targetItem);
+                    
+                    targetItem.innerHTML = `
+                        <div class="target-checkbox"></div>
+                        <div class="target-avatar">
+                            ${stranger.avatar}
+                            <div class="target-online-indicator"></div>
+                        </div>
+                        <div class="target-info">
+                            <div class="target-name">${stranger.name}</div>
+                            <div class="target-status">
+                                ${stranger.distance} away • Online
+                            </div>
+                        </div>
+                    `;
+                    
+                    targetList.appendChild(targetItem);
+                });
+                
+            } else if (tabType === 'random') {
+                targetList.innerHTML = `
+                    <div style="text-align: center; padding: 20px;">
+                        <div style="font-size: 2rem; margin-bottom: 10px;">🎲</div>
+                        <div style="font-size: 1.1rem; font-weight: 600; margin-bottom: 8px;">Random Challenge</div>
+                        <p style="font-size: 0.9rem; opacity: 0.8;">Send this challenge to a random player from your friends and nearby players!</p>
+                    </div>
+                `;
+                
+                // Auto-select random mode
+                selectedTargets = ['random'];
+            }
+        }
+
+        function toggleTarget(targetId, targetElement) {
+            const checkbox = targetElement.querySelector('.target-checkbox');
+            const isSelected = selectedTargets.includes(targetId);
+            
+            if (isSelected) {
+                // Remove from selection
+                selectedTargets = selectedTargets.filter(id => id !== targetId);
+                targetElement.classList.remove('selected');
+                checkbox.classList.remove('checked');
+            } else {
+                // Add to selection
+                selectedTargets.push(targetId);
+                targetElement.classList.add('selected');
+                checkbox.classList.add('checked');
+            }
+            
+            // Update send button
+            updateSendButton();
+        }
+
+        function updateSendButton() {
+            const sendBtn = document.getElementById('sendChallengeBtn');
+            if (!sendBtn) return;
+            
+            const cost = selectedTargets.length * 25;
+            const isRandomMode = selectedTargets.includes('random');
+            
+            if (selectedTargets.length === 0) {
+                sendBtn.textContent = 'Select targets first';
+                sendBtn.disabled = true;
+            } else if (isRandomMode) {
+                sendBtn.textContent = 'Send to Random Player (25 tokens)';
+                sendBtn.disabled = appState.user.tokens < 25;
+            } else {
+                sendBtn.textContent = `Send to ${selectedTargets.length} player${selectedTargets.length > 1 ? 's' : ''} (${cost} tokens)`;
+                sendBtn.disabled = appState.user.tokens < cost;
+            }
+        }
+
+        async function sendSelectedAIChallenge() {
+            if (!selectedAIChallenge || selectedTargets.length === 0) {
+                showMessage('❌ Please select a challenge and targets!', 'error');
+                return;
+            }
+            
+            const isRandomMode = selectedTargets.includes('random');
+            const cost = isRandomMode ? 25 : selectedTargets.length * 25;
+            
+            if (appState.user.tokens < cost) {
+                showMessage('❌ Not enough tokens!', 'error');
+                return;
+            }
+            
+            try {
+                const sendBtn = document.getElementById('sendChallengeBtn');
+                sendBtn.disabled = true;
+                sendBtn.classList.add('loading');
+                
+                let actualTargets = [];
+                
+                if (isRandomMode) {
+                    // Select random target from friends and nearby
+                    const allTargets = [...appState.friends, ...appState.nearbyStrangers];
+                    if (allTargets.length > 0) {
+                        const randomTarget = allTargets[Math.floor(Math.random() * allTargets.length)];
+                        actualTargets = [randomTarget.id];
+                    }
+                } else {
+                    actualTargets = selectedTargets;
+                }
+                
+                if (actualTargets.length === 0) {
+                    showMessage('❌ No available targets!', 'error');
+                    return;
+                }
+                
+                // Create Firebase challenge
+                const challengeData = {
+                    title: selectedAIChallenge.title,
+                    description: selectedAIChallenge.description,
+                    category: selectedAIChallenge.category,
+                    reward: selectedAIChallenge.reward,
+                    difficulty: selectedAIChallenge.difficulty,
+                    timeLimit: selectedAIChallenge.timeLimit,
+                    creatorId: 'AI',
+                    creatorName: 'AI Challenge System',
+                    senderId: currentUser.uid,
+                    senderName: appState.user.name,
+                    participants: [currentUser.uid, ...actualTargets],
+                    status: 'active',
+                    responses: {},
+                    createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+                    expiresAt: new Date(Date.now() + selectedAIChallenge.timeLimit * 60 * 60 * 1000),
+                    isAI: true
+                };
+                
+                // Add to Firebase
+                await db.collection('challenges').add(challengeData);
+                
+                // Deduct tokens
+                await db.collection('users').doc(currentUser.uid).update({
+                    tokens: firebase.firestore.FieldValue.increment(-cost)
+                });
+                
+                appState.user.tokens -= cost;
+                updateUserDisplay();
+                
+                // Get target names for feedback
+                const targetNames = actualTargets.map(targetId => {
+                    const friend = appState.friends.find(f => f.id === targetId);
+                    const stranger = appState.nearbyStrangers.find(s => s.id === targetId);
+                    return friend ? friend.name : stranger ? stranger.name : 'Unknown';
+                });
+                
+                cancelChallengeSelection();
+                
+                showMessage(`🎯 AI Challenge sent to ${targetNames.join(', ')}! (-${cost} tokens)`, 'success');
+                console.log('✅ AI Challenge sent successfully');
+                
+            } catch (error) {
+                console.error('Error sending AI challenge:', error);
+                showMessage('❌ Failed to send challenge. Please try again.', 'error');
+            } finally {
+                const sendBtn = document.getElementById('sendChallengeBtn');
+                sendBtn.disabled = false;
+                sendBtn.classList.remove('loading');
+            }
+        }
+
+        function cancelChallengeSelection() {
+            // Clear selection
+            selectedAIChallenge = null;
+            selectedTargets = [];
+            
+            // Remove visual selection
+            document.querySelectorAll('.ai-challenge-card').forEach(card => {
+                card.classList.remove('selected');
+            });
+            
+            // Hide target selector
+            document.getElementById('targetSelector').classList.remove('show');
+            
+            // Reset send button
+            updateSendButton();
+        }
+
+        function startAITimer() {
+            if (aiChallengeTimer) {
+                clearInterval(aiChallengeTimer);
+            }
+            
+            aiChallengeTimer = setInterval(() => {
+                if (aiChallengeActive) {
+                    generateAIChallenges();
+                    showMessage('🤖 New AI challenges generated!', 'info');
+                    
+                    // Reset countdown
+                    aiTimerCountdown = 120;
+                }
+            }, aiChallengeInterval);
+            
+            console.log('⏰ AI Challenge timer started (2 minutes)');
+        }
+
+        function startTimerCountdown() {
+            if (aiTimerInterval) {
+                clearInterval(aiTimerInterval);
+            }
+            
+            aiTimerInterval = setInterval(() => {
+                if (aiChallengeActive && aiTimerCountdown > 0) {
+                    aiTimerCountdown--;
+                    updateTimerDisplay();
+                }
+            }, 1000);
+        }
+
+        function updateTimerDisplay() {
+            const timerElement = document.getElementById('aiTimerCount');
+            if (!timerElement) return;
+            
+            const minutes = Math.floor(aiTimerCountdown / 60);
+            const seconds = aiTimerCountdown % 60;
+            timerElement.textContent = `${minutes}:${seconds.toString().padStart(2, '0')}`;
+        }
+
+        function stopAIChallenge() {
+            if (aiChallengeTimer) {
+                clearInterval(aiChallengeTimer);
+                aiChallengeTimer = null;
+            }
+            
+            if (aiTimerInterval) {
+                clearInterval(aiTimerInterval);
+                aiTimerInterval = null;
+            }
+            
+            console.log('🛑 AI Challenge system stopped');
+        }
+
+        function toggleAIChallenge() {
+            aiChallengeActive = !aiChallengeActive;
+            const toggleBtn = document.getElementById('toggleAIBtn');
+            
+            if (aiChallengeActive) {
+                toggleBtn.textContent = '⏸️ Pause Timer';
+                toggleBtn.classList.remove('btn-primary');
+                toggleBtn.classList.add('btn-secondary');
+                showMessage('▶️ AI Challenge timer resumed!', 'success');
+                
+                // Reset countdown
+                aiTimerCountdown = 120;
+                startTimerCountdown();
+            } else {
+                toggleBtn.textContent = '▶️ Resume Timer';
+                toggleBtn.classList.remove('btn-secondary');
+                toggleBtn.classList.add('btn-primary');
+                showMessage('⏸️ AI Challenge timer paused', 'info');
+            }
         }
 
         // Load user session with real Firebase data
@@ -1420,6 +2496,15 @@
                     appState.user.friends = friends.length;
                     renderFriends();
                     updateUserDisplay();
+                    
+                    // Update target selector if visible
+                    if (document.getElementById('targetSelector').classList.contains('show')) {
+                        const activeTab = document.querySelector('.target-tab.active');
+                        if (activeTab && activeTab.textContent.includes('Friends')) {
+                            loadTargets('friends');
+                        }
+                    }
+                    
                     console.log(`✅ Loaded ${friends.length} friends in real-time`);
                 }, (error) => {
                     console.error('Friends listener error:', error);
@@ -1461,6 +2546,7 @@
                         appState.user.tokens = userData.tokens || 0;
                         appState.user.level = userData.level || 1;
                         updateUserDisplay();
+                        updateSendButton(); // Update AI challenge send button
                         console.log('💰 Real-time user stats updated');
                     }
                 }, (error) => {
@@ -1585,6 +2671,9 @@
                     console.log('✅ User status updated to offline');
                 }
                 
+                // Stop AI Challenge system
+                stopAIChallenge();
+                
                 // Clean up all listeners
                 unsubscribeFunctions.forEach(unsubscribe => unsubscribe());
                 unsubscribeFunctions = [];
@@ -1602,6 +2691,11 @@
                     challenges: [],
                     quickChallengeActive: true
                 };
+                
+                // Reset AI challenge state
+                currentAIChallenges = [];
+                selectedAIChallenge = null;
+                selectedTargets = [];
                 
             } catch (error) {
                 console.error('Logout error:', error);
@@ -1651,7 +2745,8 @@
                     status: 'active',
                     responses: {},
                     createdAt: firebase.firestore.FieldValue.serverTimestamp(),
-                    expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000) // 24 hours from now
+                    expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000), // 24 hours from now
+                    isAI: false
                 };
                 
                 // Add to Firebase database
@@ -2146,34 +3241,40 @@
                 challengeElement.className = 'challenge-item';
                 
                 const isCreator = challenge.creatorId === currentUser.uid;
+                const isSender = challenge.senderId === currentUser.uid;
                 const userResponse = challenge.responses && challenge.responses[currentUser.uid];
                 const responseStatus = userResponse ? userResponse.response : 'pending';
                 
                 let actionButtons = '';
-                if (!isCreator && responseStatus === 'pending') {
+                if (!isCreator && !isSender && responseStatus === 'pending') {
                     actionButtons = `
                         <button class="btn btn-primary btn-small" onclick="respondToChallenge('${challenge.id}', 'accepted')">Accept</button>
                         <button class="btn btn-secondary btn-small" onclick="respondToChallenge('${challenge.id}', 'declined')">Decline</button>
                     `;
-                } else if (!isCreator && responseStatus === 'accepted') {
+                } else if (!isCreator && !isSender && responseStatus === 'accepted') {
                     actionButtons = `
                         <button class="btn btn-primary btn-small" onclick="respondToChallenge('${challenge.id}', 'completed')">Mark Complete</button>
                     `;
-                } else if (isCreator) {
+                } else if (isCreator || isSender) {
                     const responseCount = Object.keys(challenge.responses || {}).length;
                     const participantCount = challenge.participants.length - 1; // Exclude creator
                     actionButtons = `<span style="opacity: 0.7;">${responseCount}/${participantCount} responded</span>`;
                 }
                 
+                const creatorDisplay = challenge.isAI ? 
+                    `🤖 ${challenge.creatorName} (sent by ${challenge.senderName})` : 
+                    challenge.creatorName;
+                
                 challengeElement.innerHTML = `
                     <div style="margin-bottom: 10px;">
                         <h4 style="margin: 0; display: flex; align-items: center; gap: 8px;">
                             ${getCategoryIcon(challenge.category)} ${challenge.title}
-                            ${isCreator ? '<span style="font-size: 0.7rem; background: rgba(155, 89, 182, 0.3); padding: 2px 8px; border-radius: 10px;">Created by you</span>' : ''}
+                            ${challenge.isAI ? '<span style="font-size: 0.7rem; background: rgba(74, 144, 226, 0.6); padding: 2px 8px; border-radius: 10px; color: white;">AI Generated</span>' : ''}
+                            ${(isCreator || isSender) ? '<span style="font-size: 0.7rem; background: rgba(155, 89, 182, 0.3); padding: 2px 8px; border-radius: 10px;">Created by you</span>' : ''}
                         </h4>
                         <p style="margin: 5px 0; opacity: 0.8; font-size: 0.9rem;">${challenge.description}</p>
                         <p style="margin: 5px 0; font-size: 0.8rem; opacity: 0.6;">
-                            By ${challenge.creatorName} • ${challenge.reward} tokens • ${formatTimeAgo(challenge.createdAt)}
+                            By ${creatorDisplay} • ${challenge.reward} tokens • ${formatTimeAgo(challenge.createdAt)}
                         </p>
                     </div>
                     <div style="display: flex; gap: 8px; align-items: center; justify-content: space-between;">
@@ -2207,77 +3308,6 @@
                             <button onclick="closeAddFriendModal()" style="background: none; border: none; color: white; font-size: 1.5rem; cursor: pointer;">✕</button>
                         </div>
                         
-                        <!-- Social Media Import -->
-                        <div style="margin-bottom: 25px;">
-                            <h4 style="margin: 0 0 15px 0; color: white; font-size: 1rem;">📱 Import from Social Media</h4>
-                            <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px;">
-                                <button class="btn btn-primary" onclick="importFromWhatsApp()" style="background: linear-gradient(45deg, #25D366, #128C7E); display: flex; align-items: center; gap: 8px; justify-content: center;">
-                                    <span>📱</span>
-                                    <span>WhatsApp</span>
-                                </button>
-                                <button class="btn btn-primary" onclick="importFromInstagram()" style="background: linear-gradient(45deg, #E4405F, #C13584); display: flex; align-items: center; gap: 8px; justify-content: center;">
-                                    <span>📷</span>
-                                    <span>Instagram</span>
-                                </button>
-                                <button class="btn btn-primary" onclick="importFromFacebook()" style="background: linear-gradient(45deg, #1877F2, #42A5F5); display: flex; align-items: center; gap: 8px; justify-content: center;">
-                                    <span>📘</span>
-                                    <span>Facebook</span>
-                                </button>
-                                <button class="btn btn-primary" onclick="importFromTwitter()" style="background: linear-gradient(45deg, #1DA1F2, #0d8bd9); display: flex; align-items: center; gap: 8px; justify-content: center;">
-                                    <span>🐦</span>
-                                    <span>Twitter</span>
-                                </button>
-                                <button class="btn btn-primary" onclick="importFromTikTok()" style="background: linear-gradient(45deg, #000000, #ff0050); display: flex; align-items: center; gap: 8px; justify-content: center;">
-                                    <span>🎵</span>
-                                    <span>TikTok</span>
-                                </button>
-                                <button class="btn btn-primary" onclick="importFromLinkedIn()" style="background: linear-gradient(45deg, #0077B5, #005885); display: flex; align-items: center; gap: 8px; justify-content: center;">
-                                    <span>💼</span>
-                                    <span>LinkedIn</span>
-                                </button>
-                            </div>
-                        </div>
-                        
-                        <!-- QR Code Sharing -->
-                        <div style="margin-bottom: 25px; text-align: center;">
-                            <h4 style="margin: 0 0 15px 0; color: white; font-size: 1rem;">📱 Share Your Profile</h4>
-                            <div style="background: rgba(255, 255, 255, 0.1); border-radius: 15px; padding: 20px; border: 1px solid rgba(255, 255, 255, 0.2);">
-                                <div id="qrCodeContainer" style="margin-bottom: 15px;">
-                                    <!-- QR Code will be generated here -->
-                                    <div style="width: 150px; height: 150px; margin: 0 auto; background: white; border-radius: 10px; display: flex; align-items: center; justify-content: center; color: black; font-weight: bold; font-size: 0.9rem; text-align: center;">
-                                        QR Code<br/>Coming Soon
-                                    </div>
-                                </div>
-                                <div style="display: flex; gap: 10px; justify-content: center; flex-wrap: wrap;">
-                                    <button class="btn btn-secondary btn-small" onclick="shareViaWhatsApp()">
-                                        📱 WhatsApp
-                                    </button>
-                                    <button class="btn btn-secondary btn-small" onclick="shareViaMessenger()">
-                                        💬 Messenger
-                                    </button>
-                                    <button class="btn btn-secondary btn-small" onclick="copyInviteLink()">
-                                        🔗 Copy Link
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <!-- Nearby Users -->
-                        <div style="margin-bottom: 25px;">
-                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
-                                <h4 style="margin: 0; color: white; font-size: 1rem;">📍 Nearby Players</h4>
-                                <button class="btn btn-secondary btn-small" onclick="scanNearbyUsers()">
-                                    🔄 Scan
-                                </button>
-                            </div>
-                            <div id="nearbyUsersList" style="max-height: 150px; overflow-y: auto;">
-                                <!-- Nearby users will be populated here -->
-                                <div style="text-align: center; opacity: 0.6; padding: 20px;">
-                                    <p>🔍 Click "Scan" to find nearby JomBro players</p>
-                                </div>
-                            </div>
-                        </div>
-                        
                         <!-- Manual Email Add -->
                         <div style="margin-bottom: 20px;">
                             <h4 style="margin: 0 0 15px 0; color: white; font-size: 1rem;">📧 Add by Email</h4>
@@ -2288,328 +3318,17 @@
                                 </button>
                             </div>
                         </div>
-                        
-                        <!-- Phone Contacts -->
-                        <div style="margin-bottom: 20px;">
-                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
-                                <h4 style="margin: 0; color: white; font-size: 1rem;">📞 Phone Contacts</h4>
-                                <button class="btn btn-secondary btn-small" onclick="importPhoneContacts()">
-                                    📱 Import
-                                </button>
-                            </div>
-                            <div id="phoneContactsList" style="max-height: 120px; overflow-y: auto;">
-                                <div style="text-align: center; opacity: 0.6; padding: 15px;">
-                                    <p>📱 Import contacts to find friends on JomBro</p>
-                                </div>
-                            </div>
-                        </div>
                     </div>
                 </div>
             `;
             
             document.body.insertAdjacentHTML('beforeend', modalHtml);
-            
-            // Generate user invite link
-            generateInviteLink();
         }
 
         function closeAddFriendModal() {
             const modal = document.getElementById('addFriendModal');
             if (modal) {
                 modal.remove();
-            }
-        }
-
-        // Social Media Import Functions
-        async function importFromWhatsApp() {
-            showMessage('📱 Opening WhatsApp integration...', 'info');
-            
-            // In a real app, this would use WhatsApp Business API or Web API
-            // For now, we'll simulate and provide sharing functionality
-            try {
-                if (navigator.share) {
-                    await navigator.share({
-                        title: 'Join me on JomBro!',
-                        text: `Hey! I'm challenging friends on JomBro. Join me: ${generateInviteLink()}`,
-                        url: window.location.origin
-                    });
-                } else {
-                    // Fallback to WhatsApp Web
-                    const message = encodeURIComponent(`Hey! I'm challenging friends on JomBro. Join me: ${generateInviteLink()}`);
-                    window.open(`https://wa.me/?text=${message}`, '_blank');
-                }
-                
-                showMessage('📱 WhatsApp invitation sent!', 'success');
-                setTimeout(() => {
-                    simulateContactImport('whatsapp', [
-                        { name: 'Ahmad Rahman', phone: '+60123456789' },
-                        { name: 'Siti Nurhaliza', phone: '+60187654321' },
-                        { name: 'Raj Kumar', phone: '+60196789012' }
-                    ]);
-                }, 2000);
-                
-            } catch (error) {
-                console.error('WhatsApp sharing error:', error);
-                showMessage('❌ WhatsApp sharing not available on this device', 'error');
-            }
-        }
-
-        async function importFromInstagram() {
-            showMessage('📷 Connecting to Instagram...', 'info');
-            
-            // Simulate Instagram API integration
-            setTimeout(() => {
-                simulateContactImport('instagram', [
-                    { name: 'maya_photographer', platform: 'instagram' },
-                    { name: 'kl_foodie_2024', platform: 'instagram' },
-                    { name: 'adventure_malaysia', platform: 'instagram' }
-                ]);
-                showMessage('📷 Instagram friends imported!', 'success');
-            }, 1500);
-        }
-
-        async function importFromFacebook() {
-            showMessage('📘 Connecting to Facebook...', 'info');
-            
-            // Simulate Facebook API integration
-            setTimeout(() => {
-                simulateContactImport('facebook', [
-                    { name: 'Wei Lin Tan', platform: 'facebook' },
-                    { name: 'Hassan Abdullah', platform: 'facebook' },
-                    { name: 'Priya Sharma', platform: 'facebook' }
-                ]);
-                showMessage('📘 Facebook friends imported!', 'success');
-            }, 1500);
-        }
-
-        async function importFromTwitter() {
-            showMessage('🐦 Connecting to Twitter...', 'info');
-            
-            setTimeout(() => {
-                simulateContactImport('twitter', [
-                    { name: '@techie_malaysia', platform: 'twitter' },
-                    { name: '@foodie_kl', platform: 'twitter' },
-                    { name: '@startup_guy', platform: 'twitter' }
-                ]);
-                showMessage('🐦 Twitter followers imported!', 'success');
-            }, 1500);
-        }
-
-        async function importFromTikTok() {
-            showMessage('🎵 Connecting to TikTok...', 'info');
-            
-            setTimeout(() => {
-                simulateContactImport('tiktok', [
-                    { name: 'dance_queen_my', platform: 'tiktok' },
-                    { name: 'comedy_king_kl', platform: 'tiktok' },
-                    { name: 'creative_content', platform: 'tiktok' }
-                ]);
-                showMessage('🎵 TikTok friends imported!', 'success');
-            }, 1500);
-        }
-
-        async function importFromLinkedIn() {
-            showMessage('💼 Connecting to LinkedIn...', 'info');
-            
-            setTimeout(() => {
-                simulateContactImport('linkedin', [
-                    { name: 'Alex Thompson', platform: 'linkedin', title: 'Software Engineer' },
-                    { name: 'Sarah Chen', platform: 'linkedin', title: 'Product Manager' },
-                    { name: 'Kumar Patel', platform: 'linkedin', title: 'Data Scientist' }
-                ]);
-                showMessage('💼 LinkedIn connections imported!', 'success');
-            }, 1500);
-        }
-
-        // Contact Import Simulation
-        function simulateContactImport(platform, contacts) {
-            const platformIcons = {
-                whatsapp: '📱',
-                instagram: '📷',
-                facebook: '📘',
-                twitter: '🐦',
-                tiktok: '🎵',
-                linkedin: '💼'
-            };
-            
-            const nearbyList = document.getElementById('nearbyUsersList');
-            if (!nearbyList) return;
-            
-            nearbyList.innerHTML = '';
-            
-            contacts.forEach((contact, index) => {
-                const contactEl = document.createElement('div');
-                contactEl.style.cssText = `
-                    display: flex;
-                    justify-content: space-between;
-                    align-items: center;
-                    padding: 10px;
-                    background: rgba(255, 255, 255, 0.05);
-                    border-radius: 10px;
-                    margin-bottom: 8px;
-                    border: 1px solid rgba(255, 255, 255, 0.1);
-                `;
-                
-                contactEl.innerHTML = `
-                    <div style="display: flex; align-items: center; gap: 10px;">
-                        <div style="font-size: 1.2rem;">${platformIcons[platform]}</div>
-                        <div>
-                            <div style="font-weight: 500;">${contact.name}</div>
-                            <div style="font-size: 0.8rem; opacity: 0.7;">
-                                ${contact.title || contact.phone || `From ${platform}`}
-                            </div>
-                        </div>
-                    </div>
-                    <button class="btn btn-primary btn-small" onclick="inviteContact('${contact.name}', '${platform}')" style="font-size: 0.8rem;">
-                        Invite
-                    </button>
-                `;
-                
-                nearbyList.appendChild(contactEl);
-            });
-        }
-
-        // Nearby Users Scanning
-        async function scanNearbyUsers() {
-            showMessage('🔍 Scanning for nearby JomBro players...', 'info');
-            
-            const nearbyList = document.getElementById('nearbyUsersList');
-            if (!nearbyList) return;
-            
-            nearbyList.innerHTML = '<div style="text-align: center; padding: 20px;"><div class="loading"></div></div>';
-            
-            // Simulate nearby users discovery
-            setTimeout(() => {
-                const nearbyUsers = [
-                    { name: 'Zain Ahmed', distance: '0.2km', avatar: '🌟', online: true },
-                    { name: 'Lisa Wong', distance: '0.5km', avatar: '🎨', online: true },
-                    { name: 'Omar Hassan', distance: '0.8km', avatar: '🚀', online: false },
-                    { name: 'Mei Lin', distance: '1.1km', avatar: '💫', online: true }
-                ];
-                
-                nearbyList.innerHTML = '';
-                
-                nearbyUsers.forEach(user => {
-                    const userEl = document.createElement('div');
-                    userEl.style.cssText = `
-                        display: flex;
-                        justify-content: space-between;
-                        align-items: center;
-                        padding: 10px;
-                        background: rgba(255, 255, 255, 0.05);
-                        border-radius: 10px;
-                        margin-bottom: 8px;
-                        border: 1px solid rgba(155, 89, 182, 0.2);
-                    `;
-                    
-                    userEl.innerHTML = `
-                        <div style="display: flex; align-items: center; gap: 10px;">
-                            <div style="position: relative;">
-                                <div style="font-size: 1.5rem;">${user.avatar}</div>
-                                ${user.online ? '<div style="position: absolute; bottom: 0; right: 0; width: 10px; height: 10px; background: #4ecdc4; border-radius: 50%; border: 2px solid #0a0a0a;"></div>' : ''}
-                            </div>
-                            <div>
-                                <div style="font-weight: 500;">${user.name}</div>
-                                <div style="font-size: 0.8rem; opacity: 0.7;">
-                                    ${user.distance} away • ${user.online ? 'Online' : 'Offline'}
-                                </div>
-                            </div>
-                        </div>
-                        <button class="btn btn-primary btn-small" onclick="sendFriendRequestToNearby('${user.name}')" style="font-size: 0.8rem;">
-                            Add Friend
-                        </button>
-                    `;
-                    
-                    nearbyList.appendChild(userEl);
-                });
-                
-                showMessage(`📍 Found ${nearbyUsers.length} nearby players!`, 'success');
-            }, 2000);
-        }
-
-        // Phone Contacts Import
-        async function importPhoneContacts() {
-            showMessage('📱 Accessing phone contacts...', 'info');
-            
-            // In a real app, this would use Contacts API
-            setTimeout(() => {
-                const phoneContacts = [
-                    { name: 'Mom', phone: '+60123456789', hasJomBro: false },
-                    { name: 'Ahmad (Work)', phone: '+60187654321', hasJomBro: true },
-                    { name: 'Siti Neighbor', phone: '+60196789012', hasJomBro: true },
-                    { name: 'Raj College', phone: '+60134567890', hasJomBro: false }
-                ];
-                
-                const contactsList = document.getElementById('phoneContactsList');
-                if (!contactsList) return;
-                
-                contactsList.innerHTML = '';
-                
-                phoneContacts.forEach(contact => {
-                    const contactEl = document.createElement('div');
-                    contactEl.style.cssText = `
-                        display: flex;
-                        justify-content: space-between;
-                        align-items: center;
-                        padding: 10px;
-                        background: rgba(255, 255, 255, 0.05);
-                        border-radius: 10px;
-                        margin-bottom: 8px;
-                        border: 1px solid rgba(255, 255, 255, 0.1);
-                    `;
-                    
-                    contactEl.innerHTML = `
-                        <div style="display: flex; align-items: center; gap: 10px;">
-                            <div style="font-size: 1.2rem;">📱</div>
-                            <div>
-                                <div style="font-weight: 500;">${contact.name}</div>
-                                <div style="font-size: 0.8rem; opacity: 0.7;">
-                                    ${contact.phone} ${contact.hasJomBro ? '• On JomBro' : ''}
-                                </div>
-                            </div>
-                        </div>
-                        <button class="btn ${contact.hasJomBro ? 'btn-primary' : 'btn-secondary'} btn-small" 
-                                onclick="${contact.hasJomBro ? `addFriendByPhone('${contact.phone}')` : `inviteViaText('${contact.phone}')`}" 
-                                style="font-size: 0.8rem;">
-                            ${contact.hasJomBro ? 'Add' : 'Invite'}
-                        </button>
-                    `;
-                    
-                    contactsList.appendChild(contactEl);
-                });
-                
-                showMessage('📱 Phone contacts imported!', 'success');
-            }, 1500);
-        }
-
-        // Helper Functions
-        function generateInviteLink() {
-            const inviteCode = currentUser ? currentUser.uid.slice(0, 8) : 'demo123';
-            return `${window.location.origin}?invite=${inviteCode}&ref=${appState.user.name}`;
-        }
-
-        async function shareViaWhatsApp() {
-            const inviteLink = generateInviteLink();
-            const message = encodeURIComponent(`🎮 Join me on JomBro! Let's challenge each other: ${inviteLink}`);
-            window.open(`https://wa.me/?text=${message}`, '_blank');
-            showMessage('📱 WhatsApp share opened!', 'success');
-        }
-
-        async function shareViaMessenger() {
-            const inviteLink = generateInviteLink();
-            const message = encodeURIComponent(`🎮 Join me on JomBro! Let's challenge each other: ${inviteLink}`);
-            window.open(`https://m.me/?text=${message}`, '_blank');
-            showMessage('💬 Messenger share opened!', 'success');
-        }
-
-        async function copyInviteLink() {
-            const inviteLink = generateInviteLink();
-            try {
-                await navigator.clipboard.writeText(inviteLink);
-                showMessage('🔗 Invite link copied to clipboard!', 'success');
-            } catch (error) {
-                console.error('Clipboard error:', error);
-                showMessage('❌ Could not copy link', 'error');
             }
         }
 
@@ -2621,88 +3340,6 @@
             } else {
                 showMessage('❌ Please enter an email address!', 'error');
             }
-        }
-
-        async function inviteContact(name, platform) {
-            showMessage(`📤 Invitation sent to ${name} via ${platform}!`, 'success');
-            
-            // In a real app, this would send actual invitations
-            // For now, we'll simulate the process
-            setTimeout(() => {
-                if (Math.random() > 0.7) {
-                    showMessage(`🎉 ${name} joined JomBro from your ${platform} invitation!`, 'success');
-                    
-                    // Add as friend automatically
-                    const newFriend = {
-                        id: 'friend_' + Date.now(),
-                        name: name,
-                        avatar: getRandomAvatar(),
-                        online: true,
-                        tokens: 1000,
-                        level: 1
-                    };
-                    
-                    appState.friends.push(newFriend);
-                    appState.user.friends = appState.friends.length;
-                    renderFriends();
-                    updateUserDisplay();
-                }
-            }, 3000);
-        }
-
-        async function sendFriendRequestToNearby(name) {
-            showMessage(`👥 Friend request sent to ${name}!`, 'success');
-            
-            // Simulate nearby friend acceptance
-            setTimeout(() => {
-                const newFriend = {
-                    id: 'nearby_' + Date.now(),
-                    name: name,
-                    avatar: getRandomAvatar(),
-                    online: true,
-                    tokens: Math.floor(Math.random() * 2000) + 500,
-                    level: Math.floor(Math.random() * 5) + 1
-                };
-                
-                appState.friends.push(newFriend);
-                appState.user.friends = appState.friends.length;
-                renderFriends();
-                updateUserDisplay();
-                
-                showMessage(`🎉 ${name} accepted your friend request!`, 'success');
-            }, 2000);
-        }
-
-        async function addFriendByPhone(phone) {
-            showMessage(`📱 Sending friend request to ${phone}...`, 'info');
-            
-            // Simulate adding friend by phone number
-            setTimeout(() => {
-                const newFriend = {
-                    id: 'phone_' + Date.now(),
-                    name: 'Phone Contact',
-                    avatar: getRandomAvatar(),
-                    online: Math.random() > 0.5,
-                    tokens: Math.floor(Math.random() * 1500) + 500,
-                    level: Math.floor(Math.random() * 3) + 1
-                };
-                
-                appState.friends.push(newFriend);
-                appState.user.friends = appState.friends.length;
-                renderFriends();
-                updateUserDisplay();
-                
-                showMessage('📱 Friend added via phone contact!', 'success');
-            }, 1500);
-        }
-
-        async function inviteViaText(phone) {
-            const inviteLink = generateInviteLink();
-            const message = encodeURIComponent(`🎮 Hey! Join me on JomBro for fun challenges: ${inviteLink}`);
-            
-            // Try to open SMS app
-            window.open(`sms:${phone}?body=${message}`, '_self');
-            showMessage(`📱 SMS invitation sent to ${phone}!`, 'success');
         }
 
         function loadAppContent() {
@@ -2759,7 +3396,8 @@
                     status: 'active',
                     responses: {},
                     createdAt: firebase.firestore.FieldValue.serverTimestamp(),
-                    expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000)
+                    expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000),
+                    isAI: false
                 };
                 
                 await db.collection('challenges').add(challengeData);
@@ -3001,6 +3639,18 @@ service cloud.firestore {
   }
 }
 
+🤖 AI CHALLENGE SYSTEM FEATURES:
+✅ Auto-generates 3 new challenges every 2 minutes
+✅ Comprehensive challenge database with 40+ unique challenges
+✅ 5 categories: Fitness, Creative, Social, Food, Adventure
+✅ Dynamic difficulty and reward system
+✅ Send to Friends, Nearby Players, or Random targets
+✅ Real-time countdown timer
+✅ Pause/Resume timer functionality
+✅ Visual selection system with glowing effects
+✅ Integration with existing Firebase backend
+✅ Token-based economy (25 tokens per challenge sent)
+
 🚀 ALSO ENABLE THESE FIREBASE FEATURES:
 1. Authentication → Email/Password
 2. Firestore Database
@@ -3011,6 +3661,8 @@ service cloud.firestore {
 - Enable push notifications
 - Add file upload for challenge proof
 - Add geolocation for nearby players
+- Add leaderboards and achievements
+- Add challenge templates and customization
             `);
         }
 
