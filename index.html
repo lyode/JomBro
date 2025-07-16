@@ -834,6 +834,7 @@
             justify-content: center;
             font-size: 1.3rem;
             position: relative;
+            overflow: hidden;
         }
 
         .search-result-info {
@@ -1011,6 +1012,7 @@
             align-items: center;
             justify-content: center;
             font-size: 1rem;
+            overflow: hidden;
         }
 
         .suggestion-info {
@@ -1095,6 +1097,7 @@
             gap: 15px;
         }
 
+        /* Enhanced User Avatar with Profile Button Functionality */
         .user-avatar {
             width: 50px;
             height: 50px;
@@ -1119,7 +1122,7 @@
         }
 
         .user-avatar:hover::after {
-            content: '✏️';
+            content: '👤';
             position: absolute;
             bottom: -5px;
             right: -5px;
@@ -1132,6 +1135,27 @@
             justify-content: center;
             font-size: 0.8rem;
             border: 2px solid #0a0a0a;
+        }
+
+        /* Add profile button indicator */
+        .profile-button-hint {
+            position: absolute;
+            bottom: -25px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(102, 126, 234, 0.9);
+            color: white;
+            padding: 4px 8px;
+            border-radius: 6px;
+            font-size: 0.7rem;
+            white-space: nowrap;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            pointer-events: none;
+        }
+
+        .user-avatar:hover .profile-button-hint {
+            opacity: 1;
         }
 
         @keyframes glow {
@@ -1413,7 +1437,288 @@
             color: rgba(255, 255, 255, 0.8);
         }
 
-        /* Avatar Change Modal */
+        /* Enhanced Profile Modal with Better Image Upload */
+        .profile-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.9);
+            z-index: 3000;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            backdrop-filter: blur(15px);
+        }
+
+        .profile-modal.show {
+            display: flex;
+        }
+
+        .profile-modal-container {
+            background: linear-gradient(135deg, rgba(20, 20, 20, 0.95), rgba(30, 30, 30, 0.95));
+            backdrop-filter: blur(20px);
+            border-radius: 24px;
+            padding: 0;
+            width: 100%;
+            max-width: 600px;
+            max-height: 90vh;
+            overflow: hidden;
+            box-shadow: 
+                0 20px 60px rgba(0, 0, 0, 0.5),
+                0 0 0 1px rgba(255, 255, 255, 0.1);
+            position: relative;
+            animation: slideUp 0.6s ease-out;
+        }
+
+        .profile-header {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            padding: 30px;
+            text-align: center;
+            position: relative;
+        }
+
+        .profile-cover {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 300"><defs><linearGradient id="grad" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" style="stop-color:rgb(102,126,234);stop-opacity:0.6" /><stop offset="100%" style="stop-color:rgb(118,75,162);stop-opacity:0.6" /></linearGradient></defs><rect width="1200" height="300" fill="url(%23grad)" /></svg>');
+            background-size: cover;
+            opacity: 0.3;
+        }
+
+        .profile-avatar-section {
+            position: relative;
+            z-index: 2;
+            margin-bottom: 20px;
+        }
+
+        /* Enhanced Profile Avatar with Clear Upload Indicator */
+        .profile-avatar-large {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            margin: 0 auto;
+            border: 4px solid rgba(255, 255, 255, 0.9);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+            background: linear-gradient(45deg, #9b59b6, #e91e63);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3.5rem;
+            position: relative;
+            overflow: hidden;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .profile-avatar-large:hover {
+            transform: scale(1.05);
+            box-shadow: 0 12px 32px rgba(0, 0, 0, 0.4);
+        }
+
+        /* Enhanced hover effect for own profile */
+        .profile-avatar-large.is-own {
+            cursor: pointer;
+        }
+
+        .profile-avatar-large.is-own:hover::after {
+            content: '📸';
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            color: white;
+        }
+
+        /* Add "Click to change" text on hover */
+        .profile-avatar-large.is-own:hover::before {
+            content: 'Click to change';
+            position: absolute;
+            bottom: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            z-index: 10;
+            white-space: nowrap;
+        }
+
+        .profile-name {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: white;
+            margin-bottom: 5px;
+            text-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+        }
+
+        .profile-email {
+            font-size: 0.9rem;
+            color: rgba(255, 255, 255, 0.8);
+            margin-bottom: 15px;
+        }
+
+        .profile-stats-row {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            margin-top: 20px;
+        }
+
+        .profile-stat {
+            text-align: center;
+        }
+
+        .profile-stat-value {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: white;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .profile-stat-label {
+            font-size: 0.8rem;
+            color: rgba(255, 255, 255, 0.7);
+            margin-top: 2px;
+        }
+
+        .profile-content {
+            padding: 30px;
+            overflow-y: auto;
+            max-height: calc(90vh - 250px);
+        }
+
+        .profile-section {
+            margin-bottom: 25px;
+        }
+
+        .profile-section-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: white;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .profile-info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+        }
+
+        .profile-info-item {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 15px;
+            transition: all 0.3s ease;
+        }
+
+        .profile-info-item:hover {
+            background: rgba(255, 255, 255, 0.08);
+            border-color: rgba(155, 89, 182, 0.3);
+        }
+
+        .profile-info-label {
+            font-size: 0.8rem;
+            color: rgba(255, 255, 255, 0.6);
+            margin-bottom: 5px;
+        }
+
+        .profile-info-value {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #9b59b6;
+        }
+
+        .profile-badges {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .profile-badge {
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.2), rgba(155, 89, 182, 0.2));
+            border: 1px solid rgba(155, 89, 182, 0.4);
+            border-radius: 20px;
+            padding: 8px 16px;
+            font-size: 0.85rem;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .profile-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .profile-action-btn {
+            flex: 1;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.9rem;
+        }
+
+        .profile-action-primary {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+        }
+
+        .profile-action-secondary {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .profile-action-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        }
+
+        .profile-close-btn {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: rgba(255, 255, 255, 0.1);
+            border: none;
+            color: white;
+            font-size: 1.5rem;
+            cursor: pointer;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+            z-index: 3;
+        }
+
+        .profile-close-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: rotate(90deg);
+        }
+
+        /* Enhanced Avatar Change Modal */
         .avatar-modal {
             position: fixed;
             top: 0;
@@ -1482,20 +1787,30 @@
             transform: scale(1.1);
         }
 
+        /* Enhanced Upload Section */
         .upload-section {
             border: 2px dashed #667eea;
             border-radius: 12px;
-            padding: 20px;
+            padding: 30px;
             text-align: center;
             background: rgba(102, 126, 234, 0.05);
             margin-bottom: 20px;
             cursor: pointer;
             transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
         }
 
         .upload-section:hover {
             background: rgba(102, 126, 234, 0.1);
             border-color: #764ba2;
+            transform: translateY(-2px);
+        }
+
+        .upload-section.dragover {
+            background: rgba(102, 126, 234, 0.2);
+            border-color: #764ba2;
+            transform: scale(1.02);
         }
 
         .upload-preview {
@@ -1511,6 +1826,80 @@
         #avatarFileInput {
             display: none;
         }
+
+        /* Enhanced Upload Instructions */
+        .upload-instructions {
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.1), rgba(155, 89, 182, 0.1));
+            border: 2px solid rgba(102, 126, 234, 0.3);
+            border-radius: 12px;
+            padding: 15px;
+            margin-bottom: 20px;
+        }
+
+        .upload-instructions h4 {
+            color: #667eea;
+            margin-bottom: 10px;
+            font-size: 0.95rem;
+        }
+
+        .upload-instructions ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .upload-instructions li {
+            color: #718096;
+            font-size: 0.85rem;
+            margin-bottom: 5px;
+            padding-left: 20px;
+            position: relative;
+        }
+
+        .upload-instructions li::before {
+            content: '✓';
+            position: absolute;
+            left: 0;
+            color: #48bb78;
+        }
+
+        /* Image crop preview */
+        .crop-preview {
+            display: none;
+            margin: 20px 0;
+            text-align: center;
+        }
+
+        .crop-preview canvas {
+            max-width: 100%;
+            border: 2px solid #667eea;
+            border-radius: 8px;
+        }
+
+        /* Profile button on main page */
+        .profile-btn {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+        }
+
+        .profile-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.5);
+        }
+
+        /* Media Query for mobile */
+        @media (max-width: 768px) {
             .container {
                 padding: 10px;
             }
@@ -1561,10 +1950,26 @@
                 grid-template-columns: 1fr 1fr;
             }
             
-            .btn-small {
-                padding: 6px 10px;
-                font-size: 0.75rem;
-                min-width: 60px;
+            .profile-modal-container {
+                max-width: 95vw;
+                padding: 0;
+            }
+            
+            .profile-header {
+                padding: 20px;
+            }
+            
+            .profile-content {
+                padding: 20px;
+            }
+            
+            .profile-avatar-large {
+                width: 100px;
+                height: 100px;
+            }
+            
+            .profile-stats-row {
+                gap: 20px;
             }
         }
     </style>
@@ -2374,7 +2779,124 @@
         </div>
     </div>
 
-    <!-- Avatar Change Modal -->
+    <!-- Enhanced Profile Modal -->
+    <div class="profile-modal" id="profileModal">
+        <div class="profile-modal-container">
+            <button class="profile-close-btn" onclick="closeProfileModal()">✕</button>
+            
+            <div class="profile-header">
+                <div class="profile-cover"></div>
+                <div class="profile-avatar-section">
+                    <div class="profile-avatar-large" id="profileAvatar" onclick="handleProfileAvatarClick()">
+                        <img id="profileAvatarImage" style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover; display: none;">
+                        <span id="profileAvatarEmoji"></span>
+                    </div>
+                    <h2 class="profile-name" id="profileName">Loading...</h2>
+                    <p class="profile-email" id="profileEmail">Loading...</p>
+                    
+                    <div class="profile-stats-row">
+                        <div class="profile-stat">
+                            <div class="profile-stat-value" id="profileTokens">0</div>
+                            <div class="profile-stat-label">Tokens</div>
+                        </div>
+                        <div class="profile-stat">
+                            <div class="profile-stat-value" id="profileLevel">1</div>
+                            <div class="profile-stat-label">Level</div>
+                        </div>
+                        <div class="profile-stat">
+                            <div class="profile-stat-value" id="profileFriends">0</div>
+                            <div class="profile-stat-label">Friends</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="profile-content">
+                <!-- Profile Info Section -->
+                <div class="profile-section">
+                    <h3 class="profile-section-title">
+                        <span>📊</span>
+                        Profile Information
+                    </h3>
+                    <div class="profile-info-grid">
+                        <div class="profile-info-item">
+                            <div class="profile-info-label">Member Since</div>
+                            <div class="profile-info-value" id="profileJoinDate">Loading...</div>
+                        </div>
+                        <div class="profile-info-item">
+                            <div class="profile-info-label">Last Active</div>
+                            <div class="profile-info-value" id="profileLastActive">Loading...</div>
+                        </div>
+                        <div class="profile-info-item">
+                            <div class="profile-info-label">Status</div>
+                            <div class="profile-info-value" id="profileStatus">
+                                <span style="color: #4ecdc4;">● Online</span>
+                            </div>
+                        </div>
+                        <div class="profile-info-item">
+                            <div class="profile-info-label">Invite Code</div>
+                            <div class="profile-info-value" id="profileInviteCode" style="font-family: monospace;">Loading...</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Achievements Section -->
+                <div class="profile-section">
+                    <h3 class="profile-section-title">
+                        <span>🏆</span>
+                        Achievements & Badges
+                    </h3>
+                    <div class="profile-badges" id="profileBadges">
+                        <div class="profile-badge">
+                            <span>🌟</span>
+                            <span>Early Adopter</span>
+                        </div>
+                        <div class="profile-badge">
+                            <span>🎮</span>
+                            <span>Gamer</span>
+                        </div>
+                        <div class="profile-badge">
+                            <span>👥</span>
+                            <span>Social Butterfly</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Stats Section -->
+                <div class="profile-section">
+                    <h3 class="profile-section-title">
+                        <span>📈</span>
+                        Statistics
+                    </h3>
+                    <div class="profile-info-grid">
+                        <div class="profile-info-item">
+                            <div class="profile-info-label">Challenges Created</div>
+                            <div class="profile-info-value" id="profileChallengesCreated">0</div>
+                        </div>
+                        <div class="profile-info-item">
+                            <div class="profile-info-label">Challenges Won</div>
+                            <div class="profile-info-value" id="profileChallengesWon">0</div>
+                        </div>
+                        <div class="profile-info-item">
+                            <div class="profile-info-label">Friends Invited</div>
+                            <div class="profile-info-value" id="profileFriendsInvited">0</div>
+                        </div>
+                        <div class="profile-info-item">
+                            <div class="profile-info-label">Total Tokens Earned</div>
+                            <div class="profile-info-value" id="profileTotalTokens">0</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Action Buttons -->
+                <div class="profile-actions" id="profileActions">
+                    <!-- Actions will be populated based on whether it's own profile or friend's -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Enhanced Avatar Change Modal -->
     <div class="avatar-modal" id="avatarModal">
         <div class="avatar-modal-container">
             <div class="friend-modal-header">
@@ -2394,18 +2916,31 @@
                 <p style="margin-top: 10px; color: #718096; font-size: 0.9rem;">Current Avatar</p>
             </div>
 
-            <!-- Upload Custom Picture -->
+            <!-- Enhanced Upload Instructions -->
+            <div class="upload-instructions">
+                <h4>📸 Profile Picture Upload</h4>
+                <ul>
+                    <li>Click the area below or drag & drop</li>
+                    <li>Supports JPG, PNG, GIF formats</li>
+                    <li>Maximum file size: 2MB</li>
+                    <li>Square images work best</li>
+                    <li>Image will be cropped to circle</li>
+                </ul>
+            </div>
+
+            <!-- Enhanced Upload Custom Picture -->
             <div class="search-section">
                 <h3 class="search-section-title">
                     <span>📸</span>
                     Upload Custom Picture
                 </h3>
-                <div class="upload-section" onclick="document.getElementById('avatarFileInput').click()">
+                <div class="upload-section" onclick="document.getElementById('avatarFileInput').click()" ondragover="handleDragOver(event)" ondragleave="handleDragLeave(event)" ondrop="handleDrop(event)">
                     <img id="uploadPreview" class="upload-preview" style="display: none;">
                     <div id="uploadPlaceholder">
-                        <div style="font-size: 2rem; margin-bottom: 10px;">📷</div>
-                        <p style="color: #667eea; font-weight: 600; margin-bottom: 5px;">Click to Upload Picture</p>
-                        <p style="color: #718096; font-size: 0.8rem;">JPG, PNG, GIF (Max 2MB)</p>
+                        <div style="font-size: 3rem; margin-bottom: 15px;">📷</div>
+                        <p style="color: #667eea; font-weight: 600; margin-bottom: 8px;">Click to Upload Picture</p>
+                        <p style="color: #718096; font-size: 0.85rem; margin-bottom: 10px;">or drag & drop here</p>
+                        <p style="color: #9b59b6; font-size: 0.8rem;">JPG, PNG, GIF (Max 2MB)</p>
                     </div>
                 </div>
                 <input type="file" id="avatarFileInput" accept="image/*" onchange="previewAvatarImage(event)">
@@ -2445,7 +2980,10 @@
                     <div class="user-name" id="userName">Loading...</div>
                 </div>
                 <div class="user-info">
-                    <div class="user-avatar" id="userAvatar" onclick="showAvatarModal()" title="Click to change avatar">👤</div>
+                    <div class="user-avatar" id="userAvatar" onclick="showOwnProfile()" title="Click to view profile">
+                        👤
+                        <span class="profile-button-hint">View Profile</span>
+                    </div>
                     <div class="user-stats">
                         <div class="stat-item">
                             <div class="stat-number" id="userTokens">0</div>
@@ -2460,6 +2998,10 @@
                             <div class="stat-label">Friends</div>
                         </div>
                     </div>
+                    <button class="profile-btn" onclick="showOwnProfile()" title="View your profile">
+                        <span>👤</span>
+                        <span>Profile</span>
+                    </button>
                     <button class="btn btn-secondary btn-small" onclick="logoutUser()" id="logoutBtn" style="display: none;">
                         Logout
                     </button>
@@ -2534,14 +3076,17 @@
                             <button class="btn btn-primary" onclick="showChallengeModal()">
                                 ⚡ Challenge System
                             </button>
+                            <button class="btn btn-secondary" onclick="showOwnProfile()">
+                                👤 My Profile
+                            </button>
                             <button class="btn btn-secondary" onclick="showTokenInfo()">
                                 🪙 About Tokens
                             </button>
                         </div>
                         
-                        <!-- Challenge System Preview -->
-                        <div style="background: rgba(237, 137, 54, 0.1); border: 2px solid rgba(237, 137, 54, 0.3); border-radius: 15px; padding: 20px; margin-top: 20px;">
-                            <h4 style="margin-bottom: 10px; color: #ed8936;">⚡ Challenge System Features:</h4>
+                        <!-- Profile & Avatar Feature Highlight -->
+                        <div style="background: linear-gradient(135deg, rgba(102, 126, 234, 0.1), rgba(155, 89, 182, 0.1)); border: 2px solid rgba(102, 126, 234, 0.3); border-radius: 15px; padding: 20px; margin-top: 20px;">
+                            <h4 style="margin-bottom: 10px; color: #667eea;">✨ New Profile Features:</h4>
                             <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 10px; margin-bottom: 15px; font-size: 0.8rem; opacity: 0.9;">
                                 <div>🎯 Create custom challenges</div>
                                 <div>📤 Send to friends instantly</div>
@@ -2633,6 +3178,7 @@
         let selectedAvatarType = null; // 'emoji' or 'image'
         let selectedEmoji = null;
         let selectedImageFile = null;
+        let currentViewingUserId = null; // Track which user's profile is being viewed
         const avatarEmojis = [
             '😎', '🌸', '🚀', '💪', '🎵', '🎨', '🤠', '🌟', '🎯', '🎭', 
             '🎪', '🌈', '🎲', '🎊', '🌺', '⚡', '🌙', '🔥', '👑', '💎',
@@ -4748,6 +5294,12 @@
             
             // Reset file input
             document.getElementById('avatarFileInput').value = '';
+            
+            // Remove drag over class
+            const uploadSection = document.querySelector('.upload-section');
+            if (uploadSection) {
+                uploadSection.classList.remove('dragover');
+            }
         }
 
         function updateCurrentAvatarPreview() {
@@ -4800,6 +5352,44 @@
             // Clear image preview if any
             document.getElementById('uploadPreview').style.display = 'none';
             document.getElementById('uploadPlaceholder').style.display = 'block';
+        }
+
+        // Enhanced drag and drop functions
+        function handleDragOver(event) {
+            event.preventDefault();
+            event.stopPropagation();
+            const uploadSection = event.currentTarget;
+            uploadSection.classList.add('dragover');
+        }
+
+        function handleDragLeave(event) {
+            event.preventDefault();
+            event.stopPropagation();
+            const uploadSection = event.currentTarget;
+            uploadSection.classList.remove('dragover');
+        }
+
+        function handleDrop(event) {
+            event.preventDefault();
+            event.stopPropagation();
+            const uploadSection = event.currentTarget;
+            uploadSection.classList.remove('dragover');
+            
+            const files = event.dataTransfer.files;
+            if (files.length > 0) {
+                const file = files[0];
+                if (file.type.startsWith('image/')) {
+                    // Create a fake event for the file input
+                    const fakeEvent = {
+                        target: {
+                            files: [file]
+                        }
+                    };
+                    previewAvatarImage(fakeEvent);
+                } else {
+                    showMessage('❌ Please drop an image file!', 'error');
+                }
+            }
         }
 
         function previewAvatarImage(event) {
@@ -4892,6 +5482,14 @@
                 closeAvatarModal();
                 showMessage('✅ Avatar updated successfully!', 'success');
                 
+                // If profile modal is open showing current user, refresh it
+                if (currentViewingUserId === currentUser.uid) {
+                    const profileModal = document.getElementById('profileModal');
+                    if (profileModal.classList.contains('show')) {
+                        showProfileModal(currentUser.uid);
+                    }
+                }
+                
             } catch (error) {
                 console.error('Error saving avatar:', error);
                 showMessage('❌ Failed to save avatar. Please try again.', 'error');
@@ -4906,11 +5504,204 @@
             
             if (appState.user.avatarUrl) {
                 // Create image element
-                avatarElement.innerHTML = `<img src="${appState.user.avatarUrl}" style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover;">`;
+                avatarElement.innerHTML = `<img src="${appState.user.avatarUrl}" style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover;"><span class="profile-button-hint">View Profile</span>`;
             } else {
-                // Show emoji
-                avatarElement.textContent = appState.user.avatar;
+                // Show emoji with hint
+                avatarElement.innerHTML = `${appState.user.avatar}<span class="profile-button-hint">View Profile</span>`;
             }
+            
+            // Also update profile modal if it's showing current user
+            if (currentViewingUserId === currentUser.uid) {
+                updateProfileAvatar(appState.user);
+            }
+        }
+
+        // Profile System Functions
+        async function showProfileModal(userId = null) {
+            const modal = document.getElementById('profileModal');
+            modal.classList.add('show');
+            
+            // If no userId provided, show current user's profile
+            const profileUserId = userId || currentUser.uid;
+            currentViewingUserId = profileUserId;
+            
+            // Check if it's own profile
+            const isOwnProfile = profileUserId === currentUser.uid;
+            
+            try {
+                // Get user data from Firestore
+                const userDoc = await db.collection('users').doc(profileUserId).get();
+                
+                if (!userDoc.exists) {
+                    showMessage('❌ User profile not found!', 'error');
+                    closeProfileModal();
+                    return;
+                }
+                
+                const userData = userDoc.data();
+                
+                // Update profile header
+                updateProfileAvatar(userData);
+                document.getElementById('profileName').textContent = userData.name || 'Unknown User';
+                document.getElementById('profileEmail').textContent = userData.email || '';
+                document.getElementById('profileTokens').textContent = userData.tokens || 0;
+                document.getElementById('profileLevel').textContent = userData.level || 1;
+                document.getElementById('profileFriends').textContent = userData.friendsCount || 0;
+                
+                // Update profile info
+                document.getElementById('profileJoinDate').textContent = formatDate(userData.createdAt);
+                document.getElementById('profileLastActive').textContent = formatLastActive(userData.lastActive);
+                document.getElementById('profileStatus').innerHTML = userData.online ? 
+                    '<span style="color: #4ecdc4;">● Online</span>' : 
+                    '<span style="color: #718096;">● Offline</span>';
+                document.getElementById('profileInviteCode').textContent = userData.inviteCode || generateInviteCode(profileUserId);
+                
+                // Update statistics
+                if (userData.referralStats) {
+                    document.getElementById('profileFriendsInvited').textContent = userData.referralStats.friends || 0;
+                    document.getElementById('profileTotalTokens').textContent = userData.referralStats.tokens || 0;
+                }
+                
+                // Get challenge stats
+                try {
+                    const challengesQuery = await db.collection('challenges')
+                        .where('createdBy', '==', profileUserId)
+                        .get();
+                    document.getElementById('profileChallengesCreated').textContent = challengesQuery.size;
+                } catch (error) {
+                    document.getElementById('profileChallengesCreated').textContent = 0;
+                }
+                
+                // Update avatar click behavior
+                const avatarElement = document.getElementById('profileAvatar');
+                if (isOwnProfile) {
+                    avatarElement.classList.add('is-own');
+                    avatarElement.title = 'Click to change avatar';
+                } else {
+                    avatarElement.classList.remove('is-own');
+                    avatarElement.title = '';
+                }
+                
+                // Update action buttons
+                updateProfileActions(isOwnProfile, profileUserId, userData);
+                
+            } catch (error) {
+                console.error('Error loading profile:', error);
+                showMessage('❌ Failed to load profile!', 'error');
+            }
+        }
+        
+        function updateProfileAvatar(userData) {
+            const avatarImage = document.getElementById('profileAvatarImage');
+            const avatarEmoji = document.getElementById('profileAvatarEmoji');
+            
+            if (userData.avatarUrl) {
+                avatarImage.src = userData.avatarUrl;
+                avatarImage.style.display = 'block';
+                avatarEmoji.style.display = 'none';
+            } else {
+                avatarEmoji.textContent = userData.avatar || '👤';
+                avatarEmoji.style.display = 'block';
+                avatarImage.style.display = 'none';
+            }
+        }
+        
+        function updateProfileActions(isOwnProfile, userId, userData) {
+            const actionsContainer = document.getElementById('profileActions');
+            
+            if (isOwnProfile) {
+                actionsContainer.innerHTML = `
+                    <button class="profile-action-btn profile-action-primary" onclick="handleProfileAvatarClick()">
+                        🎨 Change Avatar
+                    </button>
+                    <button class="profile-action-btn profile-action-secondary" onclick="copyProfileLink()">
+                        📋 Copy Profile Link
+                    </button>
+                    <button class="profile-action-btn profile-action-secondary" onclick="shareProfile()">
+                        📤 Share Profile
+                    </button>
+                `;
+            } else {
+                const isFriend = appState.friends.some(f => f.id === userId);
+                actionsContainer.innerHTML = `
+                    ${!isFriend ? 
+                        `<button class="profile-action-btn profile-action-primary" onclick="addFriendFromProfile('${userId}', '${userData.name}')">
+                            ➕ Add Friend
+                        </button>` : 
+                        `<button class="profile-action-btn profile-action-secondary" disabled>
+                            ✅ Already Friends
+                        </button>`
+                    }
+                    ${userData.online && isFriend ? 
+                        `<button class="profile-action-btn profile-action-primary" onclick="challengeFriendFromProfile('${userId}')">
+                            ⚡ Challenge
+                        </button>` : ''
+                    }
+                    <button class="profile-action-btn profile-action-secondary" onclick="copyInviteCodeFromProfile('${userData.inviteCode || generateInviteCode(userId)}')">
+                        📋 Copy Invite Code
+                    </button>
+                `;
+            }
+        }
+        
+        function closeProfileModal() {
+            const modal = document.getElementById('profileModal');
+            modal.classList.remove('show');
+            currentViewingUserId = null;
+        }
+        
+        function handleProfileAvatarClick() {
+            if (currentViewingUserId === currentUser.uid) {
+                closeProfileModal();
+                showAvatarModal();
+            }
+        }
+        
+        async function addFriendFromProfile(friendId, friendName) {
+            await addFriendById(friendId, friendName);
+            // Refresh profile to update buttons
+            showProfileModal(friendId);
+        }
+        
+        function challengeFriendFromProfile(friendId) {
+            closeProfileModal();
+            challengeFriend(friendId);
+        }
+        
+        function copyInviteCodeFromProfile(inviteCode) {
+            const text = `Join JomBro with invite code: ${inviteCode}\n\n${window.location.origin}?invite=${inviteCode}`;
+            copyText(text);
+        }
+        
+        function copyProfileLink() {
+            const profileUrl = `${window.location.origin}/profile/${currentUser.uid}`;
+            copyText(profileUrl);
+            showMessage('📋 Profile link copied!', 'success');
+        }
+        
+        function shareProfile() {
+            const message = `Check out my JomBro profile!\n\n🎮 ${appState.user.name}\n🪙 ${appState.user.tokens} tokens\n⭐ Level ${appState.user.level}\n\nJoin me: ${window.location.origin}?invite=${userInviteCode}`;
+            
+            if (navigator.share) {
+                navigator.share({
+                    title: 'My JomBro Profile',
+                    text: message,
+                    url: window.location.origin
+                });
+            } else {
+                copyText(message);
+                showMessage('📋 Profile info copied! Share it anywhere!', 'success');
+            }
+        }
+        
+        function formatDate(timestamp) {
+            if (!timestamp) return 'Unknown';
+            const date = timestamp.toDate ? timestamp.toDate() : new Date(timestamp);
+            return date.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
+        }
+        
+        function showOwnProfile() {
+            showProfileModal(currentUser.uid);
         }
 
         // Update friend stats
@@ -4999,12 +5790,8 @@
         function updateUserDisplay() {
             document.getElementById('userName').textContent = appState.user.name;
             
-            const avatarElement = document.getElementById('userAvatar');
-            if (appState.user.avatarUrl) {
-                avatarElement.innerHTML = `<img src="${appState.user.avatarUrl}" style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover;">`;
-            } else {
-                avatarElement.textContent = appState.user.avatar;
-            }
+            // Update avatar with hint
+            updateUserAvatar();
             
             document.getElementById('userTokens').textContent = appState.user.tokens.toLocaleString();
             document.getElementById('userLevel').textContent = appState.user.level;
@@ -5105,10 +5892,7 @@
 
         // View user profile
         function viewUserProfile(userId) {
-            const user = appState.friends.find(f => f.id === userId);
-            if (user) {
-                showMessage(`👤 Viewing ${user.name}'s profile (feature coming soon!)`, 'info');
-            }
+            showProfileModal(userId);
         }
 
         // Show token info
@@ -5353,6 +6137,13 @@
                 }
             });
 
+            // Close profile modal when clicking outside
+            document.getElementById('profileModal').addEventListener('click', (e) => {
+                if (e.target.id === 'profileModal') {
+                    closeProfileModal();
+                }
+            });
+
             // Handle window before unload
             window.addEventListener('beforeunload', () => {
                 if (currentUser && db) {
@@ -5366,6 +6157,7 @@
                     closeFriendModal();
                     closeChallengeModal();
                     closeAvatarModal();
+                    closeProfileModal();
                     closeQuickGuide();
                 }
                 if (e.ctrlKey && e.key === 'k') {
@@ -5375,6 +6167,10 @@
                 if (e.ctrlKey && e.key === 'j') {
                     e.preventDefault();
                     showChallengeModal();
+                }
+                if (e.ctrlKey && e.key === 'p') {
+                    e.preventDefault();
+                    showOwnProfile();
                 }
             });
         }
@@ -5391,7 +6187,10 @@
             
             console.log('✅ JomBro Ready!');
             console.log('🎯 Features Loaded:');
-            console.log('  ✅ Avatar Change System');
+            console.log('  ✅ Avatar Change System with Image Upload');
+            console.log('  ✅ Enhanced Profile Button');
+            console.log('  ✅ User Profile System');
+            console.log('  ✅ Drag & Drop Image Upload');
             console.log('  ✅ Social Media Friend Adding');
             console.log('  ✅ Auto-Connect via Invite Links');
             console.log('  ✅ Real User Database');
@@ -5401,10 +6200,12 @@
         });
 
         // Console welcome message
-        console.log('🎮 JomBro Enhanced Friend & Challenge System Loaded!');
+        console.log('🎮 JomBro Enhanced Profile & Avatar System Loaded!');
         console.log('');
         console.log('🚀 PRODUCTION VERSION - All Features Active!');
-        console.log('✅ Avatar System with Image Upload');
+        console.log('✅ Avatar System with Image Upload & Drag-Drop');
+        console.log('✅ Enhanced Profile Button with Hover Hint');
+        console.log('✅ User Profile System');
         console.log('✅ Real Authentication System');
         console.log('✅ Firebase Firestore Database');
         console.log('✅ Real-time Friend Connections');
@@ -5414,20 +6215,44 @@
         console.log('✅ Referral Rewards (100 tokens per friend)');
         console.log('✅ Persistent Data Storage');
         console.log('');
-        console.log('🔥 Features:');
-        console.log('• Click avatar to change (emoji or custom image)');
-        console.log('• Add friends via social media (WhatsApp, FB, IG, TikTok)');
-        console.log('• Auto-connect when using invite links');
-        console.log('• Search by email, username, or invite code');
-        console.log('• Real user suggestions (no demo data)');
-        console.log('• Earn tokens for inviting friends');
+        console.log('🔥 New Profile Features:');
+        console.log('• Click your avatar to view full profile');
+        console.log('• Hover over avatar to see "View Profile" hint');
+        console.log('• Change avatar from profile (emoji or custom image)');
+        console.log('• Drag & drop images to upload');
+        console.log('• Image size validation (2MB max)');
+        console.log('• View friend profiles with stats and info');
+        console.log('• Profile button next to logout for easy access');
         console.log('');
         console.log('💡 Tips:');
+        console.log('• Click on your avatar or Profile button to access profile');
+        console.log('• Drag & drop images directly to avatar upload area');
         console.log('• Share your invite code on social media');
         console.log('• Friends who join with your code auto-connect');
         console.log('• You earn 100 tokens for each friend added');
+        console.log('');
+        console.log('⌨️ Keyboard Shortcuts:');
+        console.log('• Ctrl+P: Open your profile');
+        console.log('• Ctrl+K: Open friend system');
+        console.log('• Ctrl+J: Open challenge system');
+        console.log('• Escape: Close any modal');
         console.log('');
         console.log('🎯 YOUR APP IS LIVE AND READY!');
     </script>
 </body>
 </html>
+            👤 Click your avatar to view profile</div>
+                                <div>📸 Upload custom profile pictures</div>
+                                <div>🎨 Choose from 70+ emoji avatars</div>
+                                <div>📊 View detailed stats & achievements</div>
+                            </div>
+                            <p style="font-size: 0.9rem; opacity: 0.8; margin: 10px 0;">
+                                <strong>💡 Pro Tip:</strong> Click on your avatar in the top right or use the Profile button to access your full profile!
+                            </p>
+                        </div>
+                        
+                        <!-- Challenge System Preview -->
+                        <div style="background: rgba(237, 137, 54, 0.1); border: 2px solid rgba(237, 137, 54, 0.3); border-radius: 15px; padding: 20px; margin-top: 20px;">
+                            <h4 style="margin-bottom: 10px; color: #ed8936;">⚡ Challenge System Features:</h4>
+                            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 10px; margin-bottom: 15px; font-size: 0.8rem; opacity: 0.9;">
+                                <div>
