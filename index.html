@@ -1109,11 +1109,29 @@
             animation: glow 3s ease-in-out infinite alternate;
             cursor: pointer;
             transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
         }
 
         .user-avatar:hover {
             transform: scale(1.1);
             box-shadow: 0 0 25px rgba(155, 89, 182, 0.6);
+        }
+
+        .user-avatar:hover::after {
+            content: '✏️';
+            position: absolute;
+            bottom: -5px;
+            right: -5px;
+            background: #667eea;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8rem;
+            border: 2px solid #0a0a0a;
         }
 
         @keyframes glow {
@@ -1395,7 +1413,104 @@
             color: rgba(255, 255, 255, 0.8);
         }
 
-        @media (max-width: 480px) {
+        /* Avatar Change Modal */
+        .avatar-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 3000;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            backdrop-filter: blur(10px);
+        }
+
+        .avatar-modal.show {
+            display: flex;
+        }
+
+        .avatar-modal-container {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border-radius: 24px;
+            padding: 30px;
+            width: 100%;
+            max-width: 500px;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 
+                0 20px 40px rgba(0, 0, 0, 0.3),
+                0 0 0 1px rgba(255, 255, 255, 0.2);
+            position: relative;
+            animation: slideUp 0.6s ease-out;
+        }
+
+        .avatar-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(60px, 1fr));
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .avatar-option {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 3px solid transparent;
+            background: rgba(102, 126, 234, 0.1);
+        }
+
+        .avatar-option:hover {
+            transform: scale(1.1);
+            border-color: #667eea;
+            background: rgba(102, 126, 234, 0.2);
+        }
+
+        .avatar-option.selected {
+            border-color: #667eea;
+            background: rgba(102, 126, 234, 0.3);
+            transform: scale(1.1);
+        }
+
+        .upload-section {
+            border: 2px dashed #667eea;
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+            background: rgba(102, 126, 234, 0.05);
+            margin-bottom: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .upload-section:hover {
+            background: rgba(102, 126, 234, 0.1);
+            border-color: #764ba2;
+        }
+
+        .upload-preview {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            margin: 0 auto 15px;
+            object-fit: cover;
+            border: 4px solid #667eea;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        }
+
+        #avatarFileInput {
+            display: none;
+        }
             .container {
                 padding: 10px;
             }
@@ -2259,6 +2374,66 @@
         </div>
     </div>
 
+    <!-- Avatar Change Modal -->
+    <div class="avatar-modal" id="avatarModal">
+        <div class="avatar-modal-container">
+            <div class="friend-modal-header">
+                <h2 class="friend-modal-title">
+                    <span>🎨</span>
+                    Change Avatar
+                </h2>
+                <button class="close-modal-btn" onclick="closeAvatarModal()">✕</button>
+            </div>
+
+            <!-- Current Avatar Preview -->
+            <div style="text-align: center; margin-bottom: 25px;">
+                <div style="width: 100px; height: 100px; margin: 0 auto; border-radius: 50%; background: linear-gradient(45deg, #9b59b6, #e91e63); display: flex; align-items: center; justify-content: center; font-size: 3rem; border: 4px solid rgba(155, 89, 182, 0.5); box-shadow: 0 0 20px rgba(155, 89, 182, 0.4);">
+                    <img id="currentAvatarPreview" style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover; display: none;">
+                    <span id="currentAvatarEmoji"></span>
+                </div>
+                <p style="margin-top: 10px; color: #718096; font-size: 0.9rem;">Current Avatar</p>
+            </div>
+
+            <!-- Upload Custom Picture -->
+            <div class="search-section">
+                <h3 class="search-section-title">
+                    <span>📸</span>
+                    Upload Custom Picture
+                </h3>
+                <div class="upload-section" onclick="document.getElementById('avatarFileInput').click()">
+                    <img id="uploadPreview" class="upload-preview" style="display: none;">
+                    <div id="uploadPlaceholder">
+                        <div style="font-size: 2rem; margin-bottom: 10px;">📷</div>
+                        <p style="color: #667eea; font-weight: 600; margin-bottom: 5px;">Click to Upload Picture</p>
+                        <p style="color: #718096; font-size: 0.8rem;">JPG, PNG, GIF (Max 2MB)</p>
+                    </div>
+                </div>
+                <input type="file" id="avatarFileInput" accept="image/*" onchange="previewAvatarImage(event)">
+            </div>
+
+            <!-- Emoji Selection -->
+            <div class="search-section">
+                <h3 class="search-section-title">
+                    <span>😊</span>
+                    Choose Emoji Avatar
+                </h3>
+                <div class="avatar-grid" id="emojiGrid">
+                    <!-- Emoji options will be populated here -->
+                </div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div style="display: flex; gap: 10px;">
+                <button class="auth-button auth-button-primary" onclick="saveAvatar()" id="saveAvatarBtn" style="flex: 1;">
+                    💾 Save Avatar
+                </button>
+                <button class="auth-button" onclick="closeAvatarModal()" style="flex: 1; background: rgba(102, 126, 234, 0.1); color: #667eea; border: 2px solid #667eea;">
+                    Cancel
+                </button>
+            </div>
+        </div>
+    </div>
+
     <!-- App Content -->
     <div class="app-content" id="appContent">
         <div class="container">
@@ -2270,7 +2445,7 @@
                     <div class="user-name" id="userName">Loading...</div>
                 </div>
                 <div class="user-info">
-                    <div class="user-avatar" id="userAvatar">👤</div>
+                    <div class="user-avatar" id="userAvatar" onclick="showAvatarModal()" title="Click to change avatar">👤</div>
                     <div class="user-stats">
                         <div class="stat-item">
                             <div class="stat-number" id="userTokens">0</div>
@@ -2399,6 +2574,7 @@
         firebase.initializeApp(firebaseConfig);
         const auth = firebase.auth();
         const db = firebase.firestore();
+        const storage = firebase.storage();
 
         // Global variables
         let currentUser = null;
@@ -2431,6 +2607,7 @@
                 id: null,
                 name: '',
                 avatar: '👤',
+                avatarUrl: null,
                 tokens: 0,
                 level: 1,
                 friends: 0,
@@ -2451,6 +2628,20 @@
             completed: 0,
             tokensEarned: 0
         };
+
+        // Avatar System Variables
+        let selectedAvatarType = null; // 'emoji' or 'image'
+        let selectedEmoji = null;
+        let selectedImageFile = null;
+        const avatarEmojis = [
+            '😎', '🌸', '🚀', '💪', '🎵', '🎨', '🤠', '🌟', '🎯', '🎭', 
+            '🎪', '🌈', '🎲', '🎊', '🌺', '⚡', '🌙', '🔥', '👑', '💎',
+            '🦄', '🐉', '🦅', '🦁', '🐺', '🦊', '🐯', '🦜', '🌻', '🍀',
+            '⭐', '💫', '✨', '🏆', '🎖️', '🥇', '💰', '💸', '🎁', '🎀',
+            '🎭', '🎨', '🎬', '🎤', '🎧', '🎸', '🥁', '🎹', '🎺', '🎻',
+            '⚽', '🏀', '🏈', '⚾', '🎾', '🏐', '🏓', '🥊', '🥋', '🏹',
+            '🛹', '🛼', '🏄', '🏊', '🚴', '🏃', '🧗', '🤺', '🏇', '⛷️'
+        ];
 
         // Enhanced Authentication System
         class AuthenticationSystem {
@@ -2730,6 +2921,7 @@
                         name: name,
                         email: email,
                         avatar: this.getRandomAvatar(),
+                        avatarUrl: null,
                         tokens: 1000,
                         level: 1,
                         friendsCount: 0,
@@ -2849,6 +3041,7 @@
                         id: user.uid,
                         name: userData.name || user.displayName || user.email.split('@')[0],
                         avatar: userData.avatar || getRandomAvatar(),
+                        avatarUrl: userData.avatarUrl || null,
                         tokens: userData.tokens || 1000,
                         level: userData.level || 1,
                         friends: userData.friendsCount || 0,
@@ -2879,6 +3072,7 @@
                         name: userName,
                         email: user.email,
                         avatar: getRandomAvatar(),
+                        avatarUrl: null,
                         tokens: 1000,
                         level: 1,
                         friendsCount: 0,
@@ -2942,6 +3136,7 @@
                                                 id: friendId,
                                                 name: friendData.name || 'Friend',
                                                 avatar: friendData.avatar || getRandomAvatar(),
+                                                avatarUrl: friendData.avatarUrl || null,
                                                 online: friendData.online || false,
                                                 lastActive: friendData.lastActive,
                                                 tokens: friendData.tokens || 0,
@@ -3143,7 +3338,9 @@
                         resultsHtml += `
                             <div class="search-result-item" onclick="viewUserProfile('${user.id}')">
                                 <div class="search-result-avatar">
-                                    ${user.avatar || '👤'}
+                                    ${user.avatarUrl ? 
+                                        `<img src="${user.avatarUrl}" style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover;">` : 
+                                        user.avatar || '👤'}
                                     ${user.online ? '<div class="online-indicator"></div>' : ''}
                                 </div>
                                 <div class="search-result-info">
@@ -3411,6 +3608,7 @@
                             id: doc.id,
                             name: userData.name,
                             avatar: userData.avatar || '👤',
+                            avatarUrl: userData.avatarUrl || null,
                             level: userData.level || 1,
                             tokens: userData.tokens || 0,
                             online: userData.online || false
@@ -3456,7 +3654,9 @@
                     suggestionsHtml += `
                         <div class="suggestion-item">
                             <div class="suggestion-avatar">
-                                ${user.avatar}
+                                ${user.avatarUrl ? 
+                                    `<img src="${user.avatarUrl}" style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover;">` : 
+                                    user.avatar}
                                 ${user.online ? '<div class="online-indicator"></div>' : ''}
                             </div>
                             <div class="suggestion-info">
@@ -4091,7 +4291,9 @@
                 friendsHtml += `
                     <div class="search-result-item ${isSelected ? 'selected' : ''}" onclick="toggleFriendSelection('${friend.id}')" style="${isSelected ? 'border-color: #667eea; background: rgba(102, 126, 234, 0.1);' : ''}">
                         <div class="search-result-avatar">
-                            ${friend.avatar}
+                            ${friend.avatarUrl ? 
+                                `<img src="${friend.avatarUrl}" style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover;">` : 
+                                friend.avatar}
                             ${friend.online ? '<div class="online-indicator"></div>' : ''}
                         </div>
                         <div class="search-result-info">
@@ -4519,6 +4721,198 @@
             }
         }
 
+        // Avatar System Functions
+        function showAvatarModal() {
+            const modal = document.getElementById('avatarModal');
+            modal.classList.add('show');
+            
+            // Reset selection
+            selectedAvatarType = null;
+            selectedEmoji = null;
+            selectedImageFile = null;
+            
+            // Show current avatar
+            updateCurrentAvatarPreview();
+            
+            // Populate emoji grid
+            populateEmojiGrid();
+            
+            // Reset upload preview
+            document.getElementById('uploadPreview').style.display = 'none';
+            document.getElementById('uploadPlaceholder').style.display = 'block';
+        }
+
+        function closeAvatarModal() {
+            const modal = document.getElementById('avatarModal');
+            modal.classList.remove('show');
+            
+            // Reset file input
+            document.getElementById('avatarFileInput').value = '';
+        }
+
+        function updateCurrentAvatarPreview() {
+            const currentEmoji = document.getElementById('currentAvatarEmoji');
+            const currentImage = document.getElementById('currentAvatarPreview');
+            
+            if (appState.user.avatarUrl) {
+                // User has custom image
+                currentImage.src = appState.user.avatarUrl;
+                currentImage.style.display = 'block';
+                currentEmoji.style.display = 'none';
+            } else {
+                // User has emoji
+                currentEmoji.textContent = appState.user.avatar;
+                currentEmoji.style.display = 'block';
+                currentImage.style.display = 'none';
+            }
+        }
+
+        function populateEmojiGrid() {
+            const grid = document.getElementById('emojiGrid');
+            grid.innerHTML = '';
+            
+            avatarEmojis.forEach(emoji => {
+                const option = document.createElement('div');
+                option.className = 'avatar-option';
+                option.textContent = emoji;
+                option.onclick = () => selectEmoji(emoji);
+                
+                if (emoji === appState.user.avatar && !appState.user.avatarUrl) {
+                    option.classList.add('selected');
+                }
+                
+                grid.appendChild(option);
+            });
+        }
+
+        function selectEmoji(emoji) {
+            // Remove previous selections
+            document.querySelectorAll('.avatar-option').forEach(opt => {
+                opt.classList.remove('selected');
+            });
+            
+            // Select new emoji
+            event.target.classList.add('selected');
+            selectedAvatarType = 'emoji';
+            selectedEmoji = emoji;
+            selectedImageFile = null;
+            
+            // Clear image preview if any
+            document.getElementById('uploadPreview').style.display = 'none';
+            document.getElementById('uploadPlaceholder').style.display = 'block';
+        }
+
+        function previewAvatarImage(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            
+            // Validate file size (2MB max)
+            if (file.size > 2 * 1024 * 1024) {
+                showMessage('❌ Image must be less than 2MB!', 'error');
+                event.target.value = '';
+                return;
+            }
+            
+            // Validate file type
+            if (!file.type.startsWith('image/')) {
+                showMessage('❌ Please select an image file!', 'error');
+                event.target.value = '';
+                return;
+            }
+            
+            selectedAvatarType = 'image';
+            selectedImageFile = file;
+            selectedEmoji = null;
+            
+            // Clear emoji selection
+            document.querySelectorAll('.avatar-option').forEach(opt => {
+                opt.classList.remove('selected');
+            });
+            
+            // Preview image
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                const preview = document.getElementById('uploadPreview');
+                preview.src = e.target.result;
+                preview.style.display = 'block';
+                document.getElementById('uploadPlaceholder').style.display = 'none';
+            };
+            reader.readAsDataURL(file);
+        }
+
+        async function saveAvatar() {
+            const saveBtn = document.getElementById('saveAvatarBtn');
+            
+            if (!selectedAvatarType) {
+                showMessage('❌ Please select an emoji or upload an image!', 'error');
+                return;
+            }
+            
+            try {
+                saveBtn.disabled = true;
+                saveBtn.classList.add('loading');
+                showMessage('💾 Saving avatar...', 'info');
+                
+                let avatarData = {};
+                
+                if (selectedAvatarType === 'emoji') {
+                    // Save emoji avatar
+                    avatarData = {
+                        avatar: selectedEmoji,
+                        avatarUrl: null,
+                        lastUpdated: firebase.firestore.FieldValue.serverTimestamp()
+                    };
+                    
+                    appState.user.avatar = selectedEmoji;
+                    appState.user.avatarUrl = null;
+                    
+                } else if (selectedAvatarType === 'image') {
+                    // Upload image to Firebase Storage
+                    const storageRef = storage.ref();
+                    const avatarRef = storageRef.child(`avatars/${currentUser.uid}/${Date.now()}_${selectedImageFile.name}`);
+                    
+                    const uploadTask = await avatarRef.put(selectedImageFile);
+                    const downloadURL = await uploadTask.ref.getDownloadURL();
+                    
+                    avatarData = {
+                        avatar: '📷', // Default emoji for custom images
+                        avatarUrl: downloadURL,
+                        lastUpdated: firebase.firestore.FieldValue.serverTimestamp()
+                    };
+                    
+                    appState.user.avatar = '📷';
+                    appState.user.avatarUrl = downloadURL;
+                }
+                
+                // Update user document
+                await db.collection('users').doc(currentUser.uid).update(avatarData);
+                
+                // Update UI
+                updateUserAvatar();
+                closeAvatarModal();
+                showMessage('✅ Avatar updated successfully!', 'success');
+                
+            } catch (error) {
+                console.error('Error saving avatar:', error);
+                showMessage('❌ Failed to save avatar. Please try again.', 'error');
+            } finally {
+                saveBtn.disabled = false;
+                saveBtn.classList.remove('loading');
+            }
+        }
+
+        function updateUserAvatar() {
+            const avatarElement = document.getElementById('userAvatar');
+            
+            if (appState.user.avatarUrl) {
+                // Create image element
+                avatarElement.innerHTML = `<img src="${appState.user.avatarUrl}" style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover;">`;
+            } else {
+                // Show emoji
+                avatarElement.textContent = appState.user.avatar;
+            }
+        }
+
         // Update friend stats
         function updateFriendStats() {
             // Update social sharing stats
@@ -4561,7 +4955,7 @@
                 
                 // Reset app state
                 appState = {
-                    user: { id: null, name: '', avatar: '👤', tokens: 0, level: 1, friends: 0, online: true },
+                    user: { id: null, name: '', avatar: '👤', avatarUrl: null, tokens: 0, level: 1, friends: 0, online: true },
                     friends: []
                 };
                 
@@ -4604,7 +4998,14 @@
 
         function updateUserDisplay() {
             document.getElementById('userName').textContent = appState.user.name;
-            document.getElementById('userAvatar').textContent = appState.user.avatar;
+            
+            const avatarElement = document.getElementById('userAvatar');
+            if (appState.user.avatarUrl) {
+                avatarElement.innerHTML = `<img src="${appState.user.avatarUrl}" style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover;">`;
+            } else {
+                avatarElement.textContent = appState.user.avatar;
+            }
+            
             document.getElementById('userTokens').textContent = appState.user.tokens.toLocaleString();
             document.getElementById('userLevel').textContent = appState.user.level;
             document.getElementById('userFriends').textContent = appState.user.friends;
@@ -4665,7 +5066,9 @@
                 friendElement.innerHTML = `
                     <div class="friend-info">
                         <div class="friend-avatar-circle">
-                            ${friend.avatar}
+                            ${friend.avatarUrl ? 
+                                `<img src="${friend.avatarUrl}" style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover;">` : 
+                                friend.avatar}
                             ${friend.online ? '<div class="online-indicator"></div>' : ''}
                         </div>
                         <div class="friend-details">
@@ -4943,6 +5346,13 @@
                 }
             });
 
+            // Close avatar modal when clicking outside
+            document.getElementById('avatarModal').addEventListener('click', (e) => {
+                if (e.target.id === 'avatarModal') {
+                    closeAvatarModal();
+                }
+            });
+
             // Handle window before unload
             window.addEventListener('beforeunload', () => {
                 if (currentUser && db) {
@@ -4955,6 +5365,7 @@
                 if (e.key === 'Escape') {
                     closeFriendModal();
                     closeChallengeModal();
+                    closeAvatarModal();
                     closeQuickGuide();
                 }
                 if (e.ctrlKey && e.key === 'k') {
@@ -4980,6 +5391,7 @@
             
             console.log('✅ JomBro Ready!');
             console.log('🎯 Features Loaded:');
+            console.log('  ✅ Avatar Change System');
             console.log('  ✅ Social Media Friend Adding');
             console.log('  ✅ Auto-Connect via Invite Links');
             console.log('  ✅ Real User Database');
@@ -4992,6 +5404,7 @@
         console.log('🎮 JomBro Enhanced Friend & Challenge System Loaded!');
         console.log('');
         console.log('🚀 PRODUCTION VERSION - All Features Active!');
+        console.log('✅ Avatar System with Image Upload');
         console.log('✅ Real Authentication System');
         console.log('✅ Firebase Firestore Database');
         console.log('✅ Real-time Friend Connections');
@@ -5002,6 +5415,7 @@
         console.log('✅ Persistent Data Storage');
         console.log('');
         console.log('🔥 Features:');
+        console.log('• Click avatar to change (emoji or custom image)');
         console.log('• Add friends via social media (WhatsApp, FB, IG, TikTok)');
         console.log('• Auto-connect when using invite links');
         console.log('• Search by email, username, or invite code');
