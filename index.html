@@ -1601,7 +1601,153 @@
             margin-bottom: 10px;
         }
 
-        /* Messages */
+        /* Phone Auth Styles */
+        .phone-input-container {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 8px;
+        }
+
+        .country-select {
+            width: 120px;
+            padding: 16px 12px;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            background: white;
+            color: #2d3748;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .country-select:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .phone-input {
+            flex: 1;
+            padding: 16px;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            font-size: 1.2rem;
+            font-weight: 600;
+            letter-spacing: 1px;
+            transition: all 0.3s ease;
+            background: white;
+            color: #2d3748;
+        }
+
+        .phone-input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+            transform: translateY(-1px);
+        }
+
+        .phone-hint, .otp-hint, .username-hint {
+            font-size: 0.85rem;
+            color: #718096;
+            margin-top: 8px;
+            text-align: center;
+        }
+
+        .otp-inputs {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+
+        .otp-input {
+            width: 50px;
+            height: 60px;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            text-align: center;
+            font-size: 1.5rem;
+            font-weight: bold;
+            background: white;
+            color: #2d3748;
+            transition: all 0.3s ease;
+        }
+
+        .otp-input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+            transform: scale(1.05);
+        }
+
+        .otp-input.filled {
+            border-color: #48bb78;
+            background: #f0fff4;
+        }
+
+        .avatar-grid {
+            display: grid;
+            grid-template-columns: repeat(6, 1fr);
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .avatar-option {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: #f7fafc;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 3px solid transparent;
+        }
+
+        .avatar-option:hover {
+            transform: scale(1.1);
+            border-color: #667eea;
+        }
+
+        .avatar-option.selected {
+            border-color: #667eea;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            box-shadow: 0 0 20px rgba(102, 126, 234, 0.4);
+        }
+
+        .terms-text {
+            text-align: center;
+            font-size: 0.8rem;
+            color: #718096;
+            margin-top: 20px;
+        }
+
+        .terms-text a {
+            color: #667eea;
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .terms-text a:hover {
+            text-decoration: underline;
+        }
+
+        #recaptcha-container {
+            margin: 20px 0;
+            display: flex;
+            justify-content: center;
+            min-height: 1px;
+        }
+
+        /* Simplified auth container */
+        .auth-container {
+            max-width: 400px;
+        }
+
+        /* Friend Modal Styles */
         .message {
             position: fixed;
             top: 20px;
@@ -1947,10 +2093,6 @@
             opacity: 1;
         }
 
-        .app-content.with-banner {
-            padding-top: 60px;
-        }
-
         .empty-state {
             text-align: center;
             padding: 40px 20px;
@@ -2029,59 +2171,6 @@
     </style>
 </head>
 <body>
-    <!-- Email Verification Banner -->
-    <div class="email-verification-banner" id="emailVerificationBanner">
-        <div class="verification-content">
-            <span class="verification-text">
-                ⚠️ Please verify your email to unlock all features
-            </span>
-            <button class="verification-button" onclick="resendVerificationEmail()">
-                Resend Verification Email
-            </button>
-            <button class="verification-close" onclick="hideVerificationBanner()">
-                ×
-            </button>
-        </div>
-    </div>
-
-    <!-- Password Reset Modal -->
-    <div class="password-reset-modal" id="passwordResetModal">
-        <div class="password-reset-container">
-            <div class="password-reset-header">
-                <h2 class="password-reset-title">Reset Password</h2>
-                <p class="password-reset-subtitle">
-                    Enter your email address and we'll send you a link to reset your password.
-                </p>
-            </div>
-            
-            <form id="passwordResetForm">
-                <div class="form-group">
-                    <label class="form-label" for="resetEmail">Email Address</label>
-                    <div class="input-container">
-                        <input 
-                            type="email" 
-                            id="resetEmail" 
-                            class="form-input" 
-                            placeholder="Enter your email"
-                            required
-                        >
-                        <span class="input-icon">📧</span>
-                    </div>
-                    <div class="validation-message" id="resetEmailError"></div>
-                </div>
-                
-                <button type="submit" class="auth-button auth-button-primary" id="resetButton">
-                    Send Reset Link
-                </button>
-                
-                <button type="button" class="auth-button" onclick="hidePasswordResetModal()" 
-                        style="background: #e2e8f0; color: #4a5568;">
-                    Cancel
-                </button>
-            </form>
-        </div>
-    </div>
-
     <!-- Starfield Background -->
     <div class="starfield" id="starfield"></div>
 
@@ -2095,186 +2184,114 @@
                 <p class="auth-subtitle">Let's Go! Let's Go!</p>
             </div>
 
-            <!-- Tab Navigation -->
-            <div class="auth-tabs">
-                <div class="tab-indicator" id="tabIndicator"></div>
-                <div class="auth-tab active" onclick="switchTab('login')" id="loginTab">
-                    Sign In
-                </div>
-                <div class="auth-tab" onclick="switchTab('signup')" id="signupTab">
-                    Create Account
-                </div>
-            </div>
-
-            <!-- Login Form -->
-            <form class="auth-form active" id="loginForm">
-                <!-- Social Login -->
-                <div class="social-login">
-                    <div class="social-title">Continue with</div>
-                    <div class="social-buttons">
-                        <button type="button" class="social-button google" onclick="signInWithGoogle()">
-                            <span>📧</span>
-                            <span>Google</span>
-                        </button>
-                        <button type="button" class="social-button facebook" onclick="signInWithFacebook()">
-                            <span>📘</span>
-                            <span>Facebook</span>
-                        </button>
-                    </div>
-                </div>
-
-                <!-- Email Input -->
+            <!-- Phone Auth Form -->
+            <form class="auth-form active" id="phoneAuthForm">
                 <div class="form-group">
-                    <label class="form-label" for="loginEmail">Email Address</label>
-                    <div class="input-container">
+                    <label class="form-label">Phone Number</label>
+                    <div class="phone-input-container">
+                        <select id="countryCode" class="country-select">
+                            <option value="+60" selected>🇲🇾 +60</option>
+                            <option value="+65">🇸🇬 +65</option>
+                            <option value="+1">🇺🇸 +1</option>
+                            <option value="+44">🇬🇧 +44</option>
+                            <option value="+91">🇮🇳 +91</option>
+                            <option value="+62">🇮🇩 +62</option>
+                            <option value="+63">🇵🇭 +63</option>
+                            <option value="+66">🇹🇭 +66</option>
+                            <option value="+84">🇻🇳 +84</option>
+                            <option value="+86">🇨🇳 +86</option>
+                            <option value="+81">🇯🇵 +81</option>
+                            <option value="+82">🇰🇷 +82</option>
+                        </select>
                         <input 
-                            type="email" 
-                            id="loginEmail" 
-                            class="form-input" 
-                            placeholder="Enter your email"
-                            autocomplete="email"
-                            required
+                            type="tel" 
+                            id="phoneNumber" 
+                            class="phone-input" 
+                            placeholder="123456789"
+                            maxlength="15"
+                            pattern="[0-9]*"
+                            inputmode="numeric"
                         >
-                        <span class="input-icon">📧</span>
                     </div>
-                    <div class="validation-message" id="loginEmailError"></div>
+                    <p class="phone-hint">We'll send you a code to verify your number</p>
                 </div>
 
-                <!-- Password Input -->
-                <div class="form-group">
-                    <label class="form-label" for="loginPassword">Password</label>
-                    <div class="input-container">
-                        <input 
-                            type="password" 
-                            id="loginPassword" 
-                            class="form-input" 
-                            placeholder="Enter your password"
-                            autocomplete="current-password"
-                            required
-                        >
-                        <span class="input-icon">🔒</span>
-                        <span class="password-toggle" onclick="togglePassword('loginPassword')">👁️</span>
-                    </div>
-                    <div class="validation-message" id="loginPasswordError"></div>
-                </div>
+                <div id="recaptcha-container"></div>
 
-                <!-- Remember Me Checkbox -->
-                <div class="form-group" style="margin-bottom: 16px;">
-                    <label class="checkbox-container">
-                        <input type="checkbox" id="rememberMe" class="checkbox-input">
-                        <span class="checkbox-label">Remember me for 30 days</span>
-                    </label>
-                </div>
-
-                <!-- Login Button -->
-                <button type="submit" class="auth-button auth-button-primary" id="loginButton">
-                    Sign In to JomBro
+                <button type="submit" class="auth-button auth-button-primary" id="sendCodeButton">
+                    Get Started →
                 </button>
 
-                <!-- Forgot Password Link -->
-                <div style="text-align: center; margin-top: 16px;">
-                    <a href="#" onclick="showPasswordResetModal()" class="forgot-password-link">
-                        Forgot your password?
-                    </a>
-                </div>
+                <p class="terms-text">
+                    By continuing, you agree to our 
+                    <a href="#" onclick="showTerms()">Terms</a> & 
+                    <a href="#" onclick="showPrivacy()">Privacy Policy</a>
+                </p>
             </form>
 
-            <!-- Signup Form -->
-            <form class="auth-form" id="signupForm">
-                <!-- Social Login -->
-                <div class="social-login">
-                    <div class="social-title">Continue with</div>
-                    <div class="social-buttons">
-                        <button type="button" class="social-button google" onclick="signInWithGoogle()">
-                            <span>📧</span>
-                            <span>Google</span>
-                        </button>
-                        <button type="button" class="social-button facebook" onclick="signInWithFacebook()">
-                            <span>📘</span>
-                            <span>Facebook</span>
-                        </button>
-                    </div>
-                </div>
-
-                <!-- Name Input -->
+            <!-- OTP Verification Form -->
+            <form class="auth-form" id="otpForm" style="display: none;">
                 <div class="form-group">
-                    <label class="form-label" for="signupName">Display Name</label>
-                    <div class="input-container">
-                        <input 
-                            type="text" 
-                            id="signupName" 
-                            class="form-input" 
-                            placeholder="Your awesome username"
-                            autocomplete="name"
-                            required
-                            minlength="2"
-                            maxlength="30"
-                        >
-                        <span class="input-icon">👤</span>
+                    <label class="form-label">Enter Verification Code</label>
+                    <div class="otp-inputs">
+                        <input type="text" class="otp-input" maxlength="1" pattern="[0-9]" inputmode="numeric">
+                        <input type="text" class="otp-input" maxlength="1" pattern="[0-9]" inputmode="numeric">
+                        <input type="text" class="otp-input" maxlength="1" pattern="[0-9]" inputmode="numeric">
+                        <input type="text" class="otp-input" maxlength="1" pattern="[0-9]" inputmode="numeric">
+                        <input type="text" class="otp-input" maxlength="1" pattern="[0-9]" inputmode="numeric">
+                        <input type="text" class="otp-input" maxlength="1" pattern="[0-9]" inputmode="numeric">
                     </div>
-                    <div class="validation-message" id="signupNameError"></div>
+                    <p class="otp-hint">Code sent to <span id="sentToNumber"></span></p>
                 </div>
 
-                <!-- Email Input -->
+                <button type="submit" class="auth-button auth-button-primary" id="verifyButton">
+                    Verify & Join
+                </button>
+
+                <button type="button" class="auth-button" onclick="resendCode()" id="resendButton" disabled>
+                    Resend Code <span id="resendTimer">(30s)</span>
+                </button>
+
+                <button type="button" class="auth-button" onclick="changeNumber()">
+                    Change Number
+                </button>
+            </form>
+
+            <!-- Username Setup Form -->
+            <form class="auth-form" id="usernameForm" style="display: none;">
                 <div class="form-group">
-                    <label class="form-label" for="signupEmail">Email Address</label>
-                    <div class="input-container">
-                        <input 
-                            type="email" 
-                            id="signupEmail" 
-                            class="form-input" 
-                            placeholder="Enter your email"
-                            autocomplete="email"
-                            required
-                        >
-                        <span class="input-icon">📧</span>
-                    </div>
-                    <div class="validation-message" id="signupEmailError"></div>
+                    <label class="form-label">Choose Your Username</label>
+                    <input 
+                        type="text" 
+                        id="username" 
+                        class="form-input" 
+                        placeholder="CoolPlayer123"
+                        maxlength="20"
+                        pattern="[a-zA-Z0-9_]*"
+                    >
+                    <p class="username-hint">This is how other players will see you</p>
                 </div>
 
-                <!-- Password Input -->
                 <div class="form-group">
-                    <label class="form-label" for="signupPassword">Password</label>
-                    <div class="input-container">
-                        <input 
-                            type="password" 
-                            id="signupPassword" 
-                            class="form-input" 
-                            placeholder="Create a strong password"
-                            autocomplete="new-password"
-                            required
-                            minlength="6"
-                        >
-                        <span class="input-icon">🔒</span>
-                        <span class="password-toggle" onclick="togglePassword('signupPassword')">👁️</span>
+                    <label class="form-label">Pick Your Avatar</label>
+                    <div class="avatar-grid">
+                        <div class="avatar-option" onclick="selectAvatar('😎')">😎</div>
+                        <div class="avatar-option" onclick="selectAvatar('🌸')">🌸</div>
+                        <div class="avatar-option" onclick="selectAvatar('🚀')">🚀</div>
+                        <div class="avatar-option" onclick="selectAvatar('💪')">💪</div>
+                        <div class="avatar-option" onclick="selectAvatar('🎵')">🎵</div>
+                        <div class="avatar-option" onclick="selectAvatar('🎨')">🎨</div>
+                        <div class="avatar-option" onclick="selectAvatar('🤠')">🤠</div>
+                        <div class="avatar-option" onclick="selectAvatar('🌟')">🌟</div>
+                        <div class="avatar-option" onclick="selectAvatar('🎯')">🎯</div>
+                        <div class="avatar-option" onclick="selectAvatar('🎭')">🎭</div>
+                        <div class="avatar-option" onclick="selectAvatar('🎪')">🎪</div>
+                        <div class="avatar-option" onclick="selectAvatar('🌈')">🌈</div>
                     </div>
-                    <div class="password-strength" id="passwordStrength">
-                        <div class="strength-bar" id="strengthBar"></div>
-                    </div>
-                    <div class="validation-message" id="signupPasswordError"></div>
                 </div>
 
-                <!-- Confirm Password Input -->
-                <div class="form-group">
-                    <label class="form-label" for="confirmPassword">Confirm Password</label>
-                    <div class="input-container">
-                        <input 
-                            type="password" 
-                            id="confirmPassword" 
-                            class="form-input" 
-                            placeholder="Confirm your password"
-                            autocomplete="new-password"
-                            required
-                        >
-                        <span class="input-icon">🔒</span>
-                        <span class="password-toggle" onclick="togglePassword('confirmPassword')">👁️</span>
-                    </div>
-                    <div class="validation-message" id="confirmPasswordError"></div>
-                </div>
-
-                <!-- Signup Button -->
-                <button type="submit" class="auth-button auth-button-primary" id="signupButton">
-                    Create JomBro Account
+                <button type="submit" class="auth-button auth-button-primary" id="startPlayingButton">
+                    Start Playing! 🎮
                 </button>
             </form>
         </div>
@@ -2629,8 +2646,6 @@
         let isOnline = navigator.onLine;
         let unsubscribeFunctions = [];
         let authInitialized = false;
-        let currentTab = 'login';
-        let verificationCheckInterval = null;
         
         // AI Challenge System Variables
         let aiChallengeTimer = null;
@@ -2666,341 +2681,192 @@
             lastRequestCount: 0
         };
 
-        // Enhanced Authentication System
-        class EnhancedAuth {
+        // Enhanced Authentication System - Phone Only
+        class PhoneAuth {
             constructor() {
+                this.confirmationResult = null;
+                this.selectedAvatar = null;
+                this.resendTimer = null;
                 this.setupEventListeners();
-                this.setupValidation();
+                this.setupRecaptcha();
             }
 
             setupEventListeners() {
-                // Form submissions
-                document.getElementById('loginForm').addEventListener('submit', (e) => {
+                // Phone auth form
+                document.getElementById('phoneAuthForm').addEventListener('submit', (e) => {
                     e.preventDefault();
-                    this.handleLogin();
+                    this.sendVerificationCode();
                 });
 
-                document.getElementById('signupForm').addEventListener('submit', (e) => {
+                // OTP form
+                document.getElementById('otpForm').addEventListener('submit', (e) => {
                     e.preventDefault();
-                    this.handleSignup();
+                    this.verifyOTP();
                 });
 
-                document.getElementById('passwordResetForm').addEventListener('submit', (e) => {
+                // Username form
+                document.getElementById('usernameForm').addEventListener('submit', (e) => {
                     e.preventDefault();
-                    this.handlePasswordReset();
+                    this.completeProfile();
                 });
 
-                // Real-time validation
-                this.setupRealTimeValidation();
-            }
-
-            setupRealTimeValidation() {
-                // Email validation
-                ['loginEmail', 'signupEmail'].forEach(id => {
-                    const input = document.getElementById(id);
-                    if (input) {
-                        input.addEventListener('input', () => this.validateEmail(input));
-                        input.addEventListener('blur', () => this.validateEmail(input));
-                    }
-                });
-
-                // Name validation
-                const nameInput = document.getElementById('signupName');
-                if (nameInput) {
-                    nameInput.addEventListener('input', () => this.validateName(nameInput));
-                    nameInput.addEventListener('blur', () => this.validateName(nameInput));
-                }
-
-                // Password validation
-                const signupPassword = document.getElementById('signupPassword');
-                if (signupPassword) {
-                    signupPassword.addEventListener('input', () => {
-                        this.validatePassword(signupPassword);
-                        this.updatePasswordStrength(signupPassword.value);
+                // OTP inputs auto-advance
+                const otpInputs = document.querySelectorAll('.otp-input');
+                otpInputs.forEach((input, index) => {
+                    input.addEventListener('input', (e) => {
+                        if (e.target.value.length === 1 && index < otpInputs.length - 1) {
+                            otpInputs[index + 1].focus();
+                        }
+                        input.classList.toggle('filled', e.target.value.length === 1);
                     });
-                }
 
-                const confirmPassword = document.getElementById('confirmPassword');
-                if (confirmPassword) {
-                    confirmPassword.addEventListener('input', () => this.validatePasswordMatch());
-                    confirmPassword.addEventListener('blur', () => this.validatePasswordMatch());
-                }
-
-                // Login password
-                const loginPassword = document.getElementById('loginPassword');
-                if (loginPassword) {
-                    loginPassword.addEventListener('input', () => this.validateLoginPassword(loginPassword));
-                }
-            }
-
-            setupValidation() {
-                // Show password strength indicator when typing
-                const signupPassword = document.getElementById('signupPassword');
-                if (signupPassword) {
-                    signupPassword.addEventListener('focus', () => {
-                        const strengthIndicator = document.getElementById('passwordStrength');
-                        if (strengthIndicator) {
-                            strengthIndicator.classList.add('show');
+                    input.addEventListener('keydown', (e) => {
+                        if (e.key === 'Backspace' && !e.target.value && index > 0) {
+                            otpInputs[index - 1].focus();
                         }
                     });
-                }
+
+                    // Auto submit when all filled
+                    if (index === otpInputs.length - 1) {
+                        input.addEventListener('input', () => {
+                            const allFilled = Array.from(otpInputs).every(inp => inp.value.length === 1);
+                            if (allFilled) {
+                                this.verifyOTP();
+                            }
+                        });
+                    }
+                });
+
+                // Phone number formatting
+                document.getElementById('phoneNumber').addEventListener('input', (e) => {
+                    e.target.value = e.target.value.replace(/\D/g, '');
+                });
             }
 
-            // Validation Methods
-            validateEmail(input) {
-                const email = input.value.trim();
-                const errorElement = document.getElementById(input.id + 'Error');
-                const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-
-                if (!email) {
-                    this.showValidationError(input, errorElement, 'Email is required');
-                    return false;
-                } else if (!emailRegex.test(email)) {
-                    this.showValidationError(input, errorElement, 'Please enter a valid email address');
-                    return false;
-                } else {
-                    this.showValidationSuccess(input, errorElement, 'Email looks good!');
-                    return true;
-                }
+            setupRecaptcha() {
+                window.recaptchaVerifier = new firebase.auth.RecaptchaVerifier('recaptcha-container', {
+                    'size': 'invisible',
+                    'callback': (response) => {
+                        console.log('reCAPTCHA solved');
+                    }
+                });
             }
 
-            validateName(input) {
-                const name = input.value.trim();
-                const errorElement = document.getElementById('signupNameError');
+            async sendVerificationCode() {
+                const countryCode = document.getElementById('countryCode').value;
+                const phoneNumber = document.getElementById('phoneNumber').value.trim();
+                const sendButton = document.getElementById('sendCodeButton');
 
-                if (!name) {
-                    this.showValidationError(input, errorElement, 'Display name is required');
-                    return false;
-                } else if (name.length < 2) {
-                    this.showValidationError(input, errorElement, 'Name must be at least 2 characters');
-                    return false;
-                } else if (name.length > 30) {
-                    this.showValidationError(input, errorElement, 'Name must be less than 30 characters');
-                    return false;
-                } else if (!/^[a-zA-Z0-9\s_-]+$/.test(name)) {
-                    this.showValidationError(input, errorElement, 'Name can only contain letters, numbers, spaces, _ and -');
-                    return false;
-                } else {
-                    this.showValidationSuccess(input, errorElement, 'Great username!');
-                    return true;
-                }
-            }
-
-            validatePassword(input) {
-                const password = input.value;
-                const errorElement = document.getElementById('signupPasswordError');
-
-                if (!password) {
-                    this.showValidationError(input, errorElement, 'Password is required');
-                    return false;
-                } else if (password.length < 6) {
-                    this.showValidationError(input, errorElement, 'Password must be at least 6 characters');
-                    return false;
-                } else if (password.length < 8) {
-                    this.showValidationInfo(input, errorElement, 'Consider using 8+ characters for better security');
-                    return true;
-                } else {
-                    this.showValidationSuccess(input, errorElement, 'Strong password!');
-                    return true;
-                }
-            }
-
-            validateLoginPassword(input) {
-                const password = input.value;
-                const errorElement = document.getElementById('loginPasswordError');
-
-                if (!password) {
-                    this.showValidationError(input, errorElement, 'Password is required');
-                    return false;
-                } else {
-                    this.clearValidation(input, errorElement);
-                    return true;
-                }
-            }
-
-            validatePasswordMatch() {
-                const password = document.getElementById('signupPassword').value;
-                const confirmPassword = document.getElementById('confirmPassword');
-                const errorElement = document.getElementById('confirmPasswordError');
-
-                if (!confirmPassword.value) {
-                    this.showValidationError(confirmPassword, errorElement, 'Please confirm your password');
-                    return false;
-                } else if (password !== confirmPassword.value) {
-                    this.showValidationError(confirmPassword, errorElement, 'Passwords do not match');
-                    return false;
-                } else {
-                    this.showValidationSuccess(confirmPassword, errorElement, 'Passwords match!');
-                    return true;
-                }
-            }
-
-            updatePasswordStrength(password) {
-                const strengthBar = document.getElementById('strengthBar');
-                if (!strengthBar) return;
-
-                let strength = 0;
-
-                // Calculate strength
-                if (password.length >= 6) strength++;
-                if (password.length >= 8) strength++;
-                if (/[A-Z]/.test(password)) strength++;
-                if (/[0-9]/.test(password)) strength++;
-                if (/[^A-Za-z0-9]/.test(password)) strength++;
-
-                // Apply visual indicator
-                strengthBar.className = 'strength-bar';
-                if (strength <= 2) {
-                    strengthBar.classList.add('strength-weak');
-                } else if (strength <= 3) {
-                    strengthBar.classList.add('strength-fair');
-                } else if (strength <= 4) {
-                    strengthBar.classList.add('strength-good');
-                } else {
-                    strengthBar.classList.add('strength-strong');
-                }
-            }
-
-            showValidationError(input, errorElement, message) {
-                input.classList.remove('valid');
-                input.classList.add('invalid');
-                if (errorElement) {
-                    errorElement.textContent = message;
-                    errorElement.className = 'validation-message error show';
-                }
-            }
-
-            showValidationSuccess(input, errorElement, message) {
-                input.classList.remove('invalid');
-                input.classList.add('valid');
-                if (errorElement) {
-                    errorElement.textContent = message;
-                    errorElement.className = 'validation-message success show';
-                }
-            }
-
-            showValidationInfo(input, errorElement, message) {
-                input.classList.remove('invalid');
-                input.classList.add('valid');
-                if (errorElement) {
-                    errorElement.textContent = message;
-                    errorElement.className = 'validation-message info show';
-                }
-            }
-
-            clearValidation(input, errorElement) {
-                input.classList.remove('invalid', 'valid');
-                if (errorElement) {
-                    errorElement.className = 'validation-message';
-                    errorElement.textContent = '';
-                }
-            }
-
-            // Authentication Methods with Security
-            async handleLogin() {
-                const email = document.getElementById('loginEmail').value.trim();
-                const password = document.getElementById('loginPassword').value;
-                const rememberMe = document.getElementById('rememberMe').checked;
-                const loginButton = document.getElementById('loginButton');
-
-                // 🔒 SECURITY CHECK
-                const securityCheck = securityManager.canPerformAction('auth', email);
-                if (!securityCheck.allowed) {
-                    this.showNotification(`🔒 ${securityCheck.reason}`, 'error');
+                if (!phoneNumber || phoneNumber.length < 6) {
+                    this.showNotification('Please enter a valid phone number', 'error');
                     return;
                 }
 
-                // Sanitize inputs
-                const sanitizedEmail = securityManager.sanitizeInput(email, 'email');
-
-                // Validate inputs
-                const emailValid = this.validateEmail(document.getElementById('loginEmail'));
-                const passwordValid = this.validateLoginPassword(document.getElementById('loginPassword'));
-
-                if (!emailValid || !passwordValid) {
-                    this.showNotification('Please fix the errors above', 'error');
-                    return;
-                }
+                const fullNumber = countryCode + phoneNumber;
 
                 try {
-                    this.setButtonLoading(loginButton, true);
-                    this.showNotification('Signing you in...', 'info');
+                    this.setButtonLoading(sendButton, true);
+                    this.showNotification('Sending verification code...', 'info');
 
-                    // Set persistence based on Remember Me checkbox
-                    const persistence = rememberMe ? 
-                        firebase.auth.Auth.Persistence.LOCAL : 
-                        firebase.auth.Auth.Persistence.SESSION;
+                    this.confirmationResult = await auth.signInWithPhoneNumber(fullNumber, window.recaptchaVerifier);
                     
-                    await auth.setPersistence(persistence);
+                    // Show OTP form
+                    document.getElementById('phoneAuthForm').style.display = 'none';
+                    document.getElementById('otpForm').style.display = 'block';
+                    document.getElementById('sentToNumber').textContent = fullNumber;
                     
-                    const userCredential = await auth.signInWithEmailAndPassword(sanitizedEmail, password);
+                    // Focus first OTP input
+                    document.querySelector('.otp-input').focus();
                     
-                    // Check if email is verified
-                    if (!userCredential.user.emailVerified) {
-                        this.showNotification('⚠️ Please verify your email to access all features', 'info');
-                        showEmailVerificationBanner();
-                    }
+                    // Start resend timer
+                    this.startResendTimer();
                     
-                    this.showNotification('Welcome back! 🎉', 'success');
+                    this.showNotification('Code sent! Check your SMS', 'success');
 
                 } catch (error) {
+                    console.error('SMS send error:', error);
                     this.handleAuthError(error);
+                    // Reset recaptcha
+                    window.recaptchaVerifier.render().then(function(widgetId) {
+                        grecaptcha.reset(widgetId);
+                    });
                 } finally {
-                    this.setButtonLoading(loginButton, false);
+                    this.setButtonLoading(sendButton, false);
                 }
             }
 
-            async handleSignup() {
-                const name = document.getElementById('signupName').value.trim();
-                const email = document.getElementById('signupEmail').value.trim();
-                const password = document.getElementById('signupPassword').value;
-                const signupButton = document.getElementById('signupButton');
+            async verifyOTP() {
+                const otpInputs = document.querySelectorAll('.otp-input');
+                const code = Array.from(otpInputs).map(input => input.value).join('');
+                const verifyButton = document.getElementById('verifyButton');
 
-                // 🔒 SECURITY CHECKS
-                const securityCheck = securityManager.canPerformAction('auth', email);
-                if (!securityCheck.allowed) {
-                    this.showNotification(`🔒 ${securityCheck.reason}`, 'error');
-                    return;
-                }
-
-                // Sanitize inputs
-                const sanitizedName = securityManager.sanitizeInput(name, 'username');
-                const sanitizedEmail = securityManager.sanitizeInput(email, 'email');
-
-                // Check for profanity in username
-                if (securityManager.containsProfanity(sanitizedName)) {
-                    this.showNotification('🔒 Username contains inappropriate content', 'error');
-                    return;
-                }
-
-                // Validate all inputs
-                const nameValid = this.validateName(document.getElementById('signupName'));
-                const emailValid = this.validateEmail(document.getElementById('signupEmail'));
-                const passwordValid = this.validatePassword(document.getElementById('signupPassword'));
-                const passwordMatchValid = this.validatePasswordMatch();
-
-                if (!nameValid || !emailValid || !passwordValid || !passwordMatchValid) {
-                    this.showNotification('Please fix the errors above', 'error');
+                if (code.length !== 6) {
+                    this.showNotification('Please enter the complete code', 'error');
                     return;
                 }
 
                 try {
-                    this.setButtonLoading(signupButton, true);
-                    this.showNotification('Creating your account...', 'info');
+                    this.setButtonLoading(verifyButton, true);
+                    this.showNotification('Verifying code...', 'info');
 
-                    // Create user account
-                    const userCredential = await auth.createUserWithEmailAndPassword(sanitizedEmail, password);
+                    const result = await this.confirmationResult.confirm(code);
+                    const user = result.user;
+
+                    // Check if new user
+                    const userDoc = await db.collection('users').doc(user.uid).get();
                     
-                    // Update profile with display name
-                    await userCredential.user.updateProfile({
-                        displayName: sanitizedName
+                    if (!userDoc.exists) {
+                        // New user - show username form
+                        document.getElementById('otpForm').style.display = 'none';
+                        document.getElementById('usernameForm').style.display = 'block';
+                        document.getElementById('username').focus();
+                    } else {
+                        // Existing user - go to app
+                        this.showNotification('Welcome back! 🎮', 'success');
+                    }
+
+                } catch (error) {
+                    console.error('OTP verification error:', error);
+                    this.showNotification('Invalid code. Please try again.', 'error');
+                    // Clear OTP inputs
+                    otpInputs.forEach(input => {
+                        input.value = '';
+                        input.classList.remove('filled');
+                    });
+                    otpInputs[0].focus();
+                } finally {
+                    this.setButtonLoading(verifyButton, false);
+                }
+            }
+
+            async completeProfile() {
+                const username = document.getElementById('username').value.trim();
+                const startButton = document.getElementById('startPlayingButton');
+
+                if (!username || username.length < 3) {
+                    this.showNotification('Username must be at least 3 characters', 'error');
+                    return;
+                }
+
+                if (!this.selectedAvatar) {
+                    this.showNotification('Please select an avatar', 'error');
+                    return;
+                }
+
+                try {
+                    this.setButtonLoading(startButton, true);
+                    this.showNotification('Creating your profile...', 'info');
+
+                    // Update user profile
+                    await currentUser.updateProfile({
+                        displayName: username
                     });
 
-                    // Create user document in Firestore with security
-                    await db.collection('users').doc(userCredential.user.uid).set({
-                        name: sanitizedName,
-                        email: sanitizedEmail,
-                        avatar: this.getRandomAvatar(),
+                    // Create user document
+                    await db.collection('users').doc(currentUser.uid).set({
+                        name: username,
+                        phoneNumber: currentUser.phoneNumber,
+                        avatar: this.selectedAvatar,
                         tokens: 1000,
                         level: 1,
                         friendsCount: 0,
@@ -3008,177 +2874,56 @@
                         lastActive: firebase.firestore.FieldValue.serverTimestamp(),
                         online: true,
                         isNewUser: true,
-                        authProvider: 'email',
-                        emailVerified: false
+                        authProvider: 'phone'
                     });
 
-                    // Send email verification
-                    await userCredential.user.sendEmailVerification();
-                    
-                    this.showNotification('Account created! Please check your email to verify your account 📧', 'success');
-                    showEmailVerificationBanner();
+                    this.showNotification('🎉 Welcome to JomBro! You got 1000 starter tokens!', 'success');
 
                 } catch (error) {
-                    this.handleAuthError(error);
+                    console.error('Profile creation error:', error);
+                    this.showNotification('Failed to create profile. Please try again.', 'error');
                 } finally {
-                    this.setButtonLoading(signupButton, false);
+                    this.setButtonLoading(startButton, false);
                 }
             }
 
-            async handlePasswordReset() {
-                const email = document.getElementById('resetEmail').value.trim();
-                const resetButton = document.getElementById('resetButton');
-
-                // Validate email
-                const emailInput = document.getElementById('resetEmail');
-                const emailValid = this.validateEmail(emailInput);
-
-                if (!emailValid) {
-                    this.showNotification('Please enter a valid email address', 'error');
-                    return;
-                }
-
-                try {
-                    this.setButtonLoading(resetButton, true);
+            startResendTimer() {
+                let seconds = 30;
+                const resendButton = document.getElementById('resendButton');
+                const timerSpan = document.getElementById('resendTimer');
+                
+                resendButton.disabled = true;
+                
+                this.resendTimer = setInterval(() => {
+                    seconds--;
+                    timerSpan.textContent = `(${seconds}s)`;
                     
-                    await auth.sendPasswordResetEmail(email);
-                    
-                    this.showNotification('Password reset email sent! Check your inbox 📧', 'success');
-                    
-                    // Clear form and hide modal after a short delay
-                    setTimeout(() => {
-                        document.getElementById('resetEmail').value = '';
-                        hidePasswordResetModal();
-                    }, 2000);
-
-                } catch (error) {
-                    this.handleAuthError(error);
-                } finally {
-                    this.setButtonLoading(resetButton, false);
-                }
+                    if (seconds <= 0) {
+                        clearInterval(this.resendTimer);
+                        resendButton.disabled = false;
+                        timerSpan.textContent = '';
+                    }
+                }, 1000);
             }
 
-            // Social Authentication with Security
-            async signInWithGoogle() {
-                try {
-                    // 🔒 SECURITY CHECK
-                    const securityCheck = securityManager.canPerformAction('auth', 'google_signin');
-                    if (!securityCheck.allowed) {
-                        this.showNotification(`🔒 ${securityCheck.reason}`, 'error');
-                        return;
-                    }
-
-                    this.showNotification('Opening Google Sign-In...', 'info');
-                    const provider = new firebase.auth.GoogleAuthProvider();
-                    provider.addScope('email');
-                    provider.addScope('profile');
-                    
-                    const result = await auth.signInWithPopup(provider);
-                    
-                    // Check if this is a new user
-                    const userDoc = await db.collection('users').doc(result.user.uid).get();
-                    
-                    if (!userDoc.exists) {
-                        // Create user document for new Google users with security
-                        const sanitizedName = securityManager.sanitizeInput(result.user.displayName, 'username');
-                        
-                        await db.collection('users').doc(result.user.uid).set({
-                            name: sanitizedName,
-                            email: result.user.email,
-                            avatar: this.getRandomAvatar(),
-                            tokens: 1000,
-                            level: 1,
-                            friendsCount: 0,
-                            createdAt: firebase.firestore.FieldValue.serverTimestamp(),
-                            lastActive: firebase.firestore.FieldValue.serverTimestamp(),
-                            online: true,
-                            isNewUser: true,
-                            authProvider: 'google',
-                            emailVerified: true // Google accounts are pre-verified
-                        });
-                    }
-
-                    this.showNotification('Welcome to JomBro! 🎉', 'success');
-
-                } catch (error) {
-                    if (error.code !== 'auth/popup-closed-by-user') {
-                        this.handleAuthError(error);
-                    }
-                }
-            }
-
-            async signInWithFacebook() {
-                try {
-                    // 🔒 SECURITY CHECK
-                    const securityCheck = securityManager.canPerformAction('auth', 'facebook_signin');
-                    if (!securityCheck.allowed) {
-                        this.showNotification(`🔒 ${securityCheck.reason}`, 'error');
-                        return;
-                    }
-
-                    this.showNotification('Opening Facebook Sign-In...', 'info');
-                    const provider = new firebase.auth.FacebookAuthProvider();
-                    provider.addScope('email');
-                    
-                    const result = await auth.signInWithPopup(provider);
-                    
-                    // Check if this is a new user
-                    const userDoc = await db.collection('users').doc(result.user.uid).get();
-                    
-                    if (!userDoc.exists) {
-                        // Create user document for new Facebook users with security
-                        const sanitizedName = securityManager.sanitizeInput(result.user.displayName, 'username');
-                        
-                        await db.collection('users').doc(result.user.uid).set({
-                            name: sanitizedName,
-                            email: result.user.email,
-                            avatar: this.getRandomAvatar(),
-                            tokens: 1000,
-                            level: 1,
-                            friendsCount: 0,
-                            createdAt: firebase.firestore.FieldValue.serverTimestamp(),
-                            lastActive: firebase.firestore.FieldValue.serverTimestamp(),
-                            online: true,
-                            isNewUser: true,
-                            authProvider: 'facebook',
-                            emailVerified: true // Facebook accounts are pre-verified
-                        });
-                    }
-
-                    this.showNotification('Welcome to JomBro! 🎉', 'success');
-
-                } catch (error) {
-                    if (error.code !== 'auth/popup-closed-by-user') {
-                        this.handleAuthError(error);
-                    }
-                }
-            }
-
-            // Error Handling
             handleAuthError(error) {
                 let errorMessage = 'An error occurred. Please try again.';
                 
                 switch (error.code) {
-                    case 'auth/user-not-found':
-                        errorMessage = 'No account found with this email address.';
+                    case 'auth/invalid-phone-number':
+                        errorMessage = 'Invalid phone number format.';
                         break;
-                    case 'auth/wrong-password':
-                        errorMessage = 'Incorrect password. Please try again.';
+                    case 'auth/missing-phone-number':
+                        errorMessage = 'Please enter a phone number.';
                         break;
-                    case 'auth/email-already-in-use':
-                        errorMessage = 'An account with this email already exists.';
+                    case 'auth/quota-exceeded':
+                        errorMessage = 'Too many requests. Please try again later.';
                         break;
-                    case 'auth/weak-password':
-                        errorMessage = 'Password is too weak. Please use a stronger password.';
+                    case 'auth/user-disabled':
+                        errorMessage = 'This account has been disabled.';
                         break;
-                    case 'auth/invalid-email':
-                        errorMessage = 'Please enter a valid email address.';
-                        break;
-                    case 'auth/too-many-requests':
-                        errorMessage = 'Too many failed attempts. Please try again later.';
-                        break;
-                    case 'auth/network-request-failed':
-                        errorMessage = 'Network error. Please check your connection.';
+                    case 'auth/operation-not-allowed':
+                        errorMessage = 'Phone authentication is not enabled.';
                         break;
                     default:
                         errorMessage = error.message || errorMessage;
@@ -3187,7 +2932,6 @@
                 this.showNotification(errorMessage, 'error');
             }
 
-            // Utility Methods
             setButtonLoading(button, loading) {
                 if (loading) {
                     button.disabled = true;
@@ -3201,12 +2945,56 @@
             showNotification(message, type = 'info') {
                 showMessage(message, type);
             }
-
-            getRandomAvatar() {
-                const avatars = ['😎', '🌸', '🚀', '💪', '🎵', '🎨', '🤠', '🌟', '🎯', '🎭', '🎪', '🌈', '🎲', '🎊', '🌺', '⚡', '🌙', '🔥'];
-                return avatars[Math.floor(Math.random() * avatars.length)];
-            }
         }
+
+        // Global functions for UI
+        window.selectAvatar = (avatar) => {
+            document.querySelectorAll('.avatar-option').forEach(opt => {
+                opt.classList.remove('selected');
+            });
+            event.target.classList.add('selected');
+            phoneAuth.selectedAvatar = avatar;
+        };
+
+        window.changeNumber = () => {
+            document.getElementById('otpForm').style.display = 'none';
+            document.getElementById('phoneAuthForm').style.display = 'block';
+            // Clear OTP inputs
+            document.querySelectorAll('.otp-input').forEach(input => {
+                input.value = '';
+                input.classList.remove('filled');
+            });
+            // Clear timer
+            if (phoneAuth.resendTimer) {
+                clearInterval(phoneAuth.resendTimer);
+            }
+        };
+
+        window.resendCode = async () => {
+            const countryCode = document.getElementById('countryCode').value;
+            const phoneNumber = document.getElementById('phoneNumber').value.trim();
+            const fullNumber = countryCode + phoneNumber;
+            
+            try {
+                showMessage('Resending code...', 'info');
+                phoneAuth.confirmationResult = await auth.signInWithPhoneNumber(fullNumber, window.recaptchaVerifier);
+                phoneAuth.startResendTimer();
+                showMessage('New code sent!', 'success');
+            } catch (error) {
+                phoneAuth.handleAuthError(error);
+            }
+        };
+
+        window.showTerms = () => {
+            showMessage('Terms & Conditions: Be nice, have fun, don\'t cheat! 😊', 'info');
+        };
+
+        window.showPrivacy = () => {
+            showMessage('Privacy: We only use your phone number for login. Your data is safe! 🔒', 'info');
+        };
+
+        // Initialize phone auth
+        let phoneAuth;
 
         // AI Challenge Database
         const aiChallengeDatabase = {
@@ -3311,20 +3099,14 @@
             try {
                 console.log('🚀 Initializing JomBro App...');
                 
-                // Initialize Enhanced Auth
-                const enhancedAuth = new EnhancedAuth();
+                // Initialize Phone Auth
+                phoneAuth = new PhoneAuth();
                 
                 // Setup auth state monitoring
                 auth.onAuthStateChanged(async (user) => {
                     if (user) {
                         currentUser = user;
-                        console.log('✅ User authenticated:', user.email);
-                        
-                        // Check email verification status
-                        if (!user.emailVerified) {
-                            showEmailVerificationBanner();
-                            startEmailVerificationCheck();
-                        }
+                        console.log('✅ User authenticated:', user.phoneNumber);
                         
                         await loadUserSession(user);
                         hideAuthModal();
@@ -3334,12 +3116,6 @@
                         console.log('❌ No user authenticated');
                         showAuthModal();
                         stopAIChallenge();
-                        
-                        // Clear verification check
-                        if (verificationCheckInterval) {
-                            clearInterval(verificationCheckInterval);
-                            verificationCheckInterval = null;
-                        }
                         
                         unsubscribeFunctions.forEach(unsubscribe => unsubscribe());
                         unsubscribeFunctions = [];
@@ -3385,77 +3161,7 @@
 
         // Setup event listeners
         function setupEventListeners() {
-            // Tab switching
-            window.switchTab = (tab) => {
-                currentTab = tab;
-                
-                // Update tabs
-                document.querySelectorAll('.auth-tab').forEach(t => t.classList.remove('active'));
-                document.getElementById(tab + 'Tab').classList.add('active');
-                
-                // Update indicator
-                const indicator = document.getElementById('tabIndicator');
-                indicator.className = 'tab-indicator';
-                if (tab === 'signup') {
-                    indicator.classList.add('signup');
-                }
-                
-                // Update forms
-                document.querySelectorAll('.auth-form').forEach(f => f.classList.remove('active'));
-                document.getElementById(tab + 'Form').classList.add('active');
-            };
-
-            // Password visibility toggle
-            window.togglePassword = (inputId) => {
-                const input = document.getElementById(inputId);
-                const toggle = input.nextElementSibling.nextElementSibling;
-                
-                if (input.type === 'password') {
-                    input.type = 'text';
-                    toggle.textContent = '👁️‍🗨️';
-                } else {
-                    input.type = 'password';
-                    toggle.textContent = '👁️';
-                }
-            };
-
-            // Social sign-in
-            window.signInWithGoogle = () => {
-                const enhancedAuth = new EnhancedAuth();
-                enhancedAuth.signInWithGoogle();
-            };
-
-            window.signInWithFacebook = () => {
-                const enhancedAuth = new EnhancedAuth();
-                enhancedAuth.signInWithFacebook();
-            };
-
-            // Password reset modal
-            window.showPasswordResetModal = () => {
-                document.getElementById('passwordResetModal').classList.add('show');
-            };
-
-            window.hidePasswordResetModal = () => {
-                document.getElementById('passwordResetModal').classList.remove('show');
-                document.getElementById('resetEmail').value = '';
-            };
-
-            // Email verification
-            window.resendVerificationEmail = async () => {
-                if (!currentUser) return;
-                
-                try {
-                    await currentUser.sendEmailVerification();
-                    showMessage('📧 Verification email sent! Please check your inbox.', 'success');
-                } catch (error) {
-                    showMessage('❌ Failed to send verification email. Try again later.', 'error');
-                }
-            };
-
-            window.hideVerificationBanner = () => {
-                document.getElementById('emailVerificationBanner').classList.remove('show');
-                document.getElementById('appContent').classList.remove('with-banner');
-            };
+            // Nothing needed here anymore - all auth handled by PhoneAuth class
         }
 
         // Load user session
@@ -3478,9 +3184,10 @@
                         online: true
                     };
                 } else {
+                    // This shouldn't happen with phone auth, but just in case
                     const newUserData = {
                         name: user.displayName || 'JomBro Player',
-                        email: user.email,
+                        phoneNumber: user.phoneNumber,
                         avatar: getRandomAvatar(),
                         tokens: 1000,
                         level: 1,
@@ -3500,12 +3207,7 @@
                 await setupRealtimeListeners();
                 loadAppContent();
                 
-                // Show appropriate welcome message based on email verification
-                if (!user.emailVerified) {
-                    showMessage(`⚠️ Welcome ${appState.user.name}! Verify your email for full access.`, 'info');
-                } else {
-                    showMessage(`🎮 Welcome back, ${appState.user.name}!`, 'success');
-                }
+                showMessage(`🎮 Welcome back, ${appState.user.name}!`, 'success');
                 
             } catch (error) {
                 console.error('Error loading user session:', error);
@@ -3696,14 +3398,6 @@
                 }
                 
                 stopAIChallenge();
-                
-                // Clear verification check
-                if (verificationCheckInterval) {
-                    clearInterval(verificationCheckInterval);
-                    verificationCheckInterval = null;
-                }
-                
-                hideVerificationBanner();
                 
                 unsubscribeFunctions.forEach(unsubscribe => unsubscribe());
                 unsubscribeFunctions = [];
@@ -4091,13 +3785,6 @@
 
         // Create secure challenge with security
         async function createQuickChallenge() {
-            // Check email verification
-            if (currentUser && !currentUser.emailVerified) {
-                showMessage('⚠️ Please verify your email to create challenges!', 'error');
-                showEmailVerificationBanner();
-                return;
-            }
-            
             const title = document.getElementById('quickChallengeTitle').value.trim();
             const description = document.getElementById('quickChallengeDesc').value.trim();
             const category = document.getElementById('quickCategory').value;
@@ -4351,13 +4038,6 @@
         async function sendSelectedAIChallenge() {
             if (!selectedAIChallenge || selectedTargets.length === 0) {
                 showMessage('❌ Please select a challenge and at least one target!', 'error');
-                return;
-            }
-            
-            // Check email verification
-            if (currentUser && !currentUser.emailVerified) {
-                showMessage('⚠️ Please verify your email to send challenges!', 'error');
-                showEmailVerificationBanner();
                 return;
             }
             
