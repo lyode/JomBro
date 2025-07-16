@@ -715,6 +715,171 @@
             color: white;
         }
 
+        .checkbox-container {
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+            user-select: none;
+            margin-bottom: 8px;
+        }
+
+        .checkbox-input {
+            width: 18px;
+            height: 18px;
+            margin-right: 10px;
+            cursor: pointer;
+            accent-color: #667eea;
+        }
+
+        .checkbox-label {
+            font-size: 0.9rem;
+            color: #4a5568;
+            font-weight: 500;
+        }
+
+        .forgot-password-link {
+            color: #667eea;
+            text-decoration: none;
+            font-size: 0.9rem;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .forgot-password-link:hover {
+            color: #764ba2;
+            text-decoration: underline;
+        }
+
+        /* Password Reset Modal */
+        .password-reset-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 2000;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .password-reset-modal.show {
+            display: flex;
+        }
+
+        .password-reset-container {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border-radius: 24px;
+            padding: 40px;
+            width: 100%;
+            max-width: 400px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+            animation: slideUp 0.4s ease-out;
+        }
+
+        .password-reset-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .password-reset-title {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: #2d3748;
+            margin-bottom: 8px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .password-reset-subtitle {
+            color: #718096;
+            font-size: 0.95rem;
+            line-height: 1.5;
+        }
+
+        .password-reset-container .form-group {
+            margin-bottom: 20px;
+        }
+
+        .password-reset-container .auth-button {
+            margin-bottom: 12px;
+        }
+
+        /* Email Verification Banner */
+        .email-verification-banner {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: linear-gradient(135deg, #f59e0b, #f97316);
+            color: white;
+            padding: 15px;
+            text-align: center;
+            z-index: 999;
+            display: none;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        .email-verification-banner.show {
+            display: block;
+        }
+
+        .verification-content {
+            max-width: 800px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .verification-text {
+            font-size: 0.95rem;
+            font-weight: 500;
+        }
+
+        .verification-button {
+            padding: 8px 16px;
+            background: rgba(255, 255, 255, 0.2);
+            border: 2px solid white;
+            border-radius: 8px;
+            color: white;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            font-size: 0.9rem;
+        }
+
+        .verification-button:hover {
+            background: white;
+            color: #f59e0b;
+        }
+
+        .verification-close {
+            position: absolute;
+            right: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            color: white;
+            font-size: 1.5rem;
+            cursor: pointer;
+            opacity: 0.8;
+            transition: opacity 0.3s ease;
+        }
+
+        .verification-close:hover {
+            opacity: 1;
+        }
+
         /* Enhanced Auth Modal Styles */
         .auth-modal {
             display: none;
@@ -929,6 +1094,10 @@
 
         .validation-message.success {
             color: #48bb78;
+        }
+
+        .validation-message.info {
+            color: #3182ce;
         }
 
         .password-strength {
@@ -1499,7 +1668,7 @@
 
         .app-content {
             opacity: 0;
-            transition: opacity 0.5s ease;
+            transition: opacity 0.5s ease, padding-top 0.3s ease;
         }
 
         .app-content.loaded {
@@ -1560,10 +1729,83 @@
             .auth-title {
                 font-size: 1.5rem;
             }
+
+            .password-reset-container {
+                padding: 24px;
+                margin: 10px;
+            }
+
+            .email-verification-banner {
+                padding: 12px 10px;
+            }
+
+            .verification-content {
+                flex-direction: column;
+                gap: 10px;
+            }
+
+            .verification-close {
+                position: static;
+                transform: none;
+                margin-top: 5px;
+            }
         }
     </style>
 </head>
 <body>
+    <!-- Email Verification Banner -->
+    <div class="email-verification-banner" id="emailVerificationBanner">
+        <div class="verification-content">
+            <span class="verification-text">
+                ⚠️ Please verify your email to unlock all features
+            </span>
+            <button class="verification-button" onclick="resendVerificationEmail()">
+                Resend Verification Email
+            </button>
+            <button class="verification-close" onclick="hideVerificationBanner()">
+                ×
+            </button>
+        </div>
+    </div>
+
+    <!-- Password Reset Modal -->
+    <div class="password-reset-modal" id="passwordResetModal">
+        <div class="password-reset-container">
+            <div class="password-reset-header">
+                <h2 class="password-reset-title">Reset Password</h2>
+                <p class="password-reset-subtitle">
+                    Enter your email address and we'll send you a link to reset your password.
+                </p>
+            </div>
+            
+            <form id="passwordResetForm">
+                <div class="form-group">
+                    <label class="form-label" for="resetEmail">Email Address</label>
+                    <div class="input-container">
+                        <input 
+                            type="email" 
+                            id="resetEmail" 
+                            class="form-input" 
+                            placeholder="Enter your email"
+                            required
+                        >
+                        <span class="input-icon">📧</span>
+                    </div>
+                    <div class="validation-message" id="resetEmailError"></div>
+                </div>
+                
+                <button type="submit" class="auth-button auth-button-primary" id="resetButton">
+                    Send Reset Link
+                </button>
+                
+                <button type="button" class="auth-button" onclick="hidePasswordResetModal()" 
+                        style="background: #e2e8f0; color: #4a5568;">
+                    Cancel
+                </button>
+            </form>
+        </div>
+    </div>
+
     <!-- Starfield Background -->
     <div class="starfield" id="starfield"></div>
 
@@ -1640,10 +1882,25 @@
                     <div class="validation-message" id="loginPasswordError"></div>
                 </div>
 
+                <!-- Remember Me Checkbox -->
+                <div class="form-group" style="margin-bottom: 16px;">
+                    <label class="checkbox-container">
+                        <input type="checkbox" id="rememberMe" class="checkbox-input">
+                        <span class="checkbox-label">Remember me for 30 days</span>
+                    </label>
+                </div>
+
                 <!-- Login Button -->
                 <button type="submit" class="auth-button auth-button-primary" id="loginButton">
                     Sign In to JomBro
                 </button>
+
+                <!-- Forgot Password Link -->
+                <div style="text-align: center; margin-top: 16px;">
+                    <a href="#" onclick="showPasswordResetModal()" class="forgot-password-link">
+                        Forgot your password?
+                    </a>
+                </div>
             </form>
 
             <!-- Signup Form -->
@@ -2395,6 +2652,7 @@
             async handleLogin() {
                 const email = document.getElementById('loginEmail').value.trim();
                 const password = document.getElementById('loginPassword').value;
+                const rememberMe = document.getElementById('rememberMe').checked;
                 const loginButton = document.getElementById('loginButton');
 
                 // 🔒 SECURITY CHECK
@@ -2420,7 +2678,20 @@
                     this.setButtonLoading(loginButton, true);
                     this.showNotification('Signing you in...', 'info');
 
+                    // Set persistence based on Remember Me checkbox
+                    const persistence = rememberMe ? 
+                        firebase.auth.Auth.Persistence.LOCAL : 
+                        firebase.auth.Auth.Persistence.SESSION;
+                    
+                    await auth.setPersistence(persistence);
+                    
                     const userCredential = await auth.signInWithEmailAndPassword(sanitizedEmail, password);
+                    
+                    // Check if email is verified
+                    if (!userCredential.user.emailVerified) {
+                        this.showNotification('⚠️ Please verify your email to access all features', 'info');
+                        showEmailVerificationBanner();
+                    }
                     
                     this.showNotification('Welcome back! 🎉', 'success');
 
@@ -2489,10 +2760,15 @@
                         lastActive: firebase.firestore.FieldValue.serverTimestamp(),
                         online: true,
                         isNewUser: true,
-                        authProvider: 'email'
+                        authProvider: 'email',
+                        emailVerified: false
                     });
 
-                    this.showNotification('Account created successfully! 🎉', 'success');
+                    // Send email verification
+                    await userCredential.user.sendEmailVerification();
+                    
+                    this.showNotification('Account created! Please check your email to verify your account 📧', 'success');
+                    showEmailVerificationBanner();
 
                 } catch (error) {
                     this.handleAuthError(error);
@@ -2536,7 +2812,8 @@
                             lastActive: firebase.firestore.FieldValue.serverTimestamp(),
                             online: true,
                             isNewUser: true,
-                            authProvider: 'google'
+                            authProvider: 'google',
+                            emailVerified: true // Google accounts are pre-verified
                         });
                     }
 
@@ -2582,7 +2859,8 @@
                             lastActive: firebase.firestore.FieldValue.serverTimestamp(),
                             online: true,
                             isNewUser: true,
-                            authProvider: 'facebook'
+                            authProvider: 'facebook',
+                            emailVerified: true // Facebook accounts are pre-verified
                         });
                     }
 
@@ -2773,6 +3051,13 @@
                     if (user) {
                         currentUser = user;
                         console.log('✅ User authenticated:', user.email);
+                        
+                        // Check email verification status
+                        if (!user.emailVerified) {
+                            showEmailVerificationBanner();
+                            startEmailVerificationCheck();
+                        }
+                        
                         await loadUserSession(user);
                         hideAuthModal();
                         initializeAIChallenge();
@@ -2781,6 +3066,13 @@
                         console.log('❌ No user authenticated');
                         showAuthModal();
                         stopAIChallenge();
+                        
+                        // Clear verification check
+                        if (verificationCheckInterval) {
+                            clearInterval(verificationCheckInterval);
+                            verificationCheckInterval = null;
+                        }
+                        
                         unsubscribeFunctions.forEach(unsubscribe => unsubscribe());
                         unsubscribeFunctions = [];
                     }
@@ -2839,7 +3131,12 @@
                 await setupRealtimeListeners();
                 loadAppContent();
                 
-                showMessage(`🎮 Welcome back, ${appState.user.name}!`, 'success');
+                // Show appropriate welcome message based on email verification
+                if (!user.emailVerified) {
+                    showMessage(`⚠️ Welcome ${appState.user.name}! Verify your email for full access.`, 'info');
+                } else {
+                    showMessage(`🎮 Welcome back, ${appState.user.name}!`, 'success');
+                }
                 
             } catch (error) {
                 console.error('Error loading user session:', error);
@@ -2958,6 +3255,15 @@
                 }
                 
                 stopAIChallenge();
+                
+                // Clear verification check
+                if (verificationCheckInterval) {
+                    clearInterval(verificationCheckInterval);
+                    verificationCheckInterval = null;
+                }
+                
+                hideVerificationBanner();
+                
                 unsubscribeFunctions.forEach(unsubscribe => unsubscribe());
                 unsubscribeFunctions = [];
                 
@@ -3158,6 +3464,13 @@
 
         // Create secure challenge with security
         async function createQuickChallenge() {
+            // Check email verification
+            if (currentUser && !currentUser.emailVerified) {
+                showMessage('⚠️ Please verify your email to create challenges!', 'error');
+                showEmailVerificationBanner();
+                return;
+            }
+            
             const title = document.getElementById('quickChallengeTitle').value.trim();
             const description = document.getElementById('quickChallengeDesc').value.trim();
             const category = document.getElementById('quickCategory').value;
