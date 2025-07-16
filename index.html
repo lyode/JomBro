@@ -223,6 +223,12 @@
             border: 1px solid rgba(255, 255, 255, 0.2);
             backdrop-filter: blur(10px);
             min-width: 55px;
+            transition: all 0.3s ease;
+        }
+
+        .stat-item:hover {
+            background: rgba(255, 255, 255, 0.15);
+            transform: translateY(-2px);
         }
 
         .stat-number {
@@ -230,6 +236,16 @@
             font-weight: bold;
             color: #9b59b6;
             text-shadow: 0 0 8px rgba(155, 89, 182, 0.7);
+            transition: all 0.3s ease;
+        }
+
+        .stat-number.updating {
+            animation: pulse-number 0.5s ease;
+        }
+
+        @keyframes pulse-number {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.2); color: #fff; }
         }
 
         .stat-label {
@@ -823,6 +839,16 @@
             z-index: 999;
             display: none;
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            animation: slideDownBanner 0.5s ease-out;
+        }
+
+        @keyframes slideDownBanner {
+            from {
+                transform: translateY(-100%);
+            }
+            to {
+                transform: translateY(0);
+            }
         }
 
         .email-verification-banner.show {
@@ -1278,6 +1304,24 @@
             text-align: center;
         }
 
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            transition: width 0.6s, height 0.6s;
+        }
+
+        .btn:hover::before {
+            width: 300px;
+            height: 300px;
+        }
+
         .btn-primary {
             background: linear-gradient(45deg, #9b59b6, #e91e63);
             color: white;
@@ -1673,6 +1717,10 @@
 
         .app-content.loaded {
             opacity: 1;
+        }
+
+        .app-content.with-banner {
+            padding-top: 60px;
         }
 
         .empty-state {
@@ -2239,7 +2287,6 @@
 
     <script>
         // Firebase Configuration
-        // For Firebase JS SDK v7.20.0 and later, measurementId is optional
         const firebaseConfig = {
             apiKey: "AIzaSyC_orriRUuf1ynDiFaJAPrO6-Gu3GeURxQ",
             authDomain: "jombro-9d129.firebaseapp.com",
@@ -2391,6 +2438,7 @@
         let unsubscribeFunctions = [];
         let authInitialized = false;
         let currentTab = 'login';
+        let verificationCheckInterval = null;
         
         // AI Challenge System Variables
         let aiChallengeTimer = null;
@@ -2440,6 +2488,11 @@
                 document.getElementById('signupForm').addEventListener('submit', (e) => {
                     e.preventDefault();
                     this.handleSignup();
+                });
+
+                document.getElementById('passwordResetForm').addEventListener('submit', (e) => {
+                    e.preventDefault();
+                    this.handlePasswordReset();
                 });
 
                 // Real-time validation
@@ -2777,6 +2830,39 @@
                 }
             }
 
+            async handlePasswordReset() {
+                const email = document.getElementById('resetEmail').value.trim();
+                const resetButton = document.getElementById('resetButton');
+
+                // Validate email
+                const emailInput = document.getElementById('resetEmail');
+                const emailValid = this.validateEmail(emailInput);
+
+                if (!emailValid) {
+                    this.showNotification('Please enter a valid email address', 'error');
+                    return;
+                }
+
+                try {
+                    this.setButtonLoading(resetButton, true);
+                    
+                    await auth.sendPasswordResetEmail(email);
+                    
+                    this.showNotification('Password reset email sent! Check your inbox 📧', 'success');
+                    
+                    // Clear form and hide modal after a short delay
+                    setTimeout(() => {
+                        document.getElementById('resetEmail').value = '';
+                        hidePasswordResetModal();
+                    }, 2000);
+
+                } catch (error) {
+                    this.handleAuthError(error);
+                } finally {
+                    this.setButtonLoading(resetButton, false);
+                }
+            }
+
             // Social Authentication with Security
             async signInWithGoogle() {
                 try {
@@ -2918,20 +3004,7 @@
             }
 
             showNotification(message, type = 'info') {
-                // Remove existing notifications
-                document.querySelectorAll('.message').forEach(n => n.remove());
-                
-                const notification = document.createElement('div');
-                notification.className = `message ${type}`;
-                notification.textContent = message;
-                document.body.appendChild(notification);
-                
-                // Auto-remove after 4 seconds
-                setTimeout(() => {
-                    if (notification.parentNode) {
-                        notification.remove();
-                    }
-                }, 4000);
+                showMessage(message, type);
             }
 
             getRandomAvatar() {
@@ -3089,6 +3162,107 @@
             }
         }
 
+        // Create starfield background
+        function createStarfield() {
+            const starfield = document.getElementById('starfield');
+            const starCount = 100;
+            
+            for (let i = 0; i < starCount; i++) {
+                const star = document.createElement('div');
+                star.className = 'star';
+                
+                // Random size
+                const size = Math.random();
+                if (size < 0.3) star.classList.add('small');
+                else if (size < 0.7) star.classList.add('medium');
+                else star.classList.add('large');
+                
+                // Random position
+                star.style.left = Math.random() * 100 + '%';
+                star.style.top = Math.random() * 100 + '%';
+                
+                // Random animation delay
+                star.style.animationDelay = Math.random() * 2 + 's';
+                
+                starfield.appendChild(star);
+            }
+        }
+
+        // Setup event listeners
+        function setupEventListeners() {
+            // Tab switching
+            window.switchTab = (tab) => {
+                currentTab = tab;
+                
+                // Update tabs
+                document.querySelectorAll('.auth-tab').forEach(t => t.classList.remove('active'));
+                document.getElementById(tab + 'Tab').classList.add('active');
+                
+                // Update indicator
+                const indicator = document.getElementById('tabIndicator');
+                indicator.className = 'tab-indicator';
+                if (tab === 'signup') {
+                    indicator.classList.add('signup');
+                }
+                
+                // Update forms
+                document.querySelectorAll('.auth-form').forEach(f => f.classList.remove('active'));
+                document.getElementById(tab + 'Form').classList.add('active');
+            };
+
+            // Password visibility toggle
+            window.togglePassword = (inputId) => {
+                const input = document.getElementById(inputId);
+                const toggle = input.nextElementSibling.nextElementSibling;
+                
+                if (input.type === 'password') {
+                    input.type = 'text';
+                    toggle.textContent = '👁️‍🗨️';
+                } else {
+                    input.type = 'password';
+                    toggle.textContent = '👁️';
+                }
+            };
+
+            // Social sign-in
+            window.signInWithGoogle = () => {
+                const enhancedAuth = new EnhancedAuth();
+                enhancedAuth.signInWithGoogle();
+            };
+
+            window.signInWithFacebook = () => {
+                const enhancedAuth = new EnhancedAuth();
+                enhancedAuth.signInWithFacebook();
+            };
+
+            // Password reset modal
+            window.showPasswordResetModal = () => {
+                document.getElementById('passwordResetModal').classList.add('show');
+            };
+
+            window.hidePasswordResetModal = () => {
+                document.getElementById('passwordResetModal').classList.remove('show');
+                document.getElementById('resetEmail').value = '';
+            };
+
+            // Email verification
+            window.resendVerificationEmail = async () => {
+                if (!currentUser) return;
+                
+                try {
+                    await currentUser.sendEmailVerification();
+                    showMessage('📧 Verification email sent! Please check your inbox.', 'success');
+                } catch (error) {
+                    showMessage('❌ Failed to send verification email. Try again later.', 'error');
+                }
+            };
+
+            window.hideVerificationBanner = () => {
+                document.getElementById('emailVerificationBanner').classList.remove('show');
+                document.getElementById('appContent').classList.remove('with-banner');
+            };
+        }
+
         // Load user session
         async function loadUserSession(user) {
             try {
@@ -3142,6 +3316,40 @@
                 console.error('Error loading user session:', error);
                 showMessage('❌ Error loading profile data', 'error');
             }
+        }
+
+        // Email verification banner functions
+        function showEmailVerificationBanner() {
+            const banner = document.getElementById('emailVerificationBanner');
+            const appContent = document.getElementById('appContent');
+            
+            if (banner && currentUser && !currentUser.emailVerified) {
+                banner.classList.add('show');
+                if (appContent) {
+                    appContent.classList.add('with-banner');
+                }
+            }
+        }
+
+        function startEmailVerificationCheck() {
+            // Check every 5 seconds if email has been verified
+            verificationCheckInterval = setInterval(async () => {
+                if (currentUser) {
+                    await currentUser.reload();
+                    if (currentUser.emailVerified) {
+                        hideVerificationBanner();
+                        clearInterval(verificationCheckInterval);
+                        verificationCheckInterval = null;
+                        
+                        // Update user document
+                        await db.collection('users').doc(currentUser.uid).update({
+                            emailVerified: true
+                        });
+                        
+                        showMessage('✅ Email verified! All features are now unlocked!', 'success');
+                    }
+                }
+            }, 5000);
         }
 
         // Setup real-time listeners
@@ -3214,8 +3422,21 @@
                 const unsubscribeUser = userRef.onSnapshot((doc) => {
                     if (doc.exists) {
                         const userData = doc.data();
+                        const oldTokens = appState.user.tokens;
                         appState.user.tokens = userData.tokens || 0;
                         appState.user.level = userData.level || 1;
+                        
+                        // Animate token change
+                        if (oldTokens !== appState.user.tokens) {
+                            const tokenElement = document.getElementById('userTokens');
+                            if (tokenElement) {
+                                tokenElement.classList.add('updating');
+                                setTimeout(() => {
+                                    tokenElement.classList.remove('updating');
+                                }, 500);
+                            }
+                        }
+                        
                         updateUserDisplay();
                     }
                 });
@@ -3462,6 +3683,61 @@
             });
         }
 
+        // Load nearby players
+        async function loadNearbyPlayers() {
+            try {
+                // Mock data for demonstration - in production, this would use geolocation
+                const mockNearbyPlayers = [
+                    { id: 'mock1', name: 'Alex', avatar: '🎮', distance: 0.5, online: true },
+                    { id: 'mock2', name: 'Sam', avatar: '🌟', distance: 1.2, online: true },
+                    { id: 'mock3', name: 'Jordan', avatar: '🚀', distance: 2.1, online: true },
+                    { id: 'mock4', name: 'Casey', avatar: '🎨', distance: 2.8, online: true }
+                ];
+                
+                appState.nearbyStrangers = mockNearbyPlayers;
+                renderNearbyPlayers();
+                
+            } catch (error) {
+                console.error('Error loading nearby players:', error);
+            }
+        }
+
+        // Render nearby players
+        function renderNearbyPlayers() {
+            const strangersTrack = document.getElementById('strangersTrack');
+            const strangersCount = document.getElementById('strangersOnlineCount');
+            
+            strangersCount.textContent = appState.nearbyStrangers.length;
+            
+            if (appState.nearbyStrangers.length === 0) {
+                strangersTrack.innerHTML = `
+                    <div class="empty-state" style="width: 100%; padding: 40px;">
+                        <h4>📍 No players nearby</h4>
+                        <p>Try increasing your detection range or check back later!</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            strangersTrack.innerHTML = '';
+            
+            appState.nearbyStrangers.forEach((stranger) => {
+                const strangerElement = document.createElement('div');
+                strangerElement.className = 'stranger-avatar-item';
+                strangerElement.onclick = () => selectStranger(stranger.id);
+                
+                strangerElement.innerHTML = `
+                    <div class="stranger-avatar">
+                        ${stranger.avatar}
+                        <div class="distance-indicator">${stranger.distance}km</div>
+                    </div>
+                    <div class="stranger-name-small">${stranger.name}</div>
+                `;
+                
+                strangersTrack.appendChild(strangerElement);
+            });
+        }
+
         // Create secure challenge with security
         async function createQuickChallenge() {
             // Check email verification
@@ -3669,3 +3945,467 @@
                         <div class="target-avatar">
                             ${friend.avatar}
                             ${friend.online ? '<div class="target-online-indicator"></div>' : ''}
+                        </div>
+                        <div class="target-info">
+                            <div class="target-name">${friend.name}</div>
+                            <div class="target-status">${friend.online ? 'Online' : 'Offline'} • Level ${friend.level}</div>
+                        </div>
+                    `;
+                    
+                    targetList.appendChild(targetItem);
+                });
+            } else if (tabType === 'nearby') {
+                if (appState.nearbyStrangers.length === 0) {
+                    targetList.innerHTML = `
+                        <div class="empty-state">
+                            <p>📍 No nearby players</p>
+                            <p style="font-size: 0.8rem; opacity: 0.7;">Try increasing detection range!</p>
+                        </div>
+                    `;
+                    return;
+                }
+                
+                appState.nearbyStrangers.forEach(stranger => {
+                    const targetItem = document.createElement('div');
+                    targetItem.className = 'target-item';
+                    targetItem.onclick = () => toggleTarget(stranger.id, targetItem);
+                    
+                    targetItem.innerHTML = `
+                        <div class="target-checkbox"></div>
+                        <div class="target-avatar">
+                            ${stranger.avatar}
+                            ${stranger.online ? '<div class="target-online-indicator"></div>' : ''}
+                        </div>
+                        <div class="target-info">
+                            <div class="target-name">${stranger.name}</div>
+                            <div class="target-status">${stranger.distance}km away • Online</div>
+                        </div>
+                    `;
+                    
+                    targetList.appendChild(targetItem);
+                });
+            } else if (tabType === 'random') {
+                targetList.innerHTML = `
+                    <div class="empty-state">
+                        <p>🎲 Random Matching</p>
+                        <p style="font-size: 0.8rem; opacity: 0.7;">Challenge will be sent to a random online player!</p>
+                        <button class="btn btn-primary" style="margin-top: 15px;" onclick="selectRandomTarget()">
+                            Select Random Player
+                        </button>
+                    </div>
+                `;
+            }
+        }
+
+        function toggleTarget(targetId, element) {
+            const checkbox = element.querySelector('.target-checkbox');
+            const isSelected = selectedTargets.includes(targetId);
+            
+            if (isSelected) {
+                selectedTargets = selectedTargets.filter(id => id !== targetId);
+                element.classList.remove('selected');
+                checkbox.classList.remove('checked');
+            } else {
+                selectedTargets.push(targetId);
+                element.classList.add('selected');
+                checkbox.classList.add('checked');
+            }
+            
+            updateSendButton();
+        }
+
+        function updateSendButton() {
+            const sendBtn = document.getElementById('sendChallengeBtn');
+            if (sendBtn) {
+                const count = selectedTargets.length;
+                const cost = 25 * count;
+                sendBtn.textContent = count > 0 ? 
+                    `Send to ${count} player${count > 1 ? 's' : ''} (${cost} tokens)` : 
+                    'Select at least 1 player';
+                sendBtn.disabled = count === 0;
+            }
+        }
+
+        async function sendSelectedAIChallenge() {
+            if (!selectedAIChallenge || selectedTargets.length === 0) {
+                showMessage('❌ Please select a challenge and at least one target!', 'error');
+                return;
+            }
+            
+            // Check email verification
+            if (currentUser && !currentUser.emailVerified) {
+                showMessage('⚠️ Please verify your email to send challenges!', 'error');
+                showEmailVerificationBanner();
+                return;
+            }
+            
+            const cost = 25 * selectedTargets.length;
+            if (appState.user.tokens < cost) {
+                showMessage(`❌ Not enough tokens! You need ${cost} tokens.`, 'error');
+                return;
+            }
+            
+            try {
+                const sendBtn = document.getElementById('sendChallengeBtn');
+                sendBtn.disabled = true;
+                sendBtn.classList.add('loading');
+                
+                const challengeData = {
+                    title: selectedAIChallenge.title,
+                    description: selectedAIChallenge.description,
+                    category: selectedAIChallenge.category,
+                    reward: selectedAIChallenge.reward,
+                    difficulty: selectedAIChallenge.difficulty,
+                    timeLimit: selectedAIChallenge.timeLimit,
+                    creatorId: 'ai_system',
+                    creatorName: 'AI Challenge Bot',
+                    senderId: currentUser.uid,
+                    senderName: appState.user.name,
+                    participants: [currentUser.uid, ...selectedTargets],
+                    status: 'active',
+                    responses: {},
+                    createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+                    expiresAt: new Date(Date.now() + selectedAIChallenge.timeLimit * 60 * 60 * 1000),
+                    isAI: true
+                };
+                
+                await db.collection('challenges').add(challengeData);
+                
+                await db.collection('users').doc(currentUser.uid).update({
+                    tokens: firebase.firestore.FieldValue.increment(-cost),
+                    aiChallengesSent: firebase.firestore.FieldValue.increment(1)
+                });
+                
+                appState.user.tokens -= cost;
+                updateUserDisplay();
+                
+                showMessage(`🤖 AI Challenge sent to ${selectedTargets.length} player${selectedTargets.length > 1 ? 's' : ''}! (-${cost} tokens)`, 'success');
+                
+                cancelChallengeSelection();
+                
+            } catch (error) {
+                console.error('Error sending AI challenge:', error);
+                showMessage('❌ Failed to send challenge. Please try again.', 'error');
+            }
+        }
+
+        function cancelChallengeSelection() {
+            selectedAIChallenge = null;
+            selectedTargets = [];
+            document.getElementById('targetSelector').classList.remove('show');
+            document.querySelectorAll('.ai-challenge-card').forEach(card => {
+                card.classList.remove('selected');
+            });
+        }
+
+        function startAITimer() {
+            if (aiChallengeActive) {
+                aiChallengeTimer = setTimeout(() => {
+                    generateAIChallenges();
+                    showMessage('🤖 New AI challenges available!', 'info');
+                    startAITimer();
+                }, aiChallengeInterval);
+            }
+        }
+
+        function startTimerCountdown() {
+            aiTimerCountdown = 120;
+            updateTimerDisplay();
+            
+            if (aiTimerInterval) {
+                clearInterval(aiTimerInterval);
+            }
+            
+            aiTimerInterval = setInterval(() => {
+                if (aiChallengeActive) {
+                    aiTimerCountdown--;
+                    updateTimerDisplay();
+                    
+                    if (aiTimerCountdown <= 0) {
+                        aiTimerCountdown = 120;
+                    }
+                }
+            }, 1000);
+        }
+
+        function updateTimerDisplay() {
+            const minutes = Math.floor(aiTimerCountdown / 60);
+            const seconds = aiTimerCountdown % 60;
+            const display = `${minutes}:${seconds.toString().padStart(2, '0')}`;
+            
+            const timerElement = document.getElementById('aiTimerCount');
+            if (timerElement) {
+                timerElement.textContent = display;
+            }
+        }
+
+        function toggleAIChallenge() {
+            aiChallengeActive = !aiChallengeActive;
+            const toggleBtn = document.getElementById('toggleAIBtn');
+            
+            if (aiChallengeActive) {
+                toggleBtn.innerHTML = '⏸️ Pause Timer';
+                startAITimer();
+                startTimerCountdown();
+                showMessage('▶️ AI Challenge timer resumed', 'info');
+            } else {
+                toggleBtn.innerHTML = '▶️ Resume Timer';
+                if (aiChallengeTimer) {
+                    clearTimeout(aiChallengeTimer);
+                }
+                if (aiTimerInterval) {
+                    clearInterval(aiTimerInterval);
+                }
+                showMessage('⏸️ AI Challenge timer paused', 'info');
+            }
+        }
+
+        function stopAIChallenge() {
+            aiChallengeActive = false;
+            if (aiChallengeTimer) {
+                clearTimeout(aiChallengeTimer);
+            }
+            if (aiTimerInterval) {
+                clearInterval(aiTimerInterval);
+            }
+        }
+
+        // Helper functions
+        function getCategoryIcon(category) {
+            const icons = {
+                fitness: '💪',
+                creative: '🎨',
+                social: '👥',
+                food: '🍕',
+                adventure: '🗺️'
+            };
+            return icons[category] || '🎯';
+        }
+
+        function formatTimeAgo(timestamp) {
+            if (!timestamp) return 'Unknown time';
+            
+            const date = timestamp.toDate ? timestamp.toDate() : new Date(timestamp);
+            const now = new Date();
+            const diff = now - date;
+            
+            const minutes = Math.floor(diff / 60000);
+            const hours = Math.floor(diff / 3600000);
+            const days = Math.floor(diff / 86400000);
+            
+            if (minutes < 1) return 'Just now';
+            if (minutes < 60) return `${minutes}m ago`;
+            if (hours < 24) return `${hours}h ago`;
+            if (days < 7) return `${days}d ago`;
+            
+            return date.toLocaleDateString();
+        }
+
+        function formatLastActive(timestamp) {
+            if (!timestamp) return 'recently';
+            
+            const date = timestamp.toDate ? timestamp.toDate() : new Date(timestamp);
+            const now = new Date();
+            const diff = now - date;
+            
+            const minutes = Math.floor(diff / 60000);
+            const hours = Math.floor(diff / 3600000);
+            const days = Math.floor(diff / 86400000);
+            
+            if (minutes < 1) return 'just now';
+            if (minutes < 60) return `${minutes} minutes ago`;
+            if (hours < 24) return `${hours} hours ago`;
+            if (days === 1) return 'yesterday';
+            if (days < 7) return `${days} days ago`;
+            
+            return date.toLocaleDateString();
+        }
+
+        function getRandomAvatar() {
+            const avatars = ['😎', '🌸', '🚀', '💪', '🎵', '🎨', '🤠', '🌟', '🎯', '🎭', '🎪', '🌈', '🎲', '🎊', '🌺', '⚡', '🌙', '🔥'];
+            return avatars[Math.floor(Math.random() * avatars.length)];
+        }
+
+        function showMessage(message, type = 'info') {
+            // Remove existing messages
+            document.querySelectorAll('.message').forEach(n => n.remove());
+            
+            const notification = document.createElement('div');
+            notification.className = `message ${type}`;
+            notification.textContent = message;
+            document.body.appendChild(notification);
+            
+            // Auto-remove after 4 seconds
+            setTimeout(() => {
+                if (notification.parentNode) {
+                    notification.remove();
+                }
+            }, 4000);
+        }
+
+        // UI Functions
+        window.toggleQuickChallenge = () => {
+            const toggle = document.getElementById('quickToggle');
+            const form = document.getElementById('quickChallengeForm');
+            
+            appState.quickChallengeActive = !appState.quickChallengeActive;
+            
+            if (appState.quickChallengeActive) {
+                toggle.classList.add('active');
+                form.style.display = 'flex';
+            } else {
+                toggle.classList.remove('active');
+                form.style.display = 'none';
+            }
+        };
+
+        window.switchTargetTab = (tab) => {
+            document.querySelectorAll('.target-tab').forEach(t => t.classList.remove('active'));
+            event.target.classList.add('active');
+            loadTargets(tab);
+        };
+
+        window.setDetectionRange = (range) => {
+            appState.detectionRange = range;
+            document.querySelectorAll('.range-btn').forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+            document.getElementById('currentRange').textContent = `(${range}km)`;
+            refreshNearbyPlayers();
+        };
+
+        window.setCustomRange = () => {
+            const customRange = parseFloat(document.getElementById('customRange').value);
+            if (customRange && customRange > 0 && customRange <= 50) {
+                appState.detectionRange = customRange;
+                document.querySelectorAll('.range-btn').forEach(btn => btn.classList.remove('active'));
+                document.getElementById('currentRange').textContent = `(${customRange}km)`;
+                refreshNearbyPlayers();
+                showMessage(`📡 Detection range set to ${customRange}km`, 'success');
+            } else {
+                showMessage('❌ Please enter a valid range (0.1 - 50 km)', 'error');
+            }
+        };
+
+        window.refreshNearbyPlayers = async () => {
+            const refreshIcon = document.getElementById('refreshIcon');
+            refreshIcon.classList.add('refreshing');
+            showMessage('🔄 Refreshing nearby players...', 'info');
+            
+            await loadNearbyPlayers();
+            
+            setTimeout(() => {
+                refreshIcon.classList.remove('refreshing');
+                showMessage('✅ Nearby players refreshed!', 'success');
+            }, 500);
+        };
+
+        window.toggleHideFromNearby = () => {
+            appState.isHiddenFromNearby = !appState.isHiddenFromNearby;
+            const hideBtn = document.getElementById('hideBtn');
+            
+            if (appState.isHiddenFromNearby) {
+                hideBtn.textContent = 'Show Me';
+                showMessage('👻 You are now hidden from nearby players', 'info');
+            } else {
+                hideBtn.textContent = 'Hide Me';
+                showMessage('👋 You are now visible to nearby players', 'info');
+            }
+        };
+
+        window.showAddFriendModal = () => {
+            showMessage('🚧 Friend system coming soon!', 'info');
+        };
+
+        window.challengeFriend = (friendId) => {
+            showMessage('🚧 Direct challenge system coming soon!', 'info');
+        };
+
+        window.respondToChallenge = async (challengeId, response) => {
+            try {
+                await db.collection('challenges').doc(challengeId).update({
+                    [`responses.${currentUser.uid}`]: {
+                        response: response,
+                        timestamp: firebase.firestore.FieldValue.serverTimestamp()
+                    }
+                });
+                
+                showMessage(`✅ Challenge ${response}!`, 'success');
+            } catch (error) {
+                console.error('Error responding to challenge:', error);
+                showMessage('❌ Failed to respond to challenge', 'error');
+            }
+        };
+
+        window.refreshChallenges = async () => {
+            showMessage('🔄 Refreshing challenges...', 'info');
+            // Challenges auto-refresh through Firestore listeners
+            showMessage('✅ Challenges refreshed!', 'success');
+        };
+
+        window.sendWaveToNearby = () => {
+            showMessage('👋 Wave sent to all nearby players!', 'success');
+        };
+
+        window.challengeRandomNearby = () => {
+            if (appState.nearbyStrangers.length === 0) {
+                showMessage('❌ No nearby players to challenge!', 'error');
+                return;
+            }
+            
+            const randomPlayer = appState.nearbyStrangers[Math.floor(Math.random() * appState.nearbyStrangers.length)];
+            showMessage(`🎯 Challenge sent to ${randomPlayer.name}!`, 'success');
+        };
+
+        window.sendAIChallengeToNearby = () => {
+            if (appState.nearbyStrangers.length === 0) {
+                showMessage('❌ No nearby players to send AI challenge!', 'error');
+                return;
+            }
+            
+            showMessage('🤖 Select an AI challenge above to send to nearby players!', 'info');
+            window.scrollTo({ top: document.querySelector('.ai-challenges-section').offsetTop - 100, behavior: 'smooth' });
+        };
+
+        window.selectStranger = (strangerId) => {
+            showMessage('🚧 Player profile system coming soon!', 'info');
+        };
+
+        window.selectRandomTarget = () => {
+            selectedTargets = ['random_player'];
+            showMessage('🎲 Random player selected!', 'success');
+            updateSendButton();
+        };
+
+        // Initialize app when DOM is loaded
+        document.addEventListener('DOMContentLoaded', initApp);
+
+        // Handle online/offline status
+        window.addEventListener('online', () => {
+            isOnline = true;
+            showMessage('✅ Connection restored!', 'success');
+            if (currentUser) {
+                updateUserOnlineStatus(true);
+            }
+        });
+
+        window.addEventListener('offline', () => {
+            isOnline = false;
+            showMessage('❌ Connection lost! Some features may not work.', 'error');
+            if (currentUser) {
+                updateUserOnlineStatus(false);
+            }
+        });
+
+        // Handle page visibility for online status
+        document.addEventListener('visibilitychange', () => {
+            if (currentUser) {
+                updateUserOnlineStatus(!document.hidden);
+            }
+        });
+
+        // Cleanup on page unload
+        window.addEventListener('beforeunload', () => {
+            if (currentUser) {
+                updateUserOnlineStatus(false);
+            }
+        });
