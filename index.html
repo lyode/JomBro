@@ -1,100 +1,4 @@
-// Enhanced email-based friend adding
-        async function addFriendByEmail() {
-            const friendEmail = document.getElementById('friendEmailInput').value.trim().toLowerCase();
-            const addBtn = document.getElementById('addFriendByEmailBtn');
-            
-            if (!friendEmail) {
-                showMessage('❌ Please enter an email address!', 'error');
-                return;
-            }
-            
-            if (friendEmail === currentUser.email.toLowerCase()) {
-                showMessage('❌ You cannot add yourself as a friend!', 'error');
-                return;
-            }
-            
-            // Email validation
-            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-            if (!emailRegex.test(friendEmail)) {
-                showMessage('❌ Please enter a valid email address!', 'error');
-                return;
-            }
-            
-            // Security check
-            const securityCheck = securityManager.canPerformAction('friendship', currentUser.uid);
-            if (!securityCheck.allowed) {
-                showMessage(`🔒 ${securityCheck.reason}`, 'error');
-                return;
-            }
-            
-            try {
-                addBtn.disabled = true;
-                addBtn.classList.add('loading');
-                showMessage('🔍 Searching for user...', 'info');
-                
-                // Search for user by email
-                const usersQuery = await db.collection('users')
-                    .where('email', '==', friendEmail)
-                    .limit(1)
-                    .get();
-                
-                if (usersQuery.empty) {
-                    showMessage('❌ User not found! Ask them to sign up first, then try again.', 'error');
-                    return;
-                }
-                
-                const friendDoc = usersQuery.docs[0];
-                const friendId = friendDoc.id;
-                const friendData = friendDoc.data();
-                
-                // Use the enhanced addFriendById function
-                await addFriendById(friendId, friendData.name);
-                document.getElementById('friendEmailInput').value = '';
-                
-            } catch (error) {
-                console.error('Error adding friend by email:', error);
-                showMessage('❌ Failed to add friend. Please check the email and try again.', 'error');
-            } finally {
-                addBtn.disabled = false;
-                addBtn.classList.remove('loading');
-            }
-        }
-
-        // Check for invite code in URL when app loads
-        function checkForInviteCode() {
-            const urlParams = new URLSearchParams(window.location.search);
-            const inviteCode = urlParams.get('invite');
-            
-            if (inviteCode && currentUser) {
-                showMessage(`🎫 Found invite code: ${inviteCode}! Opening friend finder...`, 'info');
-                
-                setTimeout(() => {
-                    showAddFriendModal();
-                    // Switch to QR tab and auto-fill invite code
-                    setTimeout(() => {
-                        switchFriendTab('search');
-                        document.getElementById('inviteCodeInput').value = inviteCode;
-                        document.getElementById('inviteCodeInput').focus();
-                    }, 500);
-                }, 1000);
-                
-                // Clean URL
-                window.history.replaceState({}, document.title, window.location.pathname);
-            }
-        }
-
-        // Helper function for copying text
-        function copyText(text) {
-            if (navigator.clipboard) {
-                navigator.clipboard.writeText(text).then(() => {
-                    showMessage('📋 Copied to clipboard!', 'success');
-                }).catch(() => {
-                    fallbackCopy(text);
-                });
-            } else {
-                fallbackCopy(text);
-            }
-        }<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -840,146 +744,6 @@
             text-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
         }
 
-        /* Nearby Players Section */
-        .detection-range-section {
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 12px;
-            padding: 15px;
-            margin-bottom: 20px;
-            border: 1px solid rgba(63, 81, 181, 0.2);
-        }
-
-        .range-header {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            margin-bottom: 12px;
-            font-size: 0.95rem;
-            font-weight: 600;
-            color: rgba(63, 81, 181, 0.9);
-        }
-
-        .range-presets {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 8px;
-            margin-bottom: 12px;
-        }
-
-        .range-btn {
-            padding: 10px 12px;
-            border: 1px solid rgba(63, 81, 181, 0.3);
-            border-radius: 8px;
-            background: rgba(255, 255, 255, 0.05);
-            color: white;
-            font-size: 0.9rem;
-            font-weight: 500;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            text-align: center;
-        }
-
-        .range-btn:hover {
-            background: rgba(63, 81, 181, 0.2);
-            border-color: rgba(63, 81, 181, 0.5);
-            transform: translateY(-1px);
-        }
-
-        .range-btn.active {
-            background: rgba(63, 81, 181, 0.4);
-            border-color: #3f51b5;
-            box-shadow: 0 0 10px rgba(63, 81, 181, 0.3);
-            color: white;
-            font-weight: bold;
-        }
-
-        .range-custom {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            justify-content: center;
-        }
-
-        .range-input {
-            width: 80px;
-            padding: 8px 10px;
-            border: 1px solid rgba(63, 81, 181, 0.3);
-            border-radius: 8px;
-            background: rgba(255, 255, 255, 0.05);
-            color: white;
-            font-size: 0.9rem;
-            text-align: center;
-        }
-
-        .range-input:focus {
-            outline: none;
-            border-color: #3f51b5;
-            box-shadow: 0 0 0 2px rgba(63, 81, 181, 0.2);
-        }
-
-        .nearby-players-list {
-            max-height: 300px;
-            overflow-y: auto;
-        }
-
-        .nearby-player-item {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            padding: 15px;
-            background: rgba(255, 255, 255, 0.02);
-            border-radius: 12px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            margin-bottom: 10px;
-            transition: all 0.3s ease;
-            cursor: pointer;
-        }
-
-        .nearby-player-item:hover {
-            background: rgba(255, 255, 255, 0.05);
-            border-color: rgba(155, 89, 182, 0.3);
-            transform: translateY(-2px);
-        }
-
-        .nearby-player-avatar {
-            width: 45px;
-            height: 45px;
-            border-radius: 50%;
-            background: linear-gradient(45deg, #9b59b6, #e91e63);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.3rem;
-            position: relative;
-        }
-
-        .distance-badge {
-            position: absolute;
-            top: -5px;
-            right: -5px;
-            background: rgba(63, 81, 181, 0.9);
-            color: white;
-            font-size: 0.7rem;
-            padding: 2px 6px;
-            border-radius: 10px;
-            font-weight: bold;
-        }
-
-        .nearby-player-info {
-            flex: 1;
-        }
-
-        .nearby-player-name {
-            font-size: 1rem;
-            font-weight: 600;
-            margin-bottom: 4px;
-        }
-
-        .nearby-player-status {
-            font-size: 0.85rem;
-            opacity: 0.7;
-        }
-
         /* Buttons */
         .btn {
             padding: 12px 18px;
@@ -1205,26 +969,6 @@
             color: rgba(255, 255, 255, 0.8);
         }
 
-        .location-prompt {
-            background: rgba(255, 193, 7, 0.1);
-            border: 1px solid rgba(255, 193, 7, 0.3);
-            border-radius: 12px;
-            padding: 15px;
-            margin-bottom: 15px;
-            text-align: center;
-        }
-
-        .location-prompt h4 {
-            color: #ffc107;
-            margin-bottom: 8px;
-        }
-
-        .location-prompt p {
-            opacity: 0.8;
-            margin-bottom: 15px;
-            font-size: 0.9rem;
-        }
-
         @media (max-width: 480px) {
             .container {
                 padding: 10px;
@@ -1259,10 +1003,6 @@
 
             .auth-title {
                 font-size: 1.5rem;
-            }
-
-            .range-presets {
-                grid-template-columns: repeat(2, 1fr);
             }
             
             .social-buttons {
@@ -1465,65 +1205,6 @@
 
             <!-- Main Content -->
             <div class="main-content">
-                <!-- Nearby Players Section -->
-                <div class="card floating-element">
-                    <div class="card-title">
-                        <span>🌍</span>
-                        <span>Nearby Players</span>
-                        <span style="font-size: 0.8rem; opacity: 0.7;" id="currentRange">(3km)</span>
-                    </div>
-                    
-                    <!-- Location Request -->
-                    <div class="location-prompt" id="locationPrompt">
-                        <h4>📍 Enable Location</h4>
-                        <p>Allow location access to find and connect with nearby JomBro players!</p>
-                        <button class="btn btn-primary btn-small" onclick="requestLocation()">
-                            Enable Location
-                        </button>
-                    </div>
-                    
-                    <!-- Detection Range Selector -->
-                    <div class="detection-range-section" id="rangeSection" style="display: none;">
-                        <div class="range-header">
-                            <span>📡</span>
-                            <span>Detection Range</span>
-                        </div>
-                        <div class="range-presets">
-                            <button class="range-btn" onclick="setDetectionRange(1)">1km</button>
-                            <button class="range-btn active" onclick="setDetectionRange(3)" id="defaultRange">3km</button>
-                            <button class="range-btn" onclick="setDetectionRange(5)">5km</button>
-                            <button class="range-btn" onclick="setDetectionRange(10)">10km</button>
-                        </div>
-                        <div class="range-custom">
-                            <input type="number" class="range-input" id="customRange" placeholder="Custom" min="0.1" max="50" step="0.1">
-                            <span style="color: rgba(255, 255, 255, 0.7);">km</span>
-                            <button class="btn btn-secondary btn-small" onclick="setCustomRange()">Set</button>
-                        </div>
-                    </div>
-                    
-                    <!-- Nearby Players List -->
-                    <div class="nearby-players-list" id="nearbyPlayersList">
-                        <div class="empty-state">
-                            <h4>🔍 No real players found nearby</h4>
-                            <p>Enable location to discover real JomBro users around you!</p>
-                            <p style="font-size: 0.8rem; opacity: 0.7; margin-top: 10px;">
-                                ✅ Only real users with GPS<br>
-                                ❌ No fake or demo players<br>
-                                📍 Share app to find friends nearby
-                            </p>
-                        </div>
-                    </div>
-                    
-                    <div style="display: flex; gap: 10px; justify-content: center; margin-top: 15px; flex-wrap: wrap;" id="nearbyActions" style="display: none;">
-                        <button class="btn btn-primary btn-small" onclick="refreshNearbyPlayers()">
-                            <span id="refreshIcon">🔄</span> Refresh
-                        </button>
-                        <button class="btn btn-secondary btn-small" onclick="toggleHideFromNearby()" id="hideBtn">
-                            👻 Hide Me
-                        </button>
-                    </div>
-                </div>
-
                 <!-- Friends Section -->
                 <div class="card floating-element">
                     <div class="card-title">
@@ -1556,7 +1237,7 @@
                     <div style="text-align: center; padding: 20px;">
                         <h3 style="margin-bottom: 15px; color: #9b59b6;">Start Your Challenge Journey</h3>
                         <p style="margin-bottom: 20px; opacity: 0.8;">
-                            Connect with friends and players nearby to start challenging each other! 
+                            Connect with friends to start challenging each other! 
                             Earn tokens, level up, and have fun competing in real-life challenges.
                         </p>
                         
@@ -1591,9 +1272,6 @@
                         <div style="display: flex; gap: 10px; justify-content: center; flex-wrap: wrap;">
                             <button class="btn btn-primary" onclick="showAddFriendModal()">
                                 🚀 Find & Add Friends
-                            </button>
-                            <button class="btn btn-secondary" onclick="requestLocation()">
-                                📍 Find Nearby Players
                             </button>
                             <button class="btn btn-secondary" onclick="showTokenInfo()">
                                 🪙 About Tokens
@@ -1691,14 +1369,10 @@
         // Initialize Security Manager
         const securityManager = new SecurityManager();
 
-        // Global variables - NO FAKE DATA EVER
+        // Global variables
         let currentUser = null;
         let unsubscribeFunctions = [];
         let currentTab = 'login';
-        let userLocation = null;
-        let nearbyPlayers = []; // ALWAYS starts empty - NO FAKE PLAYERS (Alex, Sarah, Mike, Emma REMOVED)
-        let detectionRange = 3; // km
-        let isHiddenFromNearby = false;
         
         // Application State
         let appState = {
@@ -2283,248 +1957,6 @@
             }
         }
 
-        // Update user location
-        async function updateUserLocation(latitude, longitude) {
-            if (!currentUser || !db) return;
-            
-            try {
-                await db.collection('users').doc(currentUser.uid).update({
-                    location: new firebase.firestore.GeoPoint(latitude, longitude),
-                    lastLocationUpdate: firebase.firestore.FieldValue.serverTimestamp(),
-                    isHiddenFromNearby: isHiddenFromNearby
-                });
-                
-                userLocation = { latitude, longitude };
-                
-            } catch (error) {
-                console.error('Error updating location:', error);
-            }
-        }
-
-        // Request location permission
-        async function requestLocation() {
-            try {
-                showMessage('📍 Requesting location access...', 'info');
-                
-                if (!navigator.geolocation) {
-                    showMessage('❌ Geolocation is not supported by this browser', 'error');
-                    return;
-                }
-                
-                const position = await new Promise((resolve, reject) => {
-                    navigator.geolocation.getCurrentPosition(resolve, reject, {
-                        enableHighAccuracy: true,
-                        timeout: 10000,
-                        maximumAge: 300000 // 5 minutes
-                    });
-                });
-                
-                const { latitude, longitude } = position.coords;
-                await updateUserLocation(latitude, longitude);
-                
-                // Hide location prompt and show range section
-                document.getElementById('locationPrompt').style.display = 'none';
-                document.getElementById('rangeSection').style.display = 'block';
-                document.getElementById('nearbyActions').style.display = 'flex';
-                
-                showMessage('📍 Location enabled! Searching for nearby players...', 'success');
-                await loadNearbyPlayers();
-                
-            } catch (error) {
-                console.error('Location error:', error);
-                let errorMessage = '❌ Could not get your location. ';
-                
-                switch (error.code) {
-                    case error.PERMISSION_DENIED:
-                        errorMessage += 'Please allow location access in your browser settings.';
-                        break;
-                    case error.POSITION_UNAVAILABLE:
-                        errorMessage += 'Location information is unavailable.';
-                        break;
-                    case error.TIMEOUT:
-                        errorMessage += 'Location request timed out.';
-                        break;
-                    default:
-                        errorMessage += 'An unknown error occurred.';
-                        break;
-                }
-                
-                showMessage(errorMessage, 'error');
-            }
-        }
-
-        // Load ONLY REAL nearby players from Firestore - ABSOLUTELY NO FAKE DATA
-        async function loadNearbyPlayers() {
-            if (!userLocation || !currentUser) {
-                nearbyPlayers = []; // Always empty until real users found
-                renderNearbyPlayers();
-                return;
-            }
-            
-            try {
-                showMessage('🔍 Searching for real nearby players...', 'info');
-                
-                // Query ONLY real users with valid location data who are online and not hidden
-                const usersRef = db.collection('users')
-                    .where('online', '==', true)
-                    .where('isHiddenFromNearby', '==', false)
-                    .limit(100);
-                
-                const snapshot = await usersRef.get();
-                const realNearbyPlayers = [];
-                
-                // Process ONLY verified real users from database - NO FAKE DATA
-                snapshot.forEach(doc => {
-                    if (doc.id === currentUser.uid) return; // Skip current user
-                    
-                    const userData = doc.data();
-                    
-                    // Strict validation - must have REAL GPS coordinates
-                    if (!userData.location || 
-                        !userData.location.latitude || 
-                        !userData.location.longitude ||
-                        typeof userData.location.latitude !== 'number' ||
-                        typeof userData.location.longitude !== 'number') {
-                        return; // Skip users without valid GPS location
-                    }
-                    
-                    // Calculate real GPS distance using Haversine formula
-                    const distance = calculateDistance(
-                        userLocation.latitude,
-                        userLocation.longitude,
-                        userData.location.latitude,
-                        userData.location.longitude
-                    );
-                    
-                    // Only include if within detection range
-                    if (distance <= detectionRange) {
-                        realNearbyPlayers.push({
-                            id: doc.id,
-                            name: userData.name || 'Player',
-                            avatar: userData.avatar || getRandomAvatar(),
-                            distance: distance.toFixed(1) + 'km',
-                            level: userData.level || 1,
-                            online: true,
-                            isReal: true, // Flag to confirm this is real data
-                            lastActive: userData.lastActive
-                        });
-                    }
-                });
-                
-                // Sort by distance (closest first)
-                realNearbyPlayers.sort((a, b) => 
-                    parseFloat(a.distance) - parseFloat(b.distance)
-                );
-                
-                // Set the real nearby players - NO FAKE DATA
-                nearbyPlayers = realNearbyPlayers;
-                renderNearbyPlayers();
-                
-                if (nearbyPlayers.length > 0) {
-                    showMessage(`🎉 Found ${nearbyPlayers.length} real nearby players!`, 'success');
-                    console.log(`📍 Real nearby players found:`, nearbyPlayers.map(p => ({ name: p.name, distance: p.distance })));
-                } else {
-                    showMessage('🔍 No real players found in your area. Invite friends to join!', 'info');
-                    console.log('📍 No real users found within range - encouraging friend invites');
-                }
-                
-            } catch (error) {
-                console.error('Error loading real nearby players:', error);
-                showMessage('❌ Failed to search for nearby players', 'error');
-                nearbyPlayers = []; // Ensure NO fake data on error
-                renderNearbyPlayers();
-            }
-        }
-
-        // Calculate distance between two coordinates (Haversine formula)
-        function calculateDistance(lat1, lon1, lat2, lon2) {
-            const R = 6371; // Earth's radius in kilometers
-            const dLat = (lat2 - lat1) * Math.PI / 180;
-            const dLon = (lon2 - lon1) * Math.PI / 180;
-            const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
-                    Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
-                    Math.sin(dLon/2) * Math.sin(dLon/2);
-            const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
-            return R * c;
-        }
-
-        // Render ONLY REAL nearby players - ABSOLUTELY NO FAKE DATA
-        function renderNearbyPlayers() {
-            const nearbyPlayersList = document.getElementById('nearbyPlayersList');
-            
-            // Always start with empty state - no fake players ever
-            if (!nearbyPlayers || nearbyPlayers.length === 0) {
-                nearbyPlayersList.innerHTML = `
-                    <div class="empty-state">
-                        <h4>🔍 No real players found nearby</h4>
-                        <p>Only verified real users with GPS enabled will appear here.</p>
-                        <p style="font-size: 0.8rem; opacity: 0.7; margin-top: 10px;">
-                            ✅ NO fake players (Alex, Sarah, Mike, Emma removed)<br>
-                            ✅ Only real JomBro users from database<br>
-                            ✅ Within ${detectionRange}km radius<br>
-                            📱 Share invite codes to find friends nearby
-                        </p>
-                    </div>
-                `;
-                return;
-            }
-            
-            nearbyPlayersList.innerHTML = '';
-            
-            // Render ONLY verified real players from database
-            nearbyPlayers.forEach(player => {
-                // Extra security - only render if marked as real AND has valid data
-                if (!player.isReal || !player.id || !player.name) {
-                    console.warn('⚠️ Skipping invalid player data:', player);
-                    return;
-                }
-                
-                const playerElement = document.createElement('div');
-                playerElement.className = 'nearby-player-item';
-                
-                playerElement.innerHTML = `
-                    <div class="nearby-player-avatar">
-                        ${player.avatar}
-                        <div class="distance-badge">${player.distance}</div>
-                    </div>
-                    <div class="nearby-player-info">
-                        <div class="nearby-player-name">${player.name}</div>
-                        <div class="nearby-player-status">Level ${player.level} • Online • Verified Real User</div>
-                    </div>
-                    <button class="btn btn-primary btn-small" onclick="connectWithPlayer('${player.id}')">
-                        Connect
-                    </button>
-                `;
-                
-                nearbyPlayersList.appendChild(playerElement);
-            });
-            
-            console.log(`📊 Rendered ${nearbyPlayers.length} verified real nearby players - NO FAKE DATA`);
-        }
-
-        // Connect with a real nearby player - NO FAKE CONNECTIONS
-        function connectWithPlayer(playerId) {
-            // Verify this is a real player from our verified list
-            const player = nearbyPlayers.find(p => p.id === playerId && p.isReal);
-            if (!player) {
-                console.error('❌ Attempted to connect with invalid player ID:', playerId);
-                showMessage('❌ Invalid player connection attempt', 'error');
-                return;
-            }
-            
-            showMessage(`👋 Connection request sent to ${player.name}! (Real user verified)`, 'success');
-            console.log(`📱 Connection sent to real user: ${player.name} (${player.distance})`);
-            
-            // Future: Add actual connection/friend request logic here
-            // For now, we'll add them as a friend suggestion
-            try {
-                addFriendById(player.id, player.name);
-            } catch (error) {
-                console.error('Error connecting with player:', error);
-                showMessage('❌ Connection failed. Please try again.', 'error');
-            }
-        }
-
         // Logout user
         async function logoutUser() {
             try {
@@ -2540,17 +1972,11 @@
                 await auth.signOut();
                 showMessage('👋 Logged out successfully!', 'info');
                 
-                // Reset app state - ensure NO fake data persists (Alex, Sarah, Mike, Emma permanently removed)
+                // Reset app state
                 appState = {
                     user: { id: null, name: '', avatar: '👤', tokens: 0, level: 1, friends: 0, online: true },
                     friends: []
                 };
-                
-                nearbyPlayers = []; // Always empty - NO FAKE PLAYERS EVER
-                userLocation = null;
-                isHiddenFromNearby = false;
-                
-                console.log('🧹 App state reset - all fake players permanently removed');
                 
                 setTimeout(() => {
                     showAuthModal();
@@ -2665,83 +2091,101 @@
             });
         }
 
-        // Detection range functions
-        function setDetectionRange(range) {
-            detectionRange = range;
-            document.getElementById('currentRange').textContent = `(${range}km)`;
+        // Enhanced email-based friend adding
+        async function addFriendByEmail() {
+            const friendEmail = document.getElementById('friendEmailInput').value.trim().toLowerCase();
+            const addBtn = document.getElementById('addFriendByEmailBtn');
             
-            document.querySelectorAll('.range-btn').forEach(btn => btn.classList.remove('active'));
-            event.target.classList.add('active');
-            
-            if (userLocation) {
-                loadNearbyPlayers(); // Load ONLY real players within new range
+            if (!friendEmail) {
+                showMessage('❌ Please enter an email address!', 'error');
+                return;
             }
-            showMessage(`📡 Detection range set to ${range}km - scanning for real players`, 'info');
+            
+            if (friendEmail === currentUser.email.toLowerCase()) {
+                showMessage('❌ You cannot add yourself as a friend!', 'error');
+                return;
+            }
+            
+            // Email validation
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!emailRegex.test(friendEmail)) {
+                showMessage('❌ Please enter a valid email address!', 'error');
+                return;
+            }
+            
+            // Security check
+            const securityCheck = securityManager.canPerformAction('friendship', currentUser.uid);
+            if (!securityCheck.allowed) {
+                showMessage(`🔒 ${securityCheck.reason}`, 'error');
+                return;
+            }
+            
+            try {
+                addBtn.disabled = true;
+                addBtn.classList.add('loading');
+                showMessage('🔍 Searching for user...', 'info');
+                
+                // Search for user by email
+                const usersQuery = await db.collection('users')
+                    .where('email', '==', friendEmail)
+                    .limit(1)
+                    .get();
+                
+                if (usersQuery.empty) {
+                    showMessage('❌ User not found! Ask them to sign up first, then try again.', 'error');
+                    return;
+                }
+                
+                const friendDoc = usersQuery.docs[0];
+                const friendId = friendDoc.id;
+                const friendData = friendDoc.data();
+                
+                // Use the enhanced addFriendById function
+                await addFriendById(friendId, friendData.name);
+                document.getElementById('friendEmailInput').value = '';
+                
+            } catch (error) {
+                console.error('Error adding friend by email:', error);
+                showMessage('❌ Failed to add friend. Please check the email and try again.', 'error');
+            } finally {
+                addBtn.disabled = false;
+                addBtn.classList.remove('loading');
+            }
         }
 
-        function setCustomRange() {
-            const customRange = parseFloat(document.getElementById('customRange').value);
-            if (customRange && customRange > 0 && customRange <= 50) {
-                detectionRange = customRange;
-                document.getElementById('currentRange').textContent = `(${customRange}km)`;
-                document.getElementById('customRange').value = '';
+        // Check for invite code in URL when app loads
+        function checkForInviteCode() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const inviteCode = urlParams.get('invite');
+            
+            if (inviteCode && currentUser) {
+                showMessage(`🎫 Found invite code: ${inviteCode}! Opening friend finder...`, 'info');
                 
-                document.querySelectorAll('.range-btn').forEach(btn => btn.classList.remove('active'));
+                setTimeout(() => {
+                    showAddFriendModal();
+                    // Switch to QR tab and auto-fill invite code
+                    setTimeout(() => {
+                        switchFriendTab('search');
+                        document.getElementById('inviteCodeInput').value = inviteCode;
+                        document.getElementById('inviteCodeInput').focus();
+                    }, 500);
+                }, 1000);
                 
-                if (userLocation) {
-                    loadNearbyPlayers(); // Load ONLY real players within custom range
-                }
-                showMessage(`📡 Custom range set to ${customRange}km - scanning for real players`, 'success');
+                // Clean URL
+                window.history.replaceState({}, document.title, window.location.pathname);
+            }
+        }
+
+        // Helper function for copying text
+        function copyText(text) {
+            if (navigator.clipboard) {
+                navigator.clipboard.writeText(text).then(() => {
+                    showMessage('📋 Copied to clipboard!', 'success');
+                }).catch(() => {
+                    fallbackCopy(text);
+                });
             } else {
-                showMessage('❌ Please enter a valid range (0.1 - 50 km)', 'error');
-            }
-        }
-
-        function refreshNearbyPlayers() {
-            const refreshIcon = document.getElementById('refreshIcon');
-            const refreshBtn = event.target;
-            
-            if (refreshIcon) {
-                refreshIcon.classList.add('refreshing');
-            }
-            refreshBtn.disabled = true;
-            
-            showMessage('🔍 Searching for real nearby players only...', 'info');
-            console.log('🔄 Refreshing nearby players - NO FAKE DATA (Alex, Sarah, Mike, Emma removed)');
-            
-            setTimeout(() => {
-                if (userLocation) {
-                    loadNearbyPlayers(); // Load ONLY real players from database
-                } else {
-                    showMessage('📍 Please enable location first!', 'info');
-                }
-                
-                if (refreshIcon) {
-                    refreshIcon.classList.remove('refreshing');
-                }
-                refreshBtn.disabled = false;
-            }, 1000);
-        }
-
-        function toggleHideFromNearby() {
-            const hideBtn = document.getElementById('hideBtn');
-            isHiddenFromNearby = !isHiddenFromNearby;
-            
-            if (isHiddenFromNearby) {
-                hideBtn.textContent = '👁️ Show Me';
-                hideBtn.classList.remove('btn-secondary');
-                hideBtn.classList.add('btn-primary');
-                showMessage('👻 You are now hidden from nearby players!', 'info');
-            } else {
-                hideBtn.textContent = '👻 Hide Me';
-                hideBtn.classList.remove('btn-primary');
-                hideBtn.classList.add('btn-secondary');
-                showMessage('👁️ You are now visible to nearby players!', 'info');
-            }
-            
-            // Update in database
-            if (currentUser && userLocation) {
-                updateUserLocation(userLocation.latitude, userLocation.longitude);
+                fallbackCopy(text);
             }
         }
 
@@ -2886,7 +2330,7 @@
                             <h5 style="color: #4a5568; margin-bottom: 12px;">💡 Friend Suggestions</h5>
                             <div id="friendSuggestions" style="max-height: 150px; overflow-y: auto;">
                                 <p style="color: #718096; font-size: 0.9rem; text-align: center; padding: 20px;">
-                                    🔍 Finding potential friends nearby...<br>
+                                    🔍 Finding potential friends...<br>
                                     <span style="font-size: 0.8rem;">Enable location to see suggestions</span>
                                 </p>
                             </div>
@@ -3245,7 +2689,7 @@
             // Implement QR code download functionality
         }
 
-        // Load friend suggestions based on location and mutual connections
+        // Load friend suggestions based on mutual connections
         async function loadFriendSuggestions() {
             const suggestionsContainer = document.getElementById('friendSuggestions');
             
@@ -3262,35 +2706,19 @@
                 allUsers.forEach(doc => {
                     if (doc.id !== currentUser.uid && !friendIds.includes(doc.id)) {
                         const userData = doc.data();
-                        let distance = null;
-                        
-                        // Calculate distance if both users have location
-                        if (userLocation && userData.location) {
-                            distance = calculateDistance(
-                                userLocation.latitude,
-                                userLocation.longitude,
-                                userData.location.latitude,
-                                userData.location.longitude
-                            );
-                        }
                         
                         suggestions.push({
                             id: doc.id,
                             name: userData.name,
                             avatar: userData.avatar || '👤',
                             level: userData.level || 1,
-                            distance: distance ? `${distance.toFixed(1)}km away` : 'Location unknown',
-                            isNearby: distance && distance <= 10
+                            tokens: userData.tokens || 0
                         });
                     }
                 });
                 
-                // Sort by proximity first, then by level
-                suggestions.sort((a, b) => {
-                    if (a.isNearby && !b.isNearby) return -1;
-                    if (!a.isNearby && b.isNearby) return 1;
-                    return b.level - a.level;
-                });
+                // Sort by level
+                suggestions.sort((a, b) => b.level - a.level);
                 
                 if (suggestions.length === 0) {
                     suggestionsContainer.innerHTML = `
@@ -3311,7 +2739,7 @@
                             </div>
                             <div style="flex: 1;">
                                 <div style="font-weight: 600; color: #2d3748; font-size: 0.9rem;">${user.name}</div>
-                                <div style="font-size: 0.7rem; color: #718096;">${user.distance} • Level ${user.level}</div>
+                                <div style="font-size: 0.7rem; color: #718096;">Level ${user.level} • ${user.tokens} tokens</div>
                             </div>
                             <button onclick="addFriendById('${user.id}', '${user.name}')" 
                                     style="padding: 4px 8px; border: 1px solid #667eea; background: #667eea; color: white; border-radius: 4px; font-size: 0.7rem; cursor: pointer;">
@@ -3375,21 +2803,6 @@
                 });
             } else {
                 fallbackCopy(shareText);
-            }
-        }
-
-        function copyEmail() {
-            const userCode = currentUser ? generateInviteCode(currentUser.uid) : '';
-            const text = `Add me on JomBro! 🎮\n\n📧 Email: ${currentUser.email}\n🎫 Invite Code: ${userCode}`;
-            
-            if (navigator.clipboard) {
-                navigator.clipboard.writeText(text).then(() => {
-                    showMessage('📧 Contact info with invite code copied!', 'success');
-                }).catch(() => {
-                    fallbackCopy(text);
-                });
-            } else {
-                fallbackCopy(text);
             }
         }
 
@@ -3501,15 +2914,6 @@
             }
         }
 
-        // Social login functions - REMOVED (Email/Password only)
-        function signInWithGoogle() {
-            showMessage('❌ Social login removed. Please use email and password.', 'error');
-        }
-
-        function signInWithFacebook() {
-            showMessage('❌ Social login removed. Please use email and password.', 'error');
-        }
-
         // Utility functions
         function createStarfield() {
             const starfield = document.getElementById('starfield');
@@ -3581,19 +2985,16 @@
 
         // Initialize the app when page loads
         document.addEventListener('DOMContentLoaded', function() {
-            console.log('🚀 JomBro Production App Starting...');
+            console.log('🚀 JomBro App Starting...');
             initApp();
             console.log('✅ JomBro initialization complete');
             console.log('🔒 Security system active');
-            console.log('🌍 Real location-based features enabled');
             console.log('🎮 Ready for production launch!');
         });
 
-        console.log('🎮 JomBro Production App Loaded!');
+        console.log('🎮 JomBro App Loaded!');
         console.log('✅ EMAIL/PASSWORD authentication ONLY');
         console.log('✅ Security system integrated');
-        console.log('✅ Real location-based features');
-        console.log('✅ ZERO fake/demo players - Alex, Sarah, Mike, Emma PERMANENTLY REMOVED');
         console.log('✅ Real user names displayed');
         console.log('✅ ENHANCED Add Friends system:');
         console.log('  📧 Search by email');
@@ -3604,26 +3005,8 @@
         console.log('  📨 Multiple sharing methods');
         console.log('✅ Social sharing for WhatsApp, FB, IG, TikTok');
         console.log('❌ Google/Facebook login REMOVED');
-        console.log('❌ ALL FAKE PLAYERS REMOVED (Alex, Sarah, Mike, Emma)');
-        console.log('🚀 100% REAL DATA ONLY - Ready for launch!');
-        console.log('');
-        console.log('🌐 HOW TO LAUNCH:');
-        console.log('1. Deploy this HTML to: Firebase Hosting, Netlify, or Vercel');
-        console.log('2. Set up Firebase Firestore Rules (from previous instructions)');
-        console.log('3. Share the live URL with friends!');
-        console.log('4. Use the built-in social sharing buttons to promote!');
-        console.log('💡 Tip: Users can share directly to WhatsApp, Facebook, Instagram & TikTok!');
-        console.log('');
-        console.log('🔥 KEY FEATURES:');
-        console.log('• Email/Password auth only');
-        console.log('• Real GPS-based player discovery');
-        console.log('• No fake or demo data anywhere');
-        console.log('• Enhanced friend system with multiple connection methods');
-        console.log('• Invite codes, QR codes, real-time search');
-        console.log('• Social sharing built-in');
-        console.log('• Friend suggestions based on location');
-        console.log('• URL invite code support');
-        console.log('• Alex, Sarah, Mike, Emma fake players PERMANENTLY REMOVED');
+        console.log('❌ Nearby Players section REMOVED');
+        console.log('🚀 100% Focus on Friends - Ready for launch!');
     </script>
 </body>
 </html>
