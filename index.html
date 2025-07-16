@@ -1753,8 +1753,16 @@
                     this.setButtonLoading(loginButton, true);
                     showMessage('Signing you in...', 'info');
 
-                    await auth.signInWithEmailAndPassword(sanitizedEmail, password);
-                    showMessage('Welcome back! 🎉', 'success');
+                    const userCredential = await auth.signInWithEmailAndPassword(sanitizedEmail, password);
+                    
+                    // Get user's name for personalized welcome (but don't wait too long)
+                    try {
+                        const userDoc = await db.collection('users').doc(userCredential.user.uid).get();
+                        const userName = userDoc.exists ? userDoc.data().name : (userCredential.user.displayName || userCredential.user.email.split('@')[0]);
+                        showMessage(`Welcome back ${userName}! 🎉`, 'success');
+                    } catch (nameError) {
+                        showMessage('Welcome back! 🎉', 'success');
+                    }
 
                 } catch (error) {
                     this.handleAuthError(error);
@@ -1798,12 +1806,12 @@
                     // Create user account
                     const userCredential = await auth.createUserWithEmailAndPassword(sanitizedEmail, password);
                     
-                    // Update profile with display name
+                    // Update profile with display name FIRST
                     await userCredential.user.updateProfile({
                         displayName: sanitizedName
                     });
 
-                    // Create user document in Firestore
+                    // Create user document in Firestore with the chosen name
                     await db.collection('users').doc(userCredential.user.uid).set({
                         name: sanitizedName,
                         email: sanitizedEmail,
@@ -1818,7 +1826,7 @@
                         authProvider: 'email'
                     });
 
-                    showMessage('Account created successfully! 🎉', 'success');
+                    showMessage(`Welcome ${sanitizedName}! Account created successfully! 🎉`, 'success');
 
                 } catch (error) {
                     this.handleAuthError(error);
@@ -1849,7 +1857,8 @@
                     
                     if (!userDoc.exists) {
                         // Create user document for new Google users
-                        const sanitizedName = securityManager.sanitizeInput(result.user.displayName, 'username');
+                        const userName = result.user.displayName || result.user.email.split('@')[0];
+                        const sanitizedName = securityManager.sanitizeInput(userName, 'username');
                         
                         await db.collection('users').doc(result.user.uid).set({
                             name: sanitizedName,
@@ -1864,9 +1873,11 @@
                             isNewUser: true,
                             authProvider: 'google'
                         });
+                        
+                        showMessage(`Welcome ${sanitizedName}! Account created with Google! 🎉`, 'success');
+                    } else {
+                        showMessage(`Welcome back ${result.user.displayName || 'to JomBro'}! 🎉`, 'success');
                     }
-
-                    showMessage('Welcome to JomBro! 🎉', 'success');
 
                 } catch (error) {
                     if (error.code !== 'auth/popup-closed-by-user') {
@@ -1895,7 +1906,8 @@
                     
                     if (!userDoc.exists) {
                         // Create user document for new Facebook users
-                        const sanitizedName = securityManager.sanitizeInput(result.user.displayName, 'username');
+                        const userName = result.user.displayName || result.user.email.split('@')[0];
+                        const sanitizedName = securityManager.sanitizeInput(userName, 'username');
                         
                         await db.collection('users').doc(result.user.uid).set({
                             name: sanitizedName,
@@ -1910,9 +1922,11 @@
                             isNewUser: true,
                             authProvider: 'facebook'
                         });
+                        
+                        showMessage(`Welcome ${sanitizedName}! Account created with Facebook! 🎉`, 'success');
+                    } else {
+                        showMessage(`Welcome back ${result.user.displayName || 'to JomBro'}! 🎉`, 'success');
                     }
-
-                    showMessage('Welcome to JomBro! 🎉', 'success');
 
                 } catch (error) {
                     if (error.code !== 'auth/popup-closed-by-user') {
@@ -2019,7 +2033,7 @@
                     const userData = userDoc.data();
                     appState.user = {
                         id: user.uid,
-                        name: userData.name || user.displayName || 'JomBro Player',
+                        name: userData.name || user.displayName || user.email.split('@')[0],
                         avatar: userData.avatar || getRandomAvatar(),
                         tokens: userData.tokens || 1000,
                         level: userData.level || 1,
@@ -2027,8 +2041,10 @@
                         online: true
                     };
                 } else {
+                    // For new users, get name from displayName or email
+                    const userName = user.displayName || user.email.split('@')[0];
                     const newUserData = {
-                        name: user.displayName || 'JomBro Player',
+                        name: userName,
                         email: user.email,
                         avatar: getRandomAvatar(),
                         tokens: 1000,
@@ -2049,7 +2065,7 @@
                 await setupRealtimeListeners();
                 loadAppContent();
                 
-                showMessage(`🎮 Welcome back, ${appState.user.name}!`, 'success');
+                showMessage(`🎮 Welcome ${appState.user.name}!`, 'success');
                 
             } catch (error) {
                 console.error('Error loading user session:', error);
@@ -2791,6 +2807,7 @@
         console.log('✅ Security system integrated');
         console.log('✅ Real location-based features');
         console.log('✅ NO fake/demo data');
+        console.log('✅ Real user names displayed');
         console.log('🚀 100% REAL - Ready for launch!');
     </script>
 </body>
