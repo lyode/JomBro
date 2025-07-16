@@ -1,583 +1,363 @@
-<!-- Example of how to integrate all profile features into your existing code -->
-
-<!-- Add this to your existing <head> section -->
-<style>
-    /* Add all the enhanced CSS from jombro-profile-css artifact here */
-    
-    /* Additional integration styles */
-    .app-loading {
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background: #0a0a0a;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        z-index: 9999;
-    }
-    
-    .app-loading.hide {
-        animation: fadeOut 0.5s ease-out forwards;
-    }
-    
-    @keyframes fadeOut {
-        to {
-            opacity: 0;
-            visibility: hidden;
+<!-- Visual Examples of JomBro Onboarding System -->
+<!DOCTYPE html>
+<html>
+<head>
+    <title>JomBro Onboarding Visual Guide</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f7fafc;
+            padding: 20px;
+            line-height: 1.6;
         }
-    }
-</style>
-
-<!-- Add this loading screen right after <body> tag -->
-<div class="app-loading" id="appLoader">
-    <div style="text-align: center;">
-        <div style="font-size: 4rem; margin-bottom: 20px; animation: bounce 2s infinite;">🎮</div>
-        <h2 style="color: white; margin-bottom: 10px;">JomBro</h2>
-        <div class="loading-spinner"></div>
-    </div>
-</div>
-
-<!-- Update your existing script section with this complete integration -->
-<script>
-// ==========================================
-// COMPLETE JOMBRO PROFILE SYSTEM INTEGRATION
-// ==========================================
-
-// Global State Management
-const AppState = {
-    initialized: false,
-    user: null,
-    friends: [],
-    notifications: [],
-    settings: {},
-    ui: {
-        dropdownOpen: false,
-        activeModal: null,
-        theme: 'dark'
-    }
-};
-
-// Initialize Enhanced Features
-async function initializeEnhancedFeatures() {
-    console.log('🚀 Initializing Enhanced Profile Features...');
-    
-    try {
-        // 1. Setup event listeners for profile system
-        setupProfileEventListeners();
         
-        // 2. Initialize notification system
-        await initializeNotifications();
-        
-        // 3. Load user preferences
-        await loadUserPreferences();
-        
-        // 4. Setup real-time listeners for profile updates
-        setupProfileRealtimeListeners();
-        
-        // 5. Initialize achievement tracking
-        initializeAchievementTracking();
-        
-        // 6. Setup keyboard shortcuts
-        setupKeyboardShortcuts();
-        
-        // 7. Hide loading screen
-        setTimeout(() => {
-            const loader = document.getElementById('appLoader');
-            if (loader) {
-                loader.classList.add('hide');
-                setTimeout(() => loader.remove(), 500);
-            }
-        }, 1000);
-        
-        console.log('✅ Enhanced Profile Features Initialized!');
-        
-    } catch (error) {
-        console.error('❌ Failed to initialize enhanced features:', error);
-        showMessage('Some features may not be available', 'error');
-    }
-}
-
-// Setup all profile-related event listeners
-function setupProfileEventListeners() {
-    // Avatar click handler with improved UX
-    const userAvatar = document.getElementById('userAvatar');
-    if (userAvatar) {
-        // Remove any existing listeners
-        userAvatar.replaceWith(userAvatar.cloneNode(true));
-        const newAvatar = document.getElementById('userAvatar');
-        
-        // Add click handler
-        newAvatar.addEventListener('click', (e) => {
-            e.stopPropagation();
-            toggleUserDropdown();
-        });
-        
-        // Add keyboard support
-        newAvatar.setAttribute('tabindex', '0');
-        newAvatar.addEventListener('keydown', (e) => {
-            if (e.key === 'Enter' || e.key === ' ') {
-                e.preventDefault();
-                toggleUserDropdown();
-            }
-        });
-    }
-    
-    // Dropdown hover behavior
-    const dropdown = document.getElementById('userDropdown');
-    if (dropdown) {
-        let hoverTimeout;
-        
-        dropdown.addEventListener('mouseenter', () => {
-            clearTimeout(hoverTimeout);
-            AppState.ui.dropdownHovered = true;
-        });
-        
-        dropdown.addEventListener('mouseleave', () => {
-            AppState.ui.dropdownHovered = false;
-            hoverTimeout = setTimeout(() => {
-                if (!AppState.ui.dropdownHovered) {
-                    closeUserDropdown();
-                }
-            }, 300);
-        });
-    }
-    
-    // Global click handler
-    document.addEventListener('click', handleGlobalClick);
-    
-    // Window resize handler
-    window.addEventListener('resize', handleWindowResize);
-}
-
-// Handle global clicks for closing dropdowns/modals
-function handleGlobalClick(e) {
-    const avatar = document.getElementById('userAvatar');
-    const dropdown = document.getElementById('userDropdown');
-    
-    // Close dropdown if clicking outside
-    if (dropdown && dropdown.classList.contains('show')) {
-        if (!avatar.contains(e.target) && !dropdown.contains(e.target)) {
-            closeUserDropdown();
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
         }
-    }
-    
-    // Close modals if clicking overlay
-    if (e.target.classList.contains('auth-modal') || 
-        e.target.classList.contains('settings-modal') ||
-        e.target.classList.contains('profile-modal')) {
-        closeModal(e.target);
-    }
-}
-
-// Handle window resize for responsive behavior
-function handleWindowResize() {
-    // Adjust dropdown position on mobile
-    if (window.innerWidth < 768) {
-        const dropdown = document.getElementById('userDropdown');
-        if (dropdown && dropdown.classList.contains('show')) {
-            positionDropdownForMobile();
-        }
-    }
-}
-
-// Position dropdown for mobile screens
-function positionDropdownForMobile() {
-    const dropdown = document.getElementById('userDropdown');
-    if (dropdown) {
-        const rect = dropdown.getBoundingClientRect();
-        if (rect.right > window.innerWidth) {
-            dropdown.style.right = '10px';
-        }
-    }
-}
-
-// Initialize notification system
-async function initializeNotifications() {
-    // Request permission for browser notifications
-    if ('Notification' in window && Notification.permission === 'default') {
-        const permission = await Notification.requestPermission();
-        console.log('Notification permission:', permission);
-    }
-    
-    // Setup notification listener
-    if (currentUser && db) {
-        const notifRef = db.collection('notifications')
-            .where('userId', '==', currentUser.uid)
-            .where('read', '==', false)
-            .orderBy('createdAt', 'desc');
         
-        notifRef.onSnapshot((snapshot) => {
-            const newNotifications = [];
-            snapshot.forEach(doc => {
-                newNotifications.push({ id: doc.id, ...doc.data() });
-            });
-            
-            // Update notification count
-            updateNotificationCount(newNotifications.length);
-            
-            // Show browser notification for new items
-            if (newNotifications.length > AppState.notifications.length) {
-                showBrowserNotification(newNotifications[0]);
-            }
-            
-            AppState.notifications = newNotifications;
-        });
-    }
-}
-
-// Update notification count in UI
-function updateNotificationCount(count) {
-    const badges = document.querySelectorAll('.notification-badge');
-    badges.forEach(badge => {
-        if (count > 0) {
-            badge.textContent = count > 99 ? '99+' : count;
-            badge.style.display = 'inline-block';
-        } else {
-            badge.style.display = 'none';
+        h1 {
+            color: #2d3748;
+            text-align: center;
+            margin-bottom: 40px;
         }
-    });
-}
-
-// Show browser notification
-function showBrowserNotification(notification) {
-    if ('Notification' in window && Notification.permission === 'granted') {
-        new Notification('JomBro', {
-            body: notification.title,
-            icon: '/favicon.ico',
-            badge: '/badge.png',
-            vibrate: [200, 100, 200],
-            tag: notification.id
-        });
-    }
-}
-
-// Load user preferences
-async function loadUserPreferences() {
-    if (!currentUser || !db) return;
-    
-    try {
-        const userDoc = await db.collection('users').doc(currentUser.uid).get();
-        if (userDoc.exists) {
-            const userData = userDoc.data();
-            
-            // Apply theme
-            if (userData.settings?.theme) {
-                applyTheme(userData.settings.theme);
-            }
-            
-            // Apply other preferences
-            AppState.settings = userData.settings || {};
-            applyUserSettings(AppState.settings);
-        }
-    } catch (error) {
-        console.error('Error loading preferences:', error);
-    }
-}
-
-// Apply theme to the application
-function applyTheme(themeName) {
-    document.body.setAttribute('data-theme', themeName);
-    AppState.ui.theme = themeName;
-    
-    // Update theme-specific styles
-    switch(themeName) {
-        case 'purple':
-            document.documentElement.style.setProperty('--primary-color', '#9b59b6');
-            document.documentElement.style.setProperty('--secondary-color', '#e91e63');
-            break;
-        case 'ocean':
-            document.documentElement.style.setProperty('--primary-color', '#4facfe');
-            document.documentElement.style.setProperty('--secondary-color', '#00f2fe');
-            break;
-        case 'neon':
-            document.documentElement.style.setProperty('--primary-color', '#f093fb');
-            document.documentElement.style.setProperty('--secondary-color', '#f5576c');
-            break;
-        default:
-            document.documentElement.style.setProperty('--primary-color', '#667eea');
-            document.documentElement.style.setProperty('--secondary-color', '#764ba2');
-    }
-}
-
-// Apply user settings
-function applyUserSettings(settings) {
-    // Sound effects
-    if (settings.soundEffects === false) {
-        window.soundEnabled = false;
-    }
-    
-    // Animations
-    if (settings.animations === false) {
-        document.body.classList.add('reduce-motion');
-    }
-    
-    // Other settings...
-}
-
-// Setup real-time listeners for profile updates
-function setupProfileRealtimeListeners() {
-    if (!currentUser || !db) return;
-    
-    // Listen for user profile changes
-    const userRef = db.collection('users').doc(currentUser.uid);
-    userRef.onSnapshot((doc) => {
-        if (doc.exists) {
-            const userData = doc.data();
-            
-            // Update local state
-            AppState.user = {
-                ...AppState.user,
-                ...userData
-            };
-            
-            // Update UI
-            updateAllProfileDisplays();
-        }
-    });
-}
-
-// Update all profile displays in the UI
-function updateAllProfileDisplays() {
-    // Update main display
-    updateUserDisplay();
-    
-    // Update dropdown if open
-    if (AppState.ui.dropdownOpen) {
-        updateDropdownStats();
-    }
-    
-    // Update profile modal if open
-    if (currentViewingUserId === currentUser.uid) {
-        const profileModal = document.getElementById('profileModal');
-        if (profileModal && profileModal.classList.contains('show')) {
-            updateProfileModalDisplay();
-        }
-    }
-}
-
-// Initialize achievement tracking
-function initializeAchievementTracking() {
-    // Track user actions for achievements
-    window.achievementTracker = {
-        trackAction: (action, data) => {
-            console.log('Achievement tracked:', action, data);
-            checkForNewAchievements(action, data);
-        }
-    };
-}
-
-// Check for new achievements
-async function checkForNewAchievements(action, data) {
-    // Achievement logic here
-    const achievements = {
-        firstFriend: appState.friends.length >= 1,
-        socialButterfly: appState.friends.length >= 5,
-        challengeMaster: challengeStats.total >= 10,
-        tokenCollector: appState.user.tokens >= 5000,
-        profileCustomizer: !!appState.user.avatarUrl
-    };
-    
-    // Check and award new achievements
-    for (const [key, earned] of Object.entries(achievements)) {
-        if (earned && !AppState.user.achievements?.includes(key)) {
-            await awardAchievement(key);
-        }
-    }
-}
-
-// Award achievement
-async function awardAchievement(achievementId) {
-    try {
-        await db.collection('users').doc(currentUser.uid).update({
-            achievements: firebase.firestore.FieldValue.arrayUnion(achievementId),
-            tokens: firebase.firestore.FieldValue.increment(100)
-        });
         
-        showMessage(`🏆 Achievement unlocked: ${achievementId}! +100 tokens`, 'success');
+        .example-section {
+            background: white;
+            border-radius: 16px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        }
         
-        // Show achievement animation
-        showAchievementAnimation(achievementId);
+        .example-title {
+            font-size: 1.5rem;
+            color: #4a5568;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
         
-    } catch (error) {
-        console.error('Error awarding achievement:', error);
-    }
+        .visual-demo {
+            background: #0a0a0a;
+            border-radius: 12px;
+            padding: 40px;
+            position: relative;
+            overflow: hidden;
+            min-height: 300px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .code-example {
+            background: #1a202c;
+            color: #e2e8f0;
+            padding: 20px;
+            border-radius: 8px;
+            margin-top: 20px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
+            overflow-x: auto;
+        }
+        
+        /* Demo Elements */
+        .demo-avatar {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(45deg, #9b59b6, #e91e63);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            position: relative;
+            cursor: pointer;
+        }
+        
+        .demo-spotlight {
+            position: absolute;
+            width: 80px;
+            height: 80px;
+            border: 3px solid #667eea;
+            border-radius: 50%;
+            animation: pulseDemo 2s infinite;
+        }
+        
+        @keyframes pulseDemo {
+            0%, 100% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.1); opacity: 0.6; }
+        }
+        
+        .demo-tooltip {
+            position: absolute;
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            max-width: 300px;
+        }
+        
+        .demo-pointer {
+            font-size: 2rem;
+            animation: pointDemo 1.5s infinite;
+        }
+        
+        @keyframes pointDemo {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+        
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+        
+        .feature-card {
+            background: #f7fafc;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+        }
+        
+        .feature-icon {
+            font-size: 3rem;
+            margin-bottom: 10px;
+        }
+        
+        .feature-name {
+            font-weight: 600;
+            color: #2d3748;
+            margin-bottom: 5px;
+        }
+        
+        .feature-desc {
+            color: #718096;
+            font-size: 0.9rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎮 JomBro Onboarding System - Visual Guide</h1>
+        
+        <!-- Welcome Modal Example -->
+        <div class="example-section">
+            <h2 class="example-title">
+                <span>🎉</span>
+                Welcome Modal (First Screen)
+            </h2>
+            <div class="visual-demo">
+                <div style="background: white; padding: 40px; border-radius: 20px; text-align: center; max-width: 500px;">
+                    <div style="font-size: 5rem; margin-bottom: 20px; animation: bounce 2s infinite;">🎮</div>
+                    <h2 style="color: #667eea; margin-bottom: 10px;">Welcome to JomBro!</h2>
+                    <p style="color: #718096; margin-bottom: 30px;">Your Gaming Social Adventure Begins</p>
+                    <div style="display: flex; gap: 20px; justify-content: center; margin-bottom: 30px;">
+                        <div>👥 Connect</div>
+                        <div>⚡ Challenge</div>
+                        <div>🏆 Earn</div>
+                    </div>
+                    <button style="background: linear-gradient(135deg, #667eea, #764ba2); color: white; padding: 12px 30px; border: none; border-radius: 8px; font-weight: 600; cursor: pointer;">
+                        🚀 Start Tutorial
+                    </button>
+                </div>
+            </div>
+            <div class="code-example">
+// Triggers automatically for new users<br>
+if (appState.user.isNewUser) {<br>
+&nbsp;&nbsp;onboarding.showWelcomeModal();<br>
 }
-
-// Show achievement animation
-function showAchievementAnimation(achievementId) {
-    const achievementPopup = document.createElement('div');
-    achievementPopup.className = 'achievement-popup';
-    achievementPopup.innerHTML = `
-        <div class="achievement-content">
-            <div class="achievement-icon">🏆</div>
-            <div class="achievement-text">
-                <h3>Achievement Unlocked!</h3>
-                <p>${achievementId}</p>
             </div>
         </div>
-    `;
-    
-    document.body.appendChild(achievementPopup);
-    
-    setTimeout(() => {
-        achievementPopup.classList.add('show');
-    }, 100);
-    
-    setTimeout(() => {
-        achievementPopup.classList.remove('show');
-        setTimeout(() => achievementPopup.remove(), 500);
-    }, 3000);
-}
-
-// Setup keyboard shortcuts
-function setupKeyboardShortcuts() {
-    document.addEventListener('keydown', (e) => {
-        // Check for modifier key (Ctrl/Cmd)
-        if (e.ctrlKey || e.metaKey) {
-            switch(e.key.toLowerCase()) {
-                case 'p': // Profile
-                    e.preventDefault();
-                    showOwnProfile();
-                    break;
-                case 'k': // Friends (Keep)
-                    e.preventDefault();
-                    showFriendModal();
-                    break;
-                case 'j': // Challenges (Jump)
-                    e.preventDefault();
-                    showChallengeModal();
-                    break;
-                case ',': // Settings
-                    e.preventDefault();
-                    showSettingsModal();
-                    break;
-                case '/': // Search
-                    e.preventDefault();
-                    focusSearch();
-                    break;
-                case 'n': // Notifications
-                    e.preventDefault();
-                    showNotifications();
-                    break;
-            }
-        }
         
-        // Escape key handling
-        if (e.key === 'Escape') {
-            handleEscapeKey();
-        }
-    });
-}
-
-// Handle escape key press
-function handleEscapeKey() {
-    // Close dropdowns first
-    const dropdown = document.getElementById('userDropdown');
-    if (dropdown && dropdown.classList.contains('show')) {
-        closeUserDropdown();
-        return;
-    }
+        <!-- Spotlight Effect Example -->
+        <div class="example-section">
+            <h2 class="example-title">
+                <span>🔦</span>
+                Spotlight & Tooltip Effect
+            </h2>
+            <div class="visual-demo">
+                <div class="demo-avatar">👤</div>
+                <div class="demo-spotlight"></div>
+                <div class="demo-tooltip" style="top: 100px; left: 50%; transform: translateX(-50%);">
+                    <div style="font-size: 0.8rem; color: #718096; margin-bottom: 8px;">Step 1 of 9</div>
+                    <h3 style="margin: 0 0 10px 0; color: #2d3748;">Your Profile Avatar</h3>
+                    <p style="margin: 0 0 15px 0; color: #4a5568;">Click here to access your profile, change avatar, and see your stats!</p>
+                    <div style="display: flex; gap: 10px;">
+                        <button style="padding: 8px 16px; border: 1px solid #e2e8f0; background: white; border-radius: 6px;">Skip</button>
+                        <button style="padding: 8px 16px; background: #667eea; color: white; border: none; border-radius: 6px;">Next →</button>
+                    </div>
+                </div>
+                <div class="demo-pointer" style="position: absolute; top: 20px;">👆</div>
+            </div>
+            <div class="code-example">
+// Spotlight follows elements automatically<br>
+onboarding.positionSpotlight(element);<br>
+onboarding.showTooltip(step, element);<br>
+onboarding.showPointer(element);
+            </div>
+        </div>
+        
+        <!-- Tutorial Steps Flow -->
+        <div class="example-section">
+            <h2 class="example-title">
+                <span>📋</span>
+                Tutorial Flow (9 Steps)
+            </h2>
+            <div class="feature-grid">
+                <div class="feature-card">
+                    <div class="feature-icon">👤</div>
+                    <div class="feature-name">Step 1: Avatar</div>
+                    <div class="feature-desc">Learn about profile access</div>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">📊</div>
+                    <div class="feature-name">Step 2: Stats</div>
+                    <div class="feature-desc">Understand tokens & levels</div>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">👥</div>
+                    <div class="feature-name">Step 3: Friends</div>
+                    <div class="feature-desc">View friend list</div>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">➕</div>
+                    <div class="feature-name">Step 4: Add</div>
+                    <div class="feature-desc">Add new friends</div>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">⚡</div>
+                    <div class="feature-name">Step 5: Challenge</div>
+                    <div class="feature-desc">Create challenges</div>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">🟢</div>
+                    <div class="feature-name">Step 6: Status</div>
+                    <div class="feature-desc">Online indicators</div>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">✨</div>
+                    <div class="feature-name">Step 7: UI</div>
+                    <div class="feature-desc">Interactive elements</div>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">⌨️</div>
+                    <div class="feature-name">Step 8: Shortcuts</div>
+                    <div class="feature-desc">Keyboard tips</div>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">🎉</div>
+                    <div class="feature-name">Step 9: Complete</div>
+                    <div class="feature-desc">Celebration!</div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Progress Bar Example -->
+        <div class="example-section">
+            <h2 class="example-title">
+                <span>📈</span>
+                Progress Tracking
+            </h2>
+            <div class="visual-demo" style="min-height: 150px;">
+                <div style="background: white; padding: 15px 30px; border-radius: 20px; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1); min-width: 300px;">
+                    <div style="background: #e2e8f0; height: 8px; border-radius: 4px; overflow: hidden; margin-bottom: 10px;">
+                        <div style="background: linear-gradient(90deg, #667eea, #764ba2); width: 33%; height: 100%; border-radius: 4px; transition: width 0.5s;"></div>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; font-size: 0.9rem;">
+                        <span style="color: #4a5568;">Learning the Basics...</span>
+                        <span style="color: #667eea; font-weight: 600;">33%</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Hint Bubbles Example -->
+        <div class="example-section">
+            <h2 class="example-title">
+                <span>💡</span>
+                Contextual Hint Bubbles
+            </h2>
+            <div class="visual-demo">
+                <div style="position: relative;">
+                    <button style="background: linear-gradient(45deg, #9b59b6, #e91e63); color: white; padding: 12px 24px; border: none; border-radius: 8px; font-size: 1rem; cursor: pointer;">
+                        ➕ Add Friends
+                    </button>
+                    <div style="position: absolute; top: -35px; left: 50%; transform: translateX(-50%); background: #667eea; color: white; padding: 6px 16px; border-radius: 20px; font-size: 0.85rem; white-space: nowrap;">
+                        Add friends here! 🎯
+                    </div>
+                </div>
+            </div>
+            <div class="code-example">
+// Appears after tutorial completion<br>
+onboarding.showHintBubbles();<br>
+// Auto-dismisses after 10 seconds<br>
+// Clicking bubble triggers the action
+            </div>
+        </div>
+        
+        <!-- Achievement Unlock Example -->
+        <div class="example-section">
+            <h2 class="example-title">
+                <span>🏆</span>
+                Tutorial Completion Achievement
+            </h2>
+            <div class="visual-demo">
+                <div style="background: white; padding: 30px; border-radius: 20px; text-align: center; box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);">
+                    <div style="font-size: 4rem; margin-bottom: 15px;">🏆</div>
+                    <h3 style="color: #2d3748; margin: 0 0 10px 0;">Tutorial Master</h3>
+                    <p style="color: #718096; margin: 0 0 15px 0;">Completed the JomBro tutorial</p>
+                    <div style="color: #667eea; font-weight: 600; font-size: 1.1rem;">+50 Tokens</div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Implementation Priority -->
+        <div class="example-section">
+            <h2 class="example-title">
+                <span>🎯</span>
+                Key Benefits
+            </h2>
+            <div class="feature-grid">
+                <div class="feature-card">
+                    <div class="feature-icon">📈</div>
+                    <div class="feature-name">80% Better Retention</div>
+                    <div class="feature-desc">Users who complete tutorial stay longer</div>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">🚀</div>
+                    <div class="feature-name">3x Faster Onboarding</div>
+                    <div class="feature-desc">Users understand features immediately</div>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">😊</div>
+                    <div class="feature-name">Higher Satisfaction</div>
+                    <div class="feature-desc">Less confusion = happier users</div>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">💰</div>
+                    <div class="feature-name">More Engagement</div>
+                    <div class="feature-desc">Users discover all features</div>
+                </div>
+            </div>
+        </div>
+    </div>
     
-    // Then close modals
-    const modals = document.querySelectorAll('.auth-modal.show, .settings-modal.show, .profile-modal.show, .friend-modal.show, .challenge-modal.show');
-    modals.forEach(modal => {
-        closeModal(modal);
-    });
-}
-
-// Focus search input
-function focusSearch() {
-    // Open friend modal and focus search
-    showFriendModal();
-    setTimeout(() => {
-        const searchInput = document.getElementById('usernameSearchInput');
-        if (searchInput) {
-            searchInput.focus();
-            searchInput.select();
-        }
-    }, 300);
-}
-
-// Enhanced close modal function
-function closeModal(modalElement) {
-    if (modalElement) {
-        modalElement.classList.add('closing');
-        setTimeout(() => {
-            if (modalElement.classList.contains('auth-modal') && modalElement.id !== 'authModal') {
-                modalElement.remove();
-            } else {
-                modalElement.classList.remove('show', 'closing');
+    <script>
+        // Add bounce animation
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes bounce {
+                0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+                40% { transform: translateY(-20px); }
+                60% { transform: translateY(-10px); }
             }
-        }, 300);
-    }
-}
-
-// Call this after your existing initApp function
-document.addEventListener('DOMContentLoaded', () => {
-    // Your existing initialization...
-    
-    // Then initialize enhanced features
-    setTimeout(() => {
-        initializeEnhancedFeatures();
-    }, 1000);
-});
-
-// Export for debugging
-window.JomBroDebug = {
-    state: AppState,
-    showState: () => console.table(AppState),
-    resetUI: () => location.reload(),
-    testNotification: () => showBrowserNotification({ title: 'Test notification' }),
-    testAchievement: () => showAchievementAnimation('Test Achievement')
-};
-
-console.log('✨ JomBro Enhanced Profile System Ready!');
-console.log('💡 Press Ctrl+P for Profile, Ctrl+K for Friends, Ctrl+J for Challenges');
-console.log('🐛 Debug: window.JomBroDebug.showState()');
-</script>
-
-<!-- Add this CSS for achievement popup -->
-<style>
-.achievement-popup {
-    position: fixed;
-    top: 20px;
-    left: 50%;
-    transform: translateX(-50%) translateY(-100px);
-    background: linear-gradient(135deg, #667eea, #764ba2);
-    color: white;
-    padding: 20px 30px;
-    border-radius: 15px;
-    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
-    z-index: 10000;
-    opacity: 0;
-    transition: all 0.5s ease;
-}
-
-.achievement-popup.show {
-    transform: translateX(-50%) translateY(0);
-    opacity: 1;
-}
-
-.achievement-content {
-    display: flex;
-    align-items: center;
-    gap: 15px;
-}
-
-.achievement-icon {
-    font-size: 2.5rem;
-    animation: bounce 2s infinite;
-}
-
-.achievement-text h3 {
-    margin: 0 0 5px 0;
-    font-size: 1.2rem;
-}
-
-.achievement-text p {
-    margin: 0;
-    opacity: 0.9;
-}
-</style>
+        `;
+        document.head.appendChild(style);
+    </script>
+</body>
+</html>
