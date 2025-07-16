@@ -519,6 +519,37 @@
             color: white;
         }
 
+        .social-button.whatsapp {
+            border-color: #25D366;
+            color: #25D366;
+        }
+
+        .social-button.whatsapp:hover {
+            background: #25D366;
+            color: white;
+        }
+
+        .social-button.instagram {
+            border: 2px solid transparent;
+            background: linear-gradient(white, white) padding-box, linear-gradient(45deg, #f09433 0%,#e6683c 25%,#dc2743 50%,#cc2366 75%,#bc1888 100%) border-box;
+            color: #e6683c;
+        }
+
+        .social-button.instagram:hover {
+            background: linear-gradient(45deg, #f09433 0%,#e6683c 25%,#dc2743 50%,#cc2366 75%,#bc1888 100%);
+            color: white;
+        }
+
+        .social-button.tiktok {
+            border-color: #000;
+            color: #000;
+        }
+
+        .social-button.tiktok:hover {
+            background: #000;
+            color: white;
+        }
+
         /* Header */
         .header {
             padding: 20px;
@@ -1063,6 +1094,16 @@
             .range-presets {
                 grid-template-columns: repeat(2, 1fr);
             }
+            
+            .social-buttons {
+                grid-template-columns: 1fr;
+            }
+            
+            .btn-small {
+                padding: 6px 10px;
+                font-size: 0.75rem;
+                min-width: 60px;
+            }
         }
     </style>
 </head>
@@ -1373,6 +1414,29 @@
                             Connect with friends and players nearby to start challenging each other! 
                             Earn tokens, level up, and have fun competing in real-life challenges.
                         </p>
+                        
+                        <!-- Invite Friends Section -->
+                        <div style="background: rgba(155, 89, 182, 0.1); border: 2px solid rgba(155, 89, 182, 0.3); border-radius: 15px; padding: 20px; margin-bottom: 20px;">
+                            <h4 style="margin-bottom: 10px; color: #9b59b6;">🚀 Invite Friends & Grow JomBro!</h4>
+                            <p style="margin-bottom: 15px; opacity: 0.9; font-size: 0.9rem;">
+                                Help us launch by sharing JomBro with your friends on social media!
+                            </p>
+                            <div style="display: flex; gap: 8px; justify-content: center; flex-wrap: wrap; margin-bottom: 10px;">
+                                <button class="btn btn-small" onclick="shareToWhatsApp()" style="background: #25D366; border-color: #25D366;">
+                                    💬 WhatsApp
+                                </button>
+                                <button class="btn btn-small" onclick="shareToFacebook()" style="background: #1877f2; border-color: #1877f2;">
+                                    📘 Facebook
+                                </button>
+                                <button class="btn btn-small" onclick="shareToInstagram()" style="background: linear-gradient(45deg, #f09433, #e6683c); border: none;">
+                                    📸 Instagram
+                                </button>
+                                <button class="btn btn-small" onclick="shareToTikTok()" style="background: #000; border-color: #000;">
+                                    🎵 TikTok
+                                </button>
+                            </div>
+                        </div>
+                        
                         <div style="display: flex; gap: 10px; justify-content: center; flex-wrap: wrap;">
                             <button class="btn btn-primary" onclick="showAddFriendModal()">
                                 👥 Add Friends
@@ -2080,41 +2144,56 @@
             try {
                 console.log('🔥 Setting up real-time listeners...');
                 
-                // Friends listener
+                // Friends listener with better error handling
                 const friendshipsRef = db.collection('friendships')
                     .where('users', 'array-contains', currentUser.uid);
                 
                 const unsubscribeFriends = friendshipsRef.onSnapshot(async (snapshot) => {
                     const friends = [];
                     
-                    for (const doc of snapshot.docs) {
-                        const friendship = doc.data();
-                        if (friendship.status === 'accepted') {
-                            const friendId = friendship.users.find(id => id !== currentUser.uid);
-                            
-                            if (friendId) {
-                                const friendDoc = await db.collection('users').doc(friendId).get();
-                                if (friendDoc.exists) {
-                                    const friendData = friendDoc.data();
-                                    friends.push({
-                                        id: friendId,
-                                        name: friendData.name,
-                                        avatar: friendData.avatar || getRandomAvatar(),
-                                        online: friendData.online || false,
-                                        lastActive: friendData.lastActive,
-                                        tokens: friendData.tokens || 0,
-                                        level: friendData.level || 1
-                                    });
+                    try {
+                        for (const doc of snapshot.docs) {
+                            const friendship = doc.data();
+                            if (friendship.status === 'accepted') {
+                                const friendId = friendship.users.find(id => id !== currentUser.uid);
+                                
+                                if (friendId) {
+                                    try {
+                                        const friendDoc = await db.collection('users').doc(friendId).get();
+                                        if (friendDoc.exists) {
+                                            const friendData = friendDoc.data();
+                                            friends.push({
+                                                id: friendId,
+                                                name: friendData.name || 'Friend',
+                                                avatar: friendData.avatar || getRandomAvatar(),
+                                                online: friendData.online || false,
+                                                lastActive: friendData.lastActive,
+                                                tokens: friendData.tokens || 0,
+                                                level: friendData.level || 1
+                                            });
+                                        }
+                                    } catch (friendError) {
+                                        console.error('Error loading friend data:', friendError);
+                                    }
                                 }
                             }
                         }
+                        
+                        appState.friends = friends;
+                        appState.user.friends = friends.length;
+                        renderFriends();
+                        updateUserDisplay();
+                        
+                        console.log(`📊 Friends loaded: ${friends.length}`);
+                        
+                    } catch (friendsError) {
+                        console.error('Error processing friends:', friendsError);
                     }
-                    
-                    appState.friends = friends;
-                    appState.user.friends = friends.length;
-                    renderFriends();
-                    updateUserDisplay();
+                }, (error) => {
+                    console.error('Friends listener error:', error);
+                    showMessage('⚠️ Connection issue with friends list', 'error');
                 });
+                
                 unsubscribeFunctions.push(unsubscribeFriends);
                 
                 // User stats listener
@@ -2544,29 +2623,71 @@
 
         // Friend functions
         function showAddFriendModal() {
+            const appUrl = window.location.origin;
+            const shareText = `Join me on JomBro! 🎮 Let's challenge each other and have fun! My email: ${currentUser ? currentUser.email : ''}`;
+            
             const modalHtml = `
                 <div class="auth-modal show" id="addFriendModal" style="z-index: 2000;">
-                    <div class="auth-container" style="max-width: 400px;">
+                    <div class="auth-container" style="max-width: 450px;">
                         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px;">
-                            <h3 style="margin: 0; color: #667eea;">👥 Add Friends</h3>
+                            <h3 style="margin: 0; color: #667eea;">👥 Add & Invite Friends</h3>
                             <button onclick="closeAddFriendModal()" style="background: none; border: none; color: #667eea; font-size: 1.5rem; cursor: pointer;">✕</button>
                         </div>
                         
-                        <div class="form-group">
-                            <label class="form-label" for="friendEmailInput">Friend's Email</label>
-                            <div class="input-container">
-                                <input type="email" id="friendEmailInput" class="form-input" placeholder="friend@example.com">
-                                <span class="input-icon">📧</span>
+                        <!-- Add by Email Section -->
+                        <div style="margin-bottom: 30px;">
+                            <h4 style="color: #4a5568; margin-bottom: 15px; font-size: 1rem;">📧 Add Existing User</h4>
+                            <div class="form-group" style="margin-bottom: 15px;">
+                                <div class="input-container">
+                                    <input type="email" id="friendEmailInput" class="form-input" placeholder="Enter friend's email address">
+                                    <span class="input-icon">📧</span>
+                                </div>
                             </div>
+                            <button class="auth-button auth-button-primary" onclick="addFriendByEmail()" id="addFriendBtn">
+                                Add Friend
+                            </button>
                         </div>
                         
-                        <button class="auth-button auth-button-primary" onclick="addFriendByEmail()">
-                            Add Friend
-                        </button>
-                        
-                        <div style="text-align: center; margin-top: 20px; padding-top: 20px; border-top: 1px solid #e2e8f0;">
-                            <p style="margin: 0; color: #718096; font-size: 0.9rem;">Share your email with friends so they can add you too!</p>
-                            <p style="margin: 5px 0 0 0; font-weight: 600; color: #667eea;">${currentUser ? currentUser.email : ''}</p>
+                        <!-- Share App Section -->
+                        <div style="border-top: 2px solid #e2e8f0; padding-top: 25px;">
+                            <h4 style="color: #4a5568; margin-bottom: 15px; font-size: 1rem;">🚀 Invite Friends to JomBro</h4>
+                            <p style="color: #718096; font-size: 0.9rem; margin-bottom: 20px; text-align: center;">
+                                Share the app with friends so they can join and challenge you!
+                            </p>
+                            
+                            <!-- Social Share Buttons -->
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 20px;">
+                                <button class="social-button whatsapp" onclick="shareToWhatsApp()" style="background: #25D366; color: white; border-color: #25D366;">
+                                    <span>💬</span>
+                                    <span>WhatsApp</span>
+                                </button>
+                                <button class="social-button facebook" onclick="shareToFacebook()" style="background: #1877f2; color: white; border-color: #1877f2;">
+                                    <span>📘</span>
+                                    <span>Facebook</span>
+                                </button>
+                                <button class="social-button instagram" onclick="shareToInstagram()" style="background: linear-gradient(45deg, #f09433 0%,#e6683c 25%,#dc2743 50%,#cc2366 75%,#bc1888 100%); color: white; border: none;">
+                                    <span>📸</span>
+                                    <span>Instagram</span>
+                                </button>
+                                <button class="social-button tiktok" onclick="shareToTikTok()" style="background: #000; color: white; border-color: #000;">
+                                    <span>🎵</span>
+                                    <span>TikTok</span>
+                                </button>
+                            </div>
+                            
+                            <!-- Copy Link Button -->
+                            <button class="auth-button" onclick="copyAppLink()" style="background: rgba(102, 126, 234, 0.1); color: #667eea; border: 2px solid #667eea; margin-bottom: 10px;">
+                                📋 Copy App Link
+                            </button>
+                            
+                            <!-- Your Info -->
+                            <div style="background: rgba(102, 126, 234, 0.05); padding: 15px; border-radius: 12px; text-align: center;">
+                                <p style="margin: 0; color: #718096; font-size: 0.9rem;">Your JomBro Email:</p>
+                                <p style="margin: 5px 0 0 0; font-weight: 600; color: #667eea; font-size: 0.9rem;">${currentUser ? currentUser.email : ''}</p>
+                                <button onclick="copyEmail()" style="background: none; border: none; color: #667eea; font-size: 0.8rem; cursor: pointer; text-decoration: underline; margin-top: 5px;">
+                                    📋 Copy Email
+                                </button>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -2583,10 +2704,23 @@
         }
 
         async function addFriendByEmail() {
-            const friendEmail = document.getElementById('friendEmailInput').value.trim();
+            const friendEmail = document.getElementById('friendEmailInput').value.trim().toLowerCase();
+            const addBtn = document.getElementById('addFriendBtn');
             
             if (!friendEmail) {
                 showMessage('❌ Please enter an email address!', 'error');
+                return;
+            }
+            
+            if (friendEmail === currentUser.email.toLowerCase()) {
+                showMessage('❌ You cannot add yourself as a friend!', 'error');
+                return;
+            }
+            
+            // Email validation
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!emailRegex.test(friendEmail)) {
+                showMessage('❌ Please enter a valid email address!', 'error');
                 return;
             }
             
@@ -2597,64 +2731,156 @@
                 return;
             }
             
-            const sanitizedEmail = securityManager.sanitizeInput(friendEmail, 'email');
-            
             try {
+                addBtn.disabled = true;
+                addBtn.classList.add('loading');
                 showMessage('🔍 Searching for user...', 'info');
                 
-                const usersRef = db.collection('users');
-                const query = await usersRef.where('email', '==', sanitizedEmail.toLowerCase()).get();
+                // Search for user by email
+                const usersQuery = await db.collection('users')
+                    .where('email', '==', friendEmail)
+                    .limit(1)
+                    .get();
                 
-                if (query.empty) {
-                    showMessage('❌ User not found with that email address!', 'error');
+                if (usersQuery.empty) {
+                    showMessage('❌ User not found! Ask them to sign up first, then try again.', 'error');
                     return;
                 }
                 
-                const friendDoc = query.docs[0];
+                const friendDoc = usersQuery.docs[0];
                 const friendId = friendDoc.id;
                 const friendData = friendDoc.data();
                 
-                if (friendId === currentUser.uid) {
-                    showMessage('❌ You cannot add yourself as a friend!', 'error');
-                    return;
-                }
-                
-                const existingFriendship = await db.collection('friendships')
-                    .where('users', 'in', [
-                        [currentUser.uid, friendId],
-                        [friendId, currentUser.uid]
-                    ])
+                // Check if friendship already exists
+                const existingFriendships = await db.collection('friendships')
+                    .where('users', 'array-contains', currentUser.uid)
                     .get();
                 
-                if (!existingFriendship.empty) {
-                    showMessage('❌ Friend request already exists or you are already friends!', 'error');
+                let friendshipExists = false;
+                existingFriendships.forEach(doc => {
+                    const friendship = doc.data();
+                    if (friendship.users.includes(friendId)) {
+                        friendshipExists = true;
+                    }
+                });
+                
+                if (friendshipExists) {
+                    showMessage('❌ Already friends or friendship request exists!', 'error');
                     return;
                 }
                 
+                // Create friendship
                 await db.collection('friendships').add({
                     users: [currentUser.uid, friendId],
                     requesterId: currentUser.uid,
                     requesterName: appState.user.name,
+                    targetId: friendId,
                     targetName: friendData.name,
-                    status: 'accepted',
+                    status: 'accepted', // Auto-accept for now, can change to 'pending' later
                     createdAt: firebase.firestore.FieldValue.serverTimestamp()
                 });
                 
-                await db.collection('users').doc(currentUser.uid).update({
+                // Update friend counts
+                const batch = db.batch();
+                batch.update(db.collection('users').doc(currentUser.uid), {
                     friendsCount: firebase.firestore.FieldValue.increment(1)
                 });
-                
-                await db.collection('users').doc(friendId).update({
+                batch.update(db.collection('users').doc(friendId), {
                     friendsCount: firebase.firestore.FieldValue.increment(1)
                 });
+                await batch.commit();
                 
+                // Clear input and close modal
+                document.getElementById('friendEmailInput').value = '';
                 closeAddFriendModal();
+                
                 showMessage(`✅ ${friendData.name} is now your friend!`, 'success');
                 
             } catch (error) {
                 console.error('Error adding friend:', error);
-                showMessage('❌ Failed to add friend. Please try again.', 'error');
+                showMessage('❌ Failed to add friend. Please check the email and try again.', 'error');
+            } finally {
+                addBtn.disabled = false;
+                addBtn.classList.remove('loading');
             }
+        }
+
+        // Social Sharing Functions
+        function shareToWhatsApp() {
+            const appUrl = window.location.origin;
+            const message = `🎮 Join me on JomBro! Challenge friends and have fun!\n\n🌟 Download: ${appUrl}\n📧 Add me: ${currentUser.email}`;
+            const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(message)}`;
+            window.open(whatsappUrl, '_blank');
+            showMessage('💬 Opening WhatsApp to share!', 'success');
+        }
+
+        function shareToFacebook() {
+            const appUrl = window.location.origin;
+            const facebookUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(appUrl)}&quote=${encodeURIComponent('🎮 Join me on JomBro! Challenge friends and have fun!')}`;
+            window.open(facebookUrl, '_blank', 'width=600,height=400');
+            showMessage('📘 Opening Facebook to share!', 'success');
+        }
+
+        function shareToInstagram() {
+            // Instagram doesn't allow direct web sharing, so copy link instead
+            copyAppLink();
+            showMessage('📸 Link copied! Paste it in your Instagram story or bio!', 'info');
+        }
+
+        function shareToTikTok() {
+            const appUrl = window.location.origin;
+            const tiktokUrl = `https://www.tiktok.com/share?url=${encodeURIComponent(appUrl)}`;
+            window.open(tiktokUrl, '_blank');
+            showMessage('🎵 Opening TikTok to share!', 'success');
+        }
+
+        function copyAppLink() {
+            const appUrl = window.location.origin;
+            const shareText = `🎮 Join me on JomBro! Challenge friends and have fun!\n\n🌟 App: ${appUrl}\n📧 My email: ${currentUser.email}`;
+            
+            if (navigator.clipboard) {
+                navigator.clipboard.writeText(shareText).then(() => {
+                    showMessage('📋 App link copied to clipboard!', 'success');
+                }).catch(() => {
+                    fallbackCopy(shareText);
+                });
+            } else {
+                fallbackCopy(shareText);
+            }
+        }
+
+        function copyEmail() {
+            const email = currentUser.email;
+            
+            if (navigator.clipboard) {
+                navigator.clipboard.writeText(email).then(() => {
+                    showMessage('📧 Email copied to clipboard!', 'success');
+                }).catch(() => {
+                    fallbackCopy(email);
+                });
+            } else {
+                fallbackCopy(email);
+            }
+        }
+
+        function fallbackCopy(text) {
+            const textArea = document.createElement('textarea');
+            textArea.value = text;
+            textArea.style.position = 'fixed';
+            textArea.style.left = '-999999px';
+            textArea.style.top = '-999999px';
+            document.body.appendChild(textArea);
+            textArea.focus();
+            textArea.select();
+            
+            try {
+                document.execCommand('copy');
+                showMessage('📋 Copied to clipboard!', 'success');
+            } catch (err) {
+                showMessage('❌ Please copy manually', 'error');
+            }
+            
+            document.body.removeChild(textArea);
         }
 
         function challengeFriend(friendId) {
@@ -2672,6 +2898,34 @@
         function showTokenInfo() {
             showMessage('🪙 Tokens are earned by completing challenges and can be used to create new challenges! Start with 1000 tokens when you join.', 'info');
         }
+
+        // Global Social Sharing Functions (can be called from anywhere)
+        window.shareToWhatsApp = function() {
+            const appUrl = window.location.origin;
+            const message = `🎮 Join me on JomBro! Challenge friends and have fun!\n\n🌟 Download: ${appUrl}\n📧 Add me: ${currentUser ? currentUser.email : ''}`;
+            const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(message)}`;
+            window.open(whatsappUrl, '_blank');
+            showMessage('💬 Opening WhatsApp to share!', 'success');
+        };
+
+        window.shareToFacebook = function() {
+            const appUrl = window.location.origin;
+            const facebookUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(appUrl)}&quote=${encodeURIComponent('🎮 Join me on JomBro! Challenge friends and have fun!')}`;
+            window.open(facebookUrl, '_blank', 'width=600,height=400');
+            showMessage('📘 Opening Facebook to share!', 'success');
+        };
+
+        window.shareToInstagram = function() {
+            copyAppLink();
+            showMessage('📸 Link copied! Paste it in your Instagram story or bio!', 'info');
+        };
+
+        window.shareToTikTok = function() {
+            const appUrl = window.location.origin;
+            const tiktokUrl = `https://www.tiktok.com/share?url=${encodeURIComponent(appUrl)}`;
+            window.open(tiktokUrl, '_blank');
+            showMessage('🎵 Opening TikTok to share!', 'success');
+        };
 
         // UI Functions
         function switchTab(tab) {
@@ -2808,7 +3062,16 @@
         console.log('✅ Real location-based features');
         console.log('✅ NO fake/demo data');
         console.log('✅ Real user names displayed');
+        console.log('✅ Social sharing for WhatsApp, FB, IG, TikTok');
+        console.log('✅ Fixed Add Friends functionality');
         console.log('🚀 100% REAL - Ready for launch!');
+        console.log('');
+        console.log('🌐 HOW TO LAUNCH:');
+        console.log('1. Deploy this HTML to: Firebase Hosting, Netlify, or Vercel');
+        console.log('2. Set up Firebase Firestore Rules (from previous instructions)');
+        console.log('3. Share the live URL with friends!');
+        console.log('4. Use the built-in social sharing buttons to promote!');
+        console.log('💡 Tip: Users can share directly to WhatsApp, Facebook, Instagram & TikTok!');
     </script>
 </body>
 </html>
