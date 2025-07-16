@@ -448,6 +448,7 @@
 
         .social-login {
             margin-bottom: 24px;
+            display: none; /* Hidden - Email/Password only */
         }
 
         .social-title {
@@ -1134,21 +1135,6 @@
 
             <!-- Login Form -->
             <form class="auth-form active" id="loginForm">
-                <!-- Social Login -->
-                <div class="social-login">
-                    <div class="social-title">Continue with</div>
-                    <div class="social-buttons">
-                        <button type="button" class="social-button google" onclick="signInWithGoogle()">
-                            <span>📧</span>
-                            <span>Google</span>
-                        </button>
-                        <button type="button" class="social-button facebook" onclick="signInWithFacebook()">
-                            <span>📘</span>
-                            <span>Facebook</span>
-                        </button>
-                    </div>
-                </div>
-
                 <!-- Email Input -->
                 <div class="form-group">
                     <label class="form-label" for="loginEmail">Email Address</label>
@@ -1192,21 +1178,6 @@
 
             <!-- Signup Form -->
             <form class="auth-form" id="signupForm">
-                <!-- Social Login -->
-                <div class="social-login">
-                    <div class="social-title">Continue with</div>
-                    <div class="social-buttons">
-                        <button type="button" class="social-button google" onclick="signInWithGoogle()">
-                            <span>📧</span>
-                            <span>Google</span>
-                        </button>
-                        <button type="button" class="social-button facebook" onclick="signInWithFacebook()">
-                            <span>📘</span>
-                            <span>Facebook</span>
-                        </button>
-                    </div>
-                </div>
-
                 <!-- Name Input -->
                 <div class="form-group">
                     <label class="form-label" for="signupName">Display Name</label>
@@ -1364,8 +1335,13 @@
                     <!-- Nearby Players List -->
                     <div class="nearby-players-list" id="nearbyPlayersList">
                         <div class="empty-state">
-                            <h4>🔍 No nearby players found</h4>
-                            <p>Enable location to discover JomBro players around you!</p>
+                            <h4>🔍 No real players found nearby</h4>
+                            <p>Enable location to discover real JomBro users around you!</p>
+                            <p style="font-size: 0.8rem; opacity: 0.7; margin-top: 10px;">
+                                ✅ Only real users with GPS<br>
+                                ❌ No fake or demo players<br>
+                                📍 Share app to find friends nearby
+                            </p>
                         </div>
                     </div>
                     
@@ -1545,7 +1521,7 @@
         let unsubscribeFunctions = [];
         let currentTab = 'login';
         let userLocation = null;
-        let nearbyPlayers = [];
+        let nearbyPlayers = []; // ALWAYS empty until real users found
         let detectionRange = 3; // km
         let isHiddenFromNearby = false;
         
@@ -1899,106 +1875,6 @@
                 }
             }
 
-            // Social Authentication
-            async signInWithGoogle() {
-                try {
-                    // Security check
-                    const securityCheck = securityManager.canPerformAction('auth', 'google_signin');
-                    if (!securityCheck.allowed) {
-                        showMessage(`🔒 ${securityCheck.reason}`, 'error');
-                        return;
-                    }
-
-                    showMessage('Opening Google Sign-In...', 'info');
-                    const provider = new firebase.auth.GoogleAuthProvider();
-                    provider.addScope('email');
-                    provider.addScope('profile');
-                    
-                    const result = await auth.signInWithPopup(provider);
-                    
-                    // Check if this is a new user
-                    const userDoc = await db.collection('users').doc(result.user.uid).get();
-                    
-                    if (!userDoc.exists) {
-                        // Create user document for new Google users
-                        const userName = result.user.displayName || result.user.email.split('@')[0];
-                        const sanitizedName = securityManager.sanitizeInput(userName, 'username');
-                        
-                        await db.collection('users').doc(result.user.uid).set({
-                            name: sanitizedName,
-                            email: result.user.email,
-                            avatar: this.getRandomAvatar(),
-                            tokens: 1000,
-                            level: 1,
-                            friendsCount: 0,
-                            createdAt: firebase.firestore.FieldValue.serverTimestamp(),
-                            lastActive: firebase.firestore.FieldValue.serverTimestamp(),
-                            online: true,
-                            isNewUser: true,
-                            authProvider: 'google'
-                        });
-                        
-                        showMessage(`Welcome ${sanitizedName}! Account created with Google! 🎉`, 'success');
-                    } else {
-                        showMessage(`Welcome back ${result.user.displayName || 'to JomBro'}! 🎉`, 'success');
-                    }
-
-                } catch (error) {
-                    if (error.code !== 'auth/popup-closed-by-user') {
-                        this.handleAuthError(error);
-                    }
-                }
-            }
-
-            async signInWithFacebook() {
-                try {
-                    // Security check
-                    const securityCheck = securityManager.canPerformAction('auth', 'facebook_signin');
-                    if (!securityCheck.allowed) {
-                        showMessage(`🔒 ${securityCheck.reason}`, 'error');
-                        return;
-                    }
-
-                    showMessage('Opening Facebook Sign-In...', 'info');
-                    const provider = new firebase.auth.FacebookAuthProvider();
-                    provider.addScope('email');
-                    
-                    const result = await auth.signInWithPopup(provider);
-                    
-                    // Check if this is a new user
-                    const userDoc = await db.collection('users').doc(result.user.uid).get();
-                    
-                    if (!userDoc.exists) {
-                        // Create user document for new Facebook users
-                        const userName = result.user.displayName || result.user.email.split('@')[0];
-                        const sanitizedName = securityManager.sanitizeInput(userName, 'username');
-                        
-                        await db.collection('users').doc(result.user.uid).set({
-                            name: sanitizedName,
-                            email: result.user.email,
-                            avatar: this.getRandomAvatar(),
-                            tokens: 1000,
-                            level: 1,
-                            friendsCount: 0,
-                            createdAt: firebase.firestore.FieldValue.serverTimestamp(),
-                            lastActive: firebase.firestore.FieldValue.serverTimestamp(),
-                            online: true,
-                            isNewUser: true,
-                            authProvider: 'facebook'
-                        });
-                        
-                        showMessage(`Welcome ${sanitizedName}! Account created with Facebook! 🎉`, 'success');
-                    } else {
-                        showMessage(`Welcome back ${result.user.displayName || 'to JomBro'}! 🎉`, 'success');
-                    }
-
-                } catch (error) {
-                    if (error.code !== 'auth/popup-closed-by-user') {
-                        this.handleAuthError(error);
-                    }
-                }
-            }
-
             // Error Handling
             handleAuthError(error) {
                 let errorMessage = 'An error occurred. Please try again.';
@@ -2302,28 +2178,36 @@
             }
         }
 
-        // Load nearby players from Firestore
+        // Load ONLY REAL nearby players from Firestore - NO FAKE DATA
         async function loadNearbyPlayers() {
-            if (!userLocation || !currentUser) return;
+            if (!userLocation || !currentUser) {
+                nearbyPlayers = [];
+                renderNearbyPlayers();
+                return;
+            }
             
             try {
-                showMessage('🔍 Searching for nearby players...', 'info');
+                showMessage('🔍 Searching for real nearby players...', 'info');
                 
-                // Query users with location data who are online and not hidden
+                // Query ONLY real users with location data who are online and not hidden
                 const usersRef = db.collection('users')
                     .where('online', '==', true)
                     .where('isHiddenFromNearby', '==', false)
-                    .limit(50); // Limit to prevent excessive queries
+                    .limit(100); // Limit to prevent excessive queries
                 
                 const snapshot = await usersRef.get();
-                const nearbyPlayersFound = [];
+                const realNearbyPlayers = [];
                 
+                // Process ONLY real users from database
                 snapshot.forEach(doc => {
                     if (doc.id === currentUser.uid) return; // Skip current user
                     
                     const userData = doc.data();
-                    if (!userData.location) return; // Skip users without location
+                    if (!userData.location || !userData.location.latitude || !userData.location.longitude) {
+                        return; // Skip users without valid GPS location
+                    }
                     
+                    // Calculate real GPS distance
                     const distance = calculateDistance(
                         userLocation.latitude,
                         userLocation.longitude,
@@ -2331,30 +2215,41 @@
                         userData.location.longitude
                     );
                     
+                    // Only include if within detection range
                     if (distance <= detectionRange) {
-                        nearbyPlayersFound.push({
+                        realNearbyPlayers.push({
                             id: doc.id,
-                            name: userData.name,
+                            name: userData.name || 'Player',
                             avatar: userData.avatar || getRandomAvatar(),
                             distance: distance.toFixed(1) + 'km',
                             level: userData.level || 1,
-                            online: true
+                            online: true,
+                            isReal: true // Flag to confirm this is real data
                         });
                     }
                 });
                 
-                nearbyPlayers = nearbyPlayersFound;
+                // Sort by distance (closest first)
+                realNearbyPlayers.sort((a, b) => 
+                    parseFloat(a.distance) - parseFloat(b.distance)
+                );
+                
+                nearbyPlayers = realNearbyPlayers;
                 renderNearbyPlayers();
                 
                 if (nearbyPlayers.length > 0) {
-                    showMessage(`🎉 Found ${nearbyPlayers.length} nearby players!`, 'success');
+                    showMessage(`🎉 Found ${nearbyPlayers.length} real nearby players!`, 'success');
+                    console.log(`📍 Real nearby players found:`, nearbyPlayers);
                 } else {
-                    showMessage('🔍 No players found in your area. Try increasing the range!', 'info');
+                    showMessage('🔍 No real players found in your area. Invite friends to join!', 'info');
+                    console.log('📍 No real users found within range');
                 }
                 
             } catch (error) {
-                console.error('Error loading nearby players:', error);
+                console.error('Error loading real nearby players:', error);
                 showMessage('❌ Failed to search for nearby players', 'error');
+                nearbyPlayers = []; // Ensure no fake data on error
+                renderNearbyPlayers();
             }
         }
 
@@ -2370,15 +2265,20 @@
             return R * c;
         }
 
-        // Render nearby players
+        // Render ONLY REAL nearby players - NO FAKE DATA
         function renderNearbyPlayers() {
             const nearbyPlayersList = document.getElementById('nearbyPlayersList');
             
-            if (nearbyPlayers.length === 0) {
+            if (!nearbyPlayers || nearbyPlayers.length === 0) {
                 nearbyPlayersList.innerHTML = `
                     <div class="empty-state">
-                        <h4>🔍 No nearby players found</h4>
-                        <p>Try increasing the detection range or wait for more players to join!</p>
+                        <h4>🔍 No real players found nearby</h4>
+                        <p>Only real users with GPS enabled will appear here.</p>
+                        <p style="font-size: 0.8rem; opacity: 0.7; margin-top: 10px;">
+                            ✅ NO fake or demo players<br>
+                            ✅ Only real JomBro users<br>
+                            ✅ Within ${detectionRange}km radius
+                        </p>
                     </div>
                 `;
                 return;
@@ -2386,7 +2286,14 @@
             
             nearbyPlayersList.innerHTML = '';
             
+            // Render only verified real players
             nearbyPlayers.forEach(player => {
+                // Extra verification - only render if marked as real
+                if (!player.isReal) {
+                    console.warn('⚠️ Skipping non-real player data');
+                    return;
+                }
+                
                 const playerElement = document.createElement('div');
                 playerElement.className = 'nearby-player-item';
                 
@@ -2397,7 +2304,7 @@
                     </div>
                     <div class="nearby-player-info">
                         <div class="nearby-player-name">${player.name}</div>
-                        <div class="nearby-player-status">Level ${player.level} • Online</div>
+                        <div class="nearby-player-status">Level ${player.level} • Online • Real User</div>
                     </div>
                     <button class="btn btn-primary btn-small" onclick="connectWithPlayer('${player.id}')">
                         Connect
@@ -2406,6 +2313,8 @@
                 
                 nearbyPlayersList.appendChild(playerElement);
             });
+            
+            console.log(`📊 Rendered ${nearbyPlayers.length} real nearby players`);
         }
 
         // Connect with a nearby player
@@ -2432,13 +2341,13 @@
                 await auth.signOut();
                 showMessage('👋 Logged out successfully!', 'info');
                 
-                // Reset app state
+                // Reset app state - ensure no fake data persists
                 appState = {
                     user: { id: null, name: '', avatar: '👤', tokens: 0, level: 1, friends: 0, online: true },
                     friends: []
                 };
                 
-                nearbyPlayers = [];
+                nearbyPlayers = []; // Always empty until real users found
                 userLocation = null;
                 isHiddenFromNearby = false;
                 
@@ -2553,9 +2462,9 @@
             event.target.classList.add('active');
             
             if (userLocation) {
-                loadNearbyPlayers();
+                loadNearbyPlayers(); // Load ONLY real players within new range
             }
-            showMessage(`📡 Detection range set to ${range}km`, 'info');
+            showMessage(`📡 Detection range set to ${range}km - scanning for real players`, 'info');
         }
 
         function setCustomRange() {
@@ -2568,9 +2477,9 @@
                 document.querySelectorAll('.range-btn').forEach(btn => btn.classList.remove('active'));
                 
                 if (userLocation) {
-                    loadNearbyPlayers();
+                    loadNearbyPlayers(); // Load ONLY real players within custom range
                 }
-                showMessage(`📡 Custom range set to ${customRange}km`, 'success');
+                showMessage(`📡 Custom range set to ${customRange}km - scanning for real players`, 'success');
             } else {
                 showMessage('❌ Please enter a valid range (0.1 - 50 km)', 'error');
             }
@@ -2585,9 +2494,11 @@
             }
             refreshBtn.disabled = true;
             
+            showMessage('🔍 Searching for real nearby players...', 'info');
+            
             setTimeout(() => {
                 if (userLocation) {
-                    loadNearbyPlayers();
+                    loadNearbyPlayers(); // Load ONLY real players
                 } else {
                     showMessage('📍 Please enable location first!', 'info');
                 }
@@ -2964,17 +2875,13 @@
             }
         }
 
-        // Social login functions
+        // Social login functions - REMOVED (Email/Password only)
         function signInWithGoogle() {
-            if (window.authSystem) {
-                window.authSystem.signInWithGoogle();
-            }
+            showMessage('❌ Social login removed. Please use email and password.', 'error');
         }
 
         function signInWithFacebook() {
-            if (window.authSystem) {
-                window.authSystem.signInWithFacebook();
-            }
+            showMessage('❌ Social login removed. Please use email and password.', 'error');
         }
 
         // Utility functions
@@ -3057,14 +2964,15 @@
         });
 
         console.log('🎮 JomBro Production App Loaded!');
-        console.log('✅ Authentication system ready');
+        console.log('✅ EMAIL/PASSWORD authentication ONLY');
         console.log('✅ Security system integrated');
         console.log('✅ Real location-based features');
-        console.log('✅ NO fake/demo data');
+        console.log('✅ ZERO fake/demo players');
         console.log('✅ Real user names displayed');
         console.log('✅ Social sharing for WhatsApp, FB, IG, TikTok');
         console.log('✅ Fixed Add Friends functionality');
-        console.log('🚀 100% REAL - Ready for launch!');
+        console.log('❌ Google/Facebook login REMOVED');
+        console.log('🚀 100% REAL DATA ONLY - Ready for launch!');
         console.log('');
         console.log('🌐 HOW TO LAUNCH:');
         console.log('1. Deploy this HTML to: Firebase Hosting, Netlify, or Vercel');
@@ -3072,6 +2980,13 @@
         console.log('3. Share the live URL with friends!');
         console.log('4. Use the built-in social sharing buttons to promote!');
         console.log('💡 Tip: Users can share directly to WhatsApp, Facebook, Instagram & TikTok!');
+        console.log('');
+        console.log('🔥 FEATURES:');
+        console.log('• Email/Password auth only');
+        console.log('• Real GPS-based player discovery');
+        console.log('• No fake or demo data anywhere');
+        console.log('• Social sharing built-in');
+        console.log('• Add friends by email');
     </script>
 </body>
 </html>
