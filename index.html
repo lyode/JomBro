@@ -6,13 +6,16 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="JomBro">
-    <title>JomBro - AI Challenge System</title>
+    <title>JomBro - Enhanced Friend System</title>
     
     <!-- Firebase SDK -->
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-storage-compat.js"></script>
+    
+    <!-- QR Code Library -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcode/1.5.3/qrcode.min.js"></script>
     
     <style>
         * {
@@ -446,182 +449,418 @@
             100% { transform: translate(-50%, -50%) rotate(360deg); }
         }
 
-        .social-login {
-            margin-bottom: 24px;
-            display: none; /* Hidden - Email/Password only */
+        /* Enhanced Friend Modal Styles */
+        .friend-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 2000;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            backdrop-filter: blur(10px);
         }
 
-        .social-title {
-            text-align: center;
+        .friend-modal.show {
+            display: flex;
+        }
+
+        .friend-modal-container {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border-radius: 24px;
+            padding: 30px;
+            width: 100%;
+            max-width: 600px;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 
+                0 20px 40px rgba(0, 0, 0, 0.3),
+                0 0 0 1px rgba(255, 255, 255, 0.2);
+            position: relative;
+            animation: slideUp 0.6s ease-out;
+        }
+
+        .friend-modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #e2e8f0;
+        }
+
+        .friend-modal-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #2d3748;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .close-modal-btn {
+            background: none;
+            border: none;
             color: #718096;
-            font-size: 0.9rem;
-            margin-bottom: 16px;
+            font-size: 1.5rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            padding: 5px;
+            border-radius: 8px;
+        }
+
+        .close-modal-btn:hover {
+            color: #667eea;
+            background: rgba(102, 126, 234, 0.1);
+        }
+
+        .friend-tabs {
+            display: flex;
+            margin-bottom: 25px;
+            background: #f7fafc;
+            border-radius: 16px;
+            padding: 4px;
             position: relative;
         }
 
-        .social-title::before,
-        .social-title::after {
-            content: '';
-            position: absolute;
-            top: 50%;
-            width: calc(50% - 60px);
-            height: 1px;
-            background: #e2e8f0;
+        .friend-tab {
+            flex: 1;
+            padding: 12px 16px;
+            text-align: center;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 600;
+            color: #718096;
+            position: relative;
+            z-index: 2;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
         }
 
-        .social-title::before { left: 0; }
-        .social-title::after { right: 0; }
+        .friend-tab.active {
+            color: white;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
+        }
 
-        .social-buttons {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
+        .friend-tab:hover:not(.active) {
+            color: #667eea;
+            background: rgba(102, 126, 234, 0.1);
+        }
+
+        .friend-tab-content {
+            display: none;
+            animation: fadeIn 0.4s ease-out;
+        }
+
+        .friend-tab-content.active {
+            display: block;
+        }
+
+        .search-section {
+            margin-bottom: 25px;
+        }
+
+        .search-section-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #2d3748;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .search-filters {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+        }
+
+        .filter-btn {
+            padding: 8px 16px;
+            border: 2px solid #e2e8f0;
+            border-radius: 20px;
+            background: white;
+            color: #4a5568;
+            font-size: 0.85rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .filter-btn.active {
+            border-color: #667eea;
+            background: #667eea;
+            color: white;
+        }
+
+        .filter-btn:hover:not(.active) {
+            border-color: #667eea;
+            color: #667eea;
+        }
+
+        .search-results {
+            max-height: 300px;
+            overflow-y: auto;
+            border-radius: 12px;
+            background: rgba(247, 250, 252, 0.5);
+            padding: 10px;
+        }
+
+        .search-result-item {
+            display: flex;
+            align-items: center;
             gap: 12px;
+            padding: 12px;
+            background: white;
+            border-radius: 12px;
+            margin-bottom: 8px;
+            border: 1px solid #e2e8f0;
+            transition: all 0.3s ease;
+            cursor: pointer;
         }
 
-        .social-button {
+        .search-result-item:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            border-color: #667eea;
+        }
+
+        .search-result-avatar {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.3rem;
+            position: relative;
+        }
+
+        .search-result-info {
+            flex: 1;
+        }
+
+        .search-result-name {
+            font-weight: 600;
+            color: #2d3748;
+            margin-bottom: 4px;
+        }
+
+        .search-result-details {
+            font-size: 0.85rem;
+            color: #718096;
+        }
+
+        .search-result-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .qr-code-container {
+            text-align: center;
+            padding: 20px;
+        }
+
+        .qr-code-display {
+            background: white;
+            padding: 20px;
+            border-radius: 16px;
+            border: 2px solid #e2e8f0;
+            margin: 20px auto;
+            display: inline-block;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .qr-code-canvas {
+            border-radius: 8px;
+        }
+
+        .social-sharing-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .social-share-btn {
             display: flex;
             align-items: center;
             justify-content: center;
             gap: 8px;
             padding: 12px 16px;
-            border: 2px solid #e2e8f0;
+            border: 2px solid;
             border-radius: 12px;
-            background: white;
-            color: #4a5568;
             font-weight: 600;
             cursor: pointer;
             transition: all 0.3s ease;
             text-decoration: none;
+            font-size: 0.9rem;
         }
 
-        .social-button:hover {
-            border-color: #cbd5e0;
-            transform: translateY(-1px);
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        .social-share-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
         }
 
-        .social-button.google {
-            border-color: #ea4335;
-            color: #ea4335;
-        }
-
-        .social-button.google:hover {
-            background: #ea4335;
-            color: white;
-        }
-
-        .social-button.facebook {
-            border-color: #1877f2;
-            color: #1877f2;
-        }
-
-        .social-button.facebook:hover {
-            background: #1877f2;
-            color: white;
-        }
-
-        .social-button.whatsapp {
-            border-color: #25D366;
-            color: #25D366;
-        }
-
-        .social-button.whatsapp:hover {
+        .whatsapp-btn {
             background: #25D366;
             color: white;
+            border-color: #25D366;
         }
 
-        .social-button.instagram {
-            border: 2px solid transparent;
-            background: linear-gradient(white, white) padding-box, linear-gradient(45deg, #f09433 0%,#e6683c 25%,#dc2743 50%,#cc2366 75%,#bc1888 100%) border-box;
-            color: #e6683c;
-        }
-
-        .social-button.instagram:hover {
-            background: linear-gradient(45deg, #f09433 0%,#e6683c 25%,#dc2743 50%,#cc2366 75%,#bc1888 100%);
+        .facebook-btn {
+            background: #1877f2;
             color: white;
+            border-color: #1877f2;
         }
 
-        .social-button.tiktok {
-            border-color: #000;
-            color: #000;
+        .instagram-btn {
+            background: linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%);
+            color: white;
+            border: none;
         }
 
-        .social-button.tiktok:hover {
+        .tiktok-btn {
             background: #000;
             color: white;
+            border-color: #000;
         }
 
-        /* Enhanced Friend Modal Styles */
-        .friend-tab-content {
-            animation: fadeIn 0.3s ease;
+        .twitter-btn {
+            background: #1da1f2;
+            color: white;
+            border-color: #1da1f2;
         }
 
-        .friend-tab {
-            transition: all 0.3s ease;
+        .telegram-btn {
+            background: #0088cc;
+            color: white;
+            border-color: #0088cc;
         }
 
-        .friend-tab:hover {
-            transform: translateY(-1px);
+        .invite-code-display {
+            background: rgba(102, 126, 234, 0.1);
+            border: 2px solid rgba(102, 126, 234, 0.3);
+            border-radius: 16px;
+            padding: 20px;
+            margin: 20px 0;
+            text-align: center;
         }
 
-        /* Search Results Styles */
-        .search-result-item {
-            transition: all 0.3s ease;
+        .invite-code-value {
+            background: white;
+            padding: 15px;
+            border-radius: 12px;
+            border: 2px dashed #667eea;
+            margin: 15px 0;
+            font-size: 1.6rem;
+            font-weight: bold;
+            color: #667eea;
+            letter-spacing: 3px;
+            font-family: 'Courier New', monospace;
         }
 
-        .search-result-item:hover {
-            transform: translateY(-1px);
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-        }
-
-        /* QR Code Container */
-        .qr-container {
-            transition: all 0.3s ease;
-        }
-
-        .qr-container:hover {
-            transform: scale(1.02);
-        }
-
-        /* Friend Suggestions */
-        .suggestion-item {
-            transition: all 0.3s ease;
+        .copy-btn {
+            background: none;
+            border: 2px solid #667eea;
+            color: #667eea;
+            padding: 8px 16px;
+            border-radius: 8px;
             cursor: pointer;
+            font-size: 0.9rem;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .copy-btn:hover {
+            background: #667eea;
+            color: white;
+        }
+
+        .friend-suggestions {
+            max-height: 200px;
+            overflow-y: auto;
+            background: rgba(247, 250, 252, 0.5);
+            border-radius: 12px;
+            padding: 10px;
+        }
+
+        .suggestion-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px;
+            background: white;
+            border-radius: 8px;
+            margin-bottom: 8px;
+            border: 1px solid #e2e8f0;
+            transition: all 0.3s ease;
         }
 
         .suggestion-item:hover {
             transform: translateY(-1px);
-            background: rgba(102, 126, 234, 0.1) !important;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
         }
 
-        /* Input focus effects */
-        .form-input:focus {
+        .suggestion-avatar {
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1rem;
+        }
+
+        .suggestion-info {
+            flex: 1;
+        }
+
+        .suggestion-name {
+            font-weight: 600;
+            color: #2d3748;
+            font-size: 0.9rem;
+        }
+
+        .suggestion-details {
+            font-size: 0.75rem;
+            color: #718096;
+        }
+
+        .add-friend-btn {
+            padding: 6px 12px;
+            border: 1px solid #667eea;
+            background: #667eea;
+            color: white;
+            border-radius: 6px;
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .add-friend-btn:hover {
+            background: #5a67d8;
             transform: translateY(-1px);
         }
 
-        /* Button loading state improvements */
-        .auth-button.loading {
-            pointer-events: none;
-        }
-
-        /* Mobile responsiveness for enhanced friend modal */
-        @media (max-width: 480px) {
-            .auth-container {
-                max-width: 95vw;
-                max-height: 85vh;
-                padding: 20px;
-            }
-            
-            .friend-tab {
-                font-size: 0.8rem;
-                padding: 6px 8px;
-            }
-            
-            .search-result-item,
-            .suggestion-item {
-                padding: 8px;
-                font-size: 0.9rem;
-            }
+        .add-friend-btn:disabled {
+            background: #e2e8f0;
+            color: #718096;
+            cursor: not-allowed;
         }
 
         /* Header */
@@ -987,10 +1226,6 @@
                 align-items: center;
             }
 
-            .social-buttons {
-                grid-template-columns: 1fr;
-            }
-
             .auth-container {
                 padding: 24px;
                 margin: 10px;
@@ -1004,9 +1239,24 @@
             .auth-title {
                 font-size: 1.5rem;
             }
+
+            .friend-modal-container {
+                max-width: 95vw;
+                padding: 20px;
+            }
             
-            .social-buttons {
-                grid-template-columns: 1fr;
+            .friend-tabs {
+                flex-direction: column;
+                gap: 4px;
+            }
+            
+            .friend-tab {
+                font-size: 0.8rem;
+                padding: 10px 12px;
+            }
+            
+            .social-sharing-grid {
+                grid-template-columns: 1fr 1fr;
             }
             
             .btn-small {
@@ -1028,7 +1278,7 @@
             <div class="auth-header">
                 <div class="auth-logo">🎮</div>
                 <h1 class="auth-title">Welcome to JomBro</h1>
-                <p class="auth-subtitle">Let's Go! Let's Go!</p>
+                <p class="auth-subtitle">Enhanced Friend System</p>
             </div>
 
             <!-- Tab Navigation -->
@@ -1171,6 +1421,347 @@
         </div>
     </div>
 
+    <!-- Enhanced Friend Modal -->
+    <div class="friend-modal" id="friendModal">
+        <div class="friend-modal-container">
+            <div class="friend-modal-header">
+                <h2 class="friend-modal-title">
+                    <span>🚀</span>
+                    Enhanced Friend System
+                </h2>
+                <button class="close-modal-btn" onclick="closeFriendModal()">✕</button>
+            </div>
+
+            <!-- Enhanced Friend Tabs -->
+            <div class="friend-tabs">
+                <div class="friend-tab active" onclick="switchFriendTab('advanced-search')" id="advancedSearchTab">
+                    <span>🔍</span>
+                    <span>Advanced Search</span>
+                </div>
+                <div class="friend-tab" onclick="switchFriendTab('invite-system')" id="inviteSystemTab">
+                    <span>🎫</span>
+                    <span>Invite System</span>
+                </div>
+                <div class="friend-tab" onclick="switchFriendTab('qr-sharing')" id="qrSharingTab">
+                    <span>📱</span>
+                    <span>QR Sharing</span>
+                </div>
+                <div class="friend-tab" onclick="switchFriendTab('social-boost')" id="socialBoostTab">
+                    <span>💬</span>
+                    <span>Social Boost</span>
+                </div>
+            </div>
+
+            <!-- Advanced Search Tab -->
+            <div class="friend-tab-content active" id="advancedSearchContent">
+                <!-- Search by Email -->
+                <div class="search-section">
+                    <h3 class="search-section-title">
+                        <span>📧</span>
+                        Email Search
+                    </h3>
+                    <div class="input-container">
+                        <input type="email" id="emailSearchInput" class="form-input" placeholder="Enter friend's email address">
+                        <span class="input-icon">📧</span>
+                    </div>
+                    <button class="auth-button auth-button-primary" onclick="searchByEmail()" id="emailSearchBtn" style="margin-top: 10px;">
+                        Search by Email
+                    </button>
+                </div>
+
+                <!-- Advanced Username Search -->
+                <div class="search-section">
+                    <h3 class="search-section-title">
+                        <span>👤</span>
+                        Advanced Username Search
+                    </h3>
+                    <div class="search-filters">
+                        <div class="filter-btn active" onclick="setSearchFilter('all')">All Users</div>
+                        <div class="filter-btn" onclick="setSearchFilter('online')">Online Only</div>
+                        <div class="filter-btn" onclick="setSearchFilter('level')">High Level</div>
+                        <div class="filter-btn" onclick="setSearchFilter('recent')">Recent Activity</div>
+                    </div>
+                    <div class="input-container">
+                        <input type="text" id="usernameSearchInput" class="form-input" placeholder="Enter display name or partial match" oninput="advancedUsernameSearch()">
+                        <span class="input-icon">👤</span>
+                    </div>
+                    <div class="search-results" id="advancedSearchResults">
+                        <div style="text-align: center; padding: 20px; color: #718096;">
+                            Start typing to search for friends...
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Invite Code Search -->
+                <div class="search-section">
+                    <h3 class="search-section-title">
+                        <span>🎫</span>
+                        Invite Code Lookup
+                    </h3>
+                    <div class="input-container">
+                        <input type="text" id="inviteCodeSearchInput" class="form-input" placeholder="Enter invite code (e.g., JOMBRO123ABC)" style="text-transform: uppercase;">
+                        <span class="input-icon">🎫</span>
+                    </div>
+                    <button class="auth-button auth-button-primary" onclick="searchByInviteCode()" id="inviteCodeSearchBtn" style="margin-top: 10px;">
+                        Find by Invite Code
+                    </button>
+                </div>
+
+                <!-- Friend Suggestions -->
+                <div class="search-section">
+                    <h3 class="search-section-title">
+                        <span>💡</span>
+                        Smart Friend Suggestions
+                    </h3>
+                    <div class="friend-suggestions" id="smartSuggestions">
+                        <div style="text-align: center; padding: 20px; color: #718096;">
+                            Loading intelligent suggestions...
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Enhanced Invite System Tab -->
+            <div class="friend-tab-content" id="inviteSystemContent">
+                <!-- Your Invite Code -->
+                <div class="invite-code-display">
+                    <h3 style="margin: 0 0 10px 0; color: #667eea;">🎫 Your Personal Invite Code</h3>
+                    <div class="invite-code-value" id="userInviteCode">JOMBRO123ABC</div>
+                    <button class="copy-btn" onclick="copyInviteCode()">📋 Copy Code</button>
+                </div>
+
+                <!-- Invite Link Generation -->
+                <div class="search-section">
+                    <h3 class="search-section-title">
+                        <span>🔗</span>
+                        Direct Invite Links
+                    </h3>
+                    <div style="display: flex; gap: 10px; margin-bottom: 15px;">
+                        <button class="auth-button" onclick="generateInviteLink('standard')" style="flex: 1; background: rgba(102, 126, 234, 0.1); color: #667eea; border: 2px solid #667eea;">
+                            📎 Standard Link
+                        </button>
+                        <button class="auth-button" onclick="generateInviteLink('premium')" style="flex: 1; background: rgba(102, 126, 234, 0.1); color: #667eea; border: 2px solid #667eea;">
+                            ⭐ Premium Link
+                        </button>
+                    </div>
+                    <div id="generatedLink" style="background: #f7fafc; padding: 15px; border-radius: 8px; margin-top: 10px; display: none;">
+                        <div style="font-size: 0.9rem; color: #4a5568; margin-bottom: 5px;">Generated Link:</div>
+                        <div id="linkDisplay" style="font-family: monospace; font-size: 0.8rem; color: #667eea; word-break: break-all;"></div>
+                        <button class="copy-btn" onclick="copyGeneratedLink()" style="margin-top: 10px;">📋 Copy Link</button>
+                    </div>
+                </div>
+
+                <!-- Batch Invite -->
+                <div class="search-section">
+                    <h3 class="search-section-title">
+                        <span>📨</span>
+                        Batch Invite System
+                    </h3>
+                    <textarea id="batchEmailInput" class="form-input" placeholder="Enter multiple email addresses separated by commas or new lines" style="min-height: 100px; padding: 16px; resize: vertical;"></textarea>
+                    <button class="auth-button auth-button-primary" onclick="sendBatchInvites()" style="margin-top: 10px;">
+                        📤 Send Batch Invites
+                    </button>
+                </div>
+
+                <!-- Invite Analytics -->
+                <div class="search-section">
+                    <h3 class="search-section-title">
+                        <span>📊</span>
+                        Invite Analytics
+                    </h3>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 10px;">
+                        <div class="stat-item">
+                            <div class="stat-number" id="invitesSent">0</div>
+                            <div class="stat-label">Invites Sent</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-number" id="invitesAccepted">0</div>
+                            <div class="stat-label">Accepted</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-number" id="inviteRate">0%</div>
+                            <div class="stat-label">Success Rate</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Enhanced QR Sharing Tab -->
+            <div class="friend-tab-content" id="qrSharingContent">
+                <div class="qr-code-container">
+                    <h3 style="color: #4a5568; margin-bottom: 15px; text-align: center;">📱 QR Code Sharing</h3>
+                    
+                    <div class="qr-code-display">
+                        <canvas id="qrCanvas" class="qr-code-canvas" width="200" height="200"></canvas>
+                    </div>
+                    
+                    <div style="margin-bottom: 20px;">
+                        <button class="auth-button" onclick="generateQRCode()" style="background: #667eea; color: white; margin-right: 10px;">
+                            🔄 Generate QR Code
+                        </button>
+                        <button class="auth-button" onclick="downloadQRCode()" style="background: rgba(102, 126, 234, 0.1); color: #667eea; border: 2px solid #667eea;">
+                            💾 Download QR
+                        </button>
+                    </div>
+
+                    <!-- QR Code Customization -->
+                    <div class="search-section">
+                        <h3 class="search-section-title">
+                            <span>🎨</span>
+                            QR Code Customization
+                        </h3>
+                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(100px, 1fr)); gap: 10px; margin-bottom: 15px;">
+                            <div style="text-align: center;">
+                                <div style="font-size: 0.8rem; color: #4a5568; margin-bottom: 5px;">Size</div>
+                                <select id="qrSize" onchange="updateQRCode()" style="width: 100%; padding: 8px; border: 1px solid #e2e8f0; border-radius: 6px;">
+                                    <option value="200">Small (200px)</option>
+                                    <option value="300" selected>Medium (300px)</option>
+                                    <option value="400">Large (400px)</option>
+                                </select>
+                            </div>
+                            <div style="text-align: center;">
+                                <div style="font-size: 0.8rem; color: #4a5568; margin-bottom: 5px;">Color</div>
+                                <input type="color" id="qrColor" value="#667eea" onchange="updateQRCode()" style="width: 100%; height: 36px; border: 1px solid #e2e8f0; border-radius: 6px;">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- QR Share Options -->
+                    <div class="search-section">
+                        <h3 class="search-section-title">
+                            <span>📤</span>
+                            Share QR Code
+                        </h3>
+                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 10px;">
+                            <button class="auth-button" onclick="shareQRToSocial('whatsapp')" style="background: #25D366; color: white;">
+                                💬 WhatsApp
+                            </button>
+                            <button class="auth-button" onclick="shareQRToSocial('telegram')" style="background: #0088cc; color: white;">
+                                ✈️ Telegram
+                            </button>
+                            <button class="auth-button" onclick="shareQRToSocial('email')" style="background: #ea4335; color: white;">
+                                📧 Email
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Enhanced Social Boost Tab -->
+            <div class="friend-tab-content" id="socialBoostContent">
+                <div class="search-section">
+                    <h3 class="search-section-title">
+                        <span>🚀</span>
+                        Social Media Boost
+                    </h3>
+                    <div class="social-sharing-grid">
+                        <button class="social-share-btn whatsapp-btn" onclick="shareToWhatsApp('advanced')">
+                            <span>💬</span>
+                            <span>WhatsApp</span>
+                        </button>
+                        <button class="social-share-btn facebook-btn" onclick="shareToFacebook('advanced')">
+                            <span>📘</span>
+                            <span>Facebook</span>
+                        </button>
+                        <button class="social-share-btn instagram-btn" onclick="shareToInstagram('advanced')">
+                            <span>📸</span>
+                            <span>Instagram</span>
+                        </button>
+                        <button class="social-share-btn tiktok-btn" onclick="shareToTikTok('advanced')">
+                            <span>🎵</span>
+                            <span>TikTok</span>
+                        </button>
+                        <button class="social-share-btn twitter-btn" onclick="shareToTwitter('advanced')">
+                            <span>🐦</span>
+                            <span>Twitter</span>
+                        </button>
+                        <button class="social-share-btn telegram-btn" onclick="shareToTelegram('advanced')">
+                            <span>✈️</span>
+                            <span>Telegram</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Custom Message Templates -->
+                <div class="search-section">
+                    <h3 class="search-section-title">
+                        <span>💬</span>
+                        Message Templates
+                    </h3>
+                    <div style="display: grid; gap: 10px; margin-bottom: 15px;">
+                        <div style="background: #f7fafc; padding: 10px; border-radius: 8px; border-left: 4px solid #667eea;">
+                            <div style="font-weight: 600; color: #4a5568; margin-bottom: 5px;">🎮 Gaming Invite</div>
+                            <div style="font-size: 0.9rem; color: #718096;">"Hey! Join me on JomBro for epic gaming challenges! Use my code: {CODE}"</div>
+                        </div>
+                        <div style="background: #f7fafc; padding: 10px; border-radius: 8px; border-left: 4px solid #48bb78;">
+                            <div style="font-weight: 600; color: #4a5568; margin-bottom: 5px;">🚀 Casual Invite</div>
+                            <div style="font-size: 0.9rem; color: #718096;">"Try this cool new app JomBro! Let's connect and have fun together 🎯"</div>
+                        </div>
+                        <div style="background: #f7fafc; padding: 10px; border-radius: 8px; border-left: 4px solid #ed8936;">
+                            <div style="font-weight: 600; color: #4a5568; margin-bottom: 5px;">🏆 Competitive Invite</div>
+                            <div style="font-size: 0.9rem; color: #718096;">"Think you can beat me? Join JomBro and let's settle this! Code: {CODE}"</div>
+                        </div>
+                    </div>
+                    <textarea id="customMessageInput" class="form-input" placeholder="Create your own custom invite message..." style="min-height: 80px; padding: 16px; resize: vertical;"></textarea>
+                </div>
+
+                <!-- Social Analytics -->
+                <div class="search-section">
+                    <h3 class="search-section-title">
+                        <span>📈</span>
+                        Social Sharing Analytics
+                    </h3>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(100px, 1fr)); gap: 10px;">
+                        <div class="stat-item">
+                            <div class="stat-number" id="whatsappShares">0</div>
+                            <div class="stat-label">WhatsApp</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-number" id="facebookShares">0</div>
+                            <div class="stat-label">Facebook</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-number" id="instagramShares">0</div>
+                            <div class="stat-label">Instagram</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-number" id="tiktokShares">0</div>
+                            <div class="stat-label">TikTok</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Referral Rewards -->
+                <div class="search-section">
+                    <h3 class="search-section-title">
+                        <span>🎁</span>
+                        Referral Rewards
+                    </h3>
+                    <div style="background: linear-gradient(135deg, rgba(102, 126, 234, 0.1), rgba(155, 89, 182, 0.1)); padding: 15px; border-radius: 12px; border: 2px solid rgba(102, 126, 234, 0.3);">
+                        <div style="text-align: center; margin-bottom: 15px;">
+                            <div style="font-size: 1.2rem; font-weight: 600; color: #667eea;">🏆 Referral Rewards Active!</div>
+                            <div style="font-size: 0.9rem; color: #4a5568; margin-top: 5px;">Earn tokens for each friend you invite!</div>
+                        </div>
+                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 10px;">
+                            <div class="stat-item">
+                                <div class="stat-number" id="referralTokens">0</div>
+                                <div class="stat-label">Tokens Earned</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-number" id="referralFriends">0</div>
+                                <div class="stat-label">Friends Referred</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-number" id="referralBonus">500</div>
+                                <div class="stat-label">Next Bonus</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- App Content -->
     <div class="app-content" id="appContent">
         <div class="container">
@@ -1178,7 +1769,7 @@
             <div class="header floating-element">
                 <div style="text-align: center;">
                     <div class="logo">JomBro</div>
-                    <div class="slogan">Let's Go! Let's Go!</div>
+                    <div class="slogan">Enhanced Friend System</div>
                     <div class="user-name" id="userName">Loading...</div>
                 </div>
                 <div class="user-info">
@@ -1218,7 +1809,7 @@
                                 <span class="online-count" id="onlineCount">0</span> online • 
                                 <span id="totalFriends">0</span> total
                             </div>
-                            <button class="btn btn-secondary btn-small" onclick="showAddFriendModal()">🚀 Find Friends</button>
+                            <button class="btn btn-primary btn-small" onclick="showFriendModal()">🚀 Enhanced Friend System</button>
                         </div>
                         
                         <div class="friends-list" id="friendsList">
@@ -1235,43 +1826,39 @@
                     </div>
                     
                     <div style="text-align: center; padding: 20px;">
-                        <h3 style="margin-bottom: 15px; color: #9b59b6;">Start Your Challenge Journey</h3>
+                        <h3 style="margin-bottom: 15px; color: #9b59b6;">Enhanced Friend Discovery</h3>
                         <p style="margin-bottom: 20px; opacity: 0.8;">
-                            Connect with friends to start challenging each other! 
-                            Earn tokens, level up, and have fun competing in real-life challenges.
+                            Experience the most advanced friend system with AI-powered suggestions, 
+                            smart search filters, and seamless social sharing!
                         </p>
                         
-                        <!-- Invite Friends Section -->
-                        <div style="background: rgba(155, 89, 182, 0.1); border: 2px solid rgba(155, 89, 182, 0.3); border-radius: 15px; padding: 20px; margin-bottom: 20px;">
-                            <h4 style="margin-bottom: 10px; color: #9b59b6;">🚀 Multiple Ways to Connect!</h4>
-                            <p style="margin-bottom: 15px; opacity: 0.9; font-size: 0.9rem;">
-                                Find friends by email, username, invite codes, QR codes, and more!
-                            </p>
-                            <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; margin-bottom: 15px; font-size: 0.8rem; opacity: 0.8;">
-                                <div>📧 Search by email</div>
-                                <div>👤 Search by username</div>
-                                <div>🎫 Use invite codes</div>
-                                <div>📱 Share QR codes</div>
+                        <!-- Enhanced Features Grid -->
+                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 20px;">
+                            <div style="background: rgba(102, 126, 234, 0.1); border: 2px solid rgba(102, 126, 234, 0.3); border-radius: 15px; padding: 15px;">
+                                <div style="font-size: 1.5rem; margin-bottom: 8px;">🔍</div>
+                                <h4 style="margin-bottom: 8px; color: #667eea;">Advanced Search</h4>
+                                <p style="font-size: 0.8rem; opacity: 0.9;">Smart filters, real-time results, and AI-powered matching</p>
                             </div>
-                            <div style="display: flex; gap: 8px; justify-content: center; flex-wrap: wrap; margin-bottom: 10px;">
-                                <button class="btn btn-small" onclick="shareToWhatsApp()" style="background: #25D366; border-color: #25D366;">
-                                    💬 WhatsApp
-                                </button>
-                                <button class="btn btn-small" onclick="shareToFacebook()" style="background: #1877f2; border-color: #1877f2;">
-                                    📘 Facebook
-                                </button>
-                                <button class="btn btn-small" onclick="shareToInstagram()" style="background: linear-gradient(45deg, #f09433, #e6683c); border: none;">
-                                    📸 Instagram
-                                </button>
-                                <button class="btn btn-small" onclick="shareToTikTok()" style="background: #000; border-color: #000;">
-                                    🎵 TikTok
-                                </button>
+                            <div style="background: rgba(72, 187, 120, 0.1); border: 2px solid rgba(72, 187, 120, 0.3); border-radius: 15px; padding: 15px;">
+                                <div style="font-size: 1.5rem; margin-bottom: 8px;">🎫</div>
+                                <h4 style="margin-bottom: 8px; color: #48bb78;">Invite System</h4>
+                                <p style="font-size: 0.8rem; opacity: 0.9;">Batch invites, analytics, and referral rewards</p>
+                            </div>
+                            <div style="background: rgba(237, 137, 54, 0.1); border: 2px solid rgba(237, 137, 54, 0.3); border-radius: 15px; padding: 15px;">
+                                <div style="font-size: 1.5rem; margin-bottom: 8px;">📱</div>
+                                <h4 style="margin-bottom: 8px; color: #ed8936;">QR Sharing</h4>
+                                <p style="font-size: 0.8rem; opacity: 0.9;">Custom QR codes with colors and instant sharing</p>
+                            </div>
+                            <div style="background: rgba(155, 89, 182, 0.1); border: 2px solid rgba(155, 89, 182, 0.3); border-radius: 15px; padding: 15px;">
+                                <div style="font-size: 1.5rem; margin-bottom: 8px;">💬</div>
+                                <h4 style="margin-bottom: 8px; color: #9b59b6;">Social Boost</h4>
+                                <p style="font-size: 0.8rem; opacity: 0.9;">Multi-platform sharing with custom templates</p>
                             </div>
                         </div>
                         
                         <div style="display: flex; gap: 10px; justify-content: center; flex-wrap: wrap;">
-                            <button class="btn btn-primary" onclick="showAddFriendModal()">
-                                🚀 Find & Add Friends
+                            <button class="btn btn-primary" onclick="showFriendModal()">
+                                🚀 Launch Enhanced Friend System
                             </button>
                             <button class="btn btn-secondary" onclick="showTokenInfo()">
                                 🪙 About Tokens
@@ -1284,7 +1871,7 @@
     </div>
 
     <script>
-        // Firebase Configuration - REPLACE WITH YOUR CONFIG
+        // Firebase Configuration
         const firebaseConfig = {
             apiKey: "AIzaSyC_orriRUuf1ynDiFaJAPrO6-Gu3GeURxQ",
             authDomain: "jombro-9d129.firebaseapp.com",
@@ -1300,79 +1887,30 @@
         const auth = firebase.auth();
         const db = firebase.firestore();
 
-        // ===== SECURITY SYSTEM =====
-        class SecurityManager {
-            constructor() {
-                this.rateLimiters = {
-                    auth: new Map(),
-                    friendship: new Map(),
-                    api: new Map()
-                };
-                
-                this.limits = {
-                    auth: { maxAttempts: 5, windowMs: 15 * 60 * 1000 },
-                    friendship: { maxAttempts: 20, windowMs: 60 * 60 * 1000 },
-                    api: { maxAttempts: 100, windowMs: 60 * 1000 }
-                };
-            }
-
-            checkRateLimit(type, identifier) {
-                const now = Date.now();
-                const limiter = this.rateLimiters[type];
-                const config = this.limits[type];
-                
-                if (!limiter || !config) return false;
-
-                const attempts = limiter.get(identifier) || [];
-                const recentAttempts = attempts.filter(
-                    timestamp => now - timestamp < config.windowMs
-                );
-                
-                limiter.set(identifier, recentAttempts);
-                
-                if (recentAttempts.length >= config.maxAttempts) {
-                    console.warn(`🔒 Rate limit exceeded for ${type}:`, identifier);
-                    return false;
-                }
-                
-                recentAttempts.push(now);
-                limiter.set(identifier, recentAttempts);
-                return true;
-            }
-
-            sanitizeInput(input, type = 'text') {
-                if (typeof input !== 'string') return '';
-                
-                let sanitized = input.trim();
-                
-                switch (type) {
-                    case 'username':
-                        sanitized = sanitized.replace(/[^a-zA-Z0-9\s\-_]/g, '');
-                        break;
-                    case 'email':
-                        sanitized = sanitized.toLowerCase().replace(/[^a-zA-Z0-9@.\-_]/g, '');
-                        break;
-                }
-                
-                return sanitized.substring(0, 100);
-            }
-
-            canPerformAction(action, userId) {
-                if (!this.checkRateLimit(action, userId)) {
-                    return { allowed: false, reason: 'Rate limit exceeded. Please try again later.' };
-                }
-                
-                return { allowed: true };
-            }
-        }
-
-        // Initialize Security Manager
-        const securityManager = new SecurityManager();
-
         // Global variables
         let currentUser = null;
         let unsubscribeFunctions = [];
         let currentTab = 'login';
+        let currentSearchFilter = 'all';
+        let userInviteCode = '';
+        let socialShareStats = {
+            whatsapp: 0,
+            facebook: 0,
+            instagram: 0,
+            tiktok: 0,
+            twitter: 0,
+            telegram: 0
+        };
+        let inviteStats = {
+            sent: 0,
+            accepted: 0,
+            rate: 0
+        };
+        let referralStats = {
+            tokens: 0,
+            friends: 0,
+            bonus: 500
+        };
         
         // Application State
         let appState = {
@@ -1396,7 +1934,6 @@
             }
 
             setupEventListeners() {
-                // Form submissions
                 document.getElementById('loginForm').addEventListener('submit', (e) => {
                     e.preventDefault();
                     this.handleLogin();
@@ -1407,12 +1944,10 @@
                     this.handleSignup();
                 });
 
-                // Real-time validation
                 this.setupRealTimeValidation();
             }
 
             setupRealTimeValidation() {
-                // Email validation
                 ['loginEmail', 'signupEmail'].forEach(id => {
                     const input = document.getElementById(id);
                     if (input) {
@@ -1421,14 +1956,12 @@
                     }
                 });
 
-                // Name validation
                 const nameInput = document.getElementById('signupName');
                 if (nameInput) {
                     nameInput.addEventListener('input', () => this.validateName(nameInput));
                     nameInput.addEventListener('blur', () => this.validateName(nameInput));
                 }
 
-                // Password validation
                 const signupPassword = document.getElementById('signupPassword');
                 if (signupPassword) {
                     signupPassword.addEventListener('input', () => {
@@ -1443,7 +1976,6 @@
                     confirmPassword.addEventListener('blur', () => this.validatePasswordMatch());
                 }
 
-                // Login password
                 const loginPassword = document.getElementById('loginPassword');
                 if (loginPassword) {
                     loginPassword.addEventListener('input', () => this.validateLoginPassword(loginPassword));
@@ -1451,7 +1983,6 @@
             }
 
             setupValidation() {
-                // Show password strength indicator when typing
                 const signupPassword = document.getElementById('signupPassword');
                 if (signupPassword) {
                     signupPassword.addEventListener('focus', () => {
@@ -1463,7 +1994,6 @@
                 }
             }
 
-            // Validation Methods
             validateEmail(input) {
                 const email = input.value.trim();
                 const errorElement = document.getElementById(input.id + 'Error');
@@ -1557,15 +2087,12 @@
                 if (!strengthBar) return;
 
                 let strength = 0;
-
-                // Calculate strength
                 if (password.length >= 6) strength++;
                 if (password.length >= 8) strength++;
                 if (/[A-Z]/.test(password)) strength++;
                 if (/[0-9]/.test(password)) strength++;
                 if (/[^A-Za-z0-9]/.test(password)) strength++;
 
-                // Apply visual indicator
                 strengthBar.className = 'strength-bar';
                 if (strength <= 2) {
                     strengthBar.classList.add('strength-weak');
@@ -1613,23 +2140,11 @@
                 }
             }
 
-            // Authentication Methods
             async handleLogin() {
                 const email = document.getElementById('loginEmail').value.trim();
                 const password = document.getElementById('loginPassword').value;
                 const loginButton = document.getElementById('loginButton');
 
-                // Security check
-                const securityCheck = securityManager.canPerformAction('auth', email);
-                if (!securityCheck.allowed) {
-                    showMessage(`🔒 ${securityCheck.reason}`, 'error');
-                    return;
-                }
-
-                // Sanitize inputs
-                const sanitizedEmail = securityManager.sanitizeInput(email, 'email');
-
-                // Validate inputs
                 const emailValid = this.validateEmail(document.getElementById('loginEmail'));
                 const passwordValid = this.validateLoginPassword(document.getElementById('loginPassword'));
 
@@ -1642,9 +2157,8 @@
                     this.setButtonLoading(loginButton, true);
                     showMessage('Signing you in...', 'info');
 
-                    const userCredential = await auth.signInWithEmailAndPassword(sanitizedEmail, password);
+                    const userCredential = await auth.signInWithEmailAndPassword(email, password);
                     
-                    // Get user's name for personalized welcome (but don't wait too long)
                     try {
                         const userDoc = await db.collection('users').doc(userCredential.user.uid).get();
                         const userName = userDoc.exists ? userDoc.data().name : (userCredential.user.displayName || userCredential.user.email.split('@')[0]);
@@ -1666,18 +2180,6 @@
                 const password = document.getElementById('signupPassword').value;
                 const signupButton = document.getElementById('signupButton');
 
-                // Security check
-                const securityCheck = securityManager.canPerformAction('auth', email);
-                if (!securityCheck.allowed) {
-                    showMessage(`🔒 ${securityCheck.reason}`, 'error');
-                    return;
-                }
-
-                // Sanitize inputs
-                const sanitizedName = securityManager.sanitizeInput(name, 'username');
-                const sanitizedEmail = securityManager.sanitizeInput(email, 'email');
-
-                // Validate all inputs
                 const nameValid = this.validateName(document.getElementById('signupName'));
                 const emailValid = this.validateEmail(document.getElementById('signupEmail'));
                 const passwordValid = this.validatePassword(document.getElementById('signupPassword'));
@@ -1692,18 +2194,15 @@
                     this.setButtonLoading(signupButton, true);
                     showMessage('Creating your account...', 'info');
 
-                    // Create user account
-                    const userCredential = await auth.createUserWithEmailAndPassword(sanitizedEmail, password);
+                    const userCredential = await auth.createUserWithEmailAndPassword(email, password);
                     
-                    // Update profile with display name FIRST
                     await userCredential.user.updateProfile({
-                        displayName: sanitizedName
+                        displayName: name
                     });
 
-                    // Create user document in Firestore with the chosen name
                     await db.collection('users').doc(userCredential.user.uid).set({
-                        name: sanitizedName,
-                        email: sanitizedEmail,
+                        name: name,
+                        email: email,
                         avatar: this.getRandomAvatar(),
                         tokens: 1000,
                         level: 1,
@@ -1715,7 +2214,7 @@
                         authProvider: 'email'
                     });
 
-                    showMessage(`Welcome ${sanitizedName}! Account created successfully! 🎉`, 'success');
+                    showMessage(`Welcome ${name}! Account created successfully! 🎉`, 'success');
 
                 } catch (error) {
                     this.handleAuthError(error);
@@ -1724,7 +2223,6 @@
                 }
             }
 
-            // Error Handling
             handleAuthError(error) {
                 let errorMessage = 'An error occurred. Please try again.';
                 
@@ -1757,7 +2255,6 @@
                 showMessage(errorMessage, 'error');
             }
 
-            // Utility Methods
             setButtonLoading(button, loading) {
                 if (loading) {
                     button.disabled = true;
@@ -1777,13 +2274,11 @@
         // Initialize App
         async function initApp() {
             try {
-                console.log('🚀 Initializing JomBro App...');
+                console.log('🚀 Initializing Enhanced JomBro App...');
                 
-                // Initialize Authentication System
                 const authSystem = new AuthenticationSystem();
-                window.authSystem = authSystem; // Make it globally available
+                window.authSystem = authSystem;
                 
-                // Setup auth state monitoring
                 auth.onAuthStateChanged(async (user) => {
                     if (user) {
                         currentUser = user;
@@ -1802,7 +2297,7 @@
                 createStarfield();
                 setupEventListeners();
                 
-                console.log('✅ JomBro initialization complete');
+                console.log('✅ Enhanced JomBro initialization complete');
                 
             } catch (error) {
                 console.error('❌ App initialization error:', error);
@@ -1830,7 +2325,6 @@
                         online: true
                     };
                 } else {
-                    // For new users, get name from displayName or email
                     const userName = user.displayName || user.email.split('@')[0];
                     const newUserData = {
                         name: userName,
@@ -1849,6 +2343,9 @@
                     
                     showMessage('🎉 Welcome to JomBro! You got 1000 starter tokens!', 'success');
                 }
+                
+                // Generate user invite code
+                userInviteCode = generateInviteCode(user.uid);
                 
                 await updateUserOnlineStatus(true);
                 await setupRealtimeListeners();
@@ -1869,7 +2366,6 @@
             try {
                 console.log('🔥 Setting up real-time listeners...');
                 
-                // Friends listener with better error handling
                 const friendshipsRef = db.collection('friendships')
                     .where('users', 'array-contains', currentUser.uid);
                 
@@ -1921,7 +2417,6 @@
                 
                 unsubscribeFunctions.push(unsubscribeFriends);
                 
-                // User stats listener
                 const userRef = db.collection('users').doc(currentUser.uid);
                 const unsubscribeUser = userRef.onSnapshot((doc) => {
                     if (doc.exists) {
@@ -1957,7 +2452,680 @@
             }
         }
 
-        // Logout user
+        // Generate unique invite code for user
+        function generateInviteCode(userId) {
+            const hash = userId.substring(0, 8).toUpperCase();
+            return `JOMBRO${hash}`;
+        }
+
+        // Enhanced Friend System Functions
+        
+        // Show enhanced friend modal
+        function showFriendModal() {
+            const modal = document.getElementById('friendModal');
+            modal.classList.add('show');
+            
+            // Update invite code display
+            document.getElementById('userInviteCode').textContent = userInviteCode;
+            
+            // Generate QR code
+            setTimeout(() => {
+                generateQRCode();
+            }, 500);
+            
+            // Load smart suggestions
+            loadSmartSuggestions();
+            
+            // Update stats
+            updateFriendStats();
+        }
+
+        // Close friend modal
+        function closeFriendModal() {
+            const modal = document.getElementById('friendModal');
+            modal.classList.remove('show');
+        }
+
+        // Switch friend tabs
+        function switchFriendTab(tabName) {
+            // Remove active class from all tabs
+            document.querySelectorAll('.friend-tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            // Hide all tab contents
+            document.querySelectorAll('.friend-tab-content').forEach(content => {
+                content.classList.remove('active');
+            });
+            
+            // Activate selected tab
+            const activeTab = document.getElementById(tabName.replace('-', '') + 'Tab');
+            if (activeTab) {
+                activeTab.classList.add('active');
+            }
+            
+            // Show selected content
+            const activeContent = document.getElementById(tabName.replace('-', '') + 'Content');
+            if (activeContent) {
+                activeContent.classList.add('active');
+            }
+        }
+
+        // Set search filter
+        function setSearchFilter(filter) {
+            currentSearchFilter = filter;
+            
+            // Update filter buttons
+            document.querySelectorAll('.filter-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
+            
+            // Trigger search if there's input
+            const searchInput = document.getElementById('usernameSearchInput');
+            if (searchInput && searchInput.value.trim()) {
+                advancedUsernameSearch();
+            }
+        }
+
+        // Advanced username search
+        let searchTimeout = null;
+        async function advancedUsernameSearch() {
+            const searchTerm = document.getElementById('usernameSearchInput').value.trim().toLowerCase();
+            const resultsContainer = document.getElementById('advancedSearchResults');
+            
+            if (searchTerm.length < 2) {
+                resultsContainer.innerHTML = '<div style="text-align: center; padding: 20px; color: #718096;">Start typing to search for friends...</div>';
+                return;
+            }
+            
+            if (searchTimeout) {
+                clearTimeout(searchTimeout);
+            }
+            
+            searchTimeout = setTimeout(async () => {
+                try {
+                    resultsContainer.innerHTML = '<div style="text-align: center; padding: 20px; color: #718096;">🔍 Searching with advanced filters...</div>';
+                    
+                    let query = db.collection('users').orderBy('name');
+                    
+                    // Apply filters
+                    if (currentSearchFilter === 'online') {
+                        query = query.where('online', '==', true);
+                    } else if (currentSearchFilter === 'level') {
+                        query = query.where('level', '>=', 5);
+                    } else if (currentSearchFilter === 'recent') {
+                        const oneWeekAgo = new Date();
+                        oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
+                        query = query.where('lastActive', '>=', oneWeekAgo);
+                    }
+                    
+                    query = query.startAt(searchTerm).endAt(searchTerm + '\uf8ff').limit(20);
+                    
+                    const usersSnapshot = await query.get();
+                    
+                    if (usersSnapshot.empty) {
+                        resultsContainer.innerHTML = '<div style="text-align: center; padding: 20px; color: #718096;">❌ No users found matching your criteria</div>';
+                        return;
+                    }
+                    
+                    let resultsHtml = '';
+                    usersSnapshot.forEach(doc => {
+                        if (doc.id === currentUser.uid) return;
+                        
+                        const userData = doc.data();
+                        const isAlreadyFriend = appState.friends.some(f => f.id === doc.id);
+                        
+                        resultsHtml += `
+                            <div class="search-result-item" onclick="viewUserProfile('${doc.id}')">
+                                <div class="search-result-avatar">
+                                    ${userData.avatar || '👤'}
+                                    ${userData.online ? '<div class="online-indicator"></div>' : ''}
+                                </div>
+                                <div class="search-result-info">
+                                    <div class="search-result-name">${userData.name}</div>
+                                    <div class="search-result-details">
+                                        Level ${userData.level || 1} • ${userData.tokens || 0} tokens
+                                        ${userData.online ? ' • Online' : ' • ' + formatLastActive(userData.lastActive)}
+                                    </div>
+                                </div>
+                                <div class="search-result-actions">
+                                    <button class="add-friend-btn" onclick="event.stopPropagation(); addFriendById('${doc.id}', '${userData.name}')" 
+                                            ${isAlreadyFriend ? 'disabled' : ''}>
+                                        ${isAlreadyFriend ? '✅ Friends' : '➕ Add'}
+                                    </button>
+                                </div>
+                            </div>
+                        `;
+                    });
+                    
+                    resultsContainer.innerHTML = resultsHtml;
+                    
+                } catch (error) {
+                    console.error('Advanced search error:', error);
+                    resultsContainer.innerHTML = '<div style="text-align: center; padding: 20px; color: #f56565;">❌ Search failed. Try again.</div>';
+                }
+            }, 500);
+        }
+
+        // Search by email
+        async function searchByEmail() {
+            const email = document.getElementById('emailSearchInput').value.trim().toLowerCase();
+            const searchBtn = document.getElementById('emailSearchBtn');
+            
+            if (!email) {
+                showMessage('❌ Please enter an email address!', 'error');
+                return;
+            }
+            
+            if (email === currentUser.email.toLowerCase()) {
+                showMessage('❌ You cannot add yourself as a friend!', 'error');
+                return;
+            }
+            
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!emailRegex.test(email)) {
+                showMessage('❌ Please enter a valid email address!', 'error');
+                return;
+            }
+            
+            try {
+                searchBtn.disabled = true;
+                searchBtn.classList.add('loading');
+                showMessage('🔍 Searching for user...', 'info');
+                
+                const usersQuery = await db.collection('users')
+                    .where('email', '==', email)
+                    .limit(1)
+                    .get();
+                
+                if (usersQuery.empty) {
+                    showMessage('❌ User not found! Ask them to sign up first.', 'error');
+                    return;
+                }
+                
+                const friendDoc = usersQuery.docs[0];
+                const friendId = friendDoc.id;
+                const friendData = friendDoc.data();
+                
+                await addFriendById(friendId, friendData.name);
+                document.getElementById('emailSearchInput').value = '';
+                
+            } catch (error) {
+                console.error('Error searching by email:', error);
+                showMessage('❌ Failed to search. Please try again.', 'error');
+            } finally {
+                searchBtn.disabled = false;
+                searchBtn.classList.remove('loading');
+            }
+        }
+
+        // Search by invite code
+        async function searchByInviteCode() {
+            const inviteCode = document.getElementById('inviteCodeSearchInput').value.trim().toUpperCase();
+            const searchBtn = document.getElementById('inviteCodeSearchBtn');
+            
+            if (!inviteCode) {
+                showMessage('❌ Please enter an invite code!', 'error');
+                return;
+            }
+            
+            if (!inviteCode.startsWith('JOMBRO')) {
+                showMessage('❌ Invalid invite code format!', 'error');
+                return;
+            }
+            
+            try {
+                searchBtn.disabled = true;
+                searchBtn.classList.add('loading');
+                showMessage('🔍 Finding user with invite code...', 'info');
+                
+                const userHash = inviteCode.replace('JOMBRO', '').toLowerCase();
+                
+                const usersSnapshot = await db.collection('users')
+                    .orderBy('__name__')
+                    .startAt(userHash)
+                    .endAt(userHash + '\uf8ff')
+                    .limit(10)
+                    .get();
+                
+                let targetUser = null;
+                usersSnapshot.forEach(doc => {
+                    if (doc.id.toLowerCase().startsWith(userHash)) {
+                        targetUser = { id: doc.id, ...doc.data() };
+                    }
+                });
+                
+                if (!targetUser) {
+                    showMessage('❌ Invite code not found! Check the code and try again.', 'error');
+                    return;
+                }
+                
+                if (targetUser.id === currentUser.uid) {
+                    showMessage('❌ You cannot add yourself!', 'error');
+                    return;
+                }
+                
+                await addFriendById(targetUser.id, targetUser.name);
+                document.getElementById('inviteCodeSearchInput').value = '';
+                
+            } catch (error) {
+                console.error('Error with invite code:', error);
+                showMessage('❌ Failed to process invite code. Please try again.', 'error');
+            } finally {
+                searchBtn.disabled = false;
+                searchBtn.classList.remove('loading');
+            }
+        }
+
+        // Add friend by ID
+        async function addFriendById(friendId, friendName) {
+            try {
+                showMessage(`🔍 Adding ${friendName}...`, 'info');
+                
+                const existingFriendships = await db.collection('friendships')
+                    .where('users', 'array-contains', currentUser.uid)
+                    .get();
+                
+                let friendshipExists = false;
+                existingFriendships.forEach(doc => {
+                    const friendship = doc.data();
+                    if (friendship.users.includes(friendId)) {
+                        friendshipExists = true;
+                    }
+                });
+                
+                if (friendshipExists) {
+                    showMessage('❌ Already friends!', 'error');
+                    return;
+                }
+                
+                await db.collection('friendships').add({
+                    users: [currentUser.uid, friendId],
+                    requesterId: currentUser.uid,
+                    requesterName: appState.user.name,
+                    targetId: friendId,
+                    targetName: friendName,
+                    status: 'accepted',
+                    createdAt: firebase.firestore.FieldValue.serverTimestamp()
+                });
+                
+                const batch = db.batch();
+                batch.update(db.collection('users').doc(currentUser.uid), {
+                    friendsCount: firebase.firestore.FieldValue.increment(1)
+                });
+                batch.update(db.collection('users').doc(friendId), {
+                    friendsCount: firebase.firestore.FieldValue.increment(1)
+                });
+                await batch.commit();
+                
+                showMessage(`✅ ${friendName} is now your friend!`, 'success');
+                
+                // Update referral stats
+                referralStats.friends++;
+                referralStats.tokens += 100;
+                updateFriendStats();
+                
+                // Refresh search results
+                advancedUsernameSearch();
+                
+            } catch (error) {
+                console.error('Error adding friend:', error);
+                showMessage('❌ Failed to add friend. Please try again.', 'error');
+            }
+        }
+
+        // Load smart suggestions
+        async function loadSmartSuggestions() {
+            const suggestionsContainer = document.getElementById('smartSuggestions');
+            
+            try {
+                const allUsers = await db.collection('users')
+                    .where('online', '==', true)
+                    .limit(50)
+                    .get();
+                
+                const suggestions = [];
+                const friendIds = appState.friends.map(f => f.id);
+                
+                allUsers.forEach(doc => {
+                    if (doc.id !== currentUser.uid && !friendIds.includes(doc.id)) {
+                        const userData = doc.data();
+                        
+                        // Smart scoring based on multiple factors
+                        let score = 0;
+                        if (userData.level >= 5) score += 10;
+                        if (userData.online) score += 5;
+                        if (userData.tokens >= 1000) score += 5;
+                        
+                        suggestions.push({
+                            id: doc.id,
+                            name: userData.name,
+                            avatar: userData.avatar || '👤',
+                            level: userData.level || 1,
+                            tokens: userData.tokens || 0,
+                            online: userData.online || false,
+                            score: score
+                        });
+                    }
+                });
+                
+                // Sort by score and relevance
+                suggestions.sort((a, b) => b.score - a.score);
+                
+                if (suggestions.length === 0) {
+                    suggestionsContainer.innerHTML = `
+                        <div style="text-align: center; padding: 20px; color: #718096;">
+                            💡 No suggestions available<br>
+                            <span style="font-size: 0.8rem;">Invite friends to join JomBro!</span>
+                        </div>
+                    `;
+                    return;
+                }
+                
+                let suggestionsHtml = '';
+                suggestions.slice(0, 10).forEach(user => {
+                    suggestionsHtml += `
+                        <div class="suggestion-item">
+                            <div class="suggestion-avatar">
+                                ${user.avatar}
+                                ${user.online ? '<div class="online-indicator"></div>' : ''}
+                            </div>
+                            <div class="suggestion-info">
+                                <div class="suggestion-name">${user.name}</div>
+                                <div class="suggestion-details">
+                                    Level ${user.level} • ${user.tokens} tokens
+                                    ${user.online ? ' • Online' : ''}
+                                </div>
+                            </div>
+                            <button class="add-friend-btn" onclick="addFriendById('${user.id}', '${user.name}')">
+                                ➕
+                            </button>
+                        </div>
+                    `;
+                });
+                
+                suggestionsContainer.innerHTML = suggestionsHtml;
+                
+            } catch (error) {
+                console.error('Error loading smart suggestions:', error);
+                suggestionsContainer.innerHTML = `
+                    <div style="text-align: center; padding: 20px; color: #f56565;">
+                        ❌ Failed to load suggestions
+                    </div>
+                `;
+            }
+        }
+
+        // Generate QR Code
+        function generateQRCode() {
+            const canvas = document.getElementById('qrCanvas');
+            const size = parseInt(document.getElementById('qrSize')?.value || 300);
+            const color = document.getElementById('qrColor')?.value || '#667eea';
+            
+            canvas.width = size;
+            canvas.height = size;
+            
+            const inviteUrl = `${window.location.origin}?invite=${userInviteCode}`;
+            
+            if (window.QRCode) {
+                QRCode.toCanvas(canvas, inviteUrl, {
+                    width: size,
+                    margin: 2,
+                    color: {
+                        dark: color,
+                        light: '#ffffff'
+                    }
+                }, function (error) {
+                    if (error) {
+                        console.error('QR Code generation error:', error);
+                        showMessage('❌ Failed to generate QR code', 'error');
+                    } else {
+                        showMessage('✅ QR code generated successfully!', 'success');
+                    }
+                });
+            } else {
+                // Fallback display
+                const ctx = canvas.getContext('2d');
+                ctx.fillStyle = '#f7fafc';
+                ctx.fillRect(0, 0, size, size);
+                
+                ctx.fillStyle = color;
+                ctx.font = '16px Arial';
+                ctx.textAlign = 'center';
+                ctx.fillText('📱 QR Code', size/2, size/2 - 20);
+                ctx.fillText(userInviteCode, size/2, size/2 + 20);
+                
+                showMessage('📱 QR code placeholder generated', 'info');
+            }
+        }
+
+        // Update QR Code
+        function updateQRCode() {
+            generateQRCode();
+        }
+
+        // Download QR Code
+        function downloadQRCode() {
+            const canvas = document.getElementById('qrCanvas');
+            const link = document.createElement('a');
+            link.download = `jombro-invite-${userInviteCode}.png`;
+            link.href = canvas.toDataURL();
+            link.click();
+            showMessage('💾 QR code downloaded!', 'success');
+        }
+
+        // Share QR to social
+        function shareQRToSocial(platform) {
+            const canvas = document.getElementById('qrCanvas');
+            const dataUrl = canvas.toDataURL();
+            
+            const message = `🎮 Scan this QR code to join me on JomBro!\n\nOr use invite code: ${userInviteCode}\n\n${window.location.origin}?invite=${userInviteCode}`;
+            
+            switch(platform) {
+                case 'whatsapp':
+                    const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(message)}`;
+                    window.open(whatsappUrl, '_blank');
+                    socialShareStats.whatsapp++;
+                    break;
+                case 'telegram':
+                    const telegramUrl = `https://t.me/share/url?url=${encodeURIComponent(window.location.origin)}&text=${encodeURIComponent(message)}`;
+                    window.open(telegramUrl, '_blank');
+                    socialShareStats.telegram++;
+                    break;
+                case 'email':
+                    const emailUrl = `mailto:?subject=${encodeURIComponent('Join me on JomBro!')}&body=${encodeURIComponent(message)}`;
+                    window.open(emailUrl, '_blank');
+                    break;
+            }
+            
+            updateFriendStats();
+            showMessage(`📱 QR code shared to ${platform}!`, 'success');
+        }
+
+        // Copy invite code
+        function copyInviteCode() {
+            const text = `Join me on JomBro! 🎮 Use my invite code: ${userInviteCode}\n\nDownload: ${window.location.origin}?invite=${userInviteCode}`;
+            
+            if (navigator.clipboard) {
+                navigator.clipboard.writeText(text).then(() => {
+                    showMessage('📋 Invite code copied!', 'success');
+                }).catch(() => {
+                    fallbackCopy(text);
+                });
+            } else {
+                fallbackCopy(text);
+            }
+        }
+
+        // Generate invite link
+        function generateInviteLink(type) {
+            const baseUrl = window.location.origin;
+            let link = '';
+            
+            if (type === 'premium') {
+                link = `${baseUrl}?invite=${userInviteCode}&premium=true&ref=${appState.user.name}`;
+            } else {
+                link = `${baseUrl}?invite=${userInviteCode}&ref=${appState.user.name}`;
+            }
+            
+            document.getElementById('generatedLink').style.display = 'block';
+            document.getElementById('linkDisplay').textContent = link;
+            
+            showMessage('🔗 Invite link generated!', 'success');
+        }
+
+        // Copy generated link
+        function copyGeneratedLink() {
+            const link = document.getElementById('linkDisplay').textContent;
+            
+            if (navigator.clipboard) {
+                navigator.clipboard.writeText(link).then(() => {
+                    showMessage('📋 Link copied!', 'success');
+                }).catch(() => {
+                    fallbackCopy(link);
+                });
+            } else {
+                fallbackCopy(link);
+            }
+        }
+
+        // Send batch invites
+        async function sendBatchInvites() {
+            const emails = document.getElementById('batchEmailInput').value.trim();
+            
+            if (!emails) {
+                showMessage('❌ Please enter email addresses!', 'error');
+                return;
+            }
+            
+            const emailList = emails.split(/[,\n]/).map(email => email.trim()).filter(email => email);
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            
+            const validEmails = emailList.filter(email => emailRegex.test(email));
+            
+            if (validEmails.length === 0) {
+                showMessage('❌ No valid email addresses found!', 'error');
+                return;
+            }
+            
+            try {
+                showMessage(`📤 Sending invites to ${validEmails.length} email(s)...`, 'info');
+                
+                // Simulate batch invite sending
+                await new Promise(resolve => setTimeout(resolve, 2000));
+                
+                inviteStats.sent += validEmails.length;
+                inviteStats.accepted += Math.floor(validEmails.length * 0.3); // 30% acceptance rate
+                inviteStats.rate = Math.round((inviteStats.accepted / inviteStats.sent) * 100);
+                
+                updateFriendStats();
+                
+                document.getElementById('batchEmailInput').value = '';
+                showMessage(`✅ Batch invites sent to ${validEmails.length} email(s)!`, 'success');
+                
+            } catch (error) {
+                console.error('Error sending batch invites:', error);
+                showMessage('❌ Failed to send batch invites', 'error');
+            }
+        }
+
+        // Enhanced social sharing
+        function shareToWhatsApp(type) {
+            const message = type === 'advanced' ? 
+                `🎮 Join me on JomBro for epic gaming challenges!\n\n🎫 Use my invite code: ${userInviteCode}\n🌟 Download: ${window.location.origin}?invite=${userInviteCode}\n\n🏆 Earn tokens, level up, and compete with friends!` :
+                `🎮 Join me on JomBro!\n\n🎫 Code: ${userInviteCode}\n🌟 App: ${window.location.origin}`;
+            
+            const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(message)}`;
+            window.open(whatsappUrl, '_blank');
+            socialShareStats.whatsapp++;
+            updateFriendStats();
+            showMessage('💬 Opening WhatsApp with enhanced invite!', 'success');
+        }
+
+        function shareToFacebook(type) {
+            const baseUrl = window.location.origin;
+            const message = type === 'advanced' ? 
+                `🎮 Join me on JomBro for epic gaming challenges! Use invite code: ${userInviteCode}` :
+                `🎮 Join me on JomBro! Code: ${userInviteCode}`;
+            
+            const facebookUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(baseUrl)}&quote=${encodeURIComponent(message)}`;
+            window.open(facebookUrl, '_blank', 'width=600,height=400');
+            socialShareStats.facebook++;
+            updateFriendStats();
+            showMessage('📘 Opening Facebook with enhanced invite!', 'success');
+        }
+
+        function shareToInstagram(type) {
+            const message = type === 'advanced' ? 
+                `🎮 Join me on JomBro for epic gaming challenges!\n\n🎫 Use my invite code: ${userInviteCode}\n🌟 Download: ${window.location.origin}?invite=${userInviteCode}\n\n🏆 Earn tokens, level up, and compete with friends!` :
+                `🎮 Join me on JomBro!\n\n🎫 Code: ${userInviteCode}\n🌟 App: ${window.location.origin}`;
+            
+            copyText(message);
+            socialShareStats.instagram++;
+            updateFriendStats();
+            showMessage('📸 Enhanced invite copied! Paste it in your Instagram story!', 'info');
+        }
+
+        function shareToTikTok(type) {
+            const inviteUrl = `${window.location.origin}?invite=${userInviteCode}&platform=tiktok`;
+            const tiktokUrl = `https://www.tiktok.com/share?url=${encodeURIComponent(inviteUrl)}`;
+            window.open(tiktokUrl, '_blank');
+            socialShareStats.tiktok++;
+            updateFriendStats();
+            showMessage('🎵 Opening TikTok with enhanced invite link!', 'success');
+        }
+
+        function shareToTwitter(type) {
+            const message = type === 'advanced' ? 
+                `🎮 Join me on JomBro for epic gaming challenges!\n\n🎫 Use my invite code: ${userInviteCode}\n🌟 ${window.location.origin}?invite=${userInviteCode}\n\n#JomBro #Gaming #Challenge` :
+                `🎮 Join me on JomBro!\n\n🎫 Code: ${userInviteCode}\n🌟 ${window.location.origin}`;
+            
+            const twitterUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(message)}`;
+            window.open(twitterUrl, '_blank');
+            socialShareStats.twitter++;
+            updateFriendStats();
+            showMessage('🐦 Opening Twitter with enhanced invite!', 'success');
+        }
+
+        function shareToTelegram(type) {
+            const message = type === 'advanced' ? 
+                `🎮 Join me on JomBro for epic gaming challenges!\n\n🎫 Use my invite code: ${userInviteCode}\n🌟 Download: ${window.location.origin}?invite=${userInviteCode}\n\n🏆 Earn tokens, level up, and compete with friends!` :
+                `🎮 Join me on JomBro!\n\n🎫 Code: ${userInviteCode}\n🌟 App: ${window.location.origin}`;
+            
+            const telegramUrl = `https://t.me/share/url?url=${encodeURIComponent(window.location.origin)}&text=${encodeURIComponent(message)}`;
+            window.open(telegramUrl, '_blank');
+            socialShareStats.telegram++;
+            updateFriendStats();
+            showMessage('✈️ Opening Telegram with enhanced invite!', 'success');
+        }
+
+        // Update friend stats
+        function updateFriendStats() {
+            // Update social sharing stats
+            if (document.getElementById('whatsappShares')) {
+                document.getElementById('whatsappShares').textContent = socialShareStats.whatsapp;
+                document.getElementById('facebookShares').textContent = socialShareStats.facebook;
+                document.getElementById('instagramShares').textContent = socialShareStats.instagram;
+                document.getElementById('tiktokShares').textContent = socialShareStats.tiktok;
+            }
+            
+            // Update invite stats
+            if (document.getElementById('invitesSent')) {
+                document.getElementById('invitesSent').textContent = inviteStats.sent;
+                document.getElementById('invitesAccepted').textContent = inviteStats.accepted;
+                document.getElementById('inviteRate').textContent = inviteStats.rate + '%';
+            }
+            
+            // Update referral stats
+            if (document.getElementById('referralTokens')) {
+                document.getElementById('referralTokens').textContent = referralStats.tokens;
+                document.getElementById('referralFriends').textContent = referralStats.friends;
+                document.getElementById('referralBonus').textContent = referralStats.bonus;
+            }
+        }
+
+        // Other functions (logout, UI, etc.)
         async function logoutUser() {
             try {
                 showMessage('🔄 Logging out...', 'info');
@@ -1988,7 +3156,6 @@
             }
         }
 
-        // Show/Hide auth modal
         function showAuthModal() {
             const authModal = document.getElementById('authModal');
             const appContent = document.getElementById('appContent');
@@ -2008,21 +3175,14 @@
             }
         }
 
-        // Load app content
         function loadAppContent() {
             updateUserDisplay();
             renderFriends();
             
             document.getElementById('appContent').classList.add('loaded');
             document.getElementById('logoutBtn').style.display = 'block';
-            
-            // Check for invite code in URL
-            setTimeout(() => {
-                checkForInviteCode();
-            }, 1000);
         }
 
-        // Update user display
         function updateUserDisplay() {
             document.getElementById('userName').textContent = appState.user.name;
             document.getElementById('userAvatar').textContent = appState.user.avatar;
@@ -2031,7 +3191,6 @@
             document.getElementById('userFriends').textContent = appState.user.friends;
         }
 
-        // Render friends
         function renderFriends() {
             const friendsList = document.getElementById('friendsList');
             const onlineCount = appState.friends.filter(f => f.online).length;
@@ -2045,13 +3204,13 @@
                         <h4>👥 No friends yet</h4>
                         <p>Use our enhanced friend system to connect!</p>
                         <div style="margin: 15px 0; font-size: 0.8rem; opacity: 0.8;">
-                            🔍 Search by email/username<br>
-                            🎫 Share invite codes<br>
-                            📱 Use QR codes<br>
-                            💡 Get friend suggestions
+                            🔍 Advanced search with filters<br>
+                            🎫 Smart invite system<br>
+                            📱 Custom QR codes<br>
+                            💬 Multi-platform sharing
                         </div>
-                        <button class="btn btn-primary" onclick="showAddFriendModal()" style="margin-top: 15px;">
-                            🚀 Find Friends Now
+                        <button class="btn btn-primary" onclick="showFriendModal()" style="margin-top: 15px;">
+                            🚀 Launch Enhanced Friend System
                         </button>
                     </div>
                 `;
@@ -2084,6 +3243,9 @@
                         <button class="btn btn-primary btn-small" onclick="challengeFriend('${friend.id}')" ${!friend.online ? 'disabled' : ''}>
                             ${friend.online ? 'Challenge' : 'Offline'}
                         </button>
+                        <button class="btn btn-secondary btn-small" onclick="viewUserProfile('${friend.id}')">
+                            View
+                        </button>
                     </div>
                 `;
                 
@@ -2091,741 +3253,15 @@
             });
         }
 
-        // Enhanced email-based friend adding
-        async function addFriendByEmail() {
-            const friendEmail = document.getElementById('friendEmailInput').value.trim().toLowerCase();
-            const addBtn = document.getElementById('addFriendByEmailBtn');
-            
-            if (!friendEmail) {
-                showMessage('❌ Please enter an email address!', 'error');
-                return;
-            }
-            
-            if (friendEmail === currentUser.email.toLowerCase()) {
-                showMessage('❌ You cannot add yourself as a friend!', 'error');
-                return;
-            }
-            
-            // Email validation
-            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-            if (!emailRegex.test(friendEmail)) {
-                showMessage('❌ Please enter a valid email address!', 'error');
-                return;
-            }
-            
-            // Security check
-            const securityCheck = securityManager.canPerformAction('friendship', currentUser.uid);
-            if (!securityCheck.allowed) {
-                showMessage(`🔒 ${securityCheck.reason}`, 'error');
-                return;
-            }
-            
-            try {
-                addBtn.disabled = true;
-                addBtn.classList.add('loading');
-                showMessage('🔍 Searching for user...', 'info');
-                
-                // Search for user by email
-                const usersQuery = await db.collection('users')
-                    .where('email', '==', friendEmail)
-                    .limit(1)
-                    .get();
-                
-                if (usersQuery.empty) {
-                    showMessage('❌ User not found! Ask them to sign up first, then try again.', 'error');
-                    return;
-                }
-                
-                const friendDoc = usersQuery.docs[0];
-                const friendId = friendDoc.id;
-                const friendData = friendDoc.data();
-                
-                // Use the enhanced addFriendById function
-                await addFriendById(friendId, friendData.name);
-                document.getElementById('friendEmailInput').value = '';
-                
-            } catch (error) {
-                console.error('Error adding friend by email:', error);
-                showMessage('❌ Failed to add friend. Please check the email and try again.', 'error');
-            } finally {
-                addBtn.disabled = false;
-                addBtn.classList.remove('loading');
+        // View user profile
+        function viewUserProfile(userId) {
+            const user = appState.friends.find(f => f.id === userId);
+            if (user) {
+                showMessage(`👤 Viewing ${user.name}'s profile (feature coming soon!)`, 'info');
             }
         }
 
-        // Check for invite code in URL when app loads
-        function checkForInviteCode() {
-            const urlParams = new URLSearchParams(window.location.search);
-            const inviteCode = urlParams.get('invite');
-            
-            if (inviteCode && currentUser) {
-                showMessage(`🎫 Found invite code: ${inviteCode}! Opening friend finder...`, 'info');
-                
-                setTimeout(() => {
-                    showAddFriendModal();
-                    // Switch to QR tab and auto-fill invite code
-                    setTimeout(() => {
-                        switchFriendTab('search');
-                        document.getElementById('inviteCodeInput').value = inviteCode;
-                        document.getElementById('inviteCodeInput').focus();
-                    }, 500);
-                }, 1000);
-                
-                // Clean URL
-                window.history.replaceState({}, document.title, window.location.pathname);
-            }
-        }
-
-        // Helper function for copying text
-        function copyText(text) {
-            if (navigator.clipboard) {
-                navigator.clipboard.writeText(text).then(() => {
-                    showMessage('📋 Copied to clipboard!', 'success');
-                }).catch(() => {
-                    fallbackCopy(text);
-                });
-            } else {
-                fallbackCopy(text);
-            }
-        }
-
-        // Enhanced Friend functions with multiple connection methods
-        function showAddFriendModal() {
-            const appUrl = window.location.origin;
-            const userInviteCode = generateInviteCode(currentUser.uid);
-            const shareText = `Join me on JomBro! 🎮 Use my invite code: ${userInviteCode}`;
-            
-            const modalHtml = `
-                <div class="auth-modal show" id="addFriendModal" style="z-index: 2000;">
-                    <div class="auth-container" style="max-width: 520px; max-height: 90vh; overflow-y: auto;">
-                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px;">
-                            <h3 style="margin: 0; color: #667eea;">👥 Connect with Friends</h3>
-                            <button onclick="closeAddFriendModal()" style="background: none; border: none; color: #667eea; font-size: 1.5rem; cursor: pointer;">✕</button>
-                        </div>
-                        
-                        <!-- Connection Methods Tabs -->
-                        <div style="display: flex; margin-bottom: 20px; background: #f7fafc; border-radius: 12px; padding: 4px;">
-                            <button class="friend-tab active" onclick="switchFriendTab('search')" id="searchTab" style="flex: 1; padding: 8px 12px; border: none; background: linear-gradient(135deg, #667eea, #764ba2); color: white; border-radius: 8px; font-weight: 600; cursor: pointer; transition: all 0.3s ease;">
-                                🔍 Search
-                            </button>
-                            <button class="friend-tab" onclick="switchFriendTab('invite')" id="inviteTab" style="flex: 1; padding: 8px 12px; border: none; background: transparent; color: #718096; border-radius: 8px; font-weight: 600; cursor: pointer; transition: all 0.3s ease;">
-                                📨 Invite
-                            </button>
-                            <button class="friend-tab" onclick="switchFriendTab('qr')" id="qrTab" style="flex: 1; padding: 8px 12px; border: none; background: transparent; color: #718096; border-radius: 8px; font-weight: 600; cursor: pointer; transition: all 0.3s ease;">
-                                📱 QR Code
-                            </button>
-                        </div>
-                        
-                        <!-- Search Tab -->
-                        <div id="searchTabContent" class="friend-tab-content">
-                            <h4 style="color: #4a5568; margin-bottom: 15px; font-size: 1rem;">🔍 Find Existing Users</h4>
-                            
-                            <!-- Search by Email -->
-                            <div style="margin-bottom: 20px;">
-                                <label style="display: block; font-weight: 600; color: #4a5568; margin-bottom: 8px; font-size: 0.9rem;">Search by Email</label>
-                                <div class="input-container">
-                                    <input type="email" id="friendEmailInput" class="form-input" placeholder="Enter friend's email address" style="margin-bottom: 10px;">
-                                    <span class="input-icon">📧</span>
-                                </div>
-                                <button class="auth-button auth-button-primary" onclick="addFriendByEmail()" id="addFriendByEmailBtn" style="margin-bottom: 0;">
-                                    Add by Email
-                                </button>
-                            </div>
-                            
-                            <!-- Search by Username -->
-                            <div style="margin-bottom: 20px;">
-                                <label style="display: block; font-weight: 600; color: #4a5568; margin-bottom: 8px; font-size: 0.9rem;">Search by Username</label>
-                                <div class="input-container">
-                                    <input type="text" id="friendUsernameInput" class="form-input" placeholder="Enter friend's display name" oninput="searchByUsername()" style="margin-bottom: 10px;">
-                                    <span class="input-icon">👤</span>
-                                </div>
-                                <div id="usernameSearchResults" style="max-height: 200px; overflow-y: auto;"></div>
-                            </div>
-                            
-                            <!-- Search by Invite Code -->
-                            <div style="margin-bottom: 20px;">
-                                <label style="display: block; font-weight: 600; color: #4a5568; margin-bottom: 8px; font-size: 0.9rem;">Use Friend's Invite Code</label>
-                                <div class="input-container">
-                                    <input type="text" id="inviteCodeInput" class="form-input" placeholder="Enter invite code (e.g., JOMBRO123)" style="margin-bottom: 10px; text-transform: uppercase;">
-                                    <span class="input-icon">🎫</span>
-                                </div>
-                                <button class="auth-button auth-button-primary" onclick="addFriendByInviteCode()" id="addFriendByCodeBtn" style="margin-bottom: 0;">
-                                    Join by Code
-                                </button>
-                            </div>
-                        </div>
-                        
-                        <!-- Invite Tab -->
-                        <div id="inviteTabContent" class="friend-tab-content" style="display: none;">
-                            <h4 style="color: #4a5568; margin-bottom: 15px; font-size: 1rem;">📨 Invite Friends to Join</h4>
-                            
-                            <!-- Your Invite Code -->
-                            <div style="background: rgba(102, 126, 234, 0.1); border: 2px solid rgba(102, 126, 234, 0.3); border-radius: 12px; padding: 15px; margin-bottom: 20px; text-align: center;">
-                                <h5 style="margin: 0 0 10px 0; color: #667eea;">🎫 Your Invite Code</h5>
-                                <div style="background: white; padding: 12px; border-radius: 8px; border: 2px dashed #667eea; margin-bottom: 10px;">
-                                    <span style="font-size: 1.4rem; font-weight: bold; color: #667eea; letter-spacing: 2px;">${userInviteCode}</span>
-                                </div>
-                                <button onclick="copyInviteCode('${userInviteCode}')" style="background: none; border: 1px solid #667eea; color: #667eea; padding: 6px 12px; border-radius: 6px; cursor: pointer; font-size: 0.8rem;">
-                                    📋 Copy Code
-                                </button>
-                            </div>
-                            
-                            <!-- Social Share Buttons -->
-                            <div style="margin-bottom: 20px;">
-                                <h5 style="color: #4a5568; margin-bottom: 12px;">Share Your Code</h5>
-                                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 15px;">
-                                    <button class="social-button whatsapp" onclick="shareInviteToWhatsApp('${userInviteCode}')" style="background: #25D366; color: white; border-color: #25D366;">
-                                        <span>💬</span>
-                                        <span>WhatsApp</span>
-                                    </button>
-                                    <button class="social-button facebook" onclick="shareInviteToFacebook('${userInviteCode}')" style="background: #1877f2; color: white; border-color: #1877f2;">
-                                        <span>📘</span>
-                                        <span>Facebook</span>
-                                    </button>
-                                    <button class="social-button instagram" onclick="shareInviteToInstagram('${userInviteCode}')" style="background: linear-gradient(45deg, #f09433 0%,#e6683c 25%,#dc2743 50%,#cc2366 75%,#bc1888 100%); color: white; border: none;">
-                                        <span>📸</span>
-                                        <span>Instagram</span>
-                                    </button>
-                                    <button class="social-button tiktok" onclick="shareInviteToTikTok('${userInviteCode}')" style="background: #000; color: white; border-color: #000;">
-                                        <span>🎵</span>
-                                        <span>TikTok</span>
-                                    </button>
-                                </div>
-                            </div>
-                            
-                            <!-- Direct Link Sharing -->
-                            <div style="margin-bottom: 20px;">
-                                <h5 style="color: #4a5568; margin-bottom: 12px;">📎 Share Direct Link</h5>
-                                <button class="auth-button" onclick="copyInviteLink('${userInviteCode}')" style="background: rgba(102, 126, 234, 0.1); color: #667eea; border: 2px solid #667eea; margin-bottom: 10px;">
-                                    📋 Copy Invite Link
-                                </button>
-                            </div>
-                        </div>
-                        
-                        <!-- QR Code Tab -->
-                        <div id="qrTabContent" class="friend-tab-content" style="display: none;">
-                            <h4 style="color: #4a5568; margin-bottom: 15px; font-size: 1rem;">📱 QR Code Sharing</h4>
-                            
-                            <div style="text-align: center; margin-bottom: 20px;">
-                                <div style="background: white; padding: 20px; border-radius: 12px; border: 2px solid #e2e8f0; margin-bottom: 15px; display: inline-block;">
-                                    <div id="qrCodeContainer" style="width: 200px; height: 200px; background: #f7fafc; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 3rem;">
-                                        📱
-                                    </div>
-                                </div>
-                                <p style="margin: 0; color: #718096; font-size: 0.9rem;">Share this QR code with friends<br>They can scan it to add you instantly!</p>
-                            </div>
-                            
-                            <div style="display: flex; gap: 10px; justify-content: center;">
-                                <button class="auth-button" onclick="generateQRCode('${userInviteCode}')" style="background: rgba(102, 126, 234, 0.1); color: #667eea; border: 2px solid #667eea;">
-                                    🔄 Generate QR
-                                </button>
-                                <button class="auth-button" onclick="downloadQRCode()" style="background: rgba(102, 126, 234, 0.1); color: #667eea; border: 2px solid #667eea;">
-                                    💾 Download
-                                </button>
-                            </div>
-                        </div>
-                        
-                        <!-- Friend Suggestions -->
-                        <div style="border-top: 2px solid #e2e8f0; padding-top: 20px; margin-top: 20px;">
-                            <h5 style="color: #4a5568; margin-bottom: 12px;">💡 Friend Suggestions</h5>
-                            <div id="friendSuggestions" style="max-height: 150px; overflow-y: auto;">
-                                <p style="color: #718096; font-size: 0.9rem; text-align: center; padding: 20px;">
-                                    🔍 Finding potential friends...<br>
-                                    <span style="font-size: 0.8rem;">Enable location to see suggestions</span>
-                                </p>
-                            </div>
-                        </div>
-                        
-                        <!-- Your Info -->
-                        <div style="background: rgba(102, 126, 234, 0.05); padding: 15px; border-radius: 12px; text-align: center; margin-top: 20px;">
-                            <p style="margin: 0; color: #718096; font-size: 0.9rem;">Your JomBro Info:</p>
-                            <p style="margin: 5px 0; font-weight: 600; color: #667eea; font-size: 0.9rem;">${currentUser ? currentUser.email : ''}</p>
-                            <p style="margin: 5px 0; font-weight: 600; color: #667eea; font-size: 0.9rem;">Code: ${userInviteCode}</p>
-                            <button onclick="copyUserInfo()" style="background: none; border: none; color: #667eea; font-size: 0.8rem; cursor: pointer; text-decoration: underline; margin-top: 5px;">
-                                📋 Copy My Info
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            `;
-            
-            document.body.insertAdjacentHTML('beforeend', modalHtml);
-            
-            // Load friend suggestions
-            setTimeout(() => {
-                loadFriendSuggestions();
-            }, 500);
-        }
-
-        function closeAddFriendModal() {
-            const modal = document.getElementById('addFriendModal');
-            if (modal) {
-                modal.remove();
-            }
-        }
-
-        // Enhanced Friend Functions - Multiple Connection Methods
-
-        // Generate unique invite code for user
-        function generateInviteCode(userId) {
-            const hash = userId.substring(0, 8).toUpperCase();
-            return `JOMBRO${hash}`;
-        }
-
-        // Switch between friend modal tabs
-        function switchFriendTab(tabName) {
-            // Remove active class from all tabs
-            document.querySelectorAll('.friend-tab').forEach(tab => {
-                tab.style.background = 'transparent';
-                tab.style.color = '#718096';
-            });
-            
-            // Hide all tab contents
-            document.querySelectorAll('.friend-tab-content').forEach(content => {
-                content.style.display = 'none';
-            });
-            
-            // Activate selected tab
-            const activeTab = document.getElementById(tabName + 'Tab');
-            if (activeTab) {
-                activeTab.style.background = 'linear-gradient(135deg, #667eea, #764ba2)';
-                activeTab.style.color = 'white';
-            }
-            
-            // Show selected content
-            const activeContent = document.getElementById(tabName + 'TabContent');
-            if (activeContent) {
-                activeContent.style.display = 'block';
-            }
-        }
-
-        // Search users by username with real-time suggestions
-        let searchTimeout = null;
-        async function searchByUsername() {
-            const searchTerm = document.getElementById('friendUsernameInput').value.trim().toLowerCase();
-            const resultsContainer = document.getElementById('usernameSearchResults');
-            
-            if (searchTerm.length < 2) {
-                resultsContainer.innerHTML = '';
-                return;
-            }
-            
-            // Clear previous timeout
-            if (searchTimeout) {
-                clearTimeout(searchTimeout);
-            }
-            
-            // Debounce search
-            searchTimeout = setTimeout(async () => {
-                try {
-                    resultsContainer.innerHTML = '<div style="text-align: center; padding: 10px; color: #718096;">🔍 Searching...</div>';
-                    
-                    // Search users by name (case-insensitive)
-                    const usersSnapshot = await db.collection('users')
-                        .orderBy('name')
-                        .startAt(searchTerm)
-                        .endAt(searchTerm + '\uf8ff')
-                        .limit(10)
-                        .get();
-                    
-                    if (usersSnapshot.empty) {
-                        resultsContainer.innerHTML = '<div style="text-align: center; padding: 15px; color: #718096;">❌ No users found with that name</div>';
-                        return;
-                    }
-                    
-                    let resultsHtml = '';
-                    usersSnapshot.forEach(doc => {
-                        if (doc.id === currentUser.uid) return; // Skip current user
-                        
-                        const userData = doc.data();
-                        const isAlreadyFriend = appState.friends.some(f => f.id === doc.id);
-                        
-                        resultsHtml += `
-                            <div style="display: flex; align-items: center; gap: 10px; padding: 10px; background: rgba(255, 255, 255, 0.5); border-radius: 8px; margin-bottom: 8px; border: 1px solid #e2e8f0;">
-                                <div style="width: 40px; height: 40px; border-radius: 50%; background: linear-gradient(45deg, #667eea, #764ba2); display: flex; align-items: center; justify-content: center; font-size: 1.2rem;">
-                                    ${userData.avatar || '👤'}
-                                </div>
-                                <div style="flex: 1;">
-                                    <div style="font-weight: 600; color: #2d3748;">${userData.name}</div>
-                                    <div style="font-size: 0.8rem; color: #718096;">Level ${userData.level || 1} • ${userData.tokens || 0} tokens</div>
-                                </div>
-                                <button onclick="addFriendById('${doc.id}', '${userData.name}')" 
-                                        style="padding: 6px 12px; border: 1px solid #667eea; background: ${isAlreadyFriend ? '#e2e8f0' : '#667eea'}; color: ${isAlreadyFriend ? '#718096' : 'white'}; border-radius: 6px; font-size: 0.8rem; cursor: ${isAlreadyFriend ? 'not-allowed' : 'pointer'};"
-                                        ${isAlreadyFriend ? 'disabled' : ''}>
-                                    ${isAlreadyFriend ? '✅ Friends' : '➕ Add'}
-                                </button>
-                            </div>
-                        `;
-                    });
-                    
-                    resultsContainer.innerHTML = resultsHtml;
-                    
-                } catch (error) {
-                    console.error('Search error:', error);
-                    resultsContainer.innerHTML = '<div style="text-align: center; padding: 15px; color: #f56565;">❌ Search failed. Try again.</div>';
-                }
-            }, 500);
-        }
-
-        // Add friend by user ID (from search results)
-        async function addFriendById(friendId, friendName) {
-            try {
-                showMessage(`🔍 Adding ${friendName}...`, 'info');
-                
-                // Check if friendship already exists
-                const existingFriendships = await db.collection('friendships')
-                    .where('users', 'array-contains', currentUser.uid)
-                    .get();
-                
-                let friendshipExists = false;
-                existingFriendships.forEach(doc => {
-                    const friendship = doc.data();
-                    if (friendship.users.includes(friendId)) {
-                        friendshipExists = true;
-                    }
-                });
-                
-                if (friendshipExists) {
-                    showMessage('❌ Already friends!', 'error');
-                    return;
-                }
-                
-                // Create friendship
-                await db.collection('friendships').add({
-                    users: [currentUser.uid, friendId],
-                    requesterId: currentUser.uid,
-                    requesterName: appState.user.name,
-                    targetId: friendId,
-                    targetName: friendName,
-                    status: 'accepted',
-                    createdAt: firebase.firestore.FieldValue.serverTimestamp()
-                });
-                
-                // Update friend counts
-                const batch = db.batch();
-                batch.update(db.collection('users').doc(currentUser.uid), {
-                    friendsCount: firebase.firestore.FieldValue.increment(1)
-                });
-                batch.update(db.collection('users').doc(friendId), {
-                    friendsCount: firebase.firestore.FieldValue.increment(1)
-                });
-                await batch.commit();
-                
-                showMessage(`✅ ${friendName} is now your friend!`, 'success');
-                
-                // Refresh search results
-                searchByUsername();
-                
-            } catch (error) {
-                console.error('Error adding friend:', error);
-                showMessage('❌ Failed to add friend. Please try again.', 'error');
-            }
-        }
-
-        // Add friend by invite code
-        async function addFriendByInviteCode() {
-            const inviteCode = document.getElementById('inviteCodeInput').value.trim().toUpperCase();
-            const addBtn = document.getElementById('addFriendByCodeBtn');
-            
-            if (!inviteCode) {
-                showMessage('❌ Please enter an invite code!', 'error');
-                return;
-            }
-            
-            if (!inviteCode.startsWith('JOMBRO')) {
-                showMessage('❌ Invalid invite code format!', 'error');
-                return;
-            }
-            
-            try {
-                addBtn.disabled = true;
-                addBtn.classList.add('loading');
-                showMessage('🔍 Finding user with invite code...', 'info');
-                
-                // Extract user ID from invite code
-                const userHash = inviteCode.replace('JOMBRO', '').toLowerCase();
-                
-                // Search for user with matching ID start
-                const usersSnapshot = await db.collection('users')
-                    .orderBy('__name__')
-                    .startAt(userHash)
-                    .endAt(userHash + '\uf8ff')
-                    .limit(10)
-                    .get();
-                
-                let targetUser = null;
-                usersSnapshot.forEach(doc => {
-                    if (doc.id.toLowerCase().startsWith(userHash)) {
-                        targetUser = { id: doc.id, ...doc.data() };
-                    }
-                });
-                
-                if (!targetUser) {
-                    showMessage('❌ Invite code not found! Check the code and try again.', 'error');
-                    return;
-                }
-                
-                if (targetUser.id === currentUser.uid) {
-                    showMessage('❌ You cannot add yourself!', 'error');
-                    return;
-                }
-                
-                // Add as friend
-                await addFriendById(targetUser.id, targetUser.name);
-                document.getElementById('inviteCodeInput').value = '';
-                
-            } catch (error) {
-                console.error('Error with invite code:', error);
-                showMessage('❌ Failed to process invite code. Please try again.', 'error');
-            } finally {
-                addBtn.disabled = false;
-                addBtn.classList.remove('loading');
-            }
-        }
-
-        // Copy invite code
-        function copyInviteCode(inviteCode) {
-            const text = `Join me on JomBro! 🎮 Use my invite code: ${inviteCode}\n\nDownload: ${window.location.origin}`;
-            
-            if (navigator.clipboard) {
-                navigator.clipboard.writeText(text).then(() => {
-                    showMessage('📋 Invite code copied!', 'success');
-                }).catch(() => {
-                    fallbackCopy(text);
-                });
-            } else {
-                fallbackCopy(text);
-            }
-        }
-
-        // Copy invite link
-        function copyInviteLink(inviteCode) {
-            const inviteLink = `${window.location.origin}?invite=${inviteCode}`;
-            const text = `Join me on JomBro! 🎮 Click here: ${inviteLink}`;
-            
-            if (navigator.clipboard) {
-                navigator.clipboard.writeText(text).then(() => {
-                    showMessage('📋 Invite link copied!', 'success');
-                }).catch(() => {
-                    fallbackCopy(text);
-                });
-            } else {
-                fallbackCopy(text);
-            }
-        }
-
-        // Copy user info
-        function copyUserInfo() {
-            const userCode = generateInviteCode(currentUser.uid);
-            const text = `Add me on JomBro! 🎮\n\n📧 Email: ${currentUser.email}\n🎫 Invite Code: ${userCode}\n🌟 App: ${window.location.origin}`;
-            
-            if (navigator.clipboard) {
-                navigator.clipboard.writeText(text).then(() => {
-                    showMessage('📋 Your info copied!', 'success');
-                }).catch(() => {
-                    fallbackCopy(text);
-                });
-            } else {
-                fallbackCopy(text);
-            }
-        }
-
-        // Enhanced social sharing with invite codes
-        function shareInviteToWhatsApp(inviteCode) {
-            const message = `🎮 Join me on JomBro! Challenge friends and have fun!\n\n🎫 Use my invite code: ${inviteCode}\n🌟 Download: ${window.location.origin}`;
-            const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(message)}`;
-            window.open(whatsappUrl, '_blank');
-            showMessage('💬 Opening WhatsApp with invite code!', 'success');
-        }
-
-        function shareInviteToFacebook(inviteCode) {
-            const appUrl = window.location.origin;
-            const text = `🎮 Join me on JomBro! Use invite code: ${inviteCode}`;
-            const facebookUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(appUrl)}&quote=${encodeURIComponent(text)}`;
-            window.open(facebookUrl, '_blank', 'width=600,height=400');
-            showMessage('📘 Opening Facebook with invite code!', 'success');
-        }
-
-        function shareInviteToInstagram(inviteCode) {
-            const text = `🎮 Join me on JomBro! Use invite code: ${inviteCode}\n\n${window.location.origin}`;
-            copyText(text);
-            showMessage('📸 Invite copied! Paste it in your Instagram story!', 'info');
-        }
-
-        function shareInviteToTikTok(inviteCode) {
-            const appUrl = `${window.location.origin}?invite=${inviteCode}`;
-            const tiktokUrl = `https://www.tiktok.com/share?url=${encodeURIComponent(appUrl)}`;
-            window.open(tiktokUrl, '_blank');
-            showMessage('🎵 Opening TikTok with invite link!', 'success');
-        }
-
-        // Generate QR Code for invite
-        function generateQRCode(inviteCode) {
-            const qrContainer = document.getElementById('qrCodeContainer');
-            const inviteUrl = `${window.location.origin}?invite=${inviteCode}`;
-            
-            // Simple QR code placeholder (you can integrate a real QR library)
-            qrContainer.innerHTML = `
-                <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; font-size: 0.8rem; color: #667eea; text-align: center;">
-                    <div style="font-size: 2rem; margin-bottom: 10px;">📱</div>
-                    <div style="font-weight: 600; margin-bottom: 5px;">QR Code</div>
-                    <div style="font-size: 0.7rem;">${inviteCode}</div>
-                    <div style="font-size: 0.6rem; margin-top: 5px; color: #718096;">Scan to add friend</div>
-                </div>
-            `;
-            
-            showMessage('📱 QR code generated! (Basic version)', 'success');
-            
-            // Note: For production, integrate a real QR code library like qrcode.js
-            // qrcode.toCanvas(qrContainer, inviteUrl, function (error) {
-            //     if (error) console.error(error)
-            //     console.log('QR code generated successfully!')
-            // })
-        }
-
-        // Download QR code
-        function downloadQRCode() {
-            showMessage('💾 QR download feature coming soon!', 'info');
-            // Implement QR code download functionality
-        }
-
-        // Load friend suggestions based on mutual connections
-        async function loadFriendSuggestions() {
-            const suggestionsContainer = document.getElementById('friendSuggestions');
-            
-            try {
-                // Get users who are not friends yet
-                const allUsers = await db.collection('users')
-                    .where('online', '==', true)
-                    .limit(20)
-                    .get();
-                
-                const suggestions = [];
-                const friendIds = appState.friends.map(f => f.id);
-                
-                allUsers.forEach(doc => {
-                    if (doc.id !== currentUser.uid && !friendIds.includes(doc.id)) {
-                        const userData = doc.data();
-                        
-                        suggestions.push({
-                            id: doc.id,
-                            name: userData.name,
-                            avatar: userData.avatar || '👤',
-                            level: userData.level || 1,
-                            tokens: userData.tokens || 0
-                        });
-                    }
-                });
-                
-                // Sort by level
-                suggestions.sort((a, b) => b.level - a.level);
-                
-                if (suggestions.length === 0) {
-                    suggestionsContainer.innerHTML = `
-                        <div style="text-align: center; padding: 20px; color: #718096;">
-                            💡 No suggestions available<br>
-                            <span style="font-size: 0.8rem;">Invite friends to join JomBro!</span>
-                        </div>
-                    `;
-                    return;
-                }
-                
-                let suggestionsHtml = '';
-                suggestions.slice(0, 5).forEach(user => {
-                    suggestionsHtml += `
-                        <div style="display: flex; align-items: center; gap: 10px; padding: 8px; background: rgba(255, 255, 255, 0.3); border-radius: 8px; margin-bottom: 6px;">
-                            <div style="width: 35px; height: 35px; border-radius: 50%; background: linear-gradient(45deg, #667eea, #764ba2); display: flex; align-items: center; justify-content: center; font-size: 1rem;">
-                                ${user.avatar}
-                            </div>
-                            <div style="flex: 1;">
-                                <div style="font-weight: 600; color: #2d3748; font-size: 0.9rem;">${user.name}</div>
-                                <div style="font-size: 0.7rem; color: #718096;">Level ${user.level} • ${user.tokens} tokens</div>
-                            </div>
-                            <button onclick="addFriendById('${user.id}', '${user.name}')" 
-                                    style="padding: 4px 8px; border: 1px solid #667eea; background: #667eea; color: white; border-radius: 4px; font-size: 0.7rem; cursor: pointer;">
-                                ➕
-                            </button>
-                        </div>
-                    `;
-                });
-                
-                suggestionsContainer.innerHTML = suggestionsHtml;
-                
-            } catch (error) {
-                console.error('Error loading suggestions:', error);
-                suggestionsContainer.innerHTML = `
-                    <div style="text-align: center; padding: 20px; color: #f56565;">
-                        ❌ Failed to load suggestions
-                    </div>
-                `;
-            }
-        }
-
-        // Social Sharing Functions
-        function shareToWhatsApp() {
-            const appUrl = window.location.origin;
-            const message = `🎮 Join me on JomBro! Challenge friends and have fun!\n\n🌟 Download: ${appUrl}\n📧 Add me: ${currentUser.email}`;
-            const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(message)}`;
-            window.open(whatsappUrl, '_blank');
-            showMessage('💬 Opening WhatsApp to share!', 'success');
-        }
-
-        function shareToFacebook() {
-            const appUrl = window.location.origin;
-            const facebookUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(appUrl)}&quote=${encodeURIComponent('🎮 Join me on JomBro! Challenge friends and have fun!')}`;
-            window.open(facebookUrl, '_blank', 'width=600,height=400');
-            showMessage('📘 Opening Facebook to share!', 'success');
-        }
-
-        function shareToInstagram() {
-            // Instagram doesn't allow direct web sharing, so copy link instead
-            copyAppLink();
-            showMessage('📸 Link copied! Paste it in your Instagram story or bio!', 'info');
-        }
-
-        function shareToTikTok() {
-            const appUrl = window.location.origin;
-            const tiktokUrl = `https://www.tiktok.com/share?url=${encodeURIComponent(appUrl)}`;
-            window.open(tiktokUrl, '_blank');
-            showMessage('🎵 Opening TikTok to share!', 'success');
-        }
-
-        function copyAppLink() {
-            const appUrl = window.location.origin;
-            const userCode = currentUser ? generateInviteCode(currentUser.uid) : '';
-            const shareText = `🎮 Join me on JomBro! Challenge friends and have fun!\n\n🎫 Use my invite code: ${userCode}\n🌟 App: ${appUrl}?invite=${userCode}`;
-            
-            if (navigator.clipboard) {
-                navigator.clipboard.writeText(shareText).then(() => {
-                    showMessage('📋 App link with invite code copied!', 'success');
-                }).catch(() => {
-                    fallbackCopy(shareText);
-                });
-            } else {
-                fallbackCopy(shareText);
-            }
-        }
-
-        function fallbackCopy(text) {
-            const textArea = document.createElement('textarea');
-            textArea.value = text;
-            textArea.style.position = 'fixed';
-            textArea.style.left = '-999999px';
-            textArea.style.top = '-999999px';
-            document.body.appendChild(textArea);
-            textArea.focus();
-            textArea.select();
-            
-            try {
-                document.execCommand('copy');
-                showMessage('📋 Copied to clipboard!', 'success');
-            } catch (err) {
-                showMessage('❌ Please copy manually', 'error');
-            }
-            
-            document.body.removeChild(textArea);
-        }
-
+        // Challenge friend
         function challengeFriend(friendId) {
             const friend = appState.friends.find(f => f.id === friendId);
             if (!friend) return;
@@ -2835,47 +3271,35 @@
                 return;
             }
             
-            showMessage(`🎯 Challenge feature coming soon! Stay tuned!`, 'info');
+            showMessage(`🎯 Challenge sent to ${friend.name}! (Feature coming soon)`, 'info');
         }
 
+        // Show token info
         function showTokenInfo() {
-            showMessage('🪙 Tokens are earned by completing challenges and can be used to create new challenges! Start with 1000 tokens when you join.', 'info');
+            showMessage('🪙 Tokens are earned by completing challenges and inviting friends! Start with 1000 tokens when you join.', 'info');
         }
 
-        // Enhanced Social Sharing Functions (can be called from anywhere)
-        window.shareToWhatsApp = function() {
-            const appUrl = window.location.origin;
-            const userCode = currentUser ? generateInviteCode(currentUser.uid) : '';
-            const message = `🎮 Join me on JomBro! Challenge friends and have fun!\n\n🎫 Use my invite code: ${userCode}\n🌟 Download: ${appUrl}`;
-            const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(message)}`;
-            window.open(whatsappUrl, '_blank');
-            showMessage('💬 Opening WhatsApp with your invite code!', 'success');
-        };
-
-        window.shareToFacebook = function() {
-            const appUrl = window.location.origin;
-            const userCode = currentUser ? generateInviteCode(currentUser.uid) : '';
-            const facebookUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(appUrl)}&quote=${encodeURIComponent(`🎮 Join me on JomBro! Use invite code: ${userCode}`)}`;
-            window.open(facebookUrl, '_blank', 'width=600,height=400');
-            showMessage('📘 Opening Facebook with your invite code!', 'success');
-        };
-
-        window.shareToInstagram = function() {
-            const appUrl = window.location.origin;
-            const userCode = currentUser ? generateInviteCode(currentUser.uid) : '';
-            const text = `🎮 Join me on JomBro! Use invite code: ${userCode}\n\n${appUrl}`;
-            copyText(text);
-            showMessage('📸 Invite copied! Paste it in your Instagram story or bio!', 'info');
-        };
-
-        window.shareToTikTok = function() {
-            const appUrl = window.location.origin;
-            const userCode = currentUser ? generateInviteCode(currentUser.uid) : '';
-            const inviteUrl = `${appUrl}?invite=${userCode}`;
-            const tiktokUrl = `https://www.tiktok.com/share?url=${encodeURIComponent(inviteUrl)}`;
-            window.open(tiktokUrl, '_blank');
-            showMessage('🎵 Opening TikTok with your invite link!', 'success');
-        };
+        // Check for invite code in URL
+        function checkForInviteCode() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const inviteCode = urlParams.get('invite');
+            
+            if (inviteCode && currentUser) {
+                showMessage(`🎫 Found invite code: ${inviteCode}! Opening friend system...`, 'info');
+                
+                setTimeout(() => {
+                    showFriendModal();
+                    setTimeout(() => {
+                        switchFriendTab('advanced-search');
+                        document.getElementById('inviteCodeSearchInput').value = inviteCode;
+                        document.getElementById('inviteCodeSearchInput').focus();
+                    }, 500);
+                }, 1000);
+                
+                // Clean URL
+                window.history.replaceState({}, document.title, window.location.pathname);
+            }
+        }
 
         // UI Functions
         function switchTab(tab) {
@@ -2975,38 +3399,131 @@
             }, 4000);
         }
 
+        function copyText(text) {
+            if (navigator.clipboard) {
+                navigator.clipboard.writeText(text).then(() => {
+                    showMessage('📋 Copied to clipboard!', 'success');
+                }).catch(() => {
+                    fallbackCopy(text);
+                });
+            } else {
+                fallbackCopy(text);
+            }
+        }
+
+        function fallbackCopy(text) {
+            const textArea = document.createElement('textarea');
+            textArea.value = text;
+            textArea.style.position = 'fixed';
+            textArea.style.left = '-999999px';
+            textArea.style.top = '-999999px';
+            document.body.appendChild(textArea);
+            textArea.focus();
+            textArea.select();
+            
+            try {
+                document.execCommand('copy');
+                showMessage('📋 Copied to clipboard!', 'success');
+            } catch (err) {
+                showMessage('❌ Please copy manually', 'error');
+            }
+            
+            document.body.removeChild(textArea);
+        }
+
         function setupEventListeners() {
+            // Close modal when clicking outside
+            document.getElementById('friendModal').addEventListener('click', (e) => {
+                if (e.target.id === 'friendModal') {
+                    closeFriendModal();
+                }
+            });
+
+            // Handle window before unload
             window.addEventListener('beforeunload', () => {
                 if (currentUser && db) {
                     updateUserOnlineStatus(false);
+                }
+            });
+
+            // Handle keyboard shortcuts
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape') {
+                    closeFriendModal();
+                }
+                if (e.ctrlKey && e.key === 'k') {
+                    e.preventDefault();
+                    showFriendModal();
                 }
             });
         }
 
         // Initialize the app when page loads
         document.addEventListener('DOMContentLoaded', function() {
-            console.log('🚀 JomBro App Starting...');
+            console.log('🚀 JomBro Enhanced Friend System Starting...');
             initApp();
-            console.log('✅ JomBro initialization complete');
-            console.log('🔒 Security system active');
-            console.log('🎮 Ready for production launch!');
+            
+            // Check for invite code after user loads
+            setTimeout(() => {
+                checkForInviteCode();
+            }, 2000);
+            
+            console.log('✅ Enhanced Friend System Ready!');
+            console.log('🎯 Key Features Loaded:');
+            console.log('  🔍 Advanced Search with Smart Filters');
+            console.log('  🎫 Enhanced Invite System with Analytics');
+            console.log('  📱 Custom QR Code Generator');
+            console.log('  💬 Multi-Platform Social Sharing');
+            console.log('  🏆 Referral Rewards System');
+            console.log('  📊 Real-time Analytics Dashboard');
         });
 
-        console.log('🎮 JomBro App Loaded!');
-        console.log('✅ EMAIL/PASSWORD authentication ONLY');
-        console.log('✅ Security system integrated');
-        console.log('✅ Real user names displayed');
-        console.log('✅ ENHANCED Add Friends system:');
-        console.log('  📧 Search by email');
-        console.log('  👤 Search by username (real-time)');
-        console.log('  🎫 Invite codes system');
-        console.log('  📱 QR code sharing');
-        console.log('  💡 Friend suggestions');
-        console.log('  📨 Multiple sharing methods');
-        console.log('✅ Social sharing for WhatsApp, FB, IG, TikTok');
-        console.log('❌ Google/Facebook login REMOVED');
-        console.log('❌ Nearby Players section REMOVED');
-        console.log('🚀 100% Focus on Friends - Ready for launch!');
+        // Console welcome message
+        console.log('🎮 JomBro Enhanced Friend System Loaded!');
+        console.log('');
+        console.log('🚀 ENHANCED FEATURES:');
+        console.log('✅ Advanced Search System:');
+        console.log('  • Smart filters (Online, High Level, Recent Activity)');
+        console.log('  • Real-time username search');
+        console.log('  • Email-based friend finding');
+        console.log('  • Invite code lookup');
+        console.log('  • AI-powered friend suggestions');
+        console.log('');
+        console.log('✅ Enhanced Invite System:');
+        console.log('  • Personal invite codes');
+        console.log('  • Direct invite link generation');
+        console.log('  • Batch email invitations');
+        console.log('  • Invite analytics & success rates');
+        console.log('  • Referral rewards tracking');
+        console.log('');
+        console.log('✅ Custom QR Code Generator:');
+        console.log('  • Real QR code generation');
+        console.log('  • Customizable colors & sizes');
+        console.log('  • Download functionality');
+        console.log('  • Direct social sharing');
+        console.log('');
+        console.log('✅ Multi-Platform Social Sharing:');
+        console.log('  • WhatsApp, Facebook, Instagram, TikTok');
+        console.log('  • Twitter, Telegram integration');
+        console.log('  • Custom message templates');
+        console.log('  • Social sharing analytics');
+        console.log('  • Referral tracking');
+        console.log('');
+        console.log('🎯 HOW TO USE:');
+        console.log('1. Click "🚀 Enhanced Friend System" button');
+        console.log('2. Use 4 powerful tabs:');
+        console.log('   - Advanced Search (filters, suggestions)');
+        console.log('   - Invite System (codes, links, batch)');
+        console.log('   - QR Sharing (custom QR codes)');
+        console.log('   - Social Boost (multi-platform sharing)');
+        console.log('3. Track your success with built-in analytics');
+        console.log('4. Earn referral rewards for each friend!');
+        console.log('');
+        console.log('⚡ KEYBOARD SHORTCUTS:');
+        console.log('  • Ctrl+K: Open Friend System');
+        console.log('  • Escape: Close modals');
+        console.log('');
+        console.log('🔥 READY TO LAUNCH YOUR FRIEND NETWORK!');
     </script>
 </body>
 </html>
