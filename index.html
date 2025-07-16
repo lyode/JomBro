@@ -2436,16 +2436,8 @@
                     <img id="uploadPreview" class="upload-preview" style="display: none;">
                     <div id="uploadPlaceholder">
                         <div style="font-size: 2rem; margin-bottom: 10px;">📷</div>
-                        <p style="color: #667eea; font-weight: 600; margin-bottom: 5px;">Upload or Take Photo</p>
+                        <p style="color: #667eea; font-weight: 600; margin-bottom: 5px;">Click to Upload Picture</p>
                         <p style="color: #718096; font-size: 0.8rem;">JPG, PNG, GIF (Max 2MB)</p>
-                        <div style="margin-top: 15px; display: flex; gap: 10px; justify-content: center;">
-                            <button class="auth-button" onclick="document.getElementById('avatarFileInput').click()" style="padding: 8px 16px; font-size: 0.85rem;">
-                                📁 Choose File
-                            </button>
-                            <button class="auth-button" onclick="openCamera()" style="padding: 8px 16px; font-size: 0.85rem; background: rgba(102, 126, 234, 0.1); color: #667eea; border: 2px solid #667eea;">
-                                📸 Take Photo
-                            </button>
-                        </div>
                     </div>
                 </div>
                 <input type="file" id="avatarFileInput" accept="image/*" capture="user" onchange="previewAvatarImage(event)">
@@ -3097,3 +3089,188 @@
                 if (password.length >= 6) strength++;
                 if (password.length >= 8) strength++;
                 if (/[A-Z]/.test(password)) strength++;
+                if (/[0-9]/.test(password)) strength++;
+                if (/[^A-Za-z0-9]/.test(password)) strength++;
+
+                strengthBar.className = 'strength-bar';
+                if (strength <= 2) {
+                    strengthBar.classList.add('strength-weak');
+                } else if (strength <= 3) {
+                    strengthBar.classList.add('strength-fair');
+                } else if (strength <= 4) {
+                    strengthBar.classList.add('strength-good');
+                } else {
+                    strengthBar.classList.add('strength-strong');
+                }
+            }
+
+            showValidationError(input, errorElement, message) {
+                input.classList.remove('valid');
+                input.classList.add('invalid');
+                if (errorElement) {
+                    errorElement.textContent = message;
+                    errorElement.className = 'validation-message error show';
+                }
+            }
+
+            showValidationSuccess(input, errorElement, message) {
+                input.classList.remove('invalid');
+                input.classList.add('valid');
+                if (errorElement) {
+                    errorElement.textContent = message;
+                    errorElement.className = 'validation-message success show';
+                }
+            }
+
+            showValidationInfo(input, errorElement, message) {
+                input.classList.remove('invalid');
+                input.classList.add('valid');
+                if (errorElement) {
+                    errorElement.textContent = message;
+                    errorElement.className = 'validation-message info show';
+                }
+            }
+
+            clearValidation(input, errorElement) {
+                input.classList.remove('invalid', 'valid');
+                if (errorElement) {
+                    errorElement.className = 'validation-message';
+                    errorElement.textContent = '';
+                }
+            }
+
+            async handleLogin() {
+                const email = document.getElementById('loginEmail').value.trim();
+                const password = document.getElementById('loginPassword').value;
+                const loginButton = document.getElementById('loginButton');
+
+                const emailValid = this.validateEmail(document.getElementById('loginEmail'));
+                const passwordValid = this.validateLoginPassword(document.getElementById('loginPassword'));
+
+                if (!emailValid || !passwordValid) {
+                    showMessage('Please fix the errors above', 'error');
+                    return;
+                }
+
+                try {
+                    this.setButtonLoading(loginButton, true);
+                    showMessage('Signing you in...', 'info');
+
+                    const userCredential = await auth.signInWithEmailAndPassword(email, password);
+                    
+                    try {
+                        const userDoc = await db.collection('users').doc(userCredential.user.uid).get();
+                        const userName = userDoc.exists ? userDoc.data().name : (userCredential.user.displayName || userCredential.user.email.split('@')[0]);
+                        showMessage(`Welcome back ${userName}! 🎉`, 'success');
+                    } catch (nameError) {
+                        showMessage('Welcome back! 🎉', 'success');
+                    }
+
+                } catch (error) {
+                    this.handleAuthError(error);
+                } finally {
+                    this.setButtonLoading(loginButton, false);
+                }
+            }
+
+            async handleSignup() {
+                const name = document.getElementById('signupName').value.trim();
+                const email = document.getElementById('signupEmail').value.trim();
+                const password = document.getElementById('signupPassword').value;
+                const signupButton = document.getElementById('signupButton');
+
+                const nameValid = this.validateName(document.getElementById('signupName'));
+                const emailValid = this.validateEmail(document.getElementById('signupEmail'));
+                const passwordValid = this.validatePassword(document.getElementById('signupPassword'));
+                const passwordMatchValid = this.validatePasswordMatch();
+
+                if (!nameValid || !emailValid || !passwordValid || !passwordMatchValid) {
+                    showMessage('Please fix the errors above', 'error');
+                    return;
+                }
+
+                try {
+                    this.setButtonLoading(signupButton, true);
+                    showMessage('Creating your account...', 'info');
+
+                    const userCredential = await auth.createUserWithEmailAndPassword(email, password);
+                    
+                    await userCredential.user.updateProfile({
+                        displayName: name
+                    });
+
+                    await db.collection('users').doc(userCredential.user.uid).set({
+                        name: name,
+                        email: email,
+                        avatar: this.getRandomAvatar(),
+                        avatarUrl: null,
+                        tokens: 1000,
+                        level: 1,
+                        friendsCount: 0,
+                        createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+                        lastActive: firebase.firestore.FieldValue.serverTimestamp(),
+                        online: true,
+                        isNewUser: true,
+                        authProvider: 'email',
+                        inviteCode: generateInviteCode(userCredential.user.uid),
+                        socialShareStats: socialShareStats,
+                        inviteStats: inviteStats,
+                        referralStats: referralStats
+                    });
+
+                    showMessage(`Welcome ${name}! Account created successfully! 🎉`, 'success');
+
+                } catch (error) {
+                    this.handleAuthError(error);
+                } finally {
+                    this.setButtonLoading(signupButton, false);
+                }
+            }
+
+            handleAuthError(error) {
+                let errorMessage = 'An error occurred. Please try again.';
+                
+                switch (error.code) {
+                    case 'auth/user-not-found':
+                        errorMessage = 'No account found with this email address.';
+                        break;
+                    case 'auth/wrong-password':
+                        errorMessage = 'Incorrect password. Please try again.';
+                        break;
+                    case 'auth/email-already-in-use':
+                        errorMessage = 'An account with this email already exists.';
+                        break;
+                    case 'auth/weak-password':
+                        errorMessage = 'Password is too weak. Please use a stronger password.';
+                        break;
+                    case 'auth/invalid-email':
+                        errorMessage = 'Please enter a valid email address.';
+                        break;
+                    case 'auth/too-many-requests':
+                        errorMessage = 'Too many failed attempts. Please try again later.';
+                        break;
+                    case 'auth/network-request-failed':
+                        errorMessage = 'Network error. Please check your connection.';
+                        break;
+                    default:
+                        errorMessage = error.message || errorMessage;
+                }
+                
+                showMessage(errorMessage, 'error');
+            }
+
+            setButtonLoading(button, loading) {
+                if (loading) {
+                    button.disabled = true;
+                    button.classList.add('loading');
+                } else {
+                    button.disabled = false;
+                    button.classList.remove('loading');
+                }
+            }
+
+            getRandomAvatar() {
+                const avatars = ['😎', '🌸', '🚀', '💪', '🎵', '🎨', '🤠', '🌟', '🎯', '🎭', '🎪', '🌈', '🎲', '🎊', '🌺', '⚡', '🌙', '🔥'];
+                return avatars[Math.floor(Math.random() * avatars.length)];
+            }
+        }
