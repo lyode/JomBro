@@ -141,16 +141,16 @@
 
         /* Header */
         .header {
-            padding: 20px;
+            padding: 15px 20px;
             display: flex;
             justify-content: space-between;
-            align-items: center;
-            flex-wrap: wrap;
+            align-items: flex-start;
             gap: 15px;
         }
 
         .logo-section {
             text-align: left;
+            flex: 0 0 auto;
         }
 
         .logo {
@@ -176,12 +176,14 @@
             color: rgba(155, 89, 182, 0.9);
             margin-top: 3px;
             letter-spacing: 0.5px;
+            cursor: pointer;
         }
 
         .user-info {
             display: flex;
             align-items: center;
-            gap: 15px;
+            gap: 10px;
+            flex: 0 0 auto;
         }
 
         .user-avatar {
@@ -1515,6 +1517,98 @@
             75% { transform: translateX(5px); }
         }
 
+        /* Friend Request Alert Popup */
+        .friend-request-alert {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            padding: 30px;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+            z-index: 3000;
+            max-width: 400px;
+            width: 90%;
+            animation: alertBounce 0.5s ease;
+            text-align: center;
+        }
+
+        .friend-request-alert-header {
+            font-size: 1.5rem;
+            font-weight: bold;
+            margin-bottom: 15px;
+            color: white;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .friend-request-alert-sender {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .friend-request-alert-avatar {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+        }
+
+        .friend-request-alert-name {
+            font-size: 1.2rem;
+            color: white;
+            font-weight: 600;
+        }
+
+        .friend-request-alert-message {
+            color: rgba(255, 255, 255, 0.9);
+            margin-bottom: 25px;
+            font-size: 1.1rem;
+        }
+
+        .friend-request-alert-actions {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+        }
+
+        .friend-request-alert-btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 25px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 1rem;
+        }
+
+        .friend-request-alert-accept {
+            background: white;
+            color: #667eea;
+        }
+
+        .friend-request-alert-accept:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        }
+
+        .friend-request-alert-dismiss {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+        }
+
+        .friend-request-alert-dismiss:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
         /* Challenge Alert Popup */
         .challenge-alert {
             position: fixed;
@@ -1938,6 +2032,7 @@
             align-items: center;
             gap: 8px;
             font-size: 0.9rem;
+            border: none;
         }
 
         .how-to-play-btn:hover {
@@ -2085,11 +2180,48 @@
             }
             
             .header {
-                flex-direction: column;
+                padding: 10px;
+                gap: 10px;
+            }
+            
+            .logo-section {
+                text-align: left;
+            }
+            
+            .user-info {
+                flex-direction: row;
+                gap: 8px;
                 align-items: center;
-                padding: 15px;
-                gap: 15px;
-                text-align: center;
+                flex-wrap: wrap;
+                justify-content: flex-end;
+            }
+            
+            .user-avatar {
+                width: 40px;
+                height: 40px;
+                font-size: 1.2rem;
+            }
+            
+            .user-stats {
+                display: flex;
+                gap: 5px;
+            }
+            
+            .stat-item {
+                padding: 5px 8px;
+                min-width: 40px;
+            }
+            
+            .stat-number {
+                font-size: 0.9rem;
+            }
+            
+            .stat-label {
+                font-size: 0.6rem;
+            }
+            
+            #logoutBtn {
+                display: none !important; /* Hide logout on mobile to save space */
             }
             
             .logo-section {
@@ -3343,10 +3475,16 @@
                 .where('to', '==', currentUser.uid)
                 .where('status', '==', 'pending')
                 .onSnapshot((snapshot) => {
-                    const requestCount = snapshot.size;
-                    if (requestCount > 0) {
-                        updateFriendRequestBadge(requestCount);
-                    }
+                    snapshot.docChanges().forEach((change) => {
+                        if (change.type === 'added') {
+                            const request = { id: change.doc.id, ...change.doc.data() };
+                            // Show alert for new friend requests
+                            if (request.createdAt && 
+                                request.createdAt.toDate() > new Date(Date.now() - 60000)) {
+                                showFriendRequestAlert(request);
+                            }
+                        }
+                    });
                 });
             
             // Listen for friends updates
@@ -3358,8 +3496,95 @@
                 });
         }
 
+        // Show friend request alert
+        function showFriendRequestAlert(request) {
+            // Play notification sound
+            playNotificationSound();
+            
+            const alertDiv = document.createElement('div');
+            alertDiv.className = 'friend-request-alert';
+            alertDiv.innerHTML = `
+                <div class="friend-request-alert-header">👥 Friend Request!</div>
+                <div class="friend-request-alert-sender">
+                    <div class="friend-request-alert-avatar">${request.fromAvatar || '👤'}</div>
+                    <div>
+                        <div class="friend-request-alert-name">${request.fromName}</div>
+                    </div>
+                </div>
+                <div class="friend-request-alert-message">
+                    wants to be your friend!
+                </div>
+                <div class="friend-request-alert-actions">
+                    <button class="friend-request-alert-btn friend-request-alert-accept" onclick="acceptFriendRequestFromAlert('${request.id}', '${request.from}', this)">
+                        Accept
+                    </button>
+                    <button class="friend-request-alert-btn friend-request-alert-dismiss" onclick="dismissAlert(this)">
+                        Later
+                    </button>
+                </div>
+            `;
+            
+            document.body.appendChild(alertDiv);
+            
+            // Auto dismiss after 10 seconds
+            setTimeout(() => {
+                if (alertDiv.parentElement) {
+                    alertDiv.remove();
+                }
+            }, 10000);
+        }
+
+        // Accept friend request from alert
+        window.acceptFriendRequestFromAlert = async function(requestId, fromUserId, button) {
+            const alertDiv = button.closest('.friend-request-alert');
+            await acceptFriendRequest(requestId, fromUserId);
+            alertDiv.remove();
+        };
+
+        // Play notification sound
+        function playNotificationSound() {
+            try {
+                // Create audio context
+                const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                
+                // Create oscillator for beep sound
+                const oscillator = audioContext.createOscillator();
+                const gainNode = audioContext.createGain();
+                
+                oscillator.connect(gainNode);
+                gainNode.connect(audioContext.destination);
+                
+                oscillator.frequency.value = 800; // Frequency in Hz
+                gainNode.gain.value = 0.3; // Volume
+                
+                oscillator.start();
+                oscillator.stop(audioContext.currentTime + 0.2); // Beep duration
+                
+                // Second beep
+                setTimeout(() => {
+                    const osc2 = audioContext.createOscillator();
+                    const gain2 = audioContext.createGain();
+                    
+                    osc2.connect(gain2);
+                    gain2.connect(audioContext.destination);
+                    
+                    osc2.frequency.value = 1000;
+                    gain2.gain.value = 0.3;
+                    
+                    osc2.start();
+                    osc2.stop(audioContext.currentTime + 0.2);
+                }, 250);
+                
+            } catch (error) {
+                console.log('Could not play sound:', error);
+            }
+        }
+
         // Show challenge alert
         function showChallengeAlert(challenge) {
+            // Play notification sound
+            playNotificationSound();
+            
             const alertDiv = document.createElement('div');
             alertDiv.className = 'challenge-alert';
             alertDiv.innerHTML = `
@@ -4374,6 +4599,7 @@
         window.generateAIChallenges = generateAIChallenges;
         window.toggleAIChallenge = toggleAIChallenge;
         window.logoutUser = logoutUser;
+        window.showHowToPlay = showHowToPlay;
 
         // Logout function
         async function logoutUser() {
@@ -4615,6 +4841,9 @@
                         </div>
                         <button class="btn btn-primary" onclick="saveProfile()" style="width: 100%; margin-top: 15px;">
                             Save Changes
+                        </button>
+                        <button class="btn btn-secondary" onclick="logoutUser()" style="width: 100%; margin-top: 10px;">
+                            Logout
                         </button>
                     </div>
                 </div>
