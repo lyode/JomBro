@@ -1,77 +1,1538 @@
-// Helper function to safely get serverTimestamp
-        function getServerTimestamp() {
-            return firebase && firebase.firestore && firebase.firestore.FieldValue 
-                ? firebase.firestore.FieldValue.serverTimestamp() 
-                : new Date();
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="JomBro">
+    <title>JomBro - AI Challenge System</title>
+    
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-storage-compat.js"></script>
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
         }
 
-        // Helper function to safely use field increment
-        function getFieldIncrement(value) {
-            return firebase && firebase.firestore && firebase.firestore.FieldValue 
-                ? firebase.firestore.FieldValue.increment(value) 
-                : value;
+        html {
+            scroll-behavior: smooth;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #0a0a0a;
+            color: white;
+            overflow-x: hidden;
+            min-height: 100vh;
+            position: relative;
+            padding-bottom: 80px;
+            scroll-behavior: smooth;
+        }
+        
+        .container {
+            max-width: 100%;
+            margin: 0 auto;
+            padding: 15px;
+            position: relative;
+            z-index: 10;
+            scroll-behavior: smooth;
+        }
+        
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        
+        ::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 4px;
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background: rgba(155, 89, 182, 0.6);
+            border-radius: 4px;
+        }
+        
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(155, 89, 182, 0.8);
         }
 
-        // Utility Functions - Define these first before using them
+        .starfield {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+            pointer-events: none;
+        }
+
+        .star {
+            position: absolute;
+            background: white;
+            border-radius: 50%;
+            animation: twinkle 2s infinite;
+        }
+
+        .star.small {
+            width: 1px;
+            height: 1px;
+            opacity: 0.6;
+        }
+
+        .star.medium {
+            width: 2px;
+            height: 2px;
+            opacity: 0.8;
+        }
+
+        .star.large {
+            width: 3px;
+            height: 3px;
+            opacity: 0.9;
+        }
+
+        @keyframes twinkle {
+            0%, 100% { opacity: 0.2; }
+            50% { opacity: 1; }
+        }
+
+        /* Floating Elements */
+        .floating-element {
+            position: relative;
+            animation: float 6s ease-in-out infinite;
+            backdrop-filter: blur(2px);
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 20px;
+            box-shadow: 
+                0 8px 32px rgba(0, 0, 0, 0.3),
+                0 0 10px rgba(255, 255, 255, 0.02),
+                inset 0 1px 0 rgba(255, 255, 255, 0.05);
+            transition: all 0.3s ease;
+            margin-bottom: 20px;
+        }
+
+        .floating-element:hover {
+            transform: translateY(-5px);
+            box-shadow: 
+                0 12px 40px rgba(0, 0, 0, 0.4),
+                0 0 20px rgba(255, 255, 255, 0.05),
+                inset 0 1px 0 rgba(255, 255, 255, 0.1);
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-8px); }
+        }
+
+        .floating-element:nth-child(2) { animation-delay: -1s; }
+        .floating-element:nth-child(3) { animation-delay: -2s; }
+        .floating-element:nth-child(4) { animation-delay: -3s; }
+        .floating-element:nth-child(5) { animation-delay: -4s; }
+
+        /* Header */
+        .header {
+            padding: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .logo-section {
+            text-align: left;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 100;
+            color: white;
+            text-shadow: 0 0 20px rgba(255, 255, 255, 0.3);
+            letter-spacing: 2px;
+        }
+
+        .slogan {
+            font-size: 0.8rem;
+            font-weight: 300;
+            color: rgba(255, 255, 255, 0.8);
+            margin-top: 5px;
+            font-style: italic;
+            letter-spacing: 1px;
+        }
+
+        .user-name {
+            font-size: 0.9rem;
+            font-weight: 400;
+            color: rgba(155, 89, 182, 0.9);
+            margin-top: 3px;
+            letter-spacing: 0.5px;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .user-avatar {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: linear-gradient(45deg, #9b59b6, #e91e63);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            border: 3px solid rgba(155, 89, 182, 0.5);
+            box-shadow: 0 0 15px rgba(155, 89, 182, 0.4);
+            animation: glow 3s ease-in-out infinite alternate;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .user-avatar:hover {
+            transform: scale(1.1);
+            box-shadow: 0 0 25px rgba(155, 89, 182, 0.6);
+        }
+
+        @keyframes glow {
+            from { box-shadow: 0 0 15px rgba(155, 89, 182, 0.4); }
+            to { box-shadow: 0 0 25px rgba(155, 89, 182, 0.7); }
+        }
+
+        .user-stats {
+            display: flex;
+            gap: 10px;
+        }
+
+        .stat-item {
+            text-align: center;
+            padding: 8px 12px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(10px);
+            min-width: 55px;
+            transition: all 0.3s ease;
+        }
+
+        .stat-item:hover {
+            background: rgba(255, 255, 255, 0.15);
+            transform: translateY(-2px);
+        }
+
+        .stat-number {
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: #9b59b6;
+            text-shadow: 0 0 8px rgba(155, 89, 182, 0.7);
+            transition: all 0.3s ease;
+        }
+
+        .stat-number.updating {
+            animation: pulse-number 0.5s ease;
+        }
+
+        @keyframes pulse-number {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.2); color: #fff; }
+        }
+
+        .stat-label {
+            font-size: 0.7rem;
+            opacity: 0.8;
+            margin-top: 2px;
+        }
+
+        /* Main Content */
+        .main-content {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .card {
+            padding: 20px;
+            transition: all 0.3s ease;
+        }
+
+        .card-title {
+            font-size: 1.4rem;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            text-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
+        }
+
+        /* Enhanced Auth Modal */
+        .auth-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .auth-modal.show {
+            display: flex;
+        }
+
+        .auth-container {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border-radius: 24px;
+            padding: 40px;
+            width: 100%;
+            max-width: 450px;
+            box-shadow: 
+                0 20px 40px rgba(0, 0, 0, 0.1),
+                0 0 0 1px rgba(255, 255, 255, 0.2);
+            position: relative;
+            overflow: hidden;
+            animation: slideUp 0.6s ease-out;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .auth-header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .auth-logo {
+            font-size: 4rem;
+            margin-bottom: 16px;
+            animation: bounce 2s infinite;
+        }
+
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+            40% { transform: translateY(-10px); }
+            60% { transform: translateY(-5px); }
+        }
+
+        .auth-title {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #2d3748;
+            margin-bottom: 8px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .auth-subtitle {
+            color: #718096;
+            font-size: 1rem;
+            font-weight: 500;
+        }
+
+        .auth-form {
+            animation: fadeIn 0.4s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateX(20px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        .form-group {
+            margin-bottom: 24px;
+            position: relative;
+        }
+
+        .form-label {
+            display: block;
+            font-weight: 600;
+            color: #4a5568;
+            margin-bottom: 8px;
+            font-size: 0.9rem;
+            transition: color 0.3s ease;
+        }
+
+        .phone-input-container {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 8px;
+        }
+
+        .country-select {
+            width: 120px;
+            padding: 16px 12px;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            background: white;
+            color: #2d3748;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .country-select:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .phone-input {
+            flex: 1;
+            padding: 16px;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            font-size: 1.2rem;
+            font-weight: 600;
+            letter-spacing: 1px;
+            transition: all 0.3s ease;
+            background: white;
+            color: #2d3748;
+        }
+
+        .phone-input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+            transform: translateY(-1px);
+        }
+
+        .phone-hint {
+            font-size: 0.85rem;
+            color: #718096;
+            margin-top: 8px;
+            text-align: center;
+        }
+
+        .username-hint {
+            font-size: 0.85rem;
+            color: #718096;
+            margin-top: 8px;
+            text-align: center;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 16px;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            background: white;
+            color: #2d3748;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+            transform: translateY(-1px);
+        }
+
+        .auth-button {
+            width: 100%;
+            padding: 16px;
+            border: none;
+            border-radius: 12px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            margin-bottom: 16px;
+        }
+
+        .auth-button-primary {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .auth-button-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.6);
+        }
+
+        .auth-button.loading {
+            color: transparent;
+        }
+
+        .auth-button.loading::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 20px;
+            height: 20px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-top: 2px solid white;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: translate(-50%, -50%) rotate(0deg); }
+            100% { transform: translate(-50%, -50%) rotate(360deg); }
+        }
+
+        .avatar-grid {
+            display: grid;
+            grid-template-columns: repeat(6, 1fr);
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .avatar-option {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: #f7fafc;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 3px solid transparent;
+        }
+
+        .avatar-option:hover {
+            transform: scale(1.1);
+            border-color: #667eea;
+        }
+
+        .avatar-option.selected {
+            border-color: #667eea;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            box-shadow: 0 0 20px rgba(102, 126, 234, 0.4);
+        }
+
+        /* Buttons */
+        .btn {
+            padding: 12px 18px;
+            border: none;
+            border-radius: 20px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+            position: relative;
+            overflow: hidden;
+            min-width: 100px;
+            text-align: center;
+        }
+
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            transition: width 0.6s, height 0.6s;
+        }
+
+        .btn:hover::before {
+            width: 300px;
+            height: 300px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(45deg, #9b59b6, #e91e63);
+            color: white;
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
+        }
+
+        .btn-small {
+            padding: 8px 14px;
+            font-size: 0.8rem;
+            min-width: 80px;
+        }
+
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .loading {
+            position: relative;
+            color: transparent !important;
+        }
+
+        .loading::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 20px;
+            height: 20px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-top: 2px solid white;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        /* Message Styles */
+        .message {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 15px 20px;
+            border-radius: 12px;
+            color: white;
+            font-weight: 500;
+            z-index: 10000;
+            max-width: 300px;
+            animation: slideIn 0.3s ease;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .message.success {
+            background: linear-gradient(45deg, #4CAF50, #45a049);
+        }
+
+        .message.error {
+            background: linear-gradient(45deg, #f44336, #da190b);
+        }
+
+        .message.info {
+            background: linear-gradient(45deg, #2196F3, #0b7dda);
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        /* Friends and Players Styling */
+        .friends-section, .challenges-section {
+            margin-bottom: 15px;
+        }
+
+        .friends-header, .challenges-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            gap: 10px;
+        }
+
+        .friends-count, .challenges-count {
+            font-size: 0.9rem;
+            opacity: 0.9;
+            padding: 6px 12px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            flex-shrink: 0;
+        }
+
+        .online-count {
+            color: #9b59b6;
+            font-weight: bold;
+            text-shadow: 0 0 8px rgba(155, 89, 182, 0.7);
+        }
+
+        .friends-list, .challenges-list {
+            display: grid;
+            gap: 15px;
+        }
+
+        .friend-item, .challenge-item {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+            padding: 15px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .friend-item:hover, .challenge-item:hover {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: rgba(155, 89, 182, 0.3);
+            transform: translateY(-2px);
+        }
+
+        .friend-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .friend-avatar-circle {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            background: linear-gradient(45deg, #9b59b6, #e91e63);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.3rem;
+            position: relative;
+        }
+
+        .online-indicator {
+            position: absolute;
+            bottom: -2px;
+            right: -2px;
+            width: 14px;
+            height: 14px;
+            background: #4ecdc4;
+            border-radius: 50%;
+            border: 2px solid #0a0a0a;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); box-shadow: 0 0 8px rgba(78, 205, 196, 0.8); }
+            50% { transform: scale(1.1); box-shadow: 0 0 15px rgba(78, 205, 196, 1); }
+            100% { transform: scale(1); box-shadow: 0 0 8px rgba(78, 205, 196, 0.8); }
+        }
+
+        .friend-details h4 {
+            margin: 0;
+            font-size: 1rem;
+            color: white;
+        }
+
+        .friend-details p {
+            margin: 2px 0 0 0;
+            font-size: 0.85rem;
+            opacity: 0.7;
+        }
+
+        .friend-actions {
+            display: flex;
+            gap: 8px;
+            margin-top: 10px;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            opacity: 0.6;
+        }
+
+        .empty-state h4 {
+            margin-bottom: 8px;
+            color: rgba(255, 255, 255, 0.8);
+        }
+
+        .app-content {
+            opacity: 0;
+            transition: opacity 0.5s ease;
+        }
+
+        .app-content.loaded {
+            opacity: 1;
+        }
+
+        /* Error State */
+        .error-message {
+            background: rgba(244, 67, 54, 0.1);
+            border: 1px solid rgba(244, 67, 54, 0.3);
+            border-radius: 8px;
+            padding: 10px 15px;
+            margin-bottom: 15px;
+            font-size: 0.9rem;
+            color: #ff6b6b;
+            display: none;
+        }
+
+        .error-message.show {
+            display: block;
+            animation: shake 0.5s ease;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            75% { transform: translateX(5px); }
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                padding: 10px;
+            }
+            
+            .header {
+                flex-direction: column;
+                align-items: flex-start;
+                padding: 15px;
+                gap: 15px;
+            }
+            
+            .user-info {
+                width: 100%;
+                justify-content: space-between;
+                align-items: center;
+            }
+
+            .auth-container {
+                padding: 24px;
+                margin: 10px;
+                border-radius: 20px;
+            }
+
+            .auth-logo {
+                font-size: 3rem;
+            }
+
+            .auth-title {
+                font-size: 1.5rem;
+            }
+
+            .avatar-grid {
+                grid-template-columns: repeat(4, 1fr);
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Starfield Background -->
+    <div class="starfield" id="starfield"></div>
+
+    <!-- Enhanced Auth Modal -->
+    <div class="auth-modal show" id="authModal">
+        <div class="auth-container">
+            <!-- Header -->
+            <div class="auth-header">
+                <div class="auth-logo">🎮</div>
+                <h1 class="auth-title">Welcome to JomBro</h1>
+                <p class="auth-subtitle">Let's Go! Let's Go!</p>
+            </div>
+
+            <!-- Error Message -->
+            <div class="error-message" id="authError"></div>
+
+            <!-- Phone Auth Form -->
+            <form class="auth-form active" id="phoneAuthForm">
+                <div class="form-group">
+                    <label class="form-label">Phone Number</label>
+                    <div class="phone-input-container">
+                        <select id="countryCode" class="country-select">
+                            <option value="+60" selected>🇲🇾 +60</option>
+                            <option value="+65">🇸🇬 +65</option>
+                            <option value="+1">🇺🇸 +1</option>
+                            <option value="+44">🇬🇧 +44</option>
+                            <option value="+91">🇮🇳 +91</option>
+                            <option value="+62">🇮🇩 +62</option>
+                            <option value="+63">🇵🇭 +63</option>
+                            <option value="+66">🇹🇭 +66</option>
+                            <option value="+84">🇻🇳 +84</option>
+                            <option value="+86">🇨🇳 +86</option>
+                            <option value="+81">🇯🇵 +81</option>
+                            <option value="+82">🇰🇷 +82</option>
+                        </select>
+                        <input 
+                            type="tel" 
+                            id="phoneNumber" 
+                            class="phone-input" 
+                            placeholder="123456789"
+                            maxlength="15"
+                            pattern="[0-9]*"
+                            inputmode="numeric"
+                        >
+                    </div>
+                    <p class="phone-hint">Enter your phone number to play instantly!</p>
+                </div>
+
+                <button type="submit" class="auth-button auth-button-primary" id="loginButton">
+                    Start Playing →
+                </button>
+            </form>
+
+            <!-- Username Setup Form -->
+            <form class="auth-form" id="usernameForm" style="display: none;">
+                <div class="form-group">
+                    <label class="form-label">Choose Your Username</label>
+                    <input 
+                        type="text" 
+                        id="username" 
+                        class="form-input" 
+                        placeholder="CoolPlayer123"
+                        maxlength="20"
+                        pattern="[a-zA-Z0-9_]*"
+                    >
+                    <p class="username-hint">This is how other players will see you</p>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Pick Your Avatar</label>
+                    <div class="avatar-grid">
+                        <div class="avatar-option" data-avatar="😎">😎</div>
+                        <div class="avatar-option" data-avatar="🌸">🌸</div>
+                        <div class="avatar-option" data-avatar="🚀">🚀</div>
+                        <div class="avatar-option" data-avatar="💪">💪</div>
+                        <div class="avatar-option" data-avatar="🎵">🎵</div>
+                        <div class="avatar-option" data-avatar="🎨">🎨</div>
+                        <div class="avatar-option" data-avatar="🤠">🤠</div>
+                        <div class="avatar-option" data-avatar="🌟">🌟</div>
+                        <div class="avatar-option" data-avatar="🎯">🎯</div>
+                        <div class="avatar-option" data-avatar="🎭">🎭</div>
+                        <div class="avatar-option" data-avatar="🎪">🎪</div>
+                        <div class="avatar-option" data-avatar="🌈">🌈</div>
+                    </div>
+                </div>
+
+                <button type="submit" class="auth-button auth-button-primary" id="startPlayingButton">
+                    Start Playing! 🎮
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- App Content -->
+    <div class="app-content" id="appContent">
+        <div class="container">
+            <!-- Header -->
+            <div class="header floating-element">
+                <div style="text-align: center;">
+                    <div class="logo">JomBro</div>
+                    <div class="slogan">Let's Go! Let's Go!</div>
+                    <div class="user-name" id="userName">Loading...</div>
+                </div>
+                <div class="user-info">
+                    <div class="user-avatar" id="userAvatar">👤</div>
+                    <div class="user-stats">
+                        <div class="stat-item">
+                            <div class="stat-number" id="userTokens">0</div>
+                            <div class="stat-label">Tokens</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-number" id="userLevel">1</div>
+                            <div class="stat-label">Level</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-number" id="userFriends">0</div>
+                            <div class="stat-label">Friends</div>
+                        </div>
+                    </div>
+                    <button class="btn btn-secondary btn-small" onclick="logoutUser()" id="logoutBtn" style="display: none;">
+                        Logout
+                    </button>
+                </div>
+            </div>
+
+            <!-- Main Content -->
+            <div class="main-content">
+                <!-- Friends Section -->
+                <div class="card floating-element">
+                    <div class="card-title">
+                        <span>👥</span>
+                        <span>Friends</span>
+                    </div>
+                    
+                    <div class="friends-section">
+                        <div class="friends-header">
+                            <div class="friends-count">
+                                <span class="online-count" id="onlineCount">0</span> online • 
+                                <span id="totalFriends">0</span> total
+                            </div>
+                            <button class="btn btn-secondary btn-small" onclick="showAddFriendModal()">Add Friend</button>
+                        </div>
+                        
+                        <div class="friends-list" id="friendsList">
+                            <!-- Friends will be populated here -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Challenges Section -->
+                <div class="card floating-element">
+                    <div class="card-title">
+                        <span>🎯</span>
+                        <span>Active Challenges</span>
+                    </div>
+                    
+                    <div class="challenges-section">
+                        <div class="challenges-header">
+                            <div class="challenges-count">
+                                <span class="online-count" id="activeChallengesCount">0</span> active
+                            </div>
+                            <button class="btn btn-secondary btn-small" onclick="refreshChallenges()">Refresh</button>
+                        </div>
+                        
+                        <div class="challenges-list" id="challengesList">
+                            <!-- Challenges will be populated here -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // App Configuration
+        const APP_CONFIG = {
+            firebase: {
+                apiKey: "AIzaSyC_orriRUuf1ynDiFaJAPrO6-Gu3GeURxQ",
+                authDomain: "jombro-9d129.firebaseapp.com",
+                projectId: "jombro-9d129",
+                storageBucket: "jombro-9d129.firebasestorage.app",
+                messagingSenderId: "390572076435",
+                appId: "1:390572076435:web:781f9f62b84542eb834c66",
+                measurementId: "G-J84HS0WPCP"
+            },
+            sessionKey: 'jombro_session',
+            phoneKey: 'jombro_phone',
+            maxRetries: 3,
+            retryDelay: 1000
+        };
+
+        // Global State
+        let appState = {
+            initialized: false,
+            firebase: null,
+            db: null,
+            currentUser: null,
+            selectedAvatar: null,
+            sessionData: null,
+            retryCount: 0,
+            userData: {
+                id: null,
+                name: '',
+                avatar: '👤',
+                tokens: 1000,
+                level: 1,
+                friends: 0,
+                phoneNumber: null
+            },
+            friends: [],
+            challenges: []
+        };
+
+        // Initialize App
+        async function initApp() {
+            console.log('🚀 Starting JomBro initialization...');
+            
+            try {
+                // Initialize Firebase
+                await initializeFirebase();
+                
+                // Setup UI
+                createStarfield();
+                setupEventListeners();
+                
+                // Check for existing session
+                await checkExistingSession();
+                
+                appState.initialized = true;
+                console.log('✅ JomBro initialization complete');
+                
+            } catch (error) {
+                console.error('❌ App initialization failed:', error);
+                showError('Failed to initialize app. Please refresh the page.');
+            }
+        }
+
+        // Initialize Firebase with retry logic
+        async function initializeFirebase() {
+            try {
+                if (typeof firebase === 'undefined') {
+                    throw new Error('Firebase SDK not loaded');
+                }
+
+                if (!firebase.apps.length) {
+                    firebase.initializeApp(APP_CONFIG.firebase);
+                }
+
+                appState.firebase = firebase;
+                appState.db = firebase.firestore();
+                
+                // Enable offline persistence
+                await appState.db.enablePersistence().catch(err => {
+                    console.warn('Persistence failed:', err);
+                });
+
+                console.log('✅ Firebase initialized successfully');
+                return true;
+
+            } catch (error) {
+                console.error('Firebase initialization error:', error);
+                
+                if (appState.retryCount < APP_CONFIG.maxRetries) {
+                    appState.retryCount++;
+                    console.log(`Retrying Firebase init (${appState.retryCount}/${APP_CONFIG.maxRetries})...`);
+                    await new Promise(resolve => setTimeout(resolve, APP_CONFIG.retryDelay));
+                    return initializeFirebase();
+                }
+                
+                throw error;
+            }
+        }
+
+        // Check for existing session
+        async function checkExistingSession() {
+            const savedSession = localStorage.getItem(APP_CONFIG.sessionKey);
+            const savedPhone = localStorage.getItem(APP_CONFIG.phoneKey);
+            
+            if (savedSession && savedPhone) {
+                try {
+                    const sessionData = JSON.parse(savedSession);
+                    console.log('🔐 Found saved session, attempting auto-login...');
+                    
+                    // Verify session is still valid
+                    const userDoc = await appState.db.collection('users').doc(sessionData.userId).get();
+                    
+                    if (userDoc.exists) {
+                        appState.currentUser = {
+                            uid: sessionData.userId,
+                            phoneNumber: savedPhone
+                        };
+                        
+                        await loadUserSession();
+                        hideAuthModal();
+                        showMessage('Welcome back! 🎮', 'success');
+                    } else {
+                        clearSession();
+                    }
+                } catch (error) {
+                    console.error('Session validation failed:', error);
+                    clearSession();
+                }
+            }
+        }
+
+        // Setup event listeners
+        function setupEventListeners() {
+            // Phone form
+            document.getElementById('phoneAuthForm').addEventListener('submit', async (e) => {
+                e.preventDefault();
+                await performLogin();
+            });
+
+            // Username form
+            document.getElementById('usernameForm').addEventListener('submit', async (e) => {
+                e.preventDefault();
+                await completeProfile();
+            });
+
+            // Phone number formatting
+            document.getElementById('phoneNumber').addEventListener('input', (e) => {
+                e.target.value = e.target.value.replace(/\D/g, '');
+            });
+
+            // Avatar selection
+            document.querySelectorAll('.avatar-option').forEach(avatar => {
+                avatar.addEventListener('click', () => selectAvatar(avatar));
+            });
+        }
+
+        // Perform login
+        async function performLogin() {
+            const countryCode = document.getElementById('countryCode').value;
+            const phoneNumber = document.getElementById('phoneNumber').value.trim();
+            const loginButton = document.getElementById('loginButton');
+
+            // Validation
+            if (!phoneNumber || phoneNumber.length < 6) {
+                showError('Please enter a valid phone number (at least 6 digits)');
+                return;
+            }
+
+            const fullNumber = countryCode + phoneNumber;
+
+            try {
+                setButtonLoading(loginButton, true);
+                hideError();
+                
+                // Create user ID from phone
+                const userId = 'user_' + fullNumber.replace(/\D/g, '');
+                
+                // Save session
+                const sessionData = {
+                    userId,
+                    timestamp: Date.now()
+                };
+                
+                localStorage.setItem(APP_CONFIG.sessionKey, JSON.stringify(sessionData));
+                localStorage.setItem(APP_CONFIG.phoneKey, fullNumber);
+                
+                appState.currentUser = {
+                    uid: userId,
+                    phoneNumber: fullNumber
+                };
+
+                // Check if user exists
+                const userDoc = await appState.db.collection('users').doc(userId).get();
+                
+                if (!userDoc.exists) {
+                    // New user - show username form
+                    document.getElementById('phoneAuthForm').style.display = 'none';
+                    document.getElementById('usernameForm').style.display = 'block';
+                    document.getElementById('username').focus();
+                    showMessage('Welcome! Please set up your profile 🎮', 'info');
+                } else {
+                    // Existing user
+                    await loadUserSession();
+                    hideAuthModal();
+                    showMessage('Welcome back! 🎮', 'success');
+                }
+
+            } catch (error) {
+                console.error('Login error:', error);
+                showError('Login failed. Please try again.');
+            } finally {
+                setButtonLoading(loginButton, false);
+            }
+        }
+
+        // Complete profile setup
+        async function completeProfile() {
+            const username = document.getElementById('username').value.trim();
+            const startButton = document.getElementById('startPlayingButton');
+
+            // Validation
+            if (!username || username.length < 3) {
+                showError('Username must be at least 3 characters');
+                return;
+            }
+
+            if (!appState.selectedAvatar) {
+                showError('Please select an avatar');
+                return;
+            }
+
+            try {
+                setButtonLoading(startButton, true);
+                hideError();
+
+                // Create user document
+                await appState.db.collection('users').doc(appState.currentUser.uid).set({
+                    name: username,
+                    phoneNumber: appState.currentUser.phoneNumber,
+                    avatar: appState.selectedAvatar,
+                    tokens: 1000,
+                    level: 1,
+                    friendsCount: 0,
+                    createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+                    lastActive: firebase.firestore.FieldValue.serverTimestamp(),
+                    online: true
+                });
+
+                showMessage('🎉 Welcome to JomBro! You got 1000 starter tokens!', 'success');
+                
+                await loadUserSession();
+                hideAuthModal();
+
+            } catch (error) {
+                console.error('Profile creation error:', error);
+                showError('Failed to create profile. Please try again.');
+            } finally {
+                setButtonLoading(startButton, false);
+            }
+        }
+
+        // Load user session
+        async function loadUserSession() {
+            try {
+                const userDoc = await appState.db.collection('users').doc(appState.currentUser.uid).get();
+                
+                if (userDoc.exists) {
+                    const userData = userDoc.data();
+                    appState.userData = {
+                        id: appState.currentUser.uid,
+                        name: userData.name,
+                        avatar: userData.avatar,
+                        tokens: userData.tokens || 1000,
+                        level: userData.level || 1,
+                        friends: userData.friendsCount || 0,
+                        phoneNumber: appState.currentUser.phoneNumber
+                    };
+                    
+                    // Update online status
+                    await updateUserOnlineStatus(true);
+                    
+                    // Setup listeners
+                    setupRealtimeListeners();
+                    
+                    // Load UI
+                    loadAppContent();
+                }
+            } catch (error) {
+                console.error('Error loading session:', error);
+                showError('Failed to load user data');
+            }
+        }
+
+        // Update user online status
+        async function updateUserOnlineStatus(online) {
+            if (!appState.currentUser || !appState.db) return;
+            
+            try {
+                await appState.db.collection('users').doc(appState.currentUser.uid).update({
+                    online: online,
+                    lastActive: firebase.firestore.FieldValue.serverTimestamp()
+                });
+            } catch (error) {
+                console.error('Error updating online status:', error);
+            }
+        }
+
+        // Setup realtime listeners
+        function setupRealtimeListeners() {
+            // This would be expanded to include friends, challenges, etc.
+            console.log('📡 Setting up realtime listeners...');
+        }
+
+        // Load app content
+        function loadAppContent() {
+            updateUserDisplay();
+            renderFriends();
+            renderChallenges();
+            
+            document.getElementById('appContent').classList.add('loaded');
+            document.getElementById('logoutBtn').style.display = 'block';
+        }
+
+        // Update user display
+        function updateUserDisplay() {
+            document.getElementById('userName').textContent = appState.userData.name;
+            document.getElementById('userAvatar').textContent = appState.userData.avatar;
+            document.getElementById('userTokens').textContent = appState.userData.tokens.toLocaleString();
+            document.getElementById('userLevel').textContent = appState.userData.level;
+            document.getElementById('userFriends').textContent = appState.userData.friends;
+        }
+
+        // Render friends list
+        function renderFriends() {
+            const friendsList = document.getElementById('friendsList');
+            
+            if (appState.friends.length === 0) {
+                friendsList.innerHTML = `
+                    <div class="empty-state">
+                        <h4>👥 No friends yet</h4>
+                        <p>Add friends to start challenging each other!</p>
+                        <button class="btn btn-primary" onclick="showAddFriendModal()" style="margin-top: 15px;">
+                            Add Your First Friend
+                        </button>
+                    </div>
+                `;
+            } else {
+                // Render friends
+                friendsList.innerHTML = appState.friends.map(friend => `
+                    <div class="friend-item">
+                        <!-- Friend content -->
+                    </div>
+                `).join('');
+            }
+            
+            document.getElementById('onlineCount').textContent = appState.friends.filter(f => f.online).length;
+            document.getElementById('totalFriends').textContent = appState.friends.length;
+        }
+
+        // Render challenges
+        function renderChallenges() {
+            const challengesList = document.getElementById('challengesList');
+            
+            if (appState.challenges.length === 0) {
+                challengesList.innerHTML = `
+                    <div class="empty-state">
+                        <h4>🎯 No active challenges</h4>
+                        <p>Create a challenge or wait for friends to challenge you!</p>
+                    </div>
+                `;
+            } else {
+                // Render challenges
+                challengesList.innerHTML = appState.challenges.map(challenge => `
+                    <div class="challenge-item">
+                        <!-- Challenge content -->
+                    </div>
+                `).join('');
+            }
+            
+            document.getElementById('activeChallengesCount').textContent = 
+                appState.challenges.filter(c => c.status === 'active').length;
+        }
+
+        // Logout user
+        async function logoutUser() {
+            try {
+                // Update online status
+                await updateUserOnlineStatus(false);
+                
+                // Clear session
+                clearSession();
+                
+                // Reset state
+                appState.currentUser = null;
+                appState.userData = {
+                    id: null,
+                    name: '',
+                    avatar: '👤',
+                    tokens: 1000,
+                    level: 1,
+                    friends: 0,
+                    phoneNumber: null
+                };
+                
+                // Reset UI
+                document.getElementById('phoneNumber').value = '';
+                document.getElementById('username').value = '';
+                document.getElementById('phoneAuthForm').style.display = 'block';
+                document.getElementById('usernameForm').style.display = 'none';
+                
+                showAuthModal();
+                showMessage('Logged out successfully', 'info');
+                
+            } catch (error) {
+                console.error('Logout error:', error);
+                showError('Failed to logout properly');
+            }
+        }
+
+        // Avatar selection
+        function selectAvatar(avatarElement) {
+            document.querySelectorAll('.avatar-option').forEach(opt => {
+                opt.classList.remove('selected');
+            });
+            
+            avatarElement.classList.add('selected');
+            appState.selectedAvatar = avatarElement.dataset.avatar;
+        }
+
+        // UI Helper Functions
+        function showAuthModal() {
+            document.getElementById('authModal').classList.add('show');
+            document.getElementById('appContent').classList.remove('loaded');
+        }
+
+        function hideAuthModal() {
+            document.getElementById('authModal').classList.remove('show');
+        }
+
         function showMessage(message, type = 'info') {
             // Remove existing messages
-            document.querySelectorAll('.message').forEach(n => n.remove());
+            document.querySelectorAll('.message').forEach(m => m.remove());
             
             const notification = document.createElement('div');
             notification.className = `message ${type}`;
             notification.textContent = message;
             document.body.appendChild(notification);
             
-            // Auto-remove after 4 seconds
-            setTimeout(() => {
-                if (notification.parentNode) {
-                    notification.remove();
-                }
-            }, 4000);
+            setTimeout(() => notification.remove(), 4000);
+        }
+
+        function showError(message) {
+            const errorElement = document.getElementById('authError');
+            errorElement.textContent = message;
+            errorElement.classList.add('show');
+        }
+
+        function hideError() {
+            const errorElement = document.getElementById('authError');
+            errorElement.classList.remove('show');
         }
 
         function setButtonLoading(button, loading) {
-            if (loading) {
-                button.disabled = true;
-                button.classList.add('loading');
-            } else {
-                button.disabled = false;
-                button.classList.remove('loading');
+            button.disabled = loading;
+            button.classList.toggle('loading', loading);
+        }
+
+        function clearSession() {
+            localStorage.removeItem(APP_CONFIG.sessionKey);
+            localStorage.removeItem(APP_CONFIG.phoneKey);
+        }
+
+        // Create starfield background
+        function createStarfield() {
+            const starfield = document.getElementById('starfield');
+            const starCount = 100;
+            
+            for (let i = 0; i < starCount; i++) {
+                const star = document.createElement('div');
+                star.className = 'star';
+                
+                const size = Math.random();
+                if (size < 0.3) star.classList.add('small');
+                else if (size < 0.7) star.classList.add('medium');
+                else star.classList.add('large');
+                
+                star.style.left = Math.random() * 100 + '%';
+                star.style.top = Math.random() * 100 + '%';
+                star.style.animationDelay = Math.random() * 2 + 's';
+                
+                starfield.appendChild(star);
             }
         }
 
-        function getRandomAvatar() {
-            const avatars = ['😎', '🌸', '🚀', '💪', '🎵', '🎨', '🤠', '🌟', '🎯', '🎭', '🎪', '🌈', '🎲', '🎊', '🌺', '⚡', '🌙', '🔥'];
-            return avatars[Math.floor(Math.random() * avatars.length)];
-        }
+        // Placeholder functions for friends/challenges
+        window.showAddFriendModal = () => {
+            showMessage('Add friend feature coming soon!', 'info');
+        };
 
-        // Initialize App
-        async function initApp() {
-            try {
-                console.log('🚀 Initializing JomBro App...');
-                
-                // Wait for Firebase to be ready
-                let attempts = 0;
-                while (!initializeFirebase() && attempts < 10) {
-                    console.log('⏳ Waiting for Firebase...');
-                    await new Promise(resolve => setTimeout(resolve, 100));
-                    attempts++;
-                }
-                
-                if (!db || !auth) {
-                    throw new Error('Firebase failed to initialize');
-                }
-                
-                createStarfield();
-                setupEventListeners();
-                
-                // Check for existing session
-                checkExistingSession();
-                
-                console.log('✅ JomBro initialization complete');
-                
-            } catch (error) {
-                console.error('❌ App initialization error:', error);
-                showMessage('⚠️ Failed to initialize JomBro. Please refresh the page.', 'error');
+        window.refreshChallenges = () => {
+            showMessage('Refreshing challenges...', 'info');
+            renderChallenges();
+        };
+
+        // Handle page visibility
+        document.addEventListener('visibilitychange', () => {
+            if (appState.currentUser) {
+                updateUserOnlineStatus(!document.hidden);
             }
-        }
+        });
+
+        // Handle page unload
+        window.addEventListener('beforeunload', () => {
+            if (appState.currentUser) {
+                updateUserOnlineStatus(false);
+            }
+        });
+
+        // Initialize when DOM is ready
+        document.addEventListener('DOMContentLoaded', initApp);
+    </script>
+</body>
+</html>
