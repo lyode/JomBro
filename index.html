@@ -139,67 +139,89 @@
         .floating-element:nth-child(4) { animation-delay: -3s; }
         .floating-element:nth-child(5) { animation-delay: -4s; }
 
-        /* Header */
+        /* Mobile-First Header */
         .header {
-            padding: 15px 20px;
+            padding: 12px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            background: rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(10px);
+        }
+
+        .header-top {
             display: flex;
             justify-content: space-between;
-            align-items: flex-start;
-            gap: 15px;
+            align-items: center;
         }
 
         .logo-section {
-            text-align: left;
-            flex: 0 0 auto;
+            flex: 1;
         }
 
         .logo {
-            font-size: 1.5rem;
-            font-weight: 100;
+            font-size: 1.8rem;
+            font-weight: 300;
             color: white;
             text-shadow: 0 0 20px rgba(255, 255, 255, 0.3);
             letter-spacing: 2px;
+            margin-bottom: 2px;
         }
 
         .slogan {
-            font-size: 0.8rem;
+            font-size: 0.75rem;
             font-weight: 300;
             color: rgba(255, 255, 255, 0.8);
-            margin-top: 5px;
             font-style: italic;
             letter-spacing: 1px;
+            margin-bottom: 2px;
         }
 
         .user-name {
-            font-size: 0.9rem;
+            font-size: 0.85rem;
             font-weight: 400;
             color: rgba(155, 89, 182, 0.9);
-            margin-top: 3px;
             letter-spacing: 0.5px;
             cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .user-name::after {
+            content: '✏️';
+            font-size: 0.7rem;
+            opacity: 0.6;
         }
 
         .user-info {
             display: flex;
             align-items: center;
-            gap: 10px;
-            flex: 0 0 auto;
+            gap: 15px;
         }
 
         .user-avatar {
-            width: 50px;
-            height: 50px;
+            width: 45px;
+            height: 45px;
             border-radius: 50%;
             background: linear-gradient(45deg, #9b59b6, #e91e63);
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 1.5rem;
+            font-size: 1.3rem;
             border: 3px solid rgba(155, 89, 182, 0.5);
             box-shadow: 0 0 15px rgba(155, 89, 182, 0.4);
             animation: glow 3s ease-in-out infinite alternate;
             cursor: pointer;
             transition: all 0.3s ease;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .user-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
         }
 
         .user-avatar:hover {
@@ -214,17 +236,23 @@
 
         .user-stats {
             display: flex;
-            gap: 10px;
+            gap: 5px;
+            width: 100%;
+            justify-content: space-between;
+            background: rgba(255, 255, 255, 0.05);
+            padding: 8px;
+            border-radius: 12px;
+            backdrop-filter: blur(10px);
         }
 
         .stat-item {
             text-align: center;
-            padding: 8px 12px;
+            padding: 6px 10px;
             background: rgba(255, 255, 255, 0.1);
-            border-radius: 12px;
+            border-radius: 10px;
             border: 1px solid rgba(255, 255, 255, 0.2);
             backdrop-filter: blur(10px);
-            min-width: 55px;
+            flex: 1;
             transition: all 0.3s ease;
             cursor: pointer;
         }
@@ -1707,7 +1735,7 @@
             background: rgba(255, 255, 255, 0.3);
         }
 
-        /* Avatar Selector Modal */
+        /* Avatar Selector Modal with Upload */
         .avatar-selector-modal {
             position: fixed;
             top: 0;
@@ -1728,9 +1756,11 @@
             background: rgba(20, 20, 30, 0.98);
             backdrop-filter: blur(20px);
             border-radius: 24px;
-            padding: 30px;
+            padding: 25px;
             width: 100%;
-            max-width: 500px;
+            max-width: 400px;
+            max-height: 85vh;
+            overflow-y: auto;
             box-shadow: 
                 0 20px 40px rgba(0, 0, 0, 0.4),
                 0 0 0 1px rgba(255, 255, 255, 0.1);
@@ -1742,32 +1772,88 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 25px;
+            margin-bottom: 20px;
         }
 
         .avatar-selector-header h2 {
-            font-size: 1.5rem;
+            font-size: 1.3rem;
             font-weight: 600;
             color: white;
             text-shadow: 0 0 10px rgba(155, 89, 182, 0.5);
         }
 
+        .avatar-upload-section {
+            text-align: center;
+            margin-bottom: 25px;
+            padding: 20px;
+            background: rgba(155, 89, 182, 0.1);
+            border-radius: 15px;
+            border: 2px dashed rgba(155, 89, 182, 0.3);
+        }
+
+        .current-avatar-preview {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #9b59b6, #e91e63);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.5rem;
+            margin: 0 auto 15px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .current-avatar-preview img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .upload-btn-container {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .upload-label {
+            background: linear-gradient(45deg, #9b59b6, #e91e63);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+        }
+
+        .upload-label:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        }
+
+        #avatarUpload {
+            display: none;
+        }
+
         .avatar-selector-grid {
             display: grid;
-            grid-template-columns: repeat(6, 1fr);
-            gap: 15px;
-            margin-bottom: 25px;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 10px;
+            margin-bottom: 20px;
         }
 
         .avatar-selector-option {
-            width: 65px;
-            height: 65px;
+            width: 60px;
+            height: 60px;
             border-radius: 50%;
             background: rgba(255, 255, 255, 0.1);
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 2.2rem;
+            font-size: 2rem;
             cursor: pointer;
             transition: all 0.3s ease;
             border: 3px solid transparent;
@@ -1783,6 +1869,24 @@
             border-color: #9b59b6;
             background: linear-gradient(135deg, #9b59b6, #e91e63);
             box-shadow: 0 0 20px rgba(155, 89, 182, 0.4);
+        }
+
+        .done-button {
+            background: linear-gradient(45deg, #4CAF50, #45a049);
+            color: white;
+            width: 100%;
+            padding: 14px;
+            border: none;
+            border-radius: 12px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .done-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(76, 175, 80, 0.4);
         }
 
         /* Profile Editor Modal */
@@ -2014,16 +2118,16 @@
             color: #9b59b6;
         }
 
-        /* How to Play Button */
+        /* How to Play Button - More Prominent */
         .how-to-play-btn {
             position: fixed;
             bottom: 20px;
             right: 20px;
             background: linear-gradient(45deg, #667eea, #764ba2);
             color: white;
-            padding: 12px 20px;
+            padding: 14px 24px;
             border-radius: 30px;
-            box-shadow: 0 4px 20px rgba(102, 126, 234, 0.4);
+            box-shadow: 0 6px 25px rgba(102, 126, 234, 0.5);
             cursor: pointer;
             font-weight: 600;
             z-index: 100;
@@ -2031,13 +2135,37 @@
             display: flex;
             align-items: center;
             gap: 8px;
-            font-size: 0.9rem;
+            font-size: 1rem;
             border: none;
+            animation: pulseButton 2s infinite;
+        }
+
+        @keyframes pulseButton {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
         }
 
         .how-to-play-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 25px rgba(102, 126, 234, 0.6);
+            transform: translateY(-2px) scale(1.1);
+            box-shadow: 0 8px 30px rgba(102, 126, 234, 0.7);
+        }
+
+        .how-to-play-btn .btn-text {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            line-height: 1.2;
+        }
+
+        .how-to-play-btn .btn-title {
+            font-size: 0.8rem;
+            opacity: 0.9;
+        }
+
+        .how-to-play-btn .btn-subtitle {
+            font-size: 1.1rem;
+            font-weight: 700;
         }
 
         /* How to Play Modal */
@@ -2181,19 +2309,19 @@
             
             .header {
                 padding: 10px;
-                gap: 10px;
-            }
-            
-            .logo-section {
-                text-align: left;
-            }
-            
-            .user-info {
-                flex-direction: row;
                 gap: 8px;
-                align-items: center;
-                flex-wrap: wrap;
-                justify-content: flex-end;
+            }
+            
+            .logo {
+                font-size: 1.5rem;
+            }
+            
+            .slogan {
+                font-size: 0.7rem;
+            }
+            
+            .user-name {
+                font-size: 0.8rem;
             }
             
             .user-avatar {
@@ -2202,14 +2330,8 @@
                 font-size: 1.2rem;
             }
             
-            .user-stats {
-                display: flex;
-                gap: 5px;
-            }
-            
             .stat-item {
                 padding: 5px 8px;
-                min-width: 40px;
             }
             
             .stat-number {
@@ -2218,26 +2340,6 @@
             
             .stat-label {
                 font-size: 0.6rem;
-            }
-            
-            #logoutBtn {
-                display: none !important; /* Hide logout on mobile to save space */
-            }
-            
-            .logo-section {
-                text-align: center;
-            }
-            
-            .user-info {
-                width: 100%;
-                flex-direction: column;
-                gap: 10px;
-                align-items: center;
-            }
-            
-            .user-stats {
-                width: 100%;
-                justify-content: center;
             }
 
             .auth-container {
@@ -2266,10 +2368,18 @@
             }
             
             .how-to-play-btn {
-                padding: 12px 20px;
+                padding: 10px 16px;
                 font-size: 0.9rem;
-                bottom: 10px;
-                right: 10px;
+                bottom: 15px;
+                right: 15px;
+            }
+            
+            .how-to-play-btn .btn-title {
+                font-size: 0.7rem;
+            }
+            
+            .how-to-play-btn .btn-subtitle {
+                font-size: 0.95rem;
             }
             
             /* Modal fixes for mobile */
@@ -2406,20 +2516,6 @@
                 width: 100%;
             }
             
-            /* Stats display */
-            .stat-item {
-                padding: 6px 10px;
-                min-width: 45px;
-            }
-            
-            .stat-number {
-                font-size: 1rem;
-            }
-            
-            .stat-label {
-                font-size: 0.65rem;
-            }
-            
             /* Fix close button position */
             .close-modal {
                 width: 35px;
@@ -2438,16 +2534,19 @@
             }
             
             /* Fix challenge alert */
-            .challenge-alert {
+            .challenge-alert,
+            .friend-request-alert {
                 width: 85%;
                 padding: 20px;
             }
             
-            .challenge-alert-header {
+            .challenge-alert-header,
+            .friend-request-alert-header {
                 font-size: 1.2rem;
             }
             
-            .challenge-alert-avatar {
+            .challenge-alert-avatar,
+            .friend-request-alert-avatar {
                 width: 50px;
                 height: 50px;
                 font-size: 1.5rem;
@@ -2463,22 +2562,6 @@
             h3 { font-size: 1.1rem; }
             h4 { font-size: 1rem; }
             p { font-size: 0.9rem; }
-            
-            .logo {
-                font-size: 1.3rem;
-            }
-            
-            #logoutBtn {
-                margin-top: 10px;
-                width: 100%;
-                max-width: 200px;
-            }
-            
-            #logoutBtn {
-                margin-top: 10px;
-                width: 100%;
-                max-width: 200px;
-            }
             
             /* Fix overlapping text in challenges */
             .ai-challenge-title,
@@ -2501,15 +2584,6 @@
             .floating-element {
                 margin-bottom: 15px;
                 animation: none; /* Disable float animation on mobile */
-            }
-            
-            /* Fix header username display */
-            .user-name {
-                font-size: 0.85rem;
-            }
-            
-            .slogan {
-                font-size: 0.75rem;
             }
             
             /* Simplify AI timer on mobile */
@@ -2627,30 +2701,27 @@
         <div class="container">
             <!-- Header -->
             <div class="header floating-element">
-                <div class="logo-section">
-                    <div class="logo">JomBro</div>
-                    <div class="slogan">Let's Go! Let's Go!</div>
-                    <div class="user-name" id="userName" onclick="showProfileEditor()">Loading...</div>
-                </div>
-                <div class="user-info">
-                    <div class="user-avatar" id="userAvatar" onclick="showAvatarSelector()">👤</div>
-                    <div class="user-stats">
-                        <div class="stat-item" onclick="showProfileEditor()">
-                            <div class="stat-number" id="userTokens">0</div>
-                            <div class="stat-label">Tokens</div>
-                        </div>
-                        <div class="stat-item" onclick="showProfileEditor()">
-                            <div class="stat-number" id="userLevel">1</div>
-                            <div class="stat-label">Level</div>
-                        </div>
-                        <div class="stat-item" onclick="showProfileEditor()">
-                            <div class="stat-number" id="userFriends">0</div>
-                            <div class="stat-label">Friends</div>
-                        </div>
+                <div class="header-top">
+                    <div class="logo-section">
+                        <div class="logo">JomBro</div>
+                        <div class="slogan">Let's Go! Let's Go!</div>
+                        <div class="user-name" id="userName" onclick="showProfileEditor()">Loading...</div>
                     </div>
-                    <button class="btn btn-secondary btn-small" onclick="logoutUser()" id="logoutBtn" style="display: none;">
-                        Logout
-                    </button>
+                    <div class="user-avatar" id="userAvatar" onclick="showAvatarSelector()">👤</div>
+                </div>
+                <div class="user-stats">
+                    <div class="stat-item" onclick="showProfileEditor()">
+                        <div class="stat-number" id="userTokens">0</div>
+                        <div class="stat-label">Tokens</div>
+                    </div>
+                    <div class="stat-item" onclick="showProfileEditor()">
+                        <div class="stat-number" id="userLevel">1</div>
+                        <div class="stat-label">Level</div>
+                    </div>
+                    <div class="stat-item" onclick="showProfileEditor()">
+                        <div class="stat-number" id="userFriends">0</div>
+                        <div class="stat-label">Friends</div>
+                    </div>
                 </div>
             </div>
 
@@ -2818,8 +2889,11 @@
         
         <!-- How to Play Button -->
         <div class="how-to-play-btn" onclick="showHowToPlay()">
-            <span>❓</span>
-            <span>How to Play</span>
+            <span style="font-size: 1.5rem;">❓</span>
+            <div class="btn-text">
+                <span class="btn-title">How to Play</span>
+                <span class="btn-subtitle">JomBro!</span>
+            </div>
         </div>
     </div>
 
@@ -3235,7 +3309,6 @@
                     
                     // Show app content
                     document.getElementById('appContent').classList.add('loaded');
-                    document.getElementById('logoutBtn').style.display = 'block';
                 }
             } catch (error) {
                 console.error('Error loading user data:', error);
@@ -3246,7 +3319,15 @@
         // Update user display
         function updateUserDisplay() {
             document.getElementById('userName').textContent = userData.name;
-            document.getElementById('userAvatar').textContent = userData.avatar;
+            
+            // Handle avatar display (emoji or image)
+            const avatarElement = document.getElementById('userAvatar');
+            if (userData.avatar && userData.avatar.startsWith('data:')) {
+                avatarElement.innerHTML = `<img src="${userData.avatar}" alt="Avatar">`;
+            } else {
+                avatarElement.textContent = userData.avatar;
+            }
+            
             document.getElementById('userTokens').textContent = userData.tokens;
             document.getElementById('userLevel').textContent = userData.level;
             document.getElementById('userFriends').textContent = userData.friendsCount;
@@ -3644,12 +3725,13 @@
             alertDiv.remove();
         };
 
-        // Show avatar selector
+        // Show avatar selector with upload option
         window.showAvatarSelector = function() {
             const modal = document.createElement('div');
             modal.className = 'avatar-selector-modal';
             
             const avatars = ['😎', '🌸', '🚀', '💪', '🎵', '🎨', '🤠', '🌟', '🎯', '🎭', '🎪', '🌈', '🎲', '🎊', '🌺', '⚡', '🌙', '🔥'];
+            const isImageAvatar = userData.avatar && userData.avatar.startsWith('data:');
             
             modal.innerHTML = `
                 <div class="avatar-selector-content">
@@ -3657,18 +3739,141 @@
                         <h2>Choose Your Avatar</h2>
                         <button class="close-modal" onclick="closeModal(this)">×</button>
                     </div>
+                    
+                    <div class="avatar-upload-section">
+                        <div class="current-avatar-preview" id="avatarPreview">
+                            ${isImageAvatar ? `<img src="${userData.avatar}" alt="Avatar">` : userData.avatar}
+                        </div>
+                        <div class="upload-btn-container">
+                            <label for="avatarUpload" class="upload-label">
+                                📷 Upload Photo
+                            </label>
+                            <input type="file" id="avatarUpload" accept="image/*" onchange="handleAvatarUpload(event)">
+                        </div>
+                        <p style="font-size: 0.8rem; opacity: 0.6; margin-top: 10px;">Upload your photo or select an emoji below</p>
+                    </div>
+                    
                     <div class="avatar-selector-grid">
                         ${avatars.map(avatar => `
-                            <div class="avatar-selector-option ${avatar === userData.avatar ? 'current' : ''}" 
-                                 onclick="changeAvatar('${avatar}', this)">
+                            <div class="avatar-selector-option ${!isImageAvatar && avatar === userData.avatar ? 'current' : ''}" 
+                                 onclick="selectEmojiAvatar('${avatar}', this)">
                                 ${avatar}
                             </div>
                         `).join('')}
                     </div>
+                    
+                    <button class="done-button" onclick="saveSelectedAvatar(this)">
+                        ✅ Done
+                    </button>
                 </div>
             `;
             
             document.body.appendChild(modal);
+        };
+
+        // Handle avatar image upload
+        window.handleAvatarUpload = function(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            
+            if (file.size > 2 * 1024 * 1024) { // 2MB limit
+                showMessage('❌ Image size must be less than 2MB', 'error');
+                return;
+            }
+            
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const img = new Image();
+                img.onload = function() {
+                    // Create canvas for resizing
+                    const canvas = document.createElement('canvas');
+                    const ctx = canvas.getContext('2d');
+                    
+                    // Calculate square crop
+                    const size = Math.min(img.width, img.height);
+                    const x = (img.width - size) / 2;
+                    const y = (img.height - size) / 2;
+                    
+                    // Set canvas size (200x200 for avatar)
+                    canvas.width = 200;
+                    canvas.height = 200;
+                    
+                    // Draw and crop image
+                    ctx.drawImage(img, x, y, size, size, 0, 0, 200, 200);
+                    
+                    // Convert to base64
+                    const resizedImage = canvas.toDataURL('image/jpeg', 0.8);
+                    
+                    // Update preview
+                    document.getElementById('avatarPreview').innerHTML = `<img src="${resizedImage}" alt="Avatar">`;
+                    
+                    // Store temporarily
+                    window.tempAvatarImage = resizedImage;
+                    
+                    // Deselect emoji avatars
+                    document.querySelectorAll('.avatar-selector-option').forEach(opt => {
+                        opt.classList.remove('current');
+                    });
+                    
+                    showMessage('✅ Photo uploaded! Click Done to save.', 'success');
+                };
+                img.src = e.target.result;
+            };
+            reader.readAsDataURL(file);
+        };
+
+        // Select emoji avatar
+        window.selectEmojiAvatar = function(emoji, element) {
+            document.querySelectorAll('.avatar-selector-option').forEach(opt => {
+                opt.classList.remove('current');
+            });
+            element.classList.add('current');
+            
+            // Update preview
+            document.getElementById('avatarPreview').innerHTML = emoji;
+            
+            // Store selection
+            window.tempAvatarEmoji = emoji;
+            window.tempAvatarImage = null; // Clear image selection
+        };
+
+        // Save selected avatar
+        window.saveSelectedAvatar = async function(button) {
+            let newAvatar = userData.avatar; // Default to current
+            
+            // Check what was selected
+            if (window.tempAvatarImage) {
+                newAvatar = window.tempAvatarImage;
+            } else if (window.tempAvatarEmoji) {
+                newAvatar = window.tempAvatarEmoji;
+            }
+            
+            try {
+                // Update UI immediately
+                userData.avatar = newAvatar;
+                const avatarElement = document.getElementById('userAvatar');
+                if (newAvatar.startsWith('data:')) {
+                    avatarElement.innerHTML = `<img src="${newAvatar}" alt="Avatar">`;
+                } else {
+                    avatarElement.textContent = newAvatar;
+                }
+                
+                // Update in database
+                await db.collection('users').doc(currentUser.uid).update({
+                    avatar: newAvatar
+                });
+                
+                // Clean up temp variables
+                window.tempAvatarImage = null;
+                window.tempAvatarEmoji = null;
+                
+                showMessage('Avatar updated! 🎨', 'success');
+                closeModal(button);
+                
+            } catch (error) {
+                console.error('Error updating avatar:', error);
+                showError('Failed to update avatar');
+            }
         };
 
         // Close modal helper
@@ -4773,31 +4978,12 @@
             }
         });
 
-        // Change avatar
-        window.changeAvatar = async function(newAvatar, element) {
-            try {
-                // Update UI immediately
-                userData.avatar = newAvatar;
-                document.getElementById('userAvatar').textContent = newAvatar;
-                
-                // Update in database
-                await db.collection('users').doc(currentUser.uid).update({
-                    avatar: newAvatar
-                });
-                
-                showMessage('Avatar updated! 🎨', 'success');
-                closeModal(element);
-                
-            } catch (error) {
-                console.error('Error updating avatar:', error);
-                showError('Failed to update avatar');
-            }
-        };
-
         // Show profile editor
         window.showProfileEditor = function() {
             const modal = document.createElement('div');
             modal.className = 'profile-modal';
+            const isImageAvatar = userData.avatar && userData.avatar.startsWith('data:');
+            
             modal.innerHTML = `
                 <div class="profile-modal-content">
                     <div class="friend-modal-header">
@@ -4813,7 +4999,7 @@
                             <label class="profile-form-label">Avatar</label>
                             <div style="text-align: center;">
                                 <div class="user-avatar" style="width: 70px; height: 70px; font-size: 2rem; margin: 0 auto 10px; cursor: pointer;" onclick="closeModal(this); showAvatarSelector()">
-                                    ${userData.avatar}
+                                    ${isImageAvatar ? `<img src="${userData.avatar}" alt="Avatar" style="width: 100%; height: 100%; object-fit: cover;">` : userData.avatar}
                                 </div>
                                 <p style="font-size: 0.8rem; opacity: 0.7;">Tap to change</p>
                             </div>
