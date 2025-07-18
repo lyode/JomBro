@@ -887,12 +887,116 @@
             text-shadow: 0 0 8px rgba(155, 89, 182, 0.7);
         }
 
-        .friends-list, .challenges-list {
-            display: grid;
-            gap: 15px;
+        /* Friends Carousel */
+        .friends-carousel-container {
+            position: relative;
+            margin-bottom: 15px;
         }
 
-        .friend-item, .challenge-item {
+        .friends-carousel {
+            display: flex;
+            gap: 15px;
+            overflow-x: auto;
+            padding: 10px 5px;
+            scroll-behavior: smooth;
+            scrollbar-width: none;
+            -ms-overflow-style: none;
+        }
+
+        .friends-carousel::-webkit-scrollbar {
+            display: none;
+        }
+
+        .friend-carousel-item {
+            flex-shrink: 0;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .friend-carousel-item:hover {
+            transform: translateY(-5px);
+        }
+
+        .friend-carousel-avatar {
+            width: 65px;
+            height: 65px;
+            border-radius: 50%;
+            background: linear-gradient(45deg, #9b59b6, #e91e63);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.8rem;
+            position: relative;
+            margin: 0 auto 8px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+            border: 3px solid rgba(255, 255, 255, 0.1);
+            overflow: hidden;
+        }
+
+        .friend-carousel-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .friend-carousel-name {
+            font-size: 0.85rem;
+            opacity: 0.9;
+            max-width: 80px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .carousel-online-indicator {
+            position: absolute;
+            bottom: 0;
+            right: 0;
+            width: 18px;
+            height: 18px;
+            background: #4ecdc4;
+            border-radius: 50%;
+            border: 3px solid #0a0a0a;
+            animation: pulse 2s infinite;
+        }
+
+        .view-all-friends-btn {
+            text-align: center;
+            padding: 10px;
+        }
+
+        .view-all-btn {
+            background: rgba(155, 89, 182, 0.2);
+            border: 1px solid rgba(155, 89, 182, 0.4);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        .view-all-btn:hover {
+            background: rgba(155, 89, 182, 0.3);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(155, 89, 182, 0.3);
+        }
+
+        /* Full Friends List (Hidden by default) */
+        .friends-list {
+            display: none;
+            grid-template-columns: 1fr;
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        .friends-list.show {
+            display: grid;
+        }
+
+        .friend-item {
             background: rgba(255, 255, 255, 0.05);
             border-radius: 15px;
             padding: 15px;
@@ -901,7 +1005,7 @@
             cursor: pointer;
         }
 
-        .friend-item:hover, .challenge-item:hover {
+        .friend-item:hover {
             background: rgba(255, 255, 255, 0.1);
             border-color: rgba(155, 89, 182, 0.3);
             transform: translateY(-2px);
@@ -923,6 +1027,13 @@
             justify-content: center;
             font-size: 1.3rem;
             position: relative;
+            overflow: hidden;
+        }
+
+        .friend-avatar-circle img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
         }
 
         .online-indicator {
@@ -959,6 +1070,26 @@
             display: flex;
             gap: 8px;
             margin-top: 10px;
+        }
+
+        .challenges-list {
+            display: grid;
+            gap: 15px;
+        }
+
+        .challenge-item {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+            padding: 15px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .challenge-item:hover {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: rgba(155, 89, 182, 0.3);
+            transform: translateY(-2px);
         }
 
         .empty-state {
@@ -2976,6 +3107,33 @@
                 min-width: 60px;
             }
             
+            /* Friends carousel mobile optimization */
+            .friends-carousel {
+                padding: 10px 5px;
+                gap: 12px;
+            }
+            
+            .friend-carousel-item {
+                min-width: 70px;
+            }
+            
+            .friend-carousel-avatar {
+                width: 60px;
+                height: 60px;
+                font-size: 1.6rem;
+            }
+            
+            .friend-carousel-name {
+                font-size: 0.8rem;
+                max-width: 70px;
+            }
+            
+            .carousel-online-indicator {
+                width: 16px;
+                height: 16px;
+                border-width: 2px;
+            }
+            
             /* Fix friend items */
             .friend-item {
                 flex-direction: column;
@@ -3919,15 +4077,17 @@
 
         // Render friends
         function renderFriends() {
+            const friendsCarousel = document.getElementById('friendsCarousel');
             const friendsList = document.getElementById('friendsList');
+            const viewAllBtn = document.getElementById('viewAllFriendsBtn');
             const onlineCount = friends.filter(f => f.online).length;
             
             document.getElementById('onlineCount').textContent = onlineCount;
             document.getElementById('totalFriends').textContent = friends.length;
             
             if (friends.length === 0) {
-                friendsList.innerHTML = `
-                    <div class="empty-state">
+                friendsCarousel.innerHTML = `
+                    <div class="empty-state" style="width: 100%; text-align: center;">
                         <h4>👥 No friends yet</h4>
                         <p>Add friends to start challenging each other!</p>
                         <button class="btn btn-primary" onclick="showAddFriendModal()" style="margin-top: 15px;">
@@ -3935,21 +4095,52 @@
                         </button>
                     </div>
                 `;
+                viewAllBtn.style.display = 'none';
                 return;
             }
             
-            friendsList.innerHTML = '';
+            // Render carousel
+            friendsCarousel.innerHTML = '';
+            friends.forEach((friend) => {
+                const carouselItem = document.createElement('div');
+                carouselItem.className = 'friend-carousel-item';
+                carouselItem.onclick = () => showFriendDetail(friend);
+                
+                const avatarHtml = friend.avatar && friend.avatar.startsWith('data:')
+                    ? `<img src="${friend.avatar}" alt="${friend.name}">`
+                    : friend.avatar;
+                
+                carouselItem.innerHTML = `
+                    <div class="friend-carousel-avatar">
+                        ${avatarHtml}
+                        ${friend.online ? '<div class="carousel-online-indicator"></div>' : ''}
+                    </div>
+                    <div class="friend-carousel-name">${friend.name}</div>
+                `;
+                
+                friendsCarousel.appendChild(carouselItem);
+            });
             
+            // Show View All button if more than 5 friends
+            if (friends.length > 5) {
+                viewAllBtn.style.display = 'block';
+            }
+            
+            // Render full list (hidden by default)
+            friendsList.innerHTML = '';
             friends.forEach((friend) => {
                 const friendElement = document.createElement('div');
                 friendElement.className = 'friend-item';
                 
                 const statusText = friend.online ? 'Online' : `Offline`;
+                const avatarHtml = friend.avatar && friend.avatar.startsWith('data:')
+                    ? `<img src="${friend.avatar}" alt="${friend.name}">`
+                    : friend.avatar;
                 
                 friendElement.innerHTML = `
                     <div class="friend-info">
                         <div class="friend-avatar-circle">
-                            ${friend.avatar}
+                            ${avatarHtml}
                             ${friend.online ? '<div class="online-indicator"></div>' : ''}
                         </div>
                         <div class="friend-details">
@@ -3967,6 +4158,64 @@
                 friendsList.appendChild(friendElement);
             });
         }
+
+        // Toggle friends list view
+        window.toggleFriendsList = function() {
+            const friendsList = document.getElementById('friendsList');
+            const viewAllText = document.getElementById('viewAllText');
+            
+            if (friendsList.classList.contains('show')) {
+                friendsList.classList.remove('show');
+                viewAllText.textContent = 'View All Friends';
+            } else {
+                friendsList.classList.add('show');
+                viewAllText.textContent = 'Hide Friends List';
+            }
+        };
+
+        // Show friend detail modal
+        window.showFriendDetail = function(friend) {
+            const modal = document.createElement('div');
+            modal.className = 'friend-modal';
+            
+            const avatarHtml = friend.avatar && friend.avatar.startsWith('data:')
+                ? `<img src="${friend.avatar}" alt="${friend.name}" style="width: 100%; height: 100%; object-fit: cover;">`
+                : friend.avatar;
+            
+            modal.innerHTML = `
+                <div class="friend-modal-content" style="max-width: 400px;">
+                    <div class="friend-modal-header">
+                        <h2>Friend Details</h2>
+                        <button class="close-modal" onclick="closeModal(this)">×</button>
+                    </div>
+                    <div style="text-align: center; padding: 20px;">
+                        <div class="user-avatar" style="width: 100px; height: 100px; font-size: 3rem; margin: 0 auto 20px;">
+                            ${avatarHtml}
+                            ${friend.online ? '<div class="online-indicator" style="width: 20px; height: 20px; border-width: 4px;"></div>' : ''}
+                        </div>
+                        <h2 style="margin-bottom: 10px;">${friend.name}</h2>
+                        <p style="opacity: 0.8; margin-bottom: 20px;">
+                            ${friend.online ? '🟢 Online Now' : '⚫ Offline'} • Level ${friend.level}
+                        </p>
+                        <div class="profile-stats-grid" style="margin-bottom: 20px;">
+                            <div class="profile-stat-box">
+                                <div class="profile-stat-value">${friend.tokens || 0}</div>
+                                <div class="profile-stat-label">Tokens</div>
+                            </div>
+                            <div class="profile-stat-box">
+                                <div class="profile-stat-value">${friend.level}</div>
+                                <div class="profile-stat-label">Level</div>
+                            </div>
+                        </div>
+                        <button class="btn btn-primary" onclick="challengeFriend('${friend.id}')" ${!friend.online ? 'disabled' : ''} style="width: 100%;">
+                            ${friend.online ? '⚡ Challenge Now' : '⏸️ Currently Offline'}
+                        </button>
+                    </div>
+                </div>
+            `;
+            
+            document.body.appendChild(modal);
+        };
 
         // Load challenges
         async function loadChallenges() {
@@ -4144,10 +4393,15 @@
             
             const alertDiv = document.createElement('div');
             alertDiv.className = 'friend-request-alert';
+            
+            const avatarHtml = request.fromAvatar && request.fromAvatar.startsWith('data:')
+                ? `<img src="${request.fromAvatar}" alt="${request.fromName}" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;">`
+                : request.fromAvatar || '👤';
+            
             alertDiv.innerHTML = `
                 <div class="friend-request-alert-header">👥 Friend Request!</div>
                 <div class="friend-request-alert-sender">
-                    <div class="friend-request-alert-avatar">${request.fromAvatar || '👤'}</div>
+                    <div class="friend-request-alert-avatar">${avatarHtml}</div>
                     <div>
                         <div class="friend-request-alert-name">${request.fromName}</div>
                     </div>
@@ -4228,10 +4482,16 @@
             
             const alertDiv = document.createElement('div');
             alertDiv.className = 'challenge-alert';
+            
+            const avatar = challenge.creatorAvatar || challenge.senderAvatar || '🎮';
+            const avatarHtml = avatar && avatar.startsWith('data:')
+                ? `<img src="${avatar}" alt="${challenge.creatorName}" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;">`
+                : avatar;
+            
             alertDiv.innerHTML = `
                 <div class="challenge-alert-header">🚨 New Challenge Alert!</div>
                 <div class="challenge-alert-sender">
-                    <div class="challenge-alert-avatar">${challenge.creatorAvatar || challenge.senderAvatar || '🎮'}</div>
+                    <div class="challenge-alert-avatar">${avatarHtml}</div>
                     <div>
                         <div class="challenge-alert-name">${challenge.creatorName}</div>
                     </div>
@@ -4561,10 +4821,14 @@
                     targetItem.className = 'target-item';
                     targetItem.onclick = () => toggleTarget(friend.id, targetItem);
                     
+                    const avatarHtml = friend.avatar && friend.avatar.startsWith('data:')
+                        ? `<img src="${friend.avatar}" alt="${friend.name}" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;">`
+                        : friend.avatar;
+                    
                     targetItem.innerHTML = `
                         <div class="target-checkbox"></div>
                         <div class="target-avatar">
-                            ${friend.avatar}
+                            ${avatarHtml}
                             ${friend.online ? '<div class="target-online-indicator"></div>' : ''}
                         </div>
                         <div class="target-info">
@@ -4791,19 +5055,25 @@
                     <div class="friend-modal-body">
                         <p style="margin-bottom: 20px; opacity: 0.8;">Select friends to send your challenge to:</p>
                         <div class="target-selection-list" id="challengeTargetList">
-                            ${friends.map(friend => `
-                                <div class="target-item" onclick="toggleChallengeTarget('${friend.id}', this)">
-                                    <div class="target-checkbox"></div>
-                                    <div class="target-avatar">
-                                        ${friend.avatar}
-                                        ${friend.online ? '<div class="target-online-indicator"></div>' : ''}
+                            ${friends.map(friend => {
+                                const avatarHtml = friend.avatar && friend.avatar.startsWith('data:')
+                                    ? `<img src="${friend.avatar}" alt="${friend.name}" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;">`
+                                    : friend.avatar;
+                                
+                                return `
+                                    <div class="target-item" onclick="toggleChallengeTarget('${friend.id}', this)">
+                                        <div class="target-checkbox"></div>
+                                        <div class="target-avatar">
+                                            ${avatarHtml}
+                                            ${friend.online ? '<div class="target-online-indicator"></div>' : ''}
+                                        </div>
+                                        <div class="target-info">
+                                            <div class="target-name">${friend.name}</div>
+                                            <div class="target-status">${friend.online ? 'Online' : 'Offline'} • Level ${friend.level}</div>
+                                        </div>
                                     </div>
-                                    <div class="target-info">
-                                        <div class="target-name">${friend.name}</div>
-                                        <div class="target-status">${friend.online ? 'Online' : 'Offline'} • Level ${friend.level}</div>
-                                    </div>
-                                </div>
-                            `).join('')}
+                                `;
+                            }).join('')}
                         </div>
                         <div style="margin-top: 20px; display: flex; justify-content: space-between; align-items: center;">
                             <button class="btn btn-secondary" onclick="selectAllTargets()">Select All</button>
@@ -5191,7 +5461,7 @@
                     item.style.animationDelay = `${index * 50}ms`;
                     
                     const avatarHtml = user.avatar && user.avatar.startsWith('data:')
-                        ? `<img src="${user.avatar}" alt="Avatar">`
+                        ? `<img src="${user.avatar}" alt="${user.name}" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;">`
                         : user.avatar || '👤';
                     
                     const mutualCount = Math.floor(Math.random() * 5) + 1; // Simulate mutual friends
@@ -5381,7 +5651,7 @@
                         item.style.animationDelay = `${index * 50}ms`;
                         
                         const avatarHtml = request.fromAvatar && request.fromAvatar.startsWith('data:')
-                            ? `<img src="${request.fromAvatar}" alt="Avatar">`
+                            ? `<img src="${request.fromAvatar}" alt="${request.fromName}" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;">`
                             : request.fromAvatar || '👤';
                         
                         item.innerHTML = `
@@ -6133,17 +6403,23 @@
                     <div class="challenge-participants">
                         <h3>Participants</h3>
                         <div class="participant-list">
-                            ${participantsList.map(p => `
-                                <div class="participant-item">
-                                    <div class="participant-info">
-                                        <div class="participant-avatar">${p.avatar}</div>
-                                        <div class="participant-name">${p.name}</div>
+                            ${participantsList.map(p => {
+                                const avatarHtml = p.avatar && p.avatar.startsWith('data:')
+                                    ? `<img src="${p.avatar}" alt="${p.name}" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;">`
+                                    : p.avatar;
+                                
+                                return `
+                                    <div class="participant-item">
+                                        <div class="participant-info">
+                                            <div class="participant-avatar">${avatarHtml}</div>
+                                            <div class="participant-name">${p.name}</div>
+                                        </div>
+                                        <div class="participant-status ${p.status}">
+                                            ${p.status.charAt(0).toUpperCase() + p.status.slice(1)}
+                                        </div>
                                     </div>
-                                    <div class="participant-status ${p.status}">
-                                        ${p.status.charAt(0).toUpperCase() + p.status.slice(1)}
-                                    </div>
-                                </div>
-                            `).join('')}
+                                `;
+                            }).join('')}
                         </div>
                     </div>
                     ${challenge.creatorId !== currentUser.uid && challenge.senderId !== currentUser.uid ? `
@@ -6185,20 +6461,36 @@
                             <div class="step-number">1</div>
                             <div class="step-content">
                                 <h3>Get Started</h3>
-                                <p>Login with your phone number. New players get 1000 free tokens to start!</p>
+                                <p>Login with your phone number. New players get 1000 free tokens to start! Choose your username and avatar.</p>
                             </div>
                         </div>
                         
                         <div class="step-item">
                             <div class="step-number">2</div>
                             <div class="step-content">
-                                <h3>Add Friends</h3>
-                                <p>Click "Add Friend" button. Search by username or share your unique friend code. You need friends to send and receive challenges!</p>
+                                <h3>Customize Your Profile</h3>
+                                <p>Tap your username to edit it anytime. Tap your avatar to change it or upload a photo. All changes are instant!</p>
                             </div>
                         </div>
                         
                         <div class="step-item">
                             <div class="step-number">3</div>
+                            <div class="step-content">
+                                <h3>Add Friends Easily</h3>
+                                <p>Multiple ways to add friends: Search by username, share your 8-character friend code, use QR codes (coming soon), or find nearby players. Friends appear as round avatars you can swipe through!</p>
+                            </div>
+                        </div>
+                        
+                        <div class="step-item">
+                            <div class="step-number">4</div>
+                            <div class="step-content">
+                                <h3>View & Manage Friends</h3>
+                                <p>See friends in a horizontal carousel - tap any avatar to view their profile. Click "View All Friends" to see the complete list with challenge buttons.</p>
+                            </div>
+                        </div>
+                        
+                        <div class="step-item">
+                            <div class="step-number">5</div>
                             <div class="step-content">
                                 <h3>Select AI Challenges</h3>
                                 <p>Click any AI-generated challenge card to select it. New challenges appear every 2 minutes automatically!</p>
@@ -6206,7 +6498,7 @@
                         </div>
                         
                         <div class="step-item">
-                            <div class="step-number">4</div>
+                            <div class="step-number">6</div>
                             <div class="step-content">
                                 <h3>Choose Friends & Send</h3>
                                 <p>After selecting a challenge, pick which friends to send it to. Each friend costs 25 tokens to challenge.</p>
@@ -6214,7 +6506,7 @@
                         </div>
                         
                         <div class="step-item">
-                            <div class="step-number">5</div>
+                            <div class="step-number">7</div>
                             <div class="step-content">
                                 <h3>Create Custom Challenges</h3>
                                 <p>Use the Quick Challenge form to create your own challenges. Costs 50 tokens to send to any number of friends.</p>
@@ -6222,26 +6514,18 @@
                         </div>
                         
                         <div class="step-item">
-                            <div class="step-number">6</div>
-                            <div class="step-content">
-                                <h3>Receive Challenge Alerts</h3>
-                                <p>When someone challenges you, a red popup appears! Click "View Details" or find it in your Active Challenges list.</p>
-                            </div>
-                        </div>
-                        
-                        <div class="step-item">
-                            <div class="step-number">7</div>
-                            <div class="step-content">
-                                <h3>Accept & Complete</h3>
-                                <p>Accept challenges you want to do. Complete the task (take photo/video proof) and mark as completed to earn tokens!</p>
-                            </div>
-                        </div>
-                        
-                        <div class="step-item">
                             <div class="step-number">8</div>
                             <div class="step-content">
-                                <h3>Earn & Level Up</h3>
-                                <p>Complete challenges to earn the token rewards. Use tokens to send more challenges. Level up as you play!</p>
+                                <h3>Receive Challenge Alerts</h3>
+                                <p>When someone challenges you or sends a friend request, a popup appears! Accept or decline instantly.</p>
+                            </div>
+                        </div>
+                        
+                        <div class="step-item">
+                            <div class="step-number">9</div>
+                            <div class="step-content">
+                                <h3>Complete & Earn</h3>
+                                <p>Accept challenges you want to do. Complete the task (take photo/video proof) and mark as completed to earn tokens!</p>
                             </div>
                         </div>
                     </div>
@@ -6249,27 +6533,30 @@
                     <div class="how-to-play-tips">
                         <h3>💡 Pro Tips</h3>
                         <ul class="tips-list">
-                            <li>Tap your avatar to change it anytime</li>
-                            <li>Tap your username to edit it</li>
-                            <li>Tap your stats to see your profile</li>
-                            <li>Tap any challenge to see full details</li>
-                            <li>Only challenge online friends for instant fun</li>
-                            <li>AI challenges refresh every 2 minutes</li>
-                            <li>Create funny, creative challenges for more engagement</li>
-                            <li>Complete challenges quickly to maintain your streak</li>
+                            <li>Tap your username below the logo to change it anytime</li>
+                            <li>Tap your avatar to change it or upload a custom photo</li>
+                            <li>Swipe through friends in the carousel view</li>
+                            <li>Tap any friend's avatar to see their full profile</li>
+                            <li>Use the smart search - it handles both usernames and friend codes</li>
+                            <li>Green dots show who's online right now</li>
+                            <li>AI challenges refresh every 2 minutes automatically</li>
+                            <li>Share your friend code to quickly connect with others</li>
+                            <li>Friend requests appear instantly as popups</li>
                             <li>The more friends you have, the more fun it gets!</li>
                         </ul>
                     </div>
                     
                     <div style="background: rgba(155, 89, 182, 0.1); padding: 15px; border-radius: 12px; margin-bottom: 20px; border: 1px solid rgba(155, 89, 182, 0.3);">
-                        <h3 style="color: #9b59b6; margin-bottom: 10px;">🎮 Game Rules</h3>
+                        <h3 style="color: #9b59b6; margin-bottom: 10px;">🎮 Quick Start Guide</h3>
                         <ul style="list-style: none; padding: 0; font-size: 0.9rem; opacity: 0.9;">
-                            <li style="margin-bottom: 8px;">• Starting tokens: 1000</li>
-                            <li style="margin-bottom: 8px;">• Send AI challenge: 25 tokens per friend</li>
-                            <li style="margin-bottom: 8px;">• Create custom challenge: 50 tokens total</li>
-                            <li style="margin-bottom: 8px;">• Complete challenges to earn rewards</li>
-                            <li style="margin-bottom: 8px;">• Challenges expire after time limit</li>
-                            <li>• Be creative, have fun, stay safe!</li>
+                            <li style="margin-bottom: 8px;">📱 Login with phone → Get 1000 tokens</li>
+                            <li style="margin-bottom: 8px;">✏️ Tap username to edit it</li>
+                            <li style="margin-bottom: 8px;">🎭 Tap avatar to change or upload photo</li>
+                            <li style="margin-bottom: 8px;">👥 Add friends: Search or share code</li>
+                            <li style="margin-bottom: 8px;">👆 Tap friend avatars to view profiles</li>
+                            <li style="margin-bottom: 8px;">🎯 Send AI challenge: 25 tokens per friend</li>
+                            <li style="margin-bottom: 8px;">⚡ Create custom challenge: 50 tokens total</li>
+                            <li>🏆 Complete challenges to earn rewards!</li>
                         </ul>
                     </div>
                     
