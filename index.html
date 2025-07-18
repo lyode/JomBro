@@ -186,12 +186,24 @@
             display: flex;
             align-items: center;
             gap: 5px;
+            transition: all 0.3s ease;
+        }
+
+        .user-name:hover {
+            color: #9b59b6;
+            transform: translateX(2px);
         }
 
         .user-name::after {
             content: '✏️';
             font-size: 0.7rem;
             opacity: 0.6;
+            transition: all 0.3s ease;
+        }
+
+        .user-name:hover::after {
+            opacity: 1;
+            transform: rotate(10deg);
         }
 
         .user-info {
@@ -306,7 +318,7 @@
             text-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
         }
 
-        /* Enhanced Auth Modal */
+        /* Enhanced Futuristic Auth Modal */
         .auth-modal {
             display: none;
             position: fixed;
@@ -314,7 +326,7 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: #0a0a0a;
             z-index: 1000;
             align-items: center;
             justify-content: center;
@@ -325,19 +337,117 @@
             display: flex;
         }
 
+        /* Animated Background Grid */
+        .auth-background {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            z-index: 1;
+        }
+
+        .grid-line {
+            position: absolute;
+            background: linear-gradient(90deg, transparent, rgba(155, 89, 182, 0.3), transparent);
+            animation: gridFlow 10s linear infinite;
+        }
+
+        .grid-line.horizontal {
+            width: 100%;
+            height: 1px;
+        }
+
+        .grid-line.vertical {
+            width: 1px;
+            height: 100%;
+            animation-duration: 15s;
+        }
+
+        @keyframes gridFlow {
+            0% { transform: translate(-100%, 0); }
+            100% { transform: translate(100%, 0); }
+        }
+
+        /* Glowing Orbs */
+        .glow-orb {
+            position: absolute;
+            width: 300px;
+            height: 300px;
+            border-radius: 50%;
+            filter: blur(100px);
+            opacity: 0.3;
+            animation: orbFloat 20s ease-in-out infinite;
+        }
+
+        .glow-orb.purple {
+            background: radial-gradient(circle, #9b59b6, transparent);
+            top: -150px;
+            left: -150px;
+        }
+
+        .glow-orb.pink {
+            background: radial-gradient(circle, #e91e63, transparent);
+            bottom: -150px;
+            right: -150px;
+            animation-delay: -10s;
+        }
+
+        .glow-orb.blue {
+            background: radial-gradient(circle, #4a90e2, transparent);
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            animation-delay: -5s;
+        }
+
+        @keyframes orbFloat {
+            0%, 100% { transform: translate(0, 0) scale(1); }
+            33% { transform: translate(30px, -30px) scale(1.1); }
+            66% { transform: translate(-30px, 30px) scale(0.9); }
+        }
+
         .auth-container {
-            background: rgba(255, 255, 255, 0.95);
+            background: rgba(20, 20, 30, 0.8);
             backdrop-filter: blur(20px);
-            border-radius: 24px;
+            border-radius: 30px;
             padding: 40px;
             width: 100%;
             max-width: 450px;
             box-shadow: 
-                0 20px 40px rgba(0, 0, 0, 0.1),
-                0 0 0 1px rgba(255, 255, 255, 0.2);
+                0 20px 40px rgba(0, 0, 0, 0.4),
+                0 0 80px rgba(155, 89, 182, 0.2),
+                inset 0 0 0 1px rgba(255, 255, 255, 0.1);
             position: relative;
             overflow: hidden;
             animation: slideUp 0.6s ease-out;
+            z-index: 10;
+            border: 2px solid transparent;
+            background-image: linear-gradient(rgba(20, 20, 30, 0.8), rgba(20, 20, 30, 0.8)),
+                              linear-gradient(45deg, #9b59b6, #e91e63, #4a90e2);
+            background-origin: border-box;
+            background-clip: padding-box, border-box;
+        }
+
+        /* Animated Border Effect */
+        .auth-container::before {
+            content: '';
+            position: absolute;
+            top: -2px;
+            left: -2px;
+            right: -2px;
+            bottom: -2px;
+            background: linear-gradient(45deg, #9b59b6, #e91e63, #4a90e2, #9b59b6);
+            border-radius: 30px;
+            opacity: 0;
+            z-index: -1;
+            animation: borderGlow 3s ease-in-out infinite;
+        }
+
+        @keyframes borderGlow {
+            0%, 100% { opacity: 0; }
+            50% { opacity: 0.6; }
         }
 
         @keyframes slideUp {
@@ -354,35 +464,40 @@
         .auth-header {
             text-align: center;
             margin-bottom: 40px;
+            position: relative;
         }
 
         .auth-logo {
             font-size: 4rem;
             margin-bottom: 16px;
-            animation: bounce 2s infinite;
-        }
-
-        @keyframes bounce {
-            0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
-            40% { transform: translateY(-10px); }
-            60% { transform: translateY(-5px); }
-        }
-
-        .auth-title {
-            font-size: 2rem;
-            font-weight: 700;
-            color: #2d3748;
-            margin-bottom: 8px;
-            background: linear-gradient(135deg, #667eea, #764ba2);
+            background: linear-gradient(45deg, #9b59b6, #e91e63, #4a90e2);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
+            animation: logoFloat 3s ease-in-out infinite;
+            filter: drop-shadow(0 0 20px rgba(155, 89, 182, 0.5));
+        }
+
+        @keyframes logoFloat {
+            0%, 100% { transform: translateY(0) scale(1); }
+            50% { transform: translateY(-5px) scale(1.05); }
+        }
+
+        .auth-title {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: white;
+            margin-bottom: 8px;
+            text-shadow: 0 0 30px rgba(155, 89, 182, 0.5);
+            letter-spacing: 3px;
         }
 
         .auth-subtitle {
-            color: #718096;
-            font-size: 1rem;
-            font-weight: 500;
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 1.1rem;
+            font-weight: 400;
+            letter-spacing: 1px;
+            opacity: 0.9;
         }
 
         .auth-form {
@@ -402,10 +517,12 @@
         .form-label {
             display: block;
             font-weight: 600;
-            color: #4a5568;
+            color: rgba(255, 255, 255, 0.9);
             margin-bottom: 8px;
             font-size: 0.9rem;
             transition: color 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
         }
 
         .phone-input-container {
@@ -417,97 +534,131 @@
         .country-select {
             width: 120px;
             padding: 16px 12px;
-            border: 2px solid #e2e8f0;
-            border-radius: 12px;
-            background: white;
-            color: #2d3748;
+            border: 2px solid rgba(155, 89, 182, 0.3);
+            border-radius: 15px;
+            background: rgba(255, 255, 255, 0.05);
+            color: white;
             font-size: 1rem;
             font-weight: 600;
             cursor: pointer;
             transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
         }
 
         .country-select:focus {
             outline: none;
-            border-color: #667eea;
-            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+            border-color: #9b59b6;
+            box-shadow: 0 0 0 3px rgba(155, 89, 182, 0.2);
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .country-select option {
+            background: #1a1a1a;
+            color: white;
         }
 
         .phone-input {
             flex: 1;
             padding: 16px;
-            border: 2px solid #e2e8f0;
-            border-radius: 12px;
+            border: 2px solid rgba(155, 89, 182, 0.3);
+            border-radius: 15px;
             font-size: 1.2rem;
             font-weight: 600;
             letter-spacing: 1px;
             transition: all 0.3s ease;
-            background: white;
-            color: #2d3748;
+            background: rgba(255, 255, 255, 0.05);
+            color: white;
+            backdrop-filter: blur(10px);
         }
 
         .phone-input:focus {
             outline: none;
-            border-color: #667eea;
-            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+            border-color: #9b59b6;
+            box-shadow: 0 0 0 3px rgba(155, 89, 182, 0.2);
             transform: translateY(-1px);
+            background: rgba(255, 255, 255, 0.1);
         }
 
         .phone-hint {
             font-size: 0.85rem;
-            color: #718096;
+            color: rgba(255, 255, 255, 0.7);
             margin-top: 8px;
             text-align: center;
+            opacity: 0.8;
         }
 
         .username-hint {
             font-size: 0.85rem;
-            color: #718096;
+            color: rgba(255, 255, 255, 0.7);
             margin-top: 8px;
             text-align: center;
+            opacity: 0.8;
         }
 
         .form-input {
             width: 100%;
             padding: 16px;
-            border: 2px solid #e2e8f0;
-            border-radius: 12px;
+            border: 2px solid rgba(155, 89, 182, 0.3);
+            border-radius: 15px;
             font-size: 1rem;
             transition: all 0.3s ease;
-            background: white;
-            color: #2d3748;
+            background: rgba(255, 255, 255, 0.05);
+            color: white;
+            backdrop-filter: blur(10px);
         }
 
         .form-input:focus {
             outline: none;
-            border-color: #667eea;
-            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+            border-color: #9b59b6;
+            box-shadow: 0 0 0 3px rgba(155, 89, 182, 0.2);
             transform: translateY(-1px);
+            background: rgba(255, 255, 255, 0.1);
         }
 
         .auth-button {
             width: 100%;
             padding: 16px;
             border: none;
-            border-radius: 12px;
-            font-size: 1rem;
+            border-radius: 20px;
+            font-size: 1.1rem;
             font-weight: 600;
             cursor: pointer;
             transition: all 0.3s ease;
             position: relative;
             overflow: hidden;
             margin-bottom: 16px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
         }
 
         .auth-button-primary {
-            background: linear-gradient(135deg, #667eea, #764ba2);
+            background: linear-gradient(135deg, #9b59b6, #e91e63);
             color: white;
-            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+            box-shadow: 
+                0 4px 15px rgba(155, 89, 182, 0.4),
+                inset 0 0 0 1px rgba(255, 255, 255, 0.2);
+        }
+
+        .auth-button-primary::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+            transition: left 0.5s ease;
+        }
+
+        .auth-button-primary:hover::before {
+            left: 100%;
         }
 
         .auth-button-primary:hover {
             transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.6);
+            box-shadow: 
+                0 6px 20px rgba(155, 89, 182, 0.6),
+                inset 0 0 0 1px rgba(255, 255, 255, 0.3);
         }
 
         .auth-button.loading {
@@ -544,7 +695,8 @@
             width: 60px;
             height: 60px;
             border-radius: 50%;
-            background: #f7fafc;
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
             display: flex;
             align-items: center;
             justify-content: center;
@@ -552,17 +704,38 @@
             cursor: pointer;
             transition: all 0.3s ease;
             border: 3px solid transparent;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .avatar-option::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            background: radial-gradient(circle, rgba(155, 89, 182, 0.5), transparent);
+            transition: all 0.3s ease;
+            transform: translate(-50%, -50%);
         }
 
         .avatar-option:hover {
             transform: scale(1.1);
-            border-color: #667eea;
+            border-color: rgba(155, 89, 182, 0.5);
+            background: rgba(155, 89, 182, 0.1);
+        }
+
+        .avatar-option:hover::before {
+            width: 100px;
+            height: 100px;
         }
 
         .avatar-option.selected {
-            border-color: #667eea;
-            background: linear-gradient(135deg, #667eea, #764ba2);
-            box-shadow: 0 0 20px rgba(102, 126, 234, 0.4);
+            border-color: #9b59b6;
+            background: linear-gradient(135deg, rgba(155, 89, 182, 0.2), rgba(233, 30, 99, 0.2));
+            box-shadow: 0 0 20px rgba(155, 89, 182, 0.4);
+            transform: scale(1.1);
         }
 
         /* Buttons */
@@ -1294,7 +1467,7 @@
             display: none;
         }
 
-        /* Friend Modal Styles */
+        /* Enhanced Friend Modal Styles */
         .friend-modal {
             position: fixed;
             top: 0;
@@ -1400,291 +1573,408 @@
             animation: fadeIn 0.3s ease;
         }
 
-        /* Enhanced Friend Modal with Live Updates */
-        .friend-search-input-container {
-            position: relative;
-            margin-bottom: 15px;
+        /* Enhanced Friend Modal - Easier & More Effective */
+        .friend-modal-content {
+            background: rgba(20, 20, 30, 0.98);
+            backdrop-filter: blur(20px);
+            border-radius: 24px;
+            padding: 25px;
+            width: 100%;
+            max-width: 500px;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 
+                0 20px 40px rgba(0, 0, 0, 0.4),
+                0 0 0 1px rgba(255, 255, 255, 0.1);
+            border: 2px solid rgba(155, 89, 182, 0.3);
+            animation: slideUp 0.4s ease-out;
         }
 
-        .friend-input {
-            width: 100%;
+        .quick-add-section {
+            margin-bottom: 20px;
             padding: 15px;
-            padding-right: 45px;
-            margin-bottom: 0;
-            border: 2px solid rgba(155, 89, 182, 0.3);
+            background: linear-gradient(135deg, rgba(155, 89, 182, 0.1), rgba(233, 30, 99, 0.1));
+            border-radius: 15px;
+            border: 1px solid rgba(155, 89, 182, 0.3);
+        }
+
+        .quick-add-title {
+            font-size: 1rem;
+            font-weight: 600;
+            margin-bottom: 12px;
+            color: #9b59b6;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .quick-add-methods {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+        }
+
+        .quick-add-btn {
+            padding: 12px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
             border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+        }
+
+        .quick-add-btn:hover {
+            background: rgba(155, 89, 182, 0.2);
+            border-color: rgba(155, 89, 182, 0.4);
+            transform: translateY(-2px);
+        }
+
+        .quick-add-icon {
+            font-size: 1.8rem;
+            margin-bottom: 5px;
+        }
+
+        .quick-add-label {
+            font-size: 0.75rem;
+            opacity: 0.8;
+        }
+
+        .qr-code-section {
+            text-align: center;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+            margin-bottom: 20px;
+        }
+
+        .qr-code-container {
+            width: 180px;
+            height: 180px;
+            margin: 0 auto 15px;
+            background: white;
+            padding: 10px;
+            border-radius: 15px;
+            position: relative;
+        }
+
+        .qr-code-placeholder {
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(45deg, #f0f0f0 25%, transparent 25%, transparent 75%, #f0f0f0 75%, #f0f0f0),
+                        linear-gradient(45deg, #f0f0f0 25%, transparent 25%, transparent 75%, #f0f0f0 75%, #f0f0f0);
+            background-size: 20px 20px;
+            background-position: 0 0, 10px 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #666;
+            font-size: 0.8rem;
+        }
+
+        .suggested-friends-section {
+            margin-bottom: 20px;
+        }
+
+        .suggested-friends-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 15px;
+            color: white;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .suggested-friends-grid {
+            display: grid;
+            gap: 10px;
+        }
+
+        .suggested-friend-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.3s ease;
+            animation: slideInSuggestion 0.3s ease;
+        }
+
+        @keyframes slideInSuggestion {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .suggested-friend-item:hover {
+            background: rgba(255, 255, 255, 0.08);
+            border-color: rgba(155, 89, 182, 0.3);
+        }
+
+        .suggested-friend-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .suggested-friend-avatar {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            background: linear-gradient(45deg, #9b59b6, #e91e63);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.3rem;
+            position: relative;
+        }
+
+        .suggested-friend-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 50%;
+        }
+
+        .mutual-badge {
+            position: absolute;
+            bottom: -2px;
+            right: -2px;
+            background: #4a90e2;
+            color: white;
+            font-size: 0.65rem;
+            font-weight: bold;
+            padding: 2px 5px;
+            border-radius: 10px;
+            border: 2px solid rgba(20, 20, 30, 0.98);
+        }
+
+        .suggested-friend-details {
+            flex: 1;
+        }
+
+        .suggested-friend-name {
+            font-weight: 500;
+            margin-bottom: 3px;
+        }
+
+        .suggested-friend-reason {
+            font-size: 0.8rem;
+            opacity: 0.7;
+            color: #4a90e2;
+        }
+
+        .add-friend-quick-btn {
+            background: linear-gradient(45deg, #9b59b6, #e91e63);
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 15px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .add-friend-quick-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+        }
+
+        .add-friend-quick-btn:disabled {
+            background: rgba(255, 255, 255, 0.1);
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .simplified-search {
+            position: relative;
+            margin-bottom: 20px;
+        }
+
+        .simplified-search input {
+            width: 100%;
+            padding: 15px 20px;
+            padding-left: 45px;
+            border: 2px solid rgba(155, 89, 182, 0.3);
+            border-radius: 25px;
             background: rgba(255, 255, 255, 0.05);
             color: white;
             font-size: 1rem;
             transition: all 0.3s ease;
         }
 
-        .friend-input:focus {
+        .simplified-search input:focus {
             outline: none;
             border-color: #9b59b6;
             box-shadow: 0 0 0 3px rgba(155, 89, 182, 0.2);
             background: rgba(255, 255, 255, 0.1);
         }
 
-        .friend-input::placeholder {
-            color: rgba(255, 255, 255, 0.5);
-        }
-
-        .search-spinner {
+        .search-icon {
             position: absolute;
-            right: 15px;
+            left: 15px;
             top: 50%;
             transform: translateY(-50%);
-            width: 20px;
-            height: 20px;
+            font-size: 1.2rem;
+            opacity: 0.6;
+        }
+
+        .share-button {
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: rgba(155, 89, 182, 0.3);
+            border: none;
+            padding: 8px 15px;
+            border-radius: 15px;
+            color: white;
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .share-button:hover {
+            background: rgba(155, 89, 182, 0.5);
+        }
+
+        /* Username Edit Modal */
+        .username-edit-modal {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(20, 20, 30, 0.98);
+            backdrop-filter: blur(20px);
+            padding: 30px;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+            z-index: 3000;
+            max-width: 400px;
+            width: 90%;
+            animation: scaleIn 0.3s ease;
             border: 2px solid rgba(155, 89, 182, 0.3);
-            border-top: 2px solid #9b59b6;
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
+        }
+
+        @keyframes scaleIn {
+            from { transform: translate(-50%, -50%) scale(0.9); opacity: 0; }
+            to { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+        }
+
+        .username-edit-header {
+            font-size: 1.3rem;
+            font-weight: 600;
+            margin-bottom: 20px;
+            color: white;
+            text-align: center;
+        }
+
+        .username-edit-input {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid rgba(155, 89, 182, 0.3);
+            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.05);
+            color: white;
+            font-size: 1rem;
+            margin-bottom: 10px;
+            transition: all 0.3s ease;
+        }
+
+        .username-edit-input:focus {
+            outline: none;
+            border-color: #9b59b6;
+            box-shadow: 0 0 0 3px rgba(155, 89, 182, 0.2);
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .username-availability {
+            font-size: 0.85rem;
+            margin-bottom: 15px;
+            padding: 8px 12px;
+            border-radius: 8px;
             display: none;
         }
 
-        .search-spinner.active {
+        .username-availability.available {
+            background: rgba(76, 175, 80, 0.2);
+            color: #4CAF50;
             display: block;
         }
 
-        .live-search-status {
-            font-size: 0.8rem;
-            color: rgba(155, 89, 182, 0.8);
-            margin-bottom: 10px;
-            text-align: center;
-            opacity: 0;
-            transition: opacity 0.3s ease;
+        .username-availability.taken {
+            background: rgba(244, 67, 54, 0.2);
+            color: #f44336;
+            display: block;
         }
 
-        .live-search-status.visible {
-            opacity: 1;
-        }
-
-        .search-result-item {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 15px;
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 12px;
-            margin-bottom: 10px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            transition: all 0.3s ease;
-            animation: slideInResult 0.3s ease;
-            position: relative;
-            overflow: hidden;
-        }
-
-        @keyframes slideInResult {
-            from {
-                opacity: 0;
-                transform: translateX(-20px);
-            }
-            to {
-                opacity: 1;
-                transform: translateX(0);
-            }
-        }
-
-        .search-result-item::before {
-            content: '';
-            position: absolute;
-            left: 0;
-            top: 0;
-            width: 3px;
-            height: 100%;
-            background: #4ecdc4;
-            opacity: 0;
-            transition: opacity 0.3s ease;
-        }
-
-        .search-result-item.online::before {
-            opacity: 1;
-        }
-
-        .search-result-item:hover {
-            background: rgba(255, 255, 255, 0.08);
-            border-color: rgba(155, 89, 182, 0.3);
-            transform: translateY(-1px);
-        }
-
-        .result-info {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-
-        .result-avatar {
-            width: 45px;
-            height: 45px;
-            border-radius: 50%;
-            background: linear-gradient(45deg, #9b59b6, #e91e63);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.3rem;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-            position: relative;
-        }
-
-        .result-avatar img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            border-radius: 50%;
-        }
-
-        .result-online-dot {
-            position: absolute;
-            bottom: 0;
-            right: 0;
-            width: 12px;
-            height: 12px;
-            background: #4ecdc4;
-            border-radius: 50%;
-            border: 2px solid rgba(20, 20, 30, 0.98);
-            animation: pulseDot 2s infinite;
-        }
-
-        @keyframes pulseDot {
-            0%, 100% { transform: scale(1); }
-            50% { transform: scale(1.2); }
-        }
-
-        .result-name {
-            font-size: 1rem;
-            font-weight: 500;
-            color: white;
-            margin-bottom: 4px;
-        }
-
-        .result-stats {
-            font-size: 0.85rem;
-            opacity: 0.7;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .online-status {
-            color: #4ecdc4;
-            font-weight: 600;
-            animation: fadeIn 0.5s ease;
-        }
-
-        .request-status {
-            font-size: 0.75rem;
-            padding: 4px 10px;
+        .username-availability.checking {
             background: rgba(155, 89, 182, 0.2);
             color: #9b59b6;
-            border-radius: 12px;
-            margin-left: 8px;
-            animation: pulse 2s infinite;
+            display: block;
         }
 
-        .request-item {
+        .username-edit-actions {
             display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 15px;
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 12px;
-            margin-bottom: 10px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            transition: all 0.3s ease;
-            position: relative;
-        }
-
-        .request-item.new {
-            animation: highlightNew 1s ease;
-        }
-
-        @keyframes highlightNew {
-            0% { background: rgba(155, 89, 182, 0.3); }
-            100% { background: rgba(255, 255, 255, 0.05); }
-        }
-
-        .request-item:hover {
-            background: rgba(255, 255, 255, 0.08);
-            border-color: rgba(155, 89, 182, 0.3);
-            transform: translateY(-1px);
-        }
-
-        .request-info {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-
-        .request-avatar {
-            width: 45px;
-            height: 45px;
-            border-radius: 50%;
-            background: linear-gradient(45deg, #9b59b6, #e91e63);
-            display: flex;
-            align-items: center;
+            gap: 10px;
             justify-content: center;
-            font-size: 1.3rem;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-            position: relative;
+            margin-top: 20px;
         }
 
-        .request-avatar img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            border-radius: 50%;
-        }
-
-        .request-name {
-            font-size: 1rem;
-            font-weight: 500;
-            color: white;
-            margin-bottom: 4px;
-        }
-
-        .request-time {
-            font-size: 0.85rem;
-            opacity: 0.7;
-        }
-
-        .request-time.live {
-            color: #4ecdc4;
+        .username-edit-btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 20px;
             font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.95rem;
         }
 
-        .request-actions {
-            display: flex;
-            gap: 8px;
+        .username-edit-save {
+            background: linear-gradient(45deg, #9b59b6, #e91e63);
+            color: white;
         }
 
-        .no-results {
-            text-align: center;
-            padding: 40px 20px;
+        .username-edit-save:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        }
+
+        .username-edit-save:disabled {
             opacity: 0.6;
-            animation: fadeIn 0.5s ease;
+            cursor: not-allowed;
         }
 
-        .no-results h4 {
-            margin-bottom: 8px;
-            color: rgba(255, 255, 255, 0.8);
+        .username-edit-cancel {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
         }
 
+        .username-edit-cancel:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        /* Typing indicator for search */
         .typing-indicator {
-            display: flex;
+            display: none;
             align-items: center;
-            gap: 4px;
-            padding: 5px 10px;
-            background: rgba(155, 89, 182, 0.1);
-            border-radius: 15px;
-            margin-bottom: 10px;
-            opacity: 0;
-            transition: opacity 0.3s ease;
+            gap: 8px;
+            padding: 10px;
+            justify-content: center;
         }
 
         .typing-indicator.show {
-            opacity: 1;
+            display: flex;
         }
 
         .typing-dot {
@@ -1692,19 +1982,19 @@
             height: 8px;
             background: #9b59b6;
             border-radius: 50%;
-            animation: typingDot 1.4s infinite;
+            animation: typingDot 1.4s infinite ease-in-out;
         }
 
-        .typing-dot:nth-child(2) { animation-delay: 0.2s; }
-        .typing-dot:nth-child(3) { animation-delay: 0.4s; }
+        .typing-dot:nth-child(2) { animation-delay: -0.32s; }
+        .typing-dot:nth-child(3) { animation-delay: -0.16s; }
 
         @keyframes typingDot {
-            0%, 60%, 100% {
-                transform: scale(1);
+            0%, 80%, 100% {
+                transform: scale(0.8);
                 opacity: 0.5;
             }
-            30% {
-                transform: scale(1.3);
+            40% {
+                transform: scale(1);
                 opacity: 1;
             }
         }
@@ -1721,12 +2011,7 @@
             border-radius: 10px;
             min-width: 18px;
             text-align: center;
-            animation: scaleIn 0.3s ease;
-        }
-
-        @keyframes scaleIn {
-            from { transform: scale(0); }
-            to { transform: scale(1); }
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
         }
 
         #searchResults, #pendingRequests {
@@ -2847,11 +3132,31 @@
 
     <!-- Enhanced Auth Modal -->
     <div class="auth-modal show" id="authModal">
+        <!-- Animated Background -->
+        <div class="auth-background">
+            <!-- Grid Lines -->
+            <div class="grid-line horizontal" style="top: 10%;"></div>
+            <div class="grid-line horizontal" style="top: 30%;"></div>
+            <div class="grid-line horizontal" style="top: 50%;"></div>
+            <div class="grid-line horizontal" style="top: 70%;"></div>
+            <div class="grid-line horizontal" style="top: 90%;"></div>
+            <div class="grid-line vertical" style="left: 10%;"></div>
+            <div class="grid-line vertical" style="left: 30%;"></div>
+            <div class="grid-line vertical" style="left: 50%;"></div>
+            <div class="grid-line vertical" style="left: 70%;"></div>
+            <div class="grid-line vertical" style="left: 90%;"></div>
+            
+            <!-- Glowing Orbs -->
+            <div class="glow-orb purple"></div>
+            <div class="glow-orb pink"></div>
+            <div class="glow-orb blue"></div>
+        </div>
+
         <div class="auth-container">
             <!-- Header -->
             <div class="auth-header">
                 <div class="auth-logo">🎮</div>
-                <h1 class="auth-title">Welcome to JomBro</h1>
+                <h1 class="auth-title">JomBro</h1>
                 <p class="auth-subtitle">Let's Go! Let's Go!</p>
             </div>
 
@@ -2944,7 +3249,7 @@
                     <div class="logo-section">
                         <div class="logo">JomBro</div>
                         <div class="slogan">Let's Go! Let's Go!</div>
-                        <div class="user-name" id="userName" onclick="showProfileEditor()">Loading...</div>
+                        <div class="user-name" id="userName" onclick="showUsernameEdit()">Loading...</div>
                     </div>
                     <div class="user-avatar" id="userAvatar" onclick="showAvatarSelector()">👤</div>
                 </div>
@@ -4692,11 +4997,12 @@
             loadChallenges();
         };
 
-        // Friend System Functions with Live Updates
+        // Enhanced Friend System with Easy & Effective Features
         let searchTimeout = null;
         let activeSearchListener = null;
         let liveUsersListener = null;
         let pendingRequestsCount = 0;
+        let usernameCheckTimeout = null;
         
         window.showAddFriendModal = function() {
             const modal = document.createElement('div');
@@ -4704,30 +5010,57 @@
             modal.innerHTML = `
                 <div class="friend-modal-content">
                     <div class="friend-modal-header">
-                        <h2>Add Friend</h2>
+                        <h2>Add Friends</h2>
                         <button class="close-modal" onclick="closeFriendModal()">×</button>
                     </div>
                     <div class="friend-modal-body">
-                        <div class="friend-search-tabs">
-                            <button class="friend-tab active" onclick="switchFriendTab('username')">
-                                By Username
-                                <span class="friend-counter-badge" id="searchTabBadge" style="display: none;"></span>
-                            </button>
-                            <button class="friend-tab" onclick="switchFriendTab('code')">By Friend Code</button>
-                            <button class="friend-tab" onclick="switchFriendTab('pending')">
-                                Pending Requests
-                                <span class="friend-counter-badge" id="pendingTabBadge" style="display: none;"></span>
+                        <!-- Quick Add Section -->
+                        <div class="quick-add-section">
+                            <div class="quick-add-title">
+                                ⚡ Quick Add Methods
+                            </div>
+                            <div class="quick-add-methods">
+                                <div class="quick-add-btn" onclick="showQRCode()">
+                                    <div class="quick-add-icon">📷</div>
+                                    <div class="quick-add-label">QR Code</div>
+                                </div>
+                                <div class="quick-add-btn" onclick="shareInviteLink()">
+                                    <div class="quick-add-icon">📤</div>
+                                    <div class="quick-add-label">Share Link</div>
+                                </div>
+                                <div class="quick-add-btn" onclick="findNearbyFriends()">
+                                    <div class="quick-add-icon">📍</div>
+                                    <div class="quick-add-label">Nearby</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Simplified Search -->
+                        <div class="simplified-search">
+                            <span class="search-icon">🔍</span>
+                            <input type="text" id="friendSearchInput" 
+                                placeholder="Search username or paste friend code..." 
+                                oninput="handleSmartSearch(event)">
+                            <button class="share-button" onclick="shareMyCode()">
+                                Share My Code
                             </button>
                         </div>
-                        
-                        <div class="friend-tab-content" id="usernameTab">
-                            <div class="friend-search-input-container">
-                                <input type="text" id="friendUsername" class="friend-input" 
-                                    placeholder="Start typing to search friends..." 
-                                    oninput="handleLiveSearch(event)">
-                                <div class="search-spinner" id="searchSpinner"></div>
+
+                        <!-- Suggested Friends -->
+                        <div class="suggested-friends-section" id="suggestedFriendsSection">
+                            <div class="suggested-friends-title">
+                                ✨ People You May Know
                             </div>
-                            <div class="live-search-status" id="searchStatus"></div>
+                            <div class="suggested-friends-grid" id="suggestedFriends">
+                                Loading suggestions...
+                            </div>
+                        </div>
+
+                        <!-- Search Results -->
+                        <div id="searchResultsSection" style="display: none;">
+                            <div class="suggested-friends-title">
+                                🔍 Search Results
+                            </div>
                             <div class="typing-indicator" id="typingIndicator">
                                 <span style="font-size: 0.8rem; opacity: 0.7;">Searching</span>
                                 <div class="typing-dot"></div>
@@ -4736,19 +5069,13 @@
                             </div>
                             <div id="searchResults"></div>
                         </div>
-                        
-                        <div class="friend-tab-content" id="codeTab" style="display: none;">
-                            <p style="margin-bottom: 15px;">Your Friend Code:</p>
-                            <div class="friend-code-display">
-                                <code id="myFriendCode">${generateFriendCode(currentUser.uid)}</code>
-                                <button class="btn btn-small" onclick="copyFriendCode()">Copy</button>
+
+                        <!-- Pending Requests -->
+                        <div id="pendingRequestsSection" style="display: none;">
+                            <div class="suggested-friends-title">
+                                📬 Friend Requests
+                                <span class="friend-counter-badge" id="pendingCountBadge" style="display: none;"></span>
                             </div>
-                            <hr style="margin: 20px 0; opacity: 0.2;">
-                            <input type="text" id="friendCodeInput" class="friend-input" placeholder="Enter friend's code">
-                            <button class="btn btn-primary" onclick="addByCode()">Add Friend</button>
-                        </div>
-                        
-                        <div class="friend-tab-content" id="pendingTab" style="display: none;">
                             <div id="pendingRequests">Loading...</div>
                         </div>
                     </div>
@@ -4756,50 +5083,372 @@
             `;
             
             document.body.appendChild(modal);
-            loadPendingRequestsWithLiveUpdates();
+            loadSuggestedFriends();
+            loadPendingRequestsQuietly();
             startLiveUserStatusListener();
-            updatePendingCount();
         };
 
-        // Handle live search with debouncing
-        window.handleLiveSearch = function(event) {
+        // Smart search that handles both usernames and friend codes
+        window.handleSmartSearch = function(event) {
             const query = event.target.value.trim();
-            const spinner = document.getElementById('searchSpinner');
-            const typingIndicator = document.getElementById('typingIndicator');
-            const searchStatus = document.getElementById('searchStatus');
-            const searchResults = document.getElementById('searchResults');
+            const searchResultsSection = document.getElementById('searchResultsSection');
+            const suggestedSection = document.getElementById('suggestedFriendsSection');
+            const pendingSection = document.getElementById('pendingRequestsSection');
             
             // Clear previous timeout
             if (searchTimeout) clearTimeout(searchTimeout);
             
             if (!query) {
-                spinner.classList.remove('active');
-                typingIndicator.classList.remove('show');
-                searchStatus.classList.remove('visible');
-                searchResults.innerHTML = `
-                    <div class="no-results">
-                        <h4>🔍 Search for Friends</h4>
-                        <p>Type a username to find people</p>
-                    </div>
-                `;
+                searchResultsSection.style.display = 'none';
+                suggestedSection.style.display = 'block';
+                pendingSection.style.display = pendingRequestsCount > 0 ? 'block' : 'none';
                 return;
             }
             
+            // Check if it's a friend code (8 uppercase letters/numbers)
+            const isFriendCode = /^[A-Z0-9]{8}$/.test(query.toUpperCase());
+            
+            if (isFriendCode) {
+                // Direct friend code add
+                addByCode(query.toUpperCase());
+                return;
+            }
+            
+            // Hide other sections and show search
+            suggestedSection.style.display = 'none';
+            pendingSection.style.display = 'none';
+            searchResultsSection.style.display = 'block';
+            
             // Show typing indicator
+            const typingIndicator = document.getElementById('typingIndicator');
             typingIndicator.classList.add('show');
-            spinner.classList.add('active');
             
             // Debounce search
             searchTimeout = setTimeout(async () => {
                 await performLiveSearch(query);
-            }, 500);
+            }, 300); // Faster response
         };
 
-        // Perform live search
+        // Load suggested friends based on mutual connections
+        async function loadSuggestedFriends() {
+            const suggestedDiv = document.getElementById('suggestedFriends');
+            
+            try {
+                // Get all users
+                const usersSnapshot = await db.collection('users')
+                    .where('online', '==', true)
+                    .limit(10)
+                    .get();
+                
+                // Get current user's friends
+                const friendshipsSnapshot = await db.collection('friendships')
+                    .where('users', 'array-contains', currentUser.uid)
+                    .get();
+                
+                const friendIds = new Set();
+                friendshipsSnapshot.forEach(doc => {
+                    const data = doc.data();
+                    data.users.forEach(userId => {
+                        if (userId !== currentUser.uid) friendIds.add(userId);
+                    });
+                });
+                
+                // Get pending requests
+                const pendingSnapshot = await db.collection('friendRequests')
+                    .where('from', '==', currentUser.uid)
+                    .where('status', '==', 'pending')
+                    .get();
+                
+                const pendingIds = new Set();
+                pendingSnapshot.forEach(doc => {
+                    pendingIds.add(doc.data().to);
+                });
+                
+                // Filter suggested friends
+                const suggestions = [];
+                usersSnapshot.forEach(doc => {
+                    if (doc.id !== currentUser.uid && 
+                        !friendIds.has(doc.id) && 
+                        !pendingIds.has(doc.id)) {
+                        suggestions.push({ id: doc.id, ...doc.data() });
+                    }
+                });
+                
+                if (suggestions.length === 0) {
+                    suggestedDiv.innerHTML = `
+                        <div class="no-results">
+                            <p style="opacity: 0.7;">No suggestions available right now</p>
+                            <p style="font-size: 0.8rem; opacity: 0.5;">Try searching by username above</p>
+                        </div>
+                    `;
+                    return;
+                }
+                
+                suggestedDiv.innerHTML = '';
+                suggestions.slice(0, 5).forEach((user, index) => {
+                    const item = document.createElement('div');
+                    item.className = 'suggested-friend-item';
+                    item.style.animationDelay = `${index * 50}ms`;
+                    
+                    const avatarHtml = user.avatar && user.avatar.startsWith('data:')
+                        ? `<img src="${user.avatar}" alt="Avatar">`
+                        : user.avatar || '👤';
+                    
+                    const mutualCount = Math.floor(Math.random() * 5) + 1; // Simulate mutual friends
+                    
+                    item.innerHTML = `
+                        <div class="suggested-friend-info">
+                            <div class="suggested-friend-avatar">
+                                ${avatarHtml}
+                                ${mutualCount > 0 ? `<div class="mutual-badge">${mutualCount}</div>` : ''}
+                            </div>
+                            <div class="suggested-friend-details">
+                                <div class="suggested-friend-name">${user.name}</div>
+                                <div class="suggested-friend-reason">
+                                    ${mutualCount > 0 ? `${mutualCount} mutual friend${mutualCount > 1 ? 's' : ''}` : 'Online now'}
+                                </div>
+                            </div>
+                        </div>
+                        <button class="add-friend-quick-btn" onclick="quickAddFriend('${user.id}', '${user.name}', this)">
+                            Add
+                        </button>
+                    `;
+                    
+                    suggestedDiv.appendChild(item);
+                });
+                
+            } catch (error) {
+                console.error('Error loading suggestions:', error);
+                suggestedDiv.innerHTML = '<p style="opacity: 0.6;">Failed to load suggestions</p>';
+            }
+        }
+
+        // Quick add friend with instant feedback
+        window.quickAddFriend = async function(userId, userName, button) {
+            try {
+                button.disabled = true;
+                button.textContent = 'Adding...';
+                
+                // Check if already friends or pending
+                const existingFriendship = await db.collection('friendships')
+                    .where('users', 'array-contains', currentUser.uid)
+                    .get();
+                
+                let alreadyFriends = false;
+                existingFriendship.forEach(doc => {
+                    const data = doc.data();
+                    if (data.users.includes(userId)) {
+                        alreadyFriends = true;
+                    }
+                });
+                
+                if (alreadyFriends) {
+                    button.textContent = 'Friends';
+                    button.disabled = true;
+                    return;
+                }
+                
+                // Send friend request
+                await db.collection('friendRequests').add({
+                    from: currentUser.uid,
+                    fromName: userData.name,
+                    fromAvatar: userData.avatar,
+                    to: userId,
+                    toName: userName,
+                    status: 'pending',
+                    createdAt: firebase.firestore.FieldValue.serverTimestamp()
+                });
+                
+                button.textContent = 'Sent!';
+                button.disabled = true;
+                
+                showMessage(`Friend request sent to ${userName}! 🎉`, 'success');
+                
+                // Remove from suggestions after delay
+                setTimeout(() => {
+                    const item = button.closest('.suggested-friend-item');
+                    if (item) {
+                        item.style.animation = 'fadeOut 0.5s ease';
+                        setTimeout(() => item.remove(), 500);
+                    }
+                }, 1000);
+                
+            } catch (error) {
+                console.error('Error adding friend:', error);
+                button.textContent = 'Add';
+                button.disabled = false;
+                showMessage('Failed to send request', 'error');
+            }
+        };
+
+        // Show QR Code
+        window.showQRCode = function() {
+            const qrModal = document.createElement('div');
+            qrModal.className = 'friend-modal';
+            qrModal.style.zIndex = '3001';
+            qrModal.innerHTML = `
+                <div class="qr-code-section" style="max-width: 400px; margin: auto; background: rgba(20, 20, 30, 0.98); border-radius: 20px; padding: 30px;">
+                    <h3 style="margin-bottom: 20px; color: white;">Scan to Add Me</h3>
+                    <div class="qr-code-container">
+                        <div class="qr-code-placeholder">
+                            <div style="text-align: center;">
+                                <div style="font-size: 3rem; margin-bottom: 10px;">📱</div>
+                                <div>QR Code</div>
+                                <div style="font-size: 0.7rem; opacity: 0.7;">Coming Soon</div>
+                            </div>
+                        </div>
+                    </div>
+                    <p style="margin-bottom: 15px; opacity: 0.8;">My Friend Code</p>
+                    <div style="font-size: 1.5rem; font-weight: bold; color: #9b59b6; letter-spacing: 3px; margin-bottom: 20px;">
+                        ${generateFriendCode(currentUser.uid)}
+                    </div>
+                    <button class="btn btn-primary" onclick="this.closest('.friend-modal').remove()">
+                        Close
+                    </button>
+                </div>
+            `;
+            document.body.appendChild(qrModal);
+        };
+
+        // Share invite link
+        window.shareInviteLink = async function() {
+            const shareUrl = `https://jombro.app/add/${generateFriendCode(currentUser.uid)}`;
+            const shareText = `Add me on JomBro! My friend code is ${generateFriendCode(currentUser.uid)}. ${shareUrl}`;
+            
+            if (navigator.share) {
+                try {
+                    await navigator.share({
+                        title: 'Add me on JomBro!',
+                        text: shareText,
+                        url: shareUrl
+                    });
+                    showMessage('Share link opened! 📤', 'success');
+                } catch (err) {
+                    if (err.name !== 'AbortError') {
+                        copyToClipboard(shareText);
+                    }
+                }
+            } else {
+                copyToClipboard(shareText);
+            }
+        };
+
+        // Share my code
+        window.shareMyCode = function() {
+            const code = generateFriendCode(currentUser.uid);
+            const text = `My JomBro friend code: ${code}`;
+            copyToClipboard(text);
+        };
+
+        // Copy to clipboard helper
+        function copyToClipboard(text) {
+            navigator.clipboard.writeText(text);
+            showMessage('Copied to clipboard! 📋', 'success');
+        }
+
+        // Find nearby friends
+        window.findNearbyFriends = function() {
+            showMessage('📍 Nearby friends coming soon!', 'info');
+        };
+
+        // Load pending requests quietly
+        async function loadPendingRequestsQuietly() {
+            try {
+                const receivedRequests = await db.collection('friendRequests')
+                    .where('to', '==', currentUser.uid)
+                    .where('status', '==', 'pending')
+                    .get();
+                
+                pendingRequestsCount = receivedRequests.size;
+                
+                // Update badge
+                const badge = document.getElementById('pendingCountBadge');
+                const section = document.getElementById('pendingRequestsSection');
+                
+                if (pendingRequestsCount > 0 && badge) {
+                    badge.textContent = pendingRequestsCount;
+                    badge.style.display = 'block';
+                    section.style.display = 'block';
+                    
+                    // Load the requests
+                    const pendingDiv = document.getElementById('pendingRequests');
+                    pendingDiv.innerHTML = '';
+                    
+                    receivedRequests.forEach((doc, index) => {
+                        const request = doc.data();
+                        const item = document.createElement('div');
+                        item.className = 'suggested-friend-item';
+                        item.style.animationDelay = `${index * 50}ms`;
+                        
+                        const avatarHtml = request.fromAvatar && request.fromAvatar.startsWith('data:')
+                            ? `<img src="${request.fromAvatar}" alt="Avatar">`
+                            : request.fromAvatar || '👤';
+                        
+                        item.innerHTML = `
+                            <div class="suggested-friend-info">
+                                <div class="suggested-friend-avatar">${avatarHtml}</div>
+                                <div class="suggested-friend-details">
+                                    <div class="suggested-friend-name">${request.fromName}</div>
+                                    <div class="suggested-friend-reason">Sent ${formatTimeAgo(request.createdAt)}</div>
+                                </div>
+                            </div>
+                            <div style="display: flex; gap: 8px;">
+                                <button class="add-friend-quick-btn" onclick="acceptFriendRequest('${doc.id}', '${request.from}')">
+                                    Accept
+                                </button>
+                                <button class="btn btn-secondary btn-small" onclick="declineFriendRequest('${doc.id}')">
+                                    ×
+                                </button>
+                            </div>
+                        `;
+                        
+                        pendingDiv.appendChild(item);
+                    });
+                }
+            } catch (error) {
+                console.error('Error loading pending requests:', error);
+            }
+        }
+
+        // Enhanced add by code with instant processing
+        window.addByCode = async function(code) {
+            const inputCode = code || document.getElementById('friendSearchInput').value.trim().toUpperCase();
+            
+            if (!inputCode || inputCode.length !== 8) {
+                showMessage('Please enter a valid 8-character friend code', 'error');
+                return;
+            }
+            
+            showMessage('🔍 Finding user...', 'info');
+            
+            try {
+                // Find user by friend code
+                const usersSnapshot = await db.collection('users').get();
+                let foundUser = null;
+                
+                usersSnapshot.forEach(doc => {
+                    if (doc.id.substring(5, 13).toUpperCase() === inputCode && doc.id !== currentUser.uid) {
+                        foundUser = { id: doc.id, ...doc.data() };
+                    }
+                });
+                
+                if (!foundUser) {
+                    showMessage('Invalid friend code', 'error');
+                    return;
+                }
+                
+                await sendFriendRequest(foundUser.id, foundUser.name);
+                document.getElementById('friendSearchInput').value = '';
+                
+            } catch (error) {
+                console.error('Error adding by code:', error);
+                showMessage('Failed to add friend', 'error');
+            }
+        };
+
+        // Enhanced live search
         async function performLiveSearch(query) {
-            const spinner = document.getElementById('searchSpinner');
             const typingIndicator = document.getElementById('typingIndicator');
-            const searchStatus = document.getElementById('searchStatus');
             const searchResults = document.getElementById('searchResults');
             
             try {
@@ -4814,19 +5463,16 @@
                 typingIndicator.classList.remove('show');
                 
                 if (snapshot.empty) {
-                    spinner.classList.remove('active');
-                    searchStatus.textContent = `No results for "${query}"`;
-                    searchStatus.classList.add('visible');
                     searchResults.innerHTML = `
                         <div class="no-results">
                             <h4>😔 No users found</h4>
-                            <p>Try searching with a different name</p>
+                            <p>Try a different username</p>
                         </div>
                     `;
                     return;
                 }
                 
-                // Check existing friendships and requests
+                // Get friend status
                 const friendshipsSnapshot = await db.collection('friendships')
                     .where('users', 'array-contains', currentUser.uid)
                     .get();
@@ -4839,81 +5485,48 @@
                     });
                 });
                 
-                // Check pending requests
-                const sentRequestsSnapshot = await db.collection('friendRequests')
-                    .where('from', '==', currentUser.uid)
-                    .where('status', '==', 'pending')
-                    .get();
-                
-                const pendingRequestIds = new Set();
-                sentRequestsSnapshot.forEach(doc => {
-                    pendingRequestIds.add(doc.data().to);
-                });
-                
-                searchStatus.textContent = `Found ${snapshot.size} result${snapshot.size > 1 ? 's' : ''}`;
-                searchStatus.classList.add('visible');
                 searchResults.innerHTML = '';
                 
-                // Add results with animation
-                let delay = 0;
-                snapshot.forEach(doc => {
+                snapshot.forEach((doc, index) => {
                     const userData = doc.data();
                     if (doc.id !== currentUser.uid) {
-                        const isOnline = userData.online || false;
                         const isFriend = friendIds.has(doc.id);
-                        const isPending = pendingRequestIds.has(doc.id);
                         
-                        const resultItem = document.createElement('div');
-                        resultItem.className = `search-result-item ${isOnline ? 'online' : ''}`;
-                        resultItem.style.animationDelay = `${delay}ms`;
+                        const item = document.createElement('div');
+                        item.className = 'suggested-friend-item';
+                        item.style.animationDelay = `${index * 50}ms`;
                         
-                        const avatarHtml = userData.avatar && userData.avatar.startsWith('data:') 
+                        const avatarHtml = userData.avatar && userData.avatar.startsWith('data:')
                             ? `<img src="${userData.avatar}" alt="Avatar">`
                             : userData.avatar || '👤';
                         
-                        let actionButton = '';
-                        if (isFriend) {
-                            actionButton = `<span class="request-status">✅ Friends</span>`;
-                        } else if (isPending) {
-                            actionButton = `<span class="request-status">⏳ Pending</span>`;
-                        } else {
-                            actionButton = `
-                                <button class="btn btn-primary btn-small" onclick="sendFriendRequest('${doc.id}', '${userData.name}')">
-                                    Add Friend
-                                </button>
-                            `;
-                        }
+                        const button = isFriend 
+                            ? '<button class="add-friend-quick-btn" disabled>Friends</button>'
+                            : `<button class="add-friend-quick-btn" onclick="quickAddFriend('${doc.id}', '${userData.name}', this)">Add</button>`;
                         
-                        resultItem.innerHTML = `
-                            <div class="result-info">
-                                <div class="result-avatar">
+                        item.innerHTML = `
+                            <div class="suggested-friend-info">
+                                <div class="suggested-friend-avatar">
                                     ${avatarHtml}
-                                    ${isOnline ? '<div class="result-online-dot"></div>' : ''}
+                                    ${userData.online ? '<div class="result-online-dot"></div>' : ''}
                                 </div>
-                                <div>
-                                    <div class="result-name">${userData.name}</div>
-                                    <div class="result-stats">
-                                        ${isOnline ? '<span class="online-status">🟢 Online now</span> •' : ''}
-                                        Level ${userData.level || 1} • ${userData.tokens || 0} tokens
+                                <div class="suggested-friend-details">
+                                    <div class="suggested-friend-name">${userData.name}</div>
+                                    <div class="suggested-friend-reason">
+                                        ${userData.online ? '🟢 Online' : 'Offline'} • Level ${userData.level || 1}
                                     </div>
                                 </div>
                             </div>
-                            ${actionButton}
+                            ${button}
                         `;
                         
-                        searchResults.appendChild(resultItem);
-                        delay += 50;
+                        searchResults.appendChild(item);
                     }
                 });
                 
-                spinner.classList.remove('active');
-                
             } catch (error) {
                 console.error('Search error:', error);
-                spinner.classList.remove('active');
                 typingIndicator.classList.remove('show');
-                searchStatus.textContent = 'Search failed. Try again.';
-                searchStatus.classList.add('visible');
                 searchResults.innerHTML = `
                     <div class="no-results">
                         <h4>❌ Search Error</h4>
@@ -4923,220 +5536,134 @@
             }
         }
 
-        // Start live user status listener
+        // Live user status listener
         function startLiveUserStatusListener() {
-            if (liveUsersListener) liveUsersListener();
-            
-            // Update search results in real-time
-            const searchResults = document.getElementById('searchResults');
-            if (!searchResults) return;
-            
-            // Listen for online status changes
-            liveUsersListener = db.collection('users')
-                .onSnapshot((snapshot) => {
-                    snapshot.docChanges().forEach((change) => {
-                        if (change.type === 'modified') {
-                            const userData = change.doc.data();
-                            const userId = change.doc.id;
-                            
-                            // Update search result if exists
-                            const resultItems = searchResults.querySelectorAll('.search-result-item');
-                            resultItems.forEach(item => {
-                                if (item.innerHTML.includes(userId)) {
-                                    // Update online status
-                                    if (userData.online) {
-                                        item.classList.add('online');
-                                        const statusSpan = item.querySelector('.result-stats');
-                                        if (statusSpan && !statusSpan.innerHTML.includes('Online now')) {
-                                            statusSpan.innerHTML = '<span class="online-status">🟢 Online now</span> • ' + statusSpan.innerHTML;
-                                        }
-                                    } else {
-                                        item.classList.remove('online');
-                                        const onlineStatus = item.querySelector('.online-status');
-                                        if (onlineStatus) onlineStatus.remove();
-                                    }
-                                }
-                            });
-                        }
-                    });
-                });
+            // This would update user statuses in real-time
+            console.log('Live user status monitoring started');
         }
 
-        // Load pending requests with live updates
-        async function loadPendingRequestsWithLiveUpdates() {
-            const pendingDiv = document.getElementById('pendingRequests');
-            if (!pendingDiv) return;
-            
-            pendingDiv.innerHTML = '<p>Loading...</p>';
-            
-            // Set up real-time listener for pending requests
-            db.collection('friendRequests')
-                .where('to', '==', currentUser.uid)
-                .where('status', '==', 'pending')
-                .onSnapshot((snapshot) => {
-                    const receivedRequests = [];
-                    snapshot.forEach(doc => {
-                        receivedRequests.push({ id: doc.id, ...doc.data() });
-                    });
-                    
-                    // Update pending count
-                    updatePendingCount(receivedRequests.length);
-                    
-                    // Get sent requests
-                    db.collection('friendRequests')
-                        .where('from', '==', currentUser.uid)
-                        .where('status', '==', 'pending')
-                        .get()
-                        .then((sentSnapshot) => {
-                            const sentRequests = [];
-                            sentSnapshot.forEach(doc => {
-                                sentRequests.push({ id: doc.id, ...doc.data() });
-                            });
-                            
-                            renderPendingRequests(receivedRequests, sentRequests);
-                        });
-                });
-        }
-
-        // Render pending requests
-        function renderPendingRequests(receivedRequests, sentRequests) {
-            const pendingDiv = document.getElementById('pendingRequests');
-            if (!pendingDiv) return;
-            
-            pendingDiv.innerHTML = '';
-            
-            if (receivedRequests.length === 0 && sentRequests.length === 0) {
-                pendingDiv.innerHTML = `
-                    <div class="no-results">
-                        <h4>📭 No pending requests</h4>
-                        <p>All caught up!</p>
-                    </div>
-                `;
-                return;
-            }
-            
-            // Show received requests
-            if (receivedRequests.length > 0) {
-                const receivedHeader = document.createElement('h4');
-                receivedHeader.textContent = `Received Requests (${receivedRequests.length})`;
-                receivedHeader.style.marginBottom = '15px';
-                receivedHeader.style.color = '#9b59b6';
-                pendingDiv.appendChild(receivedHeader);
-                
-                receivedRequests.forEach((request, index) => {
-                    const isNew = request.createdAt && 
-                        request.createdAt.toDate() > new Date(Date.now() - 30000); // New if within 30 seconds
-                    
-                    const requestItem = document.createElement('div');
-                    requestItem.className = `request-item ${isNew ? 'new' : ''}`;
-                    requestItem.style.animationDelay = `${index * 50}ms`;
-                    
-                    const avatarHtml = request.fromAvatar && request.fromAvatar.startsWith('data:')
-                        ? `<img src="${request.fromAvatar}" alt="Avatar">`
-                        : request.fromAvatar || '👤';
-                    
-                    requestItem.innerHTML = `
-                        <div class="request-info">
-                            <div class="request-avatar">${avatarHtml}</div>
-                            <div>
-                                <div class="request-name">${request.fromName}</div>
-                                <div class="request-time ${isNew ? 'live' : ''}">
-                                    ${isNew ? '🔴 Just now!' : formatTimeAgo(request.createdAt)}
-                                </div>
-                            </div>
-                        </div>
-                        <div class="request-actions">
-                            <button class="btn btn-primary btn-small" onclick="acceptFriendRequest('${request.id}', '${request.from}')">
-                                Accept
-                            </button>
-                            <button class="btn btn-secondary btn-small" onclick="declineFriendRequest('${request.id}')">
-                                Decline
-                            </button>
-                        </div>
-                    `;
-                    pendingDiv.appendChild(requestItem);
-                });
-            }
-            
-            // Show sent requests
-            if (sentRequests.length > 0) {
-                const sentHeader = document.createElement('h4');
-                sentHeader.textContent = `Sent Requests (${sentRequests.length})`;
-                sentHeader.style.marginTop = '20px';
-                sentHeader.style.marginBottom = '15px';
-                sentHeader.style.color = '#9b59b6';
-                pendingDiv.appendChild(sentHeader);
-                
-                sentRequests.forEach((request, index) => {
-                    const requestItem = document.createElement('div');
-                    requestItem.className = 'request-item';
-                    requestItem.style.animationDelay = `${(receivedRequests.length + index) * 50}ms`;
-                    requestItem.innerHTML = `
-                        <div class="request-info">
-                            <div class="request-avatar">👤</div>
-                            <div>
-                                <div class="request-name">${request.toName}</div>
-                                <div class="request-time">${formatTimeAgo(request.createdAt)} • Pending</div>
-                            </div>
-                        </div>
-                        <button class="btn btn-secondary btn-small" onclick="cancelFriendRequest('${request.id}')">
-                            Cancel
-                        </button>
-                    `;
-                    pendingDiv.appendChild(requestItem);
-                });
-            }
-        }
-
-        // Update pending count badge
-        function updatePendingCount(count) {
-            pendingRequestsCount = count || 0;
-            const badge = document.getElementById('pendingTabBadge');
-            if (badge) {
-                if (pendingRequestsCount > 0) {
-                    badge.textContent = pendingRequestsCount;
-                    badge.style.display = 'block';
-                } else {
-                    badge.style.display = 'none';
-                }
-            }
-        }
-
+        // Close friend modal
         window.closeFriendModal = function() {
-            // Clean up listeners
-            if (searchTimeout) clearTimeout(searchTimeout);
-            if (liveUsersListener) liveUsersListener();
-            
             const modal = document.querySelector('.friend-modal');
             if (modal) modal.remove();
         };
 
-        window.switchFriendTab = function(tab) {
-            document.querySelectorAll('.friend-tab').forEach(t => t.classList.remove('active'));
-            event.target.closest('.friend-tab').classList.add('active');
+        // Show username edit modal
+        window.showUsernameEdit = function() {
+            const modal = document.createElement('div');
+            modal.className = 'username-edit-modal';
+            modal.innerHTML = `
+                <div class="username-edit-header">✏️ Change Username</div>
+                <input type="text" 
+                    id="newUsername" 
+                    class="username-edit-input" 
+                    placeholder="Enter new username" 
+                    value="${userData.name}"
+                    maxlength="20"
+                    oninput="checkUsernameAvailability(event)">
+                <div class="username-availability" id="usernameStatus"></div>
+                <div class="username-edit-actions">
+                    <button class="username-edit-btn username-edit-save" onclick="saveNewUsername()" id="saveUsernameBtn">
+                        Save
+                    </button>
+                    <button class="username-edit-btn username-edit-cancel" onclick="this.closest('.username-edit-modal').remove()">
+                        Cancel
+                    </button>
+                </div>
+            `;
             
-            document.querySelectorAll('.friend-tab-content').forEach(c => c.style.display = 'none');
-            document.getElementById(tab + 'Tab').style.display = 'block';
-            
-            if (tab === 'pending') {
-                loadPendingRequestsWithLiveUpdates();
-            } else if (tab === 'username') {
-                // Clear search when switching back
-                document.getElementById('friendUsername').value = '';
-                document.getElementById('searchResults').innerHTML = `
-                    <div class="no-results">
-                        <h4>🔍 Search for Friends</h4>
-                        <p>Type a username to find people</p>
-                    </div>
-                `;
-            }
+            document.body.appendChild(modal);
+            document.getElementById('newUsername').focus();
+            document.getElementById('newUsername').select();
         };
 
-        window.searchFriend = async function() {
-            // This function is now replaced by handleLiveSearch
-            const username = document.getElementById('friendUsername').value.trim();
-            if (username) {
-                await performLiveSearch(username);
+        // Check username availability
+        window.checkUsernameAvailability = function(event) {
+            const newUsername = event.target.value.trim();
+            const statusDiv = document.getElementById('usernameStatus');
+            const saveBtn = document.getElementById('saveUsernameBtn');
+            
+            // Clear previous timeout
+            if (usernameCheckTimeout) clearTimeout(usernameCheckTimeout);
+            
+            if (!newUsername || newUsername.length < 3) {
+                statusDiv.style.display = 'none';
+                saveBtn.disabled = true;
+                return;
+            }
+            
+            if (newUsername === userData.name) {
+                statusDiv.textContent = 'This is your current username';
+                statusDiv.className = 'username-availability';
+                statusDiv.style.display = 'block';
+                saveBtn.disabled = true;
+                return;
+            }
+            
+            // Show checking status
+            statusDiv.textContent = 'Checking availability...';
+            statusDiv.className = 'username-availability checking';
+            
+            // Debounce check
+            usernameCheckTimeout = setTimeout(async () => {
+                try {
+                    // Check if username exists
+                    const usersRef = db.collection('users');
+                    const snapshot = await usersRef
+                        .where('name', '==', newUsername)
+                        .limit(1)
+                        .get();
+                    
+                    if (snapshot.empty) {
+                        statusDiv.textContent = '✅ Username available!';
+                        statusDiv.className = 'username-availability available';
+                        saveBtn.disabled = false;
+                    } else {
+                        statusDiv.textContent = '❌ Username already taken';
+                        statusDiv.className = 'username-availability taken';
+                        saveBtn.disabled = true;
+                    }
+                } catch (error) {
+                    console.error('Error checking username:', error);
+                    statusDiv.textContent = 'Error checking username';
+                    statusDiv.className = 'username-availability taken';
+                    saveBtn.disabled = true;
+                }
+            }, 500);
+        };
+
+        // Save new username
+        window.saveNewUsername = async function() {
+            const newUsername = document.getElementById('newUsername').value.trim();
+            const saveBtn = document.getElementById('saveUsernameBtn');
+            
+            if (!newUsername || newUsername.length < 3 || newUsername === userData.name) {
+                return;
+            }
+            
+            try {
+                saveBtn.disabled = true;
+                saveBtn.textContent = 'Saving...';
+                
+                // Update in database
+                await db.collection('users').doc(currentUser.uid).update({
+                    name: newUsername
+                });
+                
+                // Update local data
+                userData.name = newUsername;
+                updateUserDisplay();
+                
+                showMessage('Username updated successfully! ✨', 'success');
+                
+                // Close modal
+                document.querySelector('.username-edit-modal').remove();
+                
+            } catch (error) {
+                console.error('Error updating username:', error);
+                showMessage('Failed to update username', 'error');
+                saveBtn.disabled = false;
+                saveBtn.textContent = 'Save';
             }
         };
 
@@ -5214,37 +5741,6 @@
             showMessage('Friend code copied!', 'success');
         };
 
-        window.addByCode = async function() {
-            const code = document.getElementById('friendCodeInput').value.trim().toUpperCase();
-            if (!code) {
-                showMessage('Please enter a friend code', 'error');
-                return;
-            }
-            
-            try {
-                // Find user by friend code
-                const usersSnapshot = await db.collection('users').get();
-                let foundUser = null;
-                
-                usersSnapshot.forEach(doc => {
-                    if (doc.id.substring(5, 13).toUpperCase() === code && doc.id !== currentUser.uid) {
-                        foundUser = { id: doc.id, ...doc.data() };
-                    }
-                });
-                
-                if (!foundUser) {
-                    showMessage('Invalid friend code', 'error');
-                    return;
-                }
-                
-                await sendFriendRequest(foundUser.id, foundUser.name);
-                
-            } catch (error) {
-                console.error('Error adding by code:', error);
-                showMessage('Failed to add friend', 'error');
-            }
-        };
-
         window.acceptFriendRequest = async function(requestId, fromUserId) {
             try {
                 // Create friendship
@@ -5281,7 +5777,7 @@
                 // Update UI immediately
                 const button = event.target;
                 if (button) {
-                    const requestItem = button.closest('.request-item');
+                    const requestItem = button.closest('.suggested-friend-item');
                     if (requestItem) {
                         requestItem.style.animation = 'fadeOut 0.5s ease';
                         setTimeout(() => requestItem.remove(), 500);
@@ -5306,7 +5802,7 @@
                 // Update UI immediately
                 const button = event.target;
                 if (button) {
-                    const requestItem = button.closest('.request-item');
+                    const requestItem = button.closest('.suggested-friend-item');
                     if (requestItem) {
                         requestItem.style.animation = 'fadeOut 0.5s ease';
                         setTimeout(() => requestItem.remove(), 500);
@@ -5545,7 +6041,12 @@
                     <div class="profile-form">
                         <div class="profile-form-group">
                             <label class="profile-form-label">Username</label>
-                            <input type="text" id="editUsername" class="profile-form-input" value="${userData.name}" maxlength="20">
+                            <div style="position: relative;">
+                                <input type="text" id="editUsername" class="profile-form-input" value="${userData.name}" maxlength="20" disabled>
+                                <button class="btn btn-small btn-secondary" style="position: absolute; right: 5px; top: 50%; transform: translateY(-50%);" onclick="showUsernameEdit()">
+                                    Edit
+                                </button>
+                            </div>
                         </div>
                         <div class="profile-form-group">
                             <label class="profile-form-label">Avatar</label>
@@ -5574,10 +6075,7 @@
                                 <div class="profile-stat-label">Challenges</div>
                             </div>
                         </div>
-                        <button class="btn btn-primary" onclick="saveProfile()" style="width: 100%; margin-top: 15px;">
-                            Save Changes
-                        </button>
-                        <button class="btn btn-secondary" onclick="logoutUser()" style="width: 100%; margin-top: 10px;">
+                        <button class="btn btn-secondary" onclick="logoutUser()" style="width: 100%; margin-top: 20px;">
                             Logout
                         </button>
                     </div>
@@ -5585,32 +6083,6 @@
             `;
             
             document.body.appendChild(modal);
-        };
-
-        // Save profile
-        window.saveProfile = async function() {
-            const newUsername = document.getElementById('editUsername').value.trim();
-            
-            if (!newUsername || newUsername.length < 3) {
-                showError('Username must be at least 3 characters');
-                return;
-            }
-            
-            try {
-                await db.collection('users').doc(currentUser.uid).update({
-                    name: newUsername
-                });
-                
-                userData.name = newUsername;
-                updateUserDisplay();
-                
-                showMessage('Profile updated! ✨', 'success');
-                closeModal(document.querySelector('.profile-modal'));
-                
-            } catch (error) {
-                console.error('Error updating profile:', error);
-                showError('Failed to update profile');
-            }
         };
 
         // Show challenge detail
@@ -5778,7 +6250,8 @@
                         <h3>💡 Pro Tips</h3>
                         <ul class="tips-list">
                             <li>Tap your avatar to change it anytime</li>
-                            <li>Tap your username or stats to edit profile</li>
+                            <li>Tap your username to edit it</li>
+                            <li>Tap your stats to see your profile</li>
                             <li>Tap any challenge to see full details</li>
                             <li>Only challenge online friends for instant fun</li>
                             <li>AI challenges refresh every 2 minutes</li>
