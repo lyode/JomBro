@@ -1383,6 +1383,7 @@
             transition: all 0.3s ease;
             font-weight: 500;
             font-size: 0.9rem;
+            position: relative;
         }
 
         .friend-tab.active {
@@ -1399,10 +1400,17 @@
             animation: fadeIn 0.3s ease;
         }
 
+        /* Enhanced Friend Modal with Live Updates */
+        .friend-search-input-container {
+            position: relative;
+            margin-bottom: 15px;
+        }
+
         .friend-input {
             width: 100%;
             padding: 15px;
-            margin-bottom: 15px;
+            padding-right: 45px;
+            margin-bottom: 0;
             border: 2px solid rgba(155, 89, 182, 0.3);
             border-radius: 12px;
             background: rgba(255, 255, 255, 0.05);
@@ -1422,27 +1430,38 @@
             color: rgba(255, 255, 255, 0.5);
         }
 
-        .friend-code-display {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            margin-bottom: 20px;
-            padding: 15px;
-            background: rgba(155, 89, 182, 0.1);
+        .search-spinner {
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 20px;
+            height: 20px;
             border: 2px solid rgba(155, 89, 182, 0.3);
-            border-radius: 12px;
+            border-top: 2px solid #9b59b6;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            display: none;
         }
 
-        .friend-code-display code {
-            flex: 1;
-            font-size: 1.2rem;
-            font-weight: bold;
-            color: #9b59b6;
-            text-shadow: 0 0 10px rgba(155, 89, 182, 0.5);
-            letter-spacing: 2px;
+        .search-spinner.active {
+            display: block;
         }
 
-        .search-result-item, .request-item {
+        .live-search-status {
+            font-size: 0.8rem;
+            color: rgba(155, 89, 182, 0.8);
+            margin-bottom: 10px;
+            text-align: center;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .live-search-status.visible {
+            opacity: 1;
+        }
+
+        .search-result-item {
             display: flex;
             align-items: center;
             justify-content: space-between;
@@ -1452,21 +1471,51 @@
             margin-bottom: 10px;
             border: 1px solid rgba(255, 255, 255, 0.1);
             transition: all 0.3s ease;
+            animation: slideInResult 0.3s ease;
+            position: relative;
+            overflow: hidden;
         }
 
-        .search-result-item:hover, .request-item:hover {
+        @keyframes slideInResult {
+            from {
+                opacity: 0;
+                transform: translateX(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .search-result-item::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 3px;
+            height: 100%;
+            background: #4ecdc4;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .search-result-item.online::before {
+            opacity: 1;
+        }
+
+        .search-result-item:hover {
             background: rgba(255, 255, 255, 0.08);
             border-color: rgba(155, 89, 182, 0.3);
             transform: translateY(-1px);
         }
 
-        .result-info, .request-info {
+        .result-info {
             display: flex;
             align-items: center;
             gap: 12px;
         }
 
-        .result-avatar, .request-avatar {
+        .result-avatar {
             width: 45px;
             height: 45px;
             border-radius: 50%;
@@ -1476,23 +1525,208 @@
             justify-content: center;
             font-size: 1.3rem;
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+            position: relative;
         }
 
-        .result-name, .request-name {
+        .result-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 50%;
+        }
+
+        .result-online-dot {
+            position: absolute;
+            bottom: 0;
+            right: 0;
+            width: 12px;
+            height: 12px;
+            background: #4ecdc4;
+            border-radius: 50%;
+            border: 2px solid rgba(20, 20, 30, 0.98);
+            animation: pulseDot 2s infinite;
+        }
+
+        @keyframes pulseDot {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.2); }
+        }
+
+        .result-name {
             font-size: 1rem;
             font-weight: 500;
             color: white;
             margin-bottom: 4px;
         }
 
-        .result-stats, .request-time {
+        .result-stats {
             font-size: 0.85rem;
             opacity: 0.7;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .online-status {
+            color: #4ecdc4;
+            font-weight: 600;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .request-status {
+            font-size: 0.75rem;
+            padding: 4px 10px;
+            background: rgba(155, 89, 182, 0.2);
+            color: #9b59b6;
+            border-radius: 12px;
+            margin-left: 8px;
+            animation: pulse 2s infinite;
+        }
+
+        .request-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            margin-bottom: 10px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .request-item.new {
+            animation: highlightNew 1s ease;
+        }
+
+        @keyframes highlightNew {
+            0% { background: rgba(155, 89, 182, 0.3); }
+            100% { background: rgba(255, 255, 255, 0.05); }
+        }
+
+        .request-item:hover {
+            background: rgba(255, 255, 255, 0.08);
+            border-color: rgba(155, 89, 182, 0.3);
+            transform: translateY(-1px);
+        }
+
+        .request-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .request-avatar {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            background: linear-gradient(45deg, #9b59b6, #e91e63);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.3rem;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+            position: relative;
+        }
+
+        .request-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 50%;
+        }
+
+        .request-name {
+            font-size: 1rem;
+            font-weight: 500;
+            color: white;
+            margin-bottom: 4px;
+        }
+
+        .request-time {
+            font-size: 0.85rem;
+            opacity: 0.7;
+        }
+
+        .request-time.live {
+            color: #4ecdc4;
+            font-weight: 600;
         }
 
         .request-actions {
             display: flex;
             gap: 8px;
+        }
+
+        .no-results {
+            text-align: center;
+            padding: 40px 20px;
+            opacity: 0.6;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .no-results h4 {
+            margin-bottom: 8px;
+            color: rgba(255, 255, 255, 0.8);
+        }
+
+        .typing-indicator {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            padding: 5px 10px;
+            background: rgba(155, 89, 182, 0.1);
+            border-radius: 15px;
+            margin-bottom: 10px;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .typing-indicator.show {
+            opacity: 1;
+        }
+
+        .typing-dot {
+            width: 8px;
+            height: 8px;
+            background: #9b59b6;
+            border-radius: 50%;
+            animation: typingDot 1.4s infinite;
+        }
+
+        .typing-dot:nth-child(2) { animation-delay: 0.2s; }
+        .typing-dot:nth-child(3) { animation-delay: 0.4s; }
+
+        @keyframes typingDot {
+            0%, 60%, 100% {
+                transform: scale(1);
+                opacity: 0.5;
+            }
+            30% {
+                transform: scale(1.3);
+                opacity: 1;
+            }
+        }
+
+        .friend-counter-badge {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background: #e91e63;
+            color: white;
+            font-size: 0.7rem;
+            font-weight: bold;
+            padding: 2px 6px;
+            border-radius: 10px;
+            min-width: 18px;
+            text-align: center;
+            animation: scaleIn 0.3s ease;
+        }
+
+        @keyframes scaleIn {
+            from { transform: scale(0); }
+            to { transform: scale(1); }
         }
 
         #searchResults, #pendingRequests {
@@ -1537,6 +1771,11 @@
         .error-message.show {
             display: block;
             animation: shake 0.5s ease;
+        }
+
+        @keyframes fadeOut {
+            from { opacity: 1; transform: translateX(0); }
+            to { opacity: 0; transform: translateX(20px); }
         }
 
         @keyframes shake {
@@ -2756,7 +2995,10 @@
                                 <span class="online-count" id="onlineCount">0</span> online • 
                                 <span id="totalFriends">0</span> total
                             </div>
-                            <button class="btn btn-secondary btn-small" onclick="showAddFriendModal()">Add Friend</button>
+                            <button class="btn btn-secondary btn-small" onclick="showAddFriendModal()" style="position: relative;">
+                                Add Friend
+                                <span class="friend-counter-badge" id="mainPendingBadge" style="display: none;"></span>
+                            </button>
                         </div>
                         
                         <div class="friends-list" id="friendsList">
@@ -3556,6 +3798,7 @@
                 .where('to', '==', currentUser.uid)
                 .where('status', '==', 'pending')
                 .onSnapshot((snapshot) => {
+                    let pendingCount = 0;
                     snapshot.docChanges().forEach((change) => {
                         if (change.type === 'added') {
                             const request = { id: change.doc.id, ...change.doc.data() };
@@ -3566,6 +3809,18 @@
                             }
                         }
                     });
+                    
+                    // Update pending count badge on main button
+                    pendingCount = snapshot.size;
+                    const mainBadge = document.getElementById('mainPendingBadge');
+                    if (mainBadge) {
+                        if (pendingCount > 0) {
+                            mainBadge.textContent = pendingCount;
+                            mainBadge.style.display = 'block';
+                        } else {
+                            mainBadge.style.display = 'none';
+                        }
+                    }
                 });
             
             // Listen for friends updates
@@ -4437,7 +4692,12 @@
             loadChallenges();
         };
 
-        // Friend System Functions
+        // Friend System Functions with Live Updates
+        let searchTimeout = null;
+        let activeSearchListener = null;
+        let liveUsersListener = null;
+        let pendingRequestsCount = 0;
+        
         window.showAddFriendModal = function() {
             const modal = document.createElement('div');
             modal.className = 'friend-modal';
@@ -4449,14 +4709,31 @@
                     </div>
                     <div class="friend-modal-body">
                         <div class="friend-search-tabs">
-                            <button class="friend-tab active" onclick="switchFriendTab('username')">By Username</button>
+                            <button class="friend-tab active" onclick="switchFriendTab('username')">
+                                By Username
+                                <span class="friend-counter-badge" id="searchTabBadge" style="display: none;"></span>
+                            </button>
                             <button class="friend-tab" onclick="switchFriendTab('code')">By Friend Code</button>
-                            <button class="friend-tab" onclick="switchFriendTab('pending')">Pending Requests</button>
+                            <button class="friend-tab" onclick="switchFriendTab('pending')">
+                                Pending Requests
+                                <span class="friend-counter-badge" id="pendingTabBadge" style="display: none;"></span>
+                            </button>
                         </div>
                         
                         <div class="friend-tab-content" id="usernameTab">
-                            <input type="text" id="friendUsername" class="friend-input" placeholder="Enter friend's username">
-                            <button class="btn btn-primary" onclick="searchFriend()">Search</button>
+                            <div class="friend-search-input-container">
+                                <input type="text" id="friendUsername" class="friend-input" 
+                                    placeholder="Start typing to search friends..." 
+                                    oninput="handleLiveSearch(event)">
+                                <div class="search-spinner" id="searchSpinner"></div>
+                            </div>
+                            <div class="live-search-status" id="searchStatus"></div>
+                            <div class="typing-indicator" id="typingIndicator">
+                                <span style="font-size: 0.8rem; opacity: 0.7;">Searching</span>
+                                <div class="typing-dot"></div>
+                                <div class="typing-dot"></div>
+                                <div class="typing-dot"></div>
+                            </div>
                             <div id="searchResults"></div>
                         </div>
                         
@@ -4479,74 +4756,387 @@
             `;
             
             document.body.appendChild(modal);
-            loadPendingRequests();
+            loadPendingRequestsWithLiveUpdates();
+            startLiveUserStatusListener();
+            updatePendingCount();
         };
 
+        // Handle live search with debouncing
+        window.handleLiveSearch = function(event) {
+            const query = event.target.value.trim();
+            const spinner = document.getElementById('searchSpinner');
+            const typingIndicator = document.getElementById('typingIndicator');
+            const searchStatus = document.getElementById('searchStatus');
+            const searchResults = document.getElementById('searchResults');
+            
+            // Clear previous timeout
+            if (searchTimeout) clearTimeout(searchTimeout);
+            
+            if (!query) {
+                spinner.classList.remove('active');
+                typingIndicator.classList.remove('show');
+                searchStatus.classList.remove('visible');
+                searchResults.innerHTML = `
+                    <div class="no-results">
+                        <h4>🔍 Search for Friends</h4>
+                        <p>Type a username to find people</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            // Show typing indicator
+            typingIndicator.classList.add('show');
+            spinner.classList.add('active');
+            
+            // Debounce search
+            searchTimeout = setTimeout(async () => {
+                await performLiveSearch(query);
+            }, 500);
+        };
+
+        // Perform live search
+        async function performLiveSearch(query) {
+            const spinner = document.getElementById('searchSpinner');
+            const typingIndicator = document.getElementById('typingIndicator');
+            const searchStatus = document.getElementById('searchStatus');
+            const searchResults = document.getElementById('searchResults');
+            
+            try {
+                // Search for users
+                const usersRef = db.collection('users');
+                const snapshot = await usersRef
+                    .where('name', '>=', query)
+                    .where('name', '<=', query + '\uf8ff')
+                    .limit(10)
+                    .get();
+                
+                typingIndicator.classList.remove('show');
+                
+                if (snapshot.empty) {
+                    spinner.classList.remove('active');
+                    searchStatus.textContent = `No results for "${query}"`;
+                    searchStatus.classList.add('visible');
+                    searchResults.innerHTML = `
+                        <div class="no-results">
+                            <h4>😔 No users found</h4>
+                            <p>Try searching with a different name</p>
+                        </div>
+                    `;
+                    return;
+                }
+                
+                // Check existing friendships and requests
+                const friendshipsSnapshot = await db.collection('friendships')
+                    .where('users', 'array-contains', currentUser.uid)
+                    .get();
+                
+                const friendIds = new Set();
+                friendshipsSnapshot.forEach(doc => {
+                    const data = doc.data();
+                    data.users.forEach(userId => {
+                        if (userId !== currentUser.uid) friendIds.add(userId);
+                    });
+                });
+                
+                // Check pending requests
+                const sentRequestsSnapshot = await db.collection('friendRequests')
+                    .where('from', '==', currentUser.uid)
+                    .where('status', '==', 'pending')
+                    .get();
+                
+                const pendingRequestIds = new Set();
+                sentRequestsSnapshot.forEach(doc => {
+                    pendingRequestIds.add(doc.data().to);
+                });
+                
+                searchStatus.textContent = `Found ${snapshot.size} result${snapshot.size > 1 ? 's' : ''}`;
+                searchStatus.classList.add('visible');
+                searchResults.innerHTML = '';
+                
+                // Add results with animation
+                let delay = 0;
+                snapshot.forEach(doc => {
+                    const userData = doc.data();
+                    if (doc.id !== currentUser.uid) {
+                        const isOnline = userData.online || false;
+                        const isFriend = friendIds.has(doc.id);
+                        const isPending = pendingRequestIds.has(doc.id);
+                        
+                        const resultItem = document.createElement('div');
+                        resultItem.className = `search-result-item ${isOnline ? 'online' : ''}`;
+                        resultItem.style.animationDelay = `${delay}ms`;
+                        
+                        const avatarHtml = userData.avatar && userData.avatar.startsWith('data:') 
+                            ? `<img src="${userData.avatar}" alt="Avatar">`
+                            : userData.avatar || '👤';
+                        
+                        let actionButton = '';
+                        if (isFriend) {
+                            actionButton = `<span class="request-status">✅ Friends</span>`;
+                        } else if (isPending) {
+                            actionButton = `<span class="request-status">⏳ Pending</span>`;
+                        } else {
+                            actionButton = `
+                                <button class="btn btn-primary btn-small" onclick="sendFriendRequest('${doc.id}', '${userData.name}')">
+                                    Add Friend
+                                </button>
+                            `;
+                        }
+                        
+                        resultItem.innerHTML = `
+                            <div class="result-info">
+                                <div class="result-avatar">
+                                    ${avatarHtml}
+                                    ${isOnline ? '<div class="result-online-dot"></div>' : ''}
+                                </div>
+                                <div>
+                                    <div class="result-name">${userData.name}</div>
+                                    <div class="result-stats">
+                                        ${isOnline ? '<span class="online-status">🟢 Online now</span> •' : ''}
+                                        Level ${userData.level || 1} • ${userData.tokens || 0} tokens
+                                    </div>
+                                </div>
+                            </div>
+                            ${actionButton}
+                        `;
+                        
+                        searchResults.appendChild(resultItem);
+                        delay += 50;
+                    }
+                });
+                
+                spinner.classList.remove('active');
+                
+            } catch (error) {
+                console.error('Search error:', error);
+                spinner.classList.remove('active');
+                typingIndicator.classList.remove('show');
+                searchStatus.textContent = 'Search failed. Try again.';
+                searchStatus.classList.add('visible');
+                searchResults.innerHTML = `
+                    <div class="no-results">
+                        <h4>❌ Search Error</h4>
+                        <p>Please try again</p>
+                    </div>
+                `;
+            }
+        }
+
+        // Start live user status listener
+        function startLiveUserStatusListener() {
+            if (liveUsersListener) liveUsersListener();
+            
+            // Update search results in real-time
+            const searchResults = document.getElementById('searchResults');
+            if (!searchResults) return;
+            
+            // Listen for online status changes
+            liveUsersListener = db.collection('users')
+                .onSnapshot((snapshot) => {
+                    snapshot.docChanges().forEach((change) => {
+                        if (change.type === 'modified') {
+                            const userData = change.doc.data();
+                            const userId = change.doc.id;
+                            
+                            // Update search result if exists
+                            const resultItems = searchResults.querySelectorAll('.search-result-item');
+                            resultItems.forEach(item => {
+                                if (item.innerHTML.includes(userId)) {
+                                    // Update online status
+                                    if (userData.online) {
+                                        item.classList.add('online');
+                                        const statusSpan = item.querySelector('.result-stats');
+                                        if (statusSpan && !statusSpan.innerHTML.includes('Online now')) {
+                                            statusSpan.innerHTML = '<span class="online-status">🟢 Online now</span> • ' + statusSpan.innerHTML;
+                                        }
+                                    } else {
+                                        item.classList.remove('online');
+                                        const onlineStatus = item.querySelector('.online-status');
+                                        if (onlineStatus) onlineStatus.remove();
+                                    }
+                                }
+                            });
+                        }
+                    });
+                });
+        }
+
+        // Load pending requests with live updates
+        async function loadPendingRequestsWithLiveUpdates() {
+            const pendingDiv = document.getElementById('pendingRequests');
+            if (!pendingDiv) return;
+            
+            pendingDiv.innerHTML = '<p>Loading...</p>';
+            
+            // Set up real-time listener for pending requests
+            db.collection('friendRequests')
+                .where('to', '==', currentUser.uid)
+                .where('status', '==', 'pending')
+                .onSnapshot((snapshot) => {
+                    const receivedRequests = [];
+                    snapshot.forEach(doc => {
+                        receivedRequests.push({ id: doc.id, ...doc.data() });
+                    });
+                    
+                    // Update pending count
+                    updatePendingCount(receivedRequests.length);
+                    
+                    // Get sent requests
+                    db.collection('friendRequests')
+                        .where('from', '==', currentUser.uid)
+                        .where('status', '==', 'pending')
+                        .get()
+                        .then((sentSnapshot) => {
+                            const sentRequests = [];
+                            sentSnapshot.forEach(doc => {
+                                sentRequests.push({ id: doc.id, ...doc.data() });
+                            });
+                            
+                            renderPendingRequests(receivedRequests, sentRequests);
+                        });
+                });
+        }
+
+        // Render pending requests
+        function renderPendingRequests(receivedRequests, sentRequests) {
+            const pendingDiv = document.getElementById('pendingRequests');
+            if (!pendingDiv) return;
+            
+            pendingDiv.innerHTML = '';
+            
+            if (receivedRequests.length === 0 && sentRequests.length === 0) {
+                pendingDiv.innerHTML = `
+                    <div class="no-results">
+                        <h4>📭 No pending requests</h4>
+                        <p>All caught up!</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            // Show received requests
+            if (receivedRequests.length > 0) {
+                const receivedHeader = document.createElement('h4');
+                receivedHeader.textContent = `Received Requests (${receivedRequests.length})`;
+                receivedHeader.style.marginBottom = '15px';
+                receivedHeader.style.color = '#9b59b6';
+                pendingDiv.appendChild(receivedHeader);
+                
+                receivedRequests.forEach((request, index) => {
+                    const isNew = request.createdAt && 
+                        request.createdAt.toDate() > new Date(Date.now() - 30000); // New if within 30 seconds
+                    
+                    const requestItem = document.createElement('div');
+                    requestItem.className = `request-item ${isNew ? 'new' : ''}`;
+                    requestItem.style.animationDelay = `${index * 50}ms`;
+                    
+                    const avatarHtml = request.fromAvatar && request.fromAvatar.startsWith('data:')
+                        ? `<img src="${request.fromAvatar}" alt="Avatar">`
+                        : request.fromAvatar || '👤';
+                    
+                    requestItem.innerHTML = `
+                        <div class="request-info">
+                            <div class="request-avatar">${avatarHtml}</div>
+                            <div>
+                                <div class="request-name">${request.fromName}</div>
+                                <div class="request-time ${isNew ? 'live' : ''}">
+                                    ${isNew ? '🔴 Just now!' : formatTimeAgo(request.createdAt)}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="request-actions">
+                            <button class="btn btn-primary btn-small" onclick="acceptFriendRequest('${request.id}', '${request.from}')">
+                                Accept
+                            </button>
+                            <button class="btn btn-secondary btn-small" onclick="declineFriendRequest('${request.id}')">
+                                Decline
+                            </button>
+                        </div>
+                    `;
+                    pendingDiv.appendChild(requestItem);
+                });
+            }
+            
+            // Show sent requests
+            if (sentRequests.length > 0) {
+                const sentHeader = document.createElement('h4');
+                sentHeader.textContent = `Sent Requests (${sentRequests.length})`;
+                sentHeader.style.marginTop = '20px';
+                sentHeader.style.marginBottom = '15px';
+                sentHeader.style.color = '#9b59b6';
+                pendingDiv.appendChild(sentHeader);
+                
+                sentRequests.forEach((request, index) => {
+                    const requestItem = document.createElement('div');
+                    requestItem.className = 'request-item';
+                    requestItem.style.animationDelay = `${(receivedRequests.length + index) * 50}ms`;
+                    requestItem.innerHTML = `
+                        <div class="request-info">
+                            <div class="request-avatar">👤</div>
+                            <div>
+                                <div class="request-name">${request.toName}</div>
+                                <div class="request-time">${formatTimeAgo(request.createdAt)} • Pending</div>
+                            </div>
+                        </div>
+                        <button class="btn btn-secondary btn-small" onclick="cancelFriendRequest('${request.id}')">
+                            Cancel
+                        </button>
+                    `;
+                    pendingDiv.appendChild(requestItem);
+                });
+            }
+        }
+
+        // Update pending count badge
+        function updatePendingCount(count) {
+            pendingRequestsCount = count || 0;
+            const badge = document.getElementById('pendingTabBadge');
+            if (badge) {
+                if (pendingRequestsCount > 0) {
+                    badge.textContent = pendingRequestsCount;
+                    badge.style.display = 'block';
+                } else {
+                    badge.style.display = 'none';
+                }
+            }
+        }
+
         window.closeFriendModal = function() {
+            // Clean up listeners
+            if (searchTimeout) clearTimeout(searchTimeout);
+            if (liveUsersListener) liveUsersListener();
+            
             const modal = document.querySelector('.friend-modal');
             if (modal) modal.remove();
         };
 
         window.switchFriendTab = function(tab) {
             document.querySelectorAll('.friend-tab').forEach(t => t.classList.remove('active'));
-            event.target.classList.add('active');
+            event.target.closest('.friend-tab').classList.add('active');
             
             document.querySelectorAll('.friend-tab-content').forEach(c => c.style.display = 'none');
             document.getElementById(tab + 'Tab').style.display = 'block';
             
             if (tab === 'pending') {
-                loadPendingRequests();
+                loadPendingRequestsWithLiveUpdates();
+            } else if (tab === 'username') {
+                // Clear search when switching back
+                document.getElementById('friendUsername').value = '';
+                document.getElementById('searchResults').innerHTML = `
+                    <div class="no-results">
+                        <h4>🔍 Search for Friends</h4>
+                        <p>Type a username to find people</p>
+                    </div>
+                `;
             }
         };
 
         window.searchFriend = async function() {
+            // This function is now replaced by handleLiveSearch
             const username = document.getElementById('friendUsername').value.trim();
-            if (!username) {
-                showMessage('Please enter a username', 'error');
-                return;
-            }
-            
-            const searchResults = document.getElementById('searchResults');
-            searchResults.innerHTML = '<p>Searching...</p>';
-            
-            try {
-                // Search for users by name
-                const usersRef = db.collection('users');
-                const snapshot = await usersRef
-                    .where('name', '>=', username)
-                    .where('name', '<=', username + '\uf8ff')
-                    .limit(10)
-                    .get();
-                
-                if (snapshot.empty) {
-                    searchResults.innerHTML = '<p style="opacity: 0.6;">No users found</p>';
-                    return;
-                }
-                
-                searchResults.innerHTML = '';
-                snapshot.forEach(doc => {
-                    const userData = doc.data();
-                    if (doc.id !== currentUser.uid) {
-                        const resultItem = document.createElement('div');
-                        resultItem.className = 'search-result-item';
-                        resultItem.innerHTML = `
-                            <div class="result-info">
-                                <span class="result-avatar">${userData.avatar || '👤'}</span>
-                                <div>
-                                    <div class="result-name">${userData.name}</div>
-                                    <div class="result-stats">Level ${userData.level || 1} • ${userData.tokens || 0} tokens</div>
-                                </div>
-                            </div>
-                            <button class="btn btn-primary btn-small" onclick="sendFriendRequest('${doc.id}', '${userData.name}')">
-                                Add Friend
-                            </button>
-                        `;
-                        searchResults.appendChild(resultItem);
-                    }
-                });
-            } catch (error) {
-                console.error('Error searching users:', error);
-                searchResults.innerHTML = '<p style="color: #f44336;">Search failed. Try again.</p>';
+            if (username) {
+                await performLiveSearch(username);
             }
         };
 
@@ -4570,6 +5160,18 @@
                     return;
                 }
                 
+                // Check for existing pending request
+                const existingRequest = await db.collection('friendRequests')
+                    .where('from', '==', currentUser.uid)
+                    .where('to', '==', targetUserId)
+                    .where('status', '==', 'pending')
+                    .get();
+                
+                if (!existingRequest.empty) {
+                    showMessage('Friend request already sent!', 'info');
+                    return;
+                }
+                
                 // Create friend request
                 await db.collection('friendRequests').add({
                     from: currentUser.uid,
@@ -4582,7 +5184,18 @@
                 });
                 
                 showMessage(`Friend request sent to ${targetName}!`, 'success');
-                closeFriendModal();
+                
+                // Update the button immediately to show pending status
+                const button = event.target;
+                if (button && button.tagName === 'BUTTON') {
+                    button.outerHTML = '<span class="request-status">⏳ Pending</span>';
+                }
+                
+                // Refresh search if still in search tab
+                const searchInput = document.getElementById('friendUsername');
+                if (searchInput && searchInput.value) {
+                    handleLiveSearch({ target: searchInput });
+                }
                 
             } catch (error) {
                 console.error('Error sending friend request:', error);
@@ -4632,96 +5245,6 @@
             }
         };
 
-        async function loadPendingRequests() {
-            const pendingDiv = document.getElementById('pendingRequests');
-            pendingDiv.innerHTML = '<p>Loading...</p>';
-            
-            try {
-                // Get requests TO current user
-                const receivedRequests = await db.collection('friendRequests')
-                    .where('to', '==', currentUser.uid)
-                    .where('status', '==', 'pending')
-                    .get();
-                
-                // Get requests FROM current user
-                const sentRequests = await db.collection('friendRequests')
-                    .where('from', '==', currentUser.uid)
-                    .where('status', '==', 'pending')
-                    .get();
-                
-                pendingDiv.innerHTML = '';
-                
-                if (receivedRequests.empty && sentRequests.empty) {
-                    pendingDiv.innerHTML = '<p style="opacity: 0.6;">No pending requests</p>';
-                    return;
-                }
-                
-                // Show received requests
-                if (!receivedRequests.empty) {
-                    const receivedHeader = document.createElement('h4');
-                    receivedHeader.textContent = 'Received Requests';
-                    receivedHeader.style.marginBottom = '15px';
-                    pendingDiv.appendChild(receivedHeader);
-                    
-                    receivedRequests.forEach(doc => {
-                        const request = doc.data();
-                        const requestItem = document.createElement('div');
-                        requestItem.className = 'request-item';
-                        requestItem.innerHTML = `
-                            <div class="request-info">
-                                <span class="request-avatar">${request.fromAvatar || '👤'}</span>
-                                <div>
-                                    <div class="request-name">${request.fromName}</div>
-                                    <div class="request-time">${formatTimeAgo(request.createdAt)}</div>
-                                </div>
-                            </div>
-                            <div class="request-actions">
-                                <button class="btn btn-primary btn-small" onclick="acceptFriendRequest('${doc.id}', '${request.from}')">
-                                    Accept
-                                </button>
-                                <button class="btn btn-secondary btn-small" onclick="declineFriendRequest('${doc.id}')">
-                                    Decline
-                                </button>
-                            </div>
-                        `;
-                        pendingDiv.appendChild(requestItem);
-                    });
-                }
-                
-                // Show sent requests
-                if (!sentRequests.empty) {
-                    const sentHeader = document.createElement('h4');
-                    sentHeader.textContent = 'Sent Requests';
-                    sentHeader.style.marginTop = '20px';
-                    sentHeader.style.marginBottom = '15px';
-                    pendingDiv.appendChild(sentHeader);
-                    
-                    sentRequests.forEach(doc => {
-                        const request = doc.data();
-                        const requestItem = document.createElement('div');
-                        requestItem.className = 'request-item';
-                        requestItem.innerHTML = `
-                            <div class="request-info">
-                                <span class="request-avatar">👤</span>
-                                <div>
-                                    <div class="request-name">${request.toName}</div>
-                                    <div class="request-time">${formatTimeAgo(request.createdAt)} • Pending</div>
-                                </div>
-                            </div>
-                            <button class="btn btn-secondary btn-small" onclick="cancelFriendRequest('${doc.id}')">
-                                Cancel
-                            </button>
-                        `;
-                        pendingDiv.appendChild(requestItem);
-                    });
-                }
-                
-            } catch (error) {
-                console.error('Error loading requests:', error);
-                pendingDiv.innerHTML = '<p style="color: #f44336;">Failed to load requests</p>';
-            }
-        }
-
         window.acceptFriendRequest = async function(requestId, fromUserId) {
             try {
                 // Create friendship
@@ -4750,9 +5273,20 @@
                 userData.friendsCount++;
                 updateUserDisplay();
                 
-                showMessage('Friend request accepted!', 'success');
-                loadPendingRequests();
+                showMessage('Friend request accepted! 🎉', 'success');
+                
+                // Reload friends list
                 loadFriends();
+                
+                // Update UI immediately
+                const button = event.target;
+                if (button) {
+                    const requestItem = button.closest('.request-item');
+                    if (requestItem) {
+                        requestItem.style.animation = 'fadeOut 0.5s ease';
+                        setTimeout(() => requestItem.remove(), 500);
+                    }
+                }
                 
             } catch (error) {
                 console.error('Error accepting request:', error);
@@ -4768,7 +5302,16 @@
                 });
                 
                 showMessage('Friend request declined', 'info');
-                loadPendingRequests();
+                
+                // Update UI immediately
+                const button = event.target;
+                if (button) {
+                    const requestItem = button.closest('.request-item');
+                    if (requestItem) {
+                        requestItem.style.animation = 'fadeOut 0.5s ease';
+                        setTimeout(() => requestItem.remove(), 500);
+                    }
+                }
                 
             } catch (error) {
                 console.error('Error declining request:', error);
@@ -4780,7 +5323,16 @@
             try {
                 await db.collection('friendRequests').doc(requestId).delete();
                 showMessage('Friend request cancelled', 'info');
-                loadPendingRequests();
+                
+                // Update UI immediately
+                const button = event.target;
+                if (button) {
+                    const requestItem = button.closest('.request-item');
+                    if (requestItem) {
+                        requestItem.style.animation = 'fadeOut 0.5s ease';
+                        setTimeout(() => requestItem.remove(), 500);
+                    }
+                }
                 
             } catch (error) {
                 console.error('Error cancelling request:', error);
