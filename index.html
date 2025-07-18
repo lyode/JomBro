@@ -2862,6 +2862,12 @@
             background: rgba(155, 89, 182, 0.1);
             border-radius: 15px;
             border: 2px dashed rgba(155, 89, 182, 0.3);
+            transition: all 0.3s ease;
+        }
+
+        .proof-upload-section.has-file {
+            border-style: solid;
+            background: rgba(155, 89, 182, 0.15);
         }
 
         .proof-upload-icon {
@@ -2971,6 +2977,35 @@
 
         .cancel-btn:hover {
             background: rgba(255, 255, 255, 0.2);
+        }
+
+        /* Upload Progress */
+        .upload-progress {
+            display: none;
+            margin-top: 20px;
+        }
+
+        .upload-progress-bar {
+            width: 100%;
+            height: 8px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .upload-progress-fill {
+            height: 100%;
+            background: linear-gradient(45deg, #9b59b6, #e91e63);
+            border-radius: 4px;
+            transition: width 0.3s ease;
+            width: 0%;
+        }
+
+        .upload-progress-text {
+            text-align: center;
+            margin-top: 10px;
+            font-size: 0.9rem;
+            opacity: 0.8;
         }
 
         /* How to Play Button - More Prominent */
@@ -3617,225 +3652,6 @@
         </div>
     </div>
 
-    <!-- App Content -->
-    <div class="app-content" id="appContent">
-        <div class="container">
-            <!-- Header -->
-            <div class="header floating-element">
-                <div class="header-top">
-                    <div class="logo-section">
-                        <div class="logo">JomBro</div>
-                        <div class="slogan">Let's Go! Let's Go!</div>
-                        <div class="user-name" id="userName" onclick="showUsernameEdit()">Loading...</div>
-                    </div>
-                    <div class="user-avatar" id="userAvatar" onclick="showAvatarSelector()">👤</div>
-                </div>
-                <div class="user-stats">
-                    <div class="stat-item" onclick="showProfileEditor()">
-                        <div class="stat-number" id="userTokens">0</div>
-                        <div class="stat-label">Tokens</div>
-                    </div>
-                    <div class="stat-item" onclick="showProfileEditor()">
-                        <div class="stat-number" id="userLevel">1</div>
-                        <div class="stat-label">Level</div>
-                    </div>
-                    <div class="stat-item" onclick="showProfileEditor()">
-                        <div class="stat-number" id="userFriends">0</div>
-                        <div class="stat-label">Friends</div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Main Content -->
-            <div class="main-content">
-                <!-- Nearby Players Section -->
-                <div class="card floating-element">
-                    <div class="card-title">
-                        <span>🎮</span>
-                        <span>Online Nearby Players</span>
-                    </div>
-                    
-                    <div class="strangers-section">
-                        <div class="strangers-carousel">
-                            <div class="strangers-track" id="strangersTrack">
-                                <!-- Players populated here -->
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Friends Section -->
-                <div class="card floating-element">
-                    <div class="card-title">
-                        <span>👥</span>
-                        <span>Friends</span>
-                    </div>
-                    
-                    <div class="friends-section">
-                        <div class="friends-header">
-                            <div class="friends-count">
-                                <span class="online-count" id="onlineCount">0</span> online • 
-                                <span id="totalFriends">0</span> total
-                            </div>
-                            <button class="btn btn-secondary btn-small" onclick="showAddFriendModal()" style="position: relative;">
-                                Add Friend
-                                <span class="friend-counter-badge" id="mainPendingBadge" style="display: none;"></span>
-                            </button>
-                        </div>
-                        
-                        <!-- Friends Carousel -->
-                        <div class="friends-carousel-container">
-                            <div class="friends-carousel" id="friendsCarousel">
-                                <!-- Friends carousel will be populated here -->
-                            </div>
-                        </div>
-                        
-                        <!-- View All Button -->
-                        <div class="view-all-friends-btn" id="viewAllFriendsBtn" style="display: none;">
-                            <button class="view-all-btn" onclick="toggleFriendsList()">
-                                <span id="viewAllText">View All Friends</span>
-                            </button>
-                        </div>
-                        
-                        <!-- Full Friends List (Hidden by default) -->
-                        <div class="friends-list" id="friendsList">
-                            <!-- Friends will be populated here -->
-                        </div>
-                    </div>
-                </div>
-
-                <!-- AI Challenge Generator -->
-                <div class="card floating-element ai-challenges-section">
-                    <div class="ai-challenges-header">
-                        <div class="ai-challenges-title">
-                            <span>🤖</span>
-                            <span>AI Challenge Generator</span>
-                        </div>
-                        <div class="ai-timer">
-                            <span>⏱️ <span class="ai-timer-count" id="aiTimerCount">2:00</span></span>
-                        </div>
-                    </div>
-                    
-                    <div class="ai-challenges-grid" id="aiChallengesGrid">
-                        <!-- AI Generated challenges will be populated here -->
-                    </div>
-                    
-                    <div class="ai-challenge-actions">
-                        <button class="btn btn-ai" onclick="generateAIChallenges()" id="generateBtn">
-                            🎯 Generate New Challenges
-                        </button>
-                        <button class="btn btn-secondary" onclick="toggleAIChallenge()" id="toggleAIBtn">
-                            ⏸️ Pause Timer
-                        </button>
-                    </div>
-                    
-                    <!-- Target Selector (Hidden by default) -->
-                    <div class="ai-challenge-target-selector" id="targetSelector">
-                        <div class="target-selector-title">
-                            <span>🎯</span>
-                            <span>Send Challenge To:</span>
-                        </div>
-                        
-                        <div class="target-tabs">
-                            <div class="target-tab active" onclick="switchTargetTab('friends')">Friends</div>
-                            <div class="target-tab" onclick="switchTargetTab('random')">Random</div>
-                        </div>
-                        
-                        <div class="target-list" id="targetList">
-                            <!-- Target list will be populated here -->
-                        </div>
-                        
-                        <div class="send-challenge-actions">
-                            <button class="btn btn-primary" onclick="sendSelectedAIChallenge()" id="sendChallengeBtn">
-                                Send Challenge (25 tokens)
-                            </button>
-                            <button class="btn btn-secondary" onclick="cancelChallengeSelection()">
-                                Cancel
-                            </button>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Quick Challenge Creator -->
-                <div class="card floating-element quick-challenge-creator">
-                    <div class="quick-challenge-header">
-                        <div class="quick-challenge-title">
-                            <span>⚡</span>
-                            <span>Quick Challenge</span>
-                        </div>
-                        <div class="quick-toggle-container">
-                            <div class="quick-toggle active" id="quickToggle" onclick="toggleQuickChallenge()">
-                                <div class="toggle-switch"></div>
-                            </div>
-                            <span class="quick-toggle-label">Create & Send</span>
-                        </div>
-                    </div>
-                    
-                    <div class="quick-challenge-form" id="quickChallengeForm">
-                        <div class="quick-input-group">
-                            <input type="text" class="quick-input" id="quickChallengeTitle" placeholder="Challenge title (e.g., Do 10 push-ups)" maxlength="60">
-                        </div>
-                        <div class="quick-input-group">
-                            <textarea class="quick-input quick-textarea" id="quickChallengeDesc" placeholder="What do they need to do? (They'll need to upload photo/video proof)"></textarea>
-                        </div>
-                        <div class="quick-options">
-                            <div class="quick-option-group">
-                                <select class="quick-select" id="quickCategory">
-                                    <option value="fitness">💪 Fitness</option>
-                                    <option value="creative">🎨 Creative</option>
-                                    <option value="social">👥 Social</option>
-                                    <option value="food">🍕 Food</option>
-                                    <option value="adventure">🗺️ Adventure</option>
-                                </select>
-                            </div>
-                            <div class="quick-option-group">
-                                <select class="quick-select" id="quickReward">
-                                    <option value="100">🪙 100 Tokens</option>
-                                    <option value="200">🪙 200 Tokens</option>
-                                    <option value="500">🪙 500 Tokens</option>
-                                    <option value="1000">🪙 1000 Tokens</option>
-                                </select>
-                            </div>
-                        </div>
-                        <div class="quick-actions">
-                            <button class="btn btn-primary quick-create-btn" onclick="selectChallengeTargets()">Select Friends & Send (50 tokens)</button>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Active Challenges Section -->
-                <div class="card floating-element">
-                    <div class="card-title">
-                        <span>🎯</span>
-                        <span>Active Challenges</span>
-                    </div>
-                    
-                    <div class="challenges-section">
-                        <div class="challenges-header">
-                            <div class="challenges-count">
-                                <span class="online-count" id="activeChallengesCount">0</span> active
-                            </div>
-                            <button class="btn btn-secondary btn-small" onclick="refreshChallenges()">Refresh</button>
-                        </div>
-                        
-                        <div class="challenges-list" id="challengesList">
-                            <!-- Challenges will be populated here -->
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        
-        <!-- How to Play Button -->
-        <div class="how-to-play-btn" onclick="showHowToPlay()">
-            <span style="font-size: 1.5rem;">❓</span>
-            <div class="btn-text">
-                <span class="btn-title">How to Play</span>
-                <span class="btn-subtitle">JomBro!</span>
-            </div>
-        </div>
-    </div>
-
     <script>
         // Fixed Firebase Configuration
         const firebaseConfig = {
@@ -3846,1701 +3662,6 @@
             messagingSenderId: "390572076435",
             appId: "1:390572076435:web:781f9f62b84542eb834c66",
             measurementId: "G-J84HS0WPCP"
-        };
-
-        // Initialize Firebase first
-        let app = null;
-        let db = null;
-        let storage = null;
-
-        // Global variables
-        let currentUser = null;
-        let selectedAvatar = null;
-        let userData = {
-            name: '',
-            avatar: '👤',
-            tokens: 1000,
-            level: 1,
-            friendsCount: 0
-        };
-        let friends = [];
-        let challenges = [];
-        let friendRequestsListener = null;
-        let challengesListener = null;
-        let friendsListener = null;
-
-        // AI Challenge System Variables
-        let aiChallengeTimer = null;
-        let aiChallengeInterval = 120000; // 2 minutes in milliseconds
-        let aiChallengeActive = true;
-        let currentAIChallenges = [];
-        let selectedAIChallenge = null;
-        let selectedTargets = [];
-        let aiTimerCountdown = 120; // 2 minutes in seconds
-        let aiTimerInterval = null;
-        let selectedChallengeTargets = [];
-
-        // AI Challenge Database
-        const aiChallengeDatabase = {
-            fitness: [
-                {
-                    title: "Perfect Plank Challenge",
-                    description: "Hold a plank position for 60 seconds with perfect form. Show your stopwatch!",
-                    difficulty: "medium",
-                    reward: 150,
-                    timeLimit: 24
-                },
-                {
-                    title: "Stairs Sprint",
-                    description: "Run up and down a flight of stairs 5 times. Record your time!",
-                    difficulty: "hard",
-                    reward: 200,
-                    timeLimit: 12
-                },
-                {
-                    title: "Push-Up Power",
-                    description: "Do 20 push-ups in under 2 minutes. Show your form!",
-                    difficulty: "medium",
-                    reward: 125,
-                    timeLimit: 18
-                },
-                {
-                    title: "Squat Squad",
-                    description: "Complete 30 squats with proper form. Film yourself!",
-                    difficulty: "easy",
-                    reward: 100,
-                    timeLimit: 24
-                }
-            ],
-            creative: [
-                {
-                    title: "Doodle Master",
-                    description: "Draw a self-portrait using only your non-dominant hand!",
-                    difficulty: "medium",
-                    reward: 150,
-                    timeLimit: 24
-                },
-                {
-                    title: "Origami Expert",
-                    description: "Fold a paper crane and take a photo with it on your head!",
-                    difficulty: "easy",
-                    reward: 100,
-                    timeLimit: 36
-                }
-            ],
-            social: [
-                {
-                    title: "Random Act of Kindness",
-                    description: "Do something nice for a stranger and share the story!",
-                    difficulty: "easy",
-                    reward: 200,
-                    timeLimit: 24
-                },
-                {
-                    title: "Compliment Chain",
-                    description: "Give genuine compliments to 5 different people today!",
-                    difficulty: "medium",
-                    reward: 150,
-                    timeLimit: 12
-                }
-            ],
-            food: [
-                {
-                    title: "Smoothie Master",
-                    description: "Create a healthy smoothie with at least 3 fruits!",
-                    difficulty: "easy",
-                    reward: 100,
-                    timeLimit: 24
-                },
-                {
-                    title: "No-Cook Creation",
-                    description: "Make a delicious meal without using heat!",
-                    difficulty: "medium",
-                    reward: 150,
-                    timeLimit: 18
-                }
-            ],
-            adventure: [
-                {
-                    title: "Local Explorer",
-                    description: "Visit a place in your city you've never been to!",
-                    difficulty: "easy",
-                    reward: 150,
-                    timeLimit: 24
-                },
-                {
-                    title: "Nature Walk",
-                    description: "Take a 30-minute walk in nature and photograph 5 different plants!",
-                    difficulty: "easy",
-                    reward: 100,
-                    timeLimit: 36
-                }
-            ]
-        };
-
-        // Initialize app when DOM is ready
-        document.addEventListener('DOMContentLoaded', async function() {
-            console.log('DOM loaded, initializing app...');
-            
-            try {
-                // Initialize Firebase
-                if (!firebase.apps.length) {
-                    app = firebase.initializeApp(firebaseConfig);
-                } else {
-                    app = firebase.app();
-                }
-                
-                db = firebase.firestore();
-                storage = firebase.storage();
-                
-                // Enable offline persistence
-                try {
-                    await db.enablePersistence();
-                } catch (err) {
-                    if (err.code == 'failed-precondition') {
-                        console.log('Multiple tabs open, persistence can only be enabled in one tab at a a time.');
-                    } else if (err.code == 'unimplemented') {
-                        console.log('The current browser does not support persistence.');
-                    }
-                }
-                
-                console.log('Firebase initialized successfully');
-                
-                // Setup UI
-                createStarfield();
-                setupEventListeners();
-                
-                // Check for existing session
-                checkExistingSession();
-                
-            } catch (error) {
-                console.error('Initialization error:', error);
-                showError('Failed to initialize app. Please refresh the page.');
-            }
-        });
-
-        // Create starfield background
-        function createStarfield() {
-            const starfield = document.getElementById('starfield');
-            if (!starfield) return;
-            
-            const starCount = 100;
-            
-            for (let i = 0; i < starCount; i++) {
-                const star = document.createElement('div');
-                star.className = 'star';
-                
-                const size = Math.random();
-                if (size < 0.3) star.classList.add('small');
-                else if (size < 0.7) star.classList.add('medium');
-                else star.classList.add('large');
-                
-                star.style.left = Math.random() * 100 + '%';
-                star.style.top = Math.random() * 100 + '%';
-                star.style.animationDelay = Math.random() * 2 + 's';
-                
-                starfield.appendChild(star);
-            }
-        }
-
-        // Setup event listeners
-        function setupEventListeners() {
-            // Phone form
-            const phoneForm = document.getElementById('phoneAuthForm');
-            if (phoneForm) {
-                phoneForm.addEventListener('submit', handlePhoneSubmit);
-            }
-
-            // Username form
-            const usernameForm = document.getElementById('usernameForm');
-            if (usernameForm) {
-                usernameForm.addEventListener('submit', handleUsernameSubmit);
-            }
-
-            // Phone number formatting
-            const phoneInput = document.getElementById('phoneNumber');
-            if (phoneInput) {
-                phoneInput.addEventListener('input', function(e) {
-                    e.target.value = e.target.value.replace(/\D/g, '');
-                });
-            }
-
-            // Avatar selection
-            document.querySelectorAll('.avatar-option').forEach(avatar => {
-                avatar.addEventListener('click', function() {
-                    selectAvatar(this);
-                });
-            });
-        }
-
-        // Check existing session
-        async function checkExistingSession() {
-            const savedPhone = localStorage.getItem('jombro_phone');
-            const savedUserId = localStorage.getItem('jombro_userId');
-            
-            if (savedPhone && savedUserId) {
-                try {
-                    const userDoc = await db.collection('users').doc(savedUserId).get();
-                    
-                    if (userDoc.exists) {
-                        currentUser = {
-                            uid: savedUserId,
-                            phoneNumber: savedPhone
-                        };
-                        
-                        await loadUserData();
-                        hideAuthModal();
-                        showMessage('Welcome back! 🎮', 'success');
-                    } else {
-                        // Clear invalid session
-                        localStorage.removeItem('jombro_phone');
-                        localStorage.removeItem('jombro_userId');
-                    }
-                } catch (error) {
-                    console.error('Session check error:', error);
-                }
-            }
-        }
-
-        // Handle phone submission
-        async function handlePhoneSubmit(e) {
-            e.preventDefault();
-            
-            const countryCode = document.getElementById('countryCode').value;
-            const phoneNumber = document.getElementById('phoneNumber').value.trim();
-            const loginButton = document.getElementById('loginButton');
-            
-            if (!phoneNumber || phoneNumber.length < 6) {
-                showError('Please enter a valid phone number');
-                return;
-            }
-            
-            const fullNumber = countryCode + phoneNumber;
-            
-            try {
-                setButtonLoading(loginButton, true);
-                hideError();
-                
-                // Create user ID from phone number
-                const userId = 'user_' + fullNumber.replace(/\D/g, '');
-                
-                // Check if user exists
-                const userDoc = await db.collection('users').doc(userId).get();
-                
-                if (userDoc.exists) {
-                    // Existing user - login
-                    currentUser = {
-                        uid: userId,
-                        phoneNumber: fullNumber
-                    };
-                    
-                    // Save session
-                    localStorage.setItem('jombro_phone', fullNumber);
-                    localStorage.setItem('jombro_userId', userId);
-                    
-                    await loadUserData();
-                    hideAuthModal();
-                    showMessage('Welcome back! 🎮', 'success');
-                } else {
-                    // New user - show username form
-                    currentUser = {
-                        uid: userId,
-                        phoneNumber: fullNumber
-                    };
-                    
-                    document.getElementById('phoneAuthForm').style.display = 'none';
-                    document.getElementById('usernameForm').style.display = 'block';
-                    document.getElementById('username').focus();
-                }
-                
-            } catch (error) {
-                console.error('Login error:', error);
-                showError('Failed to login. Please try again.');
-            } finally {
-                setButtonLoading(loginButton, false);
-            }
-        }
-
-        // Handle username submission
-        async function handleUsernameSubmit(e) {
-            e.preventDefault();
-            
-            const username = document.getElementById('username').value.trim();
-            const startButton = document.getElementById('startPlayingButton');
-            
-            if (!username || username.length < 3) {
-                showError('Username must be at least 3 characters');
-                return;
-            }
-            
-            if (!selectedAvatar) {
-                showError('Please select an avatar');
-                return;
-            }
-            
-            try {
-                setButtonLoading(startButton, true);
-                hideError();
-                
-                // Create user document
-                await db.collection('users').doc(currentUser.uid).set({
-                    name: username,
-                    phoneNumber: currentUser.phoneNumber,
-                    avatar: selectedAvatar,
-                    tokens: 1000,
-                    level: 1,
-                    friendsCount: 0,
-                    createdAt: firebase.firestore.FieldValue.serverTimestamp(),
-                    lastActive: firebase.firestore.FieldValue.serverTimestamp(),
-                    online: true
-                });
-                
-                // Save session
-                localStorage.setItem('jombro_phone', currentUser.phoneNumber);
-                localStorage.setItem('jombro_userId', currentUser.uid);
-                
-                await loadUserData();
-                hideAuthModal();
-                showMessage('🎉 Welcome to JomBro! You got 1000 starter tokens!', 'success');
-                
-            } catch (error) {
-                console.error('Profile creation error:', error);
-                showError('Failed to create profile. Please try again.');
-            } finally {
-                setButtonLoading(startButton, false);
-            }
-        }
-
-        // Load user data
-        async function loadUserData() {
-            try {
-                const userDoc = await db.collection('users').doc(currentUser.uid).get();
-                
-                if (userDoc.exists) {
-                    const data = userDoc.data();
-                    userData = {
-                        name: data.name,
-                        avatar: data.avatar,
-                        tokens: data.tokens || 1000,
-                        level: data.level || 1,
-                        friendsCount: data.friendsCount || 0
-                    };
-                    
-                    // Update UI
-                    updateUserDisplay();
-                    
-                    // Update online status
-                    await db.collection('users').doc(currentUser.uid).update({
-                        online: true,
-                        lastActive: firebase.firestore.FieldValue.serverTimestamp()
-                    });
-                    
-                    // Load friends and challenges
-                    loadFriends();
-                    loadChallenges();
-                    loadNearbyPlayers();
-                    
-                    // Initialize AI Challenge System
-                    generateAIChallenges();
-                    startAITimer();
-                    startTimerCountdown();
-                    
-                    // Setup real-time listeners
-                    setupRealtimeListeners();
-                    
-                    // Show app content
-                    document.getElementById('appContent').classList.add('loaded');
-                }
-            } catch (error) {
-                console.error('Error loading user data:', error);
-                showError('Failed to load user data');
-            }
-        }
-
-        // Update user display
-        function updateUserDisplay() {
-            document.getElementById('userName').textContent = userData.name;
-            
-            // Handle avatar display (emoji or image)
-            const avatarElement = document.getElementById('userAvatar');
-            if (userData.avatar && userData.avatar.startsWith('data:')) {
-                avatarElement.innerHTML = `<img src="${userData.avatar}" alt="Avatar">`;
-            } else {
-                avatarElement.innerHTML = '';
-                avatarElement.textContent = userData.avatar || '👤';
-            }
-            
-            document.getElementById('userTokens').textContent = userData.tokens;
-            document.getElementById('userLevel').textContent = userData.level;
-            document.getElementById('userFriends').textContent = userData.friendsCount;
-        }
-
-        // Load friends
-        async function loadFriends() {
-            try {
-                const friendshipsSnapshot = await db.collection('friendships')
-                    .where('users', 'array-contains', currentUser.uid)
-                    .get();
-                
-                friends = [];
-                
-                for (const doc of friendshipsSnapshot.docs) {
-                    const friendship = doc.data();
-                    const friendId = friendship.users.find(id => id !== currentUser.uid);
-                    
-                    if (friendId) {
-                        const friendDoc = await db.collection('users').doc(friendId).get();
-                        if (friendDoc.exists) {
-                            const friendData = friendDoc.data();
-                            friends.push({
-                                id: friendId,
-                                name: friendData.name,
-                                avatar: friendData.avatar,
-                                level: friendData.level || 1,
-                                tokens: friendData.tokens || 0,
-                                online: friendData.online || false,
-                                lastActive: friendData.lastActive
-                            });
-                        }
-                    }
-                }
-                
-                renderFriends();
-                
-            } catch (error) {
-                console.error('Error loading friends:', error);
-            }
-        }
-
-        // Render friends
-        function renderFriends() {
-            const friendsCarousel = document.getElementById('friendsCarousel');
-            const friendsList = document.getElementById('friendsList');
-            const viewAllBtn = document.getElementById('viewAllFriendsBtn');
-            const onlineCount = friends.filter(f => f.online).length;
-            
-            document.getElementById('onlineCount').textContent = onlineCount;
-            document.getElementById('totalFriends').textContent = friends.length;
-            
-            if (friends.length === 0) {
-                friendsCarousel.innerHTML = `
-                    <div class="empty-state" style="width: 100%; text-align: center; padding: 40px 20px;">
-                        <h4>👥 No friends yet</h4>
-                        <p>Add friends to start challenging each other!</p>
-                        <button class="btn btn-primary" onclick="showAddFriendModal()" style="margin-top: 15px;">
-                            Add Your First Friend
-                        </button>
-                    </div>
-                `;
-                viewAllBtn.style.display = 'none';
-                friendsList.innerHTML = '';
-                return;
-            }
-            
-            // Render carousel
-            friendsCarousel.innerHTML = '';
-            friends.forEach((friend) => {
-                const carouselItem = document.createElement('div');
-                carouselItem.className = 'friend-carousel-item';
-                carouselItem.onclick = () => showFriendProfile(friend.id);
-                
-                let avatarHtml;
-                if (friend.avatar && friend.avatar.startsWith('data:')) {
-                    avatarHtml = `<img src="${friend.avatar}" alt="${friend.name}">`;
-                } else {
-                    avatarHtml = friend.avatar || '👤';
-                }
-                
-                carouselItem.innerHTML = `
-                    <div class="friend-carousel-avatar">
-                        ${avatarHtml}
-                        ${friend.online ? '<div class="carousel-online-indicator"></div>' : ''}
-                    </div>
-                    <div class="friend-carousel-name">${friend.name}</div>
-                `;
-                
-                friendsCarousel.appendChild(carouselItem);
-            });
-            
-            // Show View All button if more than 5 friends
-            if (friends.length > 5) {
-                viewAllBtn.style.display = 'block';
-            } else {
-                viewAllBtn.style.display = 'none';
-            }
-            
-            // Render full list (hidden by default)
-            friendsList.innerHTML = '';
-            friends.forEach((friend) => {
-                const friendElement = document.createElement('div');
-                friendElement.className = 'friend-item';
-                
-                const statusText = friend.online ? 'Online' : 'Offline';
-                let avatarHtml;
-                if (friend.avatar && friend.avatar.startsWith('data:')) {
-                    avatarHtml = `<img src="${friend.avatar}" alt="${friend.name}">`;
-                } else {
-                    avatarHtml = friend.avatar || '👤';
-                }
-                
-                friendElement.innerHTML = `
-                    <div class="friend-info">
-                        <div class="friend-avatar-circle">
-                            ${avatarHtml}
-                            ${friend.online ? '<div class="online-indicator"></div>' : ''}
-                        </div>
-                        <div class="friend-details">
-                            <h4>${friend.name}</h4>
-                            <p>${statusText} • Level ${friend.level}</p>
-                        </div>
-                    </div>
-                    <div class="friend-actions">
-                        <button class="btn btn-primary btn-small" onclick="challengeFriend('${friend.id}')" ${!friend.online ? 'disabled' : ''}>
-                            Challenge
-                        </button>
-                    </div>
-                `;
-                
-                friendsList.appendChild(friendElement);
-            });
-        }
-
-        // Toggle friends list view
-        window.toggleFriendsList = function() {
-            const friendsList = document.getElementById('friendsList');
-            const viewAllText = document.getElementById('viewAllText');
-            
-            if (friendsList.classList.contains('show')) {
-                friendsList.classList.remove('show');
-                viewAllText.textContent = 'View All Friends';
-            } else {
-                friendsList.classList.add('show');
-                viewAllText.textContent = 'Hide Friends List';
-            }
-        };
-
-        // Show friend detail modal
-        window.showFriendDetail = function(friend) {
-            const modal = document.createElement('div');
-            modal.className = 'friend-modal';
-            
-            let avatarHtml;
-            if (friend.avatar && friend.avatar.startsWith('data:')) {
-                avatarHtml = `<img src="${friend.avatar}" alt="${friend.name}">`;
-            } else {
-                avatarHtml = friend.avatar || '👤';
-            }
-            
-            modal.innerHTML = `
-                <div class="friend-modal-content" style="max-width: 400px;">
-                    <div class="friend-modal-header">
-                        <h2>Friend Profile</h2>
-                        <button class="close-modal" onclick="closeModal(this)">×</button>
-                    </div>
-                    <div style="text-align: center; padding: 20px;">
-                        <div class="user-avatar" style="width: 100px; height: 100px; font-size: 3rem; margin: 0 auto 20px;">
-                            ${avatarHtml}
-                            ${friend.online ? '<div class="online-indicator" style="width: 20px; height: 20px; border-width: 4px;"></div>' : ''}
-                        </div>
-                        <h2 style="margin-bottom: 10px;">${friend.name}</h2>
-                        <p style="opacity: 0.8; margin-bottom: 20px;">
-                            ${friend.online ? '🟢 Online Now' : '⚫ Offline'} • Level ${friend.level}
-                        </p>
-                        <div class="profile-stats-grid" style="margin-bottom: 20px;">
-                            <div class="profile-stat-box">
-                                <div class="profile-stat-value">${friend.tokens || 0}</div>
-                                <div class="profile-stat-label">Tokens</div>
-                            </div>
-                            <div class="profile-stat-box">
-                                <div class="profile-stat-value">${friend.level}</div>
-                                <div class="profile-stat-label">Level</div>
-                            </div>
-                        </div>
-                        <button class="btn btn-primary" onclick="challengeFriend('${friend.id}')" ${!friend.online ? 'disabled' : ''} style="width: 100%;">
-                            ${friend.online ? '⚡ Challenge Now' : '⏸️ Currently Offline'}
-                        </button>
-                    </div>
-                </div>
-            `;
-            
-            document.body.appendChild(modal);
-        };
-
-        // Load challenges
-        async function loadChallenges() {
-            try {
-                const challengesSnapshot = await db.collection('challenges')
-                    .where('participants', 'array-contains', currentUser.uid)
-                    .where('status', '==', 'active')
-                    .orderBy('createdAt', 'desc')
-                    .limit(20)
-                    .get();
-                
-                challenges = [];
-                
-                challengesSnapshot.forEach(doc => {
-                    challenges.push({
-                        id: doc.id,
-                        ...doc.data()
-                    });
-                });
-                
-                renderChallenges();
-                
-            } catch (error) {
-                console.error('Error loading challenges:', error);
-            }
-        }
-
-        // Render challenges
-        function renderChallenges() {
-            const challengesList = document.getElementById('challengesList');
-            const activeCount = challenges.filter(c => c.status === 'active').length;
-            
-            document.getElementById('activeChallengesCount').textContent = activeCount;
-            
-            if (challenges.length === 0) {
-                challengesList.innerHTML = `
-                    <div class="empty-state">
-                        <h4>🎯 No active challenges</h4>
-                        <p>Create a challenge or wait for friends to challenge you!</p>
-                    </div>
-                `;
-                return;
-            }
-            
-            challengesList.innerHTML = '';
-            
-            challenges.forEach((challenge) => {
-                const challengeElement = document.createElement('div');
-                challengeElement.className = 'challenge-item';
-                challengeElement.onclick = () => showChallengeDetail(challenge);
-                
-                const isCreator = challenge.creatorId === currentUser.uid;
-                const isSender = challenge.senderId === currentUser.uid;
-                const userResponse = challenge.responses && challenge.responses[currentUser.uid];
-                const responseStatus = userResponse ? userResponse.response : 'pending';
-                
-                let actionButtons = '';
-                let statusBadge = '';
-                
-                if (!isCreator && !isSender && responseStatus === 'pending') {
-                    actionButtons = `
-                        <button class="btn btn-primary btn-small" onclick="event.stopPropagation(); respondToChallenge('${challenge.id}', 'accepted')">Accept</button>
-                        <button class="btn btn-secondary btn-small" onclick="event.stopPropagation(); respondToChallenge('${challenge.id}', 'declined')">Decline</button>
-                    `;
-                } else if (!isCreator && !isSender && responseStatus === 'accepted' && (!userResponse || !userResponse.proofUrl)) {
-                    actionButtons = `
-                        <button class="btn btn-primary btn-small" onclick="event.stopPropagation(); showSubmitChallengeModal('${challenge.id}')">📸 Submit Proof</button>
-                    `;
-                    statusBadge = '<span style="font-size: 0.7rem; background: rgba(255, 165, 0, 0.6); padding: 2px 8px; border-radius: 10px; color: white;">Accepted</span>';
-                } else if (userResponse && userResponse.proofUrl) {
-                    statusBadge = '<span style="font-size: 0.7rem; background: rgba(76, 175, 80, 0.6); padding: 2px 8px; border-radius: 10px; color: white;">✅ Completed</span>';
-                } else if (responseStatus === 'declined') {
-                    statusBadge = '<span style="font-size: 0.7rem; background: rgba(244, 67, 54, 0.6); padding: 2px 8px; border-radius: 10px; color: white;">Declined</span>';
-                }
-                
-                const creatorDisplay = challenge.isAI ? 
-                    `🤖 AI Bot` : 
-                    challenge.creatorName;
-                
-                challengeElement.innerHTML = `
-                    <div style="margin-bottom: 10px;">
-                        <h4 style="margin: 0; display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
-                            ${getCategoryIcon(challenge.category)} ${challenge.title}
-                            ${challenge.isAI ? '<span style="font-size: 0.7rem; background: rgba(74, 144, 226, 0.6); padding: 2px 8px; border-radius: 10px; color: white;">AI</span>' : ''}
-                            ${statusBadge}
-                        </h4>
-                        <p style="margin: 5px 0; opacity: 0.8; font-size: 0.9rem;">${challenge.description}</p>
-                        <p style="margin: 5px 0; font-size: 0.8rem; opacity: 0.6;">
-                            ${creatorDisplay} • ${challenge.reward} tokens • ${formatTimeAgo(challenge.createdAt)}
-                        </p>
-                    </div>
-                    <div style="display: flex; gap: 8px; align-items: center; justify-content: space-between; flex-wrap: wrap;">
-                        <div style="display: flex; gap: 8px;">
-                            ${actionButtons}
-                        </div>
-                    </div>
-                `;
-                
-                challengesList.appendChild(challengeElement);
-            });
-        }
-
-        // Show submit challenge modal
-        window.showSubmitChallengeModal = function(challengeId) {
-            const challenge = challenges.find(c => c.id === challengeId);
-            if (!challenge) return;
-            
-            const modal = document.createElement('div');
-            modal.className = 'submit-challenge-modal';
-            modal.innerHTML = `
-                <div class="submit-challenge-content">
-                    <div class="submit-challenge-header">
-                        <h2>Submit Challenge Proof</h2>
-                        <button class="close-modal" onclick="closeModal(this)">×</button>
-                    </div>
-                    <div class="submit-challenge-description">
-                        <strong>Challenge:</strong> ${challenge.title}<br>
-                        <strong>Task:</strong> ${challenge.description}
-                    </div>
-                    
-                    <div class="proof-upload-section">
-                        <div class="proof-upload-icon">📸</div>
-                        <label for="proofUpload" class="proof-upload-label">
-                            Upload Photo/Video Proof
-                        </label>
-                        <input type="file" id="proofUpload" accept="image/*,video/*" onchange="handleProofUpload(event, '${challengeId}')">
-                        <p style="font-size: 0.8rem; opacity: 0.6; margin-top: 10px;">Max file size: 10MB</p>
-                    </div>
-                    
-                    <div class="proof-preview" id="proofPreview" style="display: none;">
-                        <!-- Preview will be shown here -->
-                    </div>
-                    
-                    <div class="proof-caption">
-                        <input type="text" class="proof-caption-input" id="proofCaption" placeholder="Add a caption (optional)" maxlength="100">
-                    </div>
-                    
-                    <div class="submit-challenge-actions">
-                        <button class="submit-btn" onclick="submitChallengeProof('${challengeId}')" id="submitProofBtn" disabled>
-                            Submit Proof
-                        </button>
-                        <button class="cancel-btn" onclick="closeModal(this)">
-                            Cancel
-                        </button>
-                    </div>
-                </div>
-            `;
-            
-            document.body.appendChild(modal);
-        };
-
-        // Handle proof upload
-        window.handleProofUpload = async function(event, challengeId) {
-            const file = event.target.files[0];
-            if (!file) return;
-            
-            // Validate file size (10MB limit)
-            if (file.size > 10 * 1024 * 1024) {
-                showMessage('❌ File size must be less than 10MB', 'error');
-                return;
-            }
-            
-            const preview = document.getElementById('proofPreview');
-            const submitBtn = document.getElementById('submitProofBtn');
-            
-            // Show preview
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                preview.style.display = 'block';
-                
-                if (file.type.startsWith('image/')) {
-                    preview.innerHTML = `<img src="${e.target.result}" alt="Proof">`;
-                } else if (file.type.startsWith('video/')) {
-                    preview.innerHTML = `<video src="${e.target.result}" controls></video>`;
-                }
-                
-                // Enable submit button
-                submitBtn.disabled = false;
-                
-                // Store file temporarily
-                window.tempProofFile = {
-                    file: file,
-                    challengeId: challengeId
-                };
-            };
-            
-            reader.readAsDataURL(file);
-        };
-
-        // Submit challenge proof
-        window.submitChallengeProof = async function(challengeId) {
-            if (!window.tempProofFile || window.tempProofFile.challengeId !== challengeId) {
-                showMessage('❌ Please upload proof first', 'error');
-                return;
-            }
-            
-            const submitBtn = document.getElementById('submitProofBtn');
-            const caption = document.getElementById('proofCaption').value.trim();
-            
-            try {
-                submitBtn.disabled = true;
-                submitBtn.classList.add('loading');
-                
-                // Upload file to Firebase Storage
-                const fileName = `challenges/${challengeId}/${currentUser.uid}_${Date.now()}_${window.tempProofFile.file.name}`;
-                const storageRef = storage.ref(fileName);
-                const uploadTask = await storageRef.put(window.tempProofFile.file);
-                const proofUrl = await uploadTask.ref.getDownloadURL();
-                
-                // Update challenge with proof
-                await db.collection('challenges').doc(challengeId).update({
-                    [`responses.${currentUser.uid}`]: {
-                        response: 'completed',
-                        proofUrl: proofUrl,
-                        proofType: window.tempProofFile.file.type.startsWith('image/') ? 'image' : 'video',
-                        caption: caption,
-                        submittedAt: firebase.firestore.FieldValue.serverTimestamp()
-                    }
-                });
-                
-                // Award tokens
-                const challenge = challenges.find(c => c.id === challengeId);
-                if (challenge) {
-                    await db.collection('users').doc(currentUser.uid).update({
-                        tokens: firebase.firestore.FieldValue.increment(challenge.reward)
-                    });
-                    
-                    userData.tokens += challenge.reward;
-                    updateUserDisplay();
-                }
-                
-                showMessage(`🎉 Challenge completed! You earned ${challenge.reward} tokens!`, 'success');
-                
-                // Clean up
-                window.tempProofFile = null;
-                
-                // Close modal
-                const modal = submitBtn.closest('.submit-challenge-modal');
-                if (modal) modal.remove();
-                
-                // Reload challenges
-                loadChallenges();
-                
-            } catch (error) {
-                console.error('Error submitting proof:', error);
-                showMessage('❌ Failed to submit proof. Please try again.', 'error');
-            } finally {
-                submitBtn.disabled = false;
-                submitBtn.classList.remove('loading');
-            }
-        };
-
-        // Load nearby players
-        async function loadNearbyPlayers() {
-            const strangersTrack = document.getElementById('strangersTrack');
-            
-            try {
-                // For now, show online players as "nearby"
-                const onlineUsers = await db.collection('users')
-                    .where('online', '==', true)
-                    .limit(8)
-                    .get();
-                
-                // Filter out current user and friends
-                const friendIds = new Set(friends.map(f => f.id));
-                const nearbyPlayers = [];
-                
-                onlineUsers.forEach(doc => {
-                    if (doc.id !== currentUser.uid && !friendIds.has(doc.id)) {
-                        nearbyPlayers.push({ id: doc.id, ...doc.data() });
-                    }
-                });
-                
-                if (nearbyPlayers.length === 0) {
-                    strangersTrack.innerHTML = `
-                        <div class="empty-state" style="width: 100%; padding: 30px 20px; text-align: center;">
-                            <h4 style="font-size: 1.1rem; margin-bottom: 8px;">👥 No Players Nearby</h4>
-                            <p style="font-size: 0.8rem; opacity: 0.7;">Invite friends to join the fun!</p>
-                            <button class="btn btn-primary btn-small" onclick="shareInviteLink()" style="margin-top: 10px;">
-                                Share Invite
-                            </button>
-                        </div>
-                    `;
-                    return;
-                }
-                
-                strangersTrack.innerHTML = '';
-                nearbyPlayers.forEach(player => {
-                    const playerItem = document.createElement('div');
-                    playerItem.className = 'friend-carousel-item';
-                    playerItem.onclick = () => showPlayerProfile(player);
-                    
-                    let avatarHtml;
-                    if (player.avatar && player.avatar.startsWith('data:')) {
-                        avatarHtml = `<img src="${player.avatar}" alt="${player.name}">`;
-                    } else {
-                        avatarHtml = player.avatar || '👤';
-                    }
-                    
-                    playerItem.innerHTML = `
-                        <div class="friend-carousel-avatar">
-                            ${avatarHtml}
-                            <div class="carousel-online-indicator"></div>
-                        </div>
-                        <div class="friend-carousel-name">${player.name}</div>
-                    `;
-                    
-                    strangersTrack.appendChild(playerItem);
-                });
-                
-            } catch (error) {
-                console.error('Error loading nearby players:', error);
-                strangersTrack.innerHTML = `
-                    <div class="empty-state" style="width: 100%; padding: 30px 20px;">
-                        <h4>📍 Coming Soon!</h4>
-                        <p style="font-size: 0.8rem; opacity: 0.7;">Location features in next update</p>
-                    </div>
-                `;
-            }
-        }
-
-        // Show player profile (for non-friends)
-        window.showPlayerProfile = function(player) {
-            const modal = document.createElement('div');
-            modal.className = 'friend-modal';
-            
-            let avatarHtml;
-            if (player.avatar && player.avatar.startsWith('data:')) {
-                avatarHtml = `<img src="${player.avatar}" alt="${player.name}">`;
-            } else {
-                avatarHtml = player.avatar || '👤';
-            }
-            
-            modal.innerHTML = `
-                <div class="friend-modal-content" style="max-width: 400px;">
-                    <div class="friend-modal-header">
-                        <h2>Player Profile</h2>
-                        <button class="close-modal" onclick="closeModal(this)">×</button>
-                    </div>
-                    <div style="text-align: center; padding: 20px;">
-                        <div class="user-avatar" style="width: 100px; height: 100px; font-size: 3rem; margin: 0 auto 20px;">
-                            ${avatarHtml}
-                            <div class="online-indicator" style="width: 20px; height: 20px; border-width: 4px;"></div>
-                        </div>
-                        <h2 style="margin-bottom: 10px;">${player.name}</h2>
-                        <p style="opacity: 0.8; margin-bottom: 20px;">
-                            🟢 Online Now • Level ${player.level || 1}
-                        </p>
-                        <div class="profile-stats-grid" style="margin-bottom: 20px;">
-                            <div class="profile-stat-box">
-                                <div class="profile-stat-value">${player.tokens || 0}</div>
-                                <div class="profile-stat-label">Tokens</div>
-                            </div>
-                            <div class="profile-stat-box">
-                                <div class="profile-stat-value">${player.level || 1}</div>
-                                <div class="profile-stat-label">Level</div>
-                            </div>
-                        </div>
-                        <button class="btn btn-primary" onclick="quickAddFriend('${player.id}', '${player.name}', this)" style="width: 100%;">
-                            👥 Add as Friend
-                        </button>
-                    </div>
-                </div>
-            `;
-            
-            document.body.appendChild(modal);
-        };
-
-        // Setup real-time listeners
-        function setupRealtimeListeners() {
-            // Listen for new challenges
-            if (challengesListener) challengesListener();
-            challengesListener = db.collection('challenges')
-                .where('participants', 'array-contains', currentUser.uid)
-                .where('status', '==', 'active')
-                .onSnapshot((snapshot) => {
-                    snapshot.docChanges().forEach((change) => {
-                        if (change.type === 'added') {
-                            const challenge = change.doc.data();
-                            if (challenge.createdAt && 
-                                challenge.createdAt.toDate() > new Date(Date.now() - 60000) &&
-                                challenge.creatorId !== currentUser.uid) {
-                                // Show alert for new challenges
-                                showChallengeAlert(challenge);
-                            }
-                        }
-                    });
-                    
-                    // Reload challenges
-                    loadChallenges();
-                });
-            
-            // Listen for friend requests
-            if (friendRequestsListener) friendRequestsListener();
-            friendRequestsListener = db.collection('friendRequests')
-                .where('to', '==', currentUser.uid)
-                .where('status', '==', 'pending')
-                .onSnapshot((snapshot) => {
-                    let pendingCount = 0;
-                    snapshot.docChanges().forEach((change) => {
-                        if (change.type === 'added') {
-                            const request = { id: change.doc.id, ...change.doc.data() };
-                            // Show alert for new friend requests
-                            if (request.createdAt && 
-                                request.createdAt.toDate() > new Date(Date.now() - 60000)) {
-                                showFriendRequestAlert(request);
-                            }
-                        }
-                    });
-                    
-                    // Update pending count badge on main button
-                    pendingCount = snapshot.size;
-                    const mainBadge = document.getElementById('mainPendingBadge');
-                    if (mainBadge) {
-                        if (pendingCount > 0) {
-                            mainBadge.textContent = pendingCount;
-                            mainBadge.style.display = 'block';
-                        } else {
-                            mainBadge.style.display = 'none';
-                        }
-                    }
-                });
-            
-            // Listen for friends updates
-            if (friendsListener) friendsListener();
-            friendsListener = db.collection('friendships')
-                .where('users', 'array-contains', currentUser.uid)
-                .onSnapshot(() => {
-                    loadFriends();
-                });
-        }
-
-        // Show friend request alert
-        function showFriendRequestAlert(request) {
-            // Play notification sound
-            playNotificationSound();
-            
-            const alertDiv = document.createElement('div');
-            alertDiv.className = 'friend-request-alert';
-            
-            let avatarHtml;
-            if (request.fromAvatar && request.fromAvatar.startsWith('data:')) {
-                avatarHtml = `<img src="${request.fromAvatar}" alt="${request.fromName}">`;
-            } else {
-                avatarHtml = request.fromAvatar || '👤';
-            }
-            
-            alertDiv.innerHTML = `
-                <div class="friend-request-alert-header">👥 Friend Request!</div>
-                <div class="friend-request-alert-sender">
-                    <div class="friend-request-alert-avatar">${avatarHtml}</div>
-                    <div>
-                        <div class="friend-request-alert-name">${request.fromName}</div>
-                    </div>
-                </div>
-                <div class="friend-request-alert-message">
-                    wants to be your friend!
-                </div>
-                <div class="friend-request-alert-actions">
-                    <button class="friend-request-alert-btn friend-request-alert-accept" onclick="acceptFriendRequestFromAlert('${request.id}', '${request.from}', this)">
-                        Accept
-                    </button>
-                    <button class="friend-request-alert-btn friend-request-alert-dismiss" onclick="dismissAlert(this)">
-                        Later
-                    </button>
-                </div>
-            `;
-            
-            document.body.appendChild(alertDiv);
-            
-            // Auto dismiss after 10 seconds
-            setTimeout(() => {
-                if (alertDiv.parentElement) {
-                    alertDiv.remove();
-                }
-            }, 10000);
-        }
-
-        // Accept friend request from alert
-        window.acceptFriendRequestFromAlert = async function(requestId, fromUserId, button) {
-            const alertDiv = button.closest('.friend-request-alert');
-            await acceptFriendRequest(requestId, fromUserId);
-            alertDiv.remove();
-        };
-
-        // Play notification sound
-        function playNotificationSound() {
-            try {
-                // Create audio context
-                const audioContext = new (window.AudioContext || window.webkitAudioContext)();
-                
-                // Create oscillator for beep sound
-                const oscillator = audioContext.createOscillator();
-                const gainNode = audioContext.createGain();
-                
-                oscillator.connect(gainNode);
-                gainNode.connect(audioContext.destination);
-                
-                oscillator.frequency.value = 800; // Frequency in Hz
-                gainNode.gain.value = 0.3; // Volume
-                
-                oscillator.start();
-                oscillator.stop(audioContext.currentTime + 0.2); // Beep duration
-                
-                // Second beep
-                setTimeout(() => {
-                    const osc2 = audioContext.createOscillator();
-                    const gain2 = audioContext.createGain();
-                    
-                    osc2.connect(gain2);
-                    gain2.connect(audioContext.destination);
-                    
-                    osc2.frequency.value = 1000;
-                    gain2.gain.value = 0.3;
-                    
-                    osc2.start();
-                    osc2.stop(audioContext.currentTime + 0.2);
-                }, 250);
-                
-            } catch (error) {
-                console.log('Could not play sound:', error);
-            }
-        }
-
-        // Show challenge alert
-        function showChallengeAlert(challenge) {
-            // Play notification sound
-            playNotificationSound();
-            
-            const alertDiv = document.createElement('div');
-            alertDiv.className = 'challenge-alert';
-            
-            const avatar = challenge.creatorAvatar || challenge.senderAvatar || '🎮';
-            let avatarHtml;
-            if (avatar && avatar.startsWith('data:')) {
-                avatarHtml = `<img src="${avatar}" alt="${challenge.creatorName}">`;
-            } else {
-                avatarHtml = avatar;
-            }
-            
-            alertDiv.innerHTML = `
-                <div class="challenge-alert-header">🚨 New Challenge Alert!</div>
-                <div class="challenge-alert-sender">
-                    <div class="challenge-alert-avatar">${avatarHtml}</div>
-                    <div>
-                        <div class="challenge-alert-name">${challenge.creatorName}</div>
-                    </div>
-                </div>
-                <div class="challenge-alert-message">
-                    sent you a challenge:<br>
-                    <strong>"${challenge.title}"</strong>
-                </div>
-                <div class="challenge-alert-actions">
-                    <button class="challenge-alert-btn challenge-alert-view" onclick="viewChallengeFromAlert('${challenge.id}', this)">
-                        View Details
-                    </button>
-                    <button class="challenge-alert-btn challenge-alert-dismiss" onclick="dismissAlert(this)">
-                        Later
-                    </button>
-                </div>
-            `;
-            
-            document.body.appendChild(alertDiv);
-            
-            // Auto dismiss after 10 seconds
-            setTimeout(() => {
-                if (alertDiv.parentElement) {
-                    alertDiv.remove();
-                }
-            }, 10000);
-        }
-
-        // View challenge from alert
-        window.viewChallengeFromAlert = function(challengeId, button) {
-            const alertDiv = button.closest('.challenge-alert');
-            alertDiv.remove();
-            
-            // Find and show challenge
-            const challenge = challenges.find(c => c.id === challengeId);
-            if (challenge) {
-                showChallengeDetail(challenge);
-            } else {
-                // Load challenge if not in list
-                db.collection('challenges').doc(challengeId).get().then(doc => {
-                    if (doc.exists) {
-                        showChallengeDetail({ id: doc.id, ...doc.data() });
-                    }
-                });
-            }
-        };
-
-        // Dismiss alert
-        window.dismissAlert = function(button) {
-            const alertDiv = button.closest('.challenge-alert, .friend-request-alert');
-            alertDiv.remove();
-        };
-
-        // Show avatar selector with upload option
-        window.showAvatarSelector = function() {
-            const modal = document.createElement('div');
-            modal.className = 'avatar-selector-modal';
-            
-            const avatars = ['😎', '🌸', '🚀', '💪', '🎵', '🎨', '🤠', '🌟', '🎯', '🎭', '🎪', '🌈', '🎲', '🎊', '🌺', '⚡', '🌙', '🔥'];
-            
-            let avatarPreview;
-            if (userData.avatar && userData.avatar.startsWith('data:')) {
-                avatarPreview = `<img src="${userData.avatar}" alt="Avatar">`;
-            } else {
-                avatarPreview = userData.avatar || '👤';
-            }
-            
-            modal.innerHTML = `
-                <div class="avatar-selector-content">
-                    <div class="avatar-selector-header">
-                        <h2>Choose Your Avatar</h2>
-                        <button class="close-modal" onclick="closeModal(this)">×</button>
-                    </div>
-                    
-                    <div class="avatar-upload-section">
-                        <div class="current-avatar-preview" id="avatarPreview">
-                            ${avatarPreview}
-                        </div>
-                        <div class="upload-btn-container">
-                            <label for="avatarUpload" class="upload-label">
-                                📷 Upload Photo
-                            </label>
-                            <input type="file" id="avatarUpload" accept="image/*" onchange="handleAvatarUpload(event)">
-                        </div>
-                        <p style="font-size: 0.8rem; opacity: 0.6; margin-top: 10px;">Upload your photo or select an emoji below</p>
-                    </div>
-                    
-                    <div class="avatar-selector-grid">
-                        ${avatars.map(avatar => {
-                            const isCurrent = userData.avatar === avatar;
-                            return `
-                                <div class="avatar-selector-option ${isCurrent ? 'current' : ''}" 
-                                     onclick="selectEmojiAvatar('${avatar}', this)">
-                                    ${avatar}
-                                </div>
-                            `;
-                        }).join('')}
-                    </div>
-                    
-                    <button class="done-button" onclick="saveSelectedAvatar(this)">
-                        ✅ Done
-                    </button>
-                </div>
-            `;
-            
-            document.body.appendChild(modal);
-        };
-
-        // Handle avatar image upload
-        window.handleAvatarUpload = function(event) {
-            const file = event.target.files[0];
-            if (!file) return;
-            
-            if (file.size > 2 * 1024 * 1024) { // 2MB limit
-                showMessage('❌ Image size must be less than 2MB', 'error');
-                return;
-            }
-            
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                const img = new Image();
-                img.onload = function() {
-                    // Create canvas for resizing
-                    const canvas = document.createElement('canvas');
-                    const ctx = canvas.getContext('2d');
-                    
-                    // Calculate square crop
-                    const size = Math.min(img.width, img.height);
-                    const x = (img.width - size) / 2;
-                    const y = (img.height - size) / 2;
-                    
-                    // Set canvas size (200x200 for avatar)
-                    canvas.width = 200;
-                    canvas.height = 200;
-                    
-                    // Draw and crop image
-                    ctx.drawImage(img, x, y, size, size, 0, 0, 200, 200);
-                    
-                    // Convert to base64
-                    const resizedImage = canvas.toDataURL('image/jpeg', 0.8);
-                    
-                    // Update preview
-                    document.getElementById('avatarPreview').innerHTML = `<img src="${resizedImage}" alt="Avatar">`;
-                    
-                    // Store temporarily
-                    window.tempAvatarImage = resizedImage;
-                    
-                    // Deselect emoji avatars
-                    document.querySelectorAll('.avatar-selector-option').forEach(opt => {
-                        opt.classList.remove('current');
-                    });
-                    
-                    showMessage('✅ Photo uploaded! Click Done to save.', 'success');
-                };
-                img.src = e.target.result;
-            };
-            reader.readAsDataURL(file);
-        };
-
-        // Select emoji avatar
-        window.selectEmojiAvatar = function(emoji, element) {
-            document.querySelectorAll('.avatar-selector-option').forEach(opt => {
-                opt.classList.remove('current');
-            });
-            element.classList.add('current');
-            
-            // Update preview
-            document.getElementById('avatarPreview').innerHTML = emoji;
-            
-            // Store selection
-            window.tempAvatarEmoji = emoji;
-            window.tempAvatarImage = null; // Clear image selection
-        };
-
-        // Save selected avatar
-        window.saveSelectedAvatar = async function(button) {
-            let newAvatar = userData.avatar; // Default to current
-            
-            // Check what was selected
-            if (window.tempAvatarImage) {
-                newAvatar = window.tempAvatarImage;
-            } else if (window.tempAvatarEmoji) {
-                newAvatar = window.tempAvatarEmoji;
-            }
-            
-            try {
-                // Update UI immediately
-                userData.avatar = newAvatar;
-                const avatarElement = document.getElementById('userAvatar');
-                if (newAvatar.startsWith('data:')) {
-                    avatarElement.innerHTML = `<img src="${newAvatar}" alt="Avatar">`;
-                } else {
-                    avatarElement.innerHTML = '';
-                    avatarElement.textContent = newAvatar;
-                }
-                
-                // Update in database
-                await db.collection('users').doc(currentUser.uid).update({
-                    avatar: newAvatar
-                });
-                
-                // Clean up temp variables
-                window.tempAvatarImage = null;
-                window.tempAvatarEmoji = null;
-                
-                showMessage('Avatar updated! 🎨', 'success');
-                closeModal(button);
-                
-            } catch (error) {
-                console.error('Error updating avatar:', error);
-                showError('Failed to update avatar');
-            }
-        };
-
-        // Close modal helper
-        window.closeModal = function(element) {
-            const modal = element.closest('.friend-modal, .avatar-selector-modal, .profile-modal, .challenge-detail-modal, .how-to-play-modal, .submit-challenge-modal');
-            if (modal) modal.remove();
-        };
-
-        // Update friend request badge
-        function updateFriendRequestBadge(count) {
-            // Could add a badge to the Add Friend button if needed
-            console.log(`You have ${count} pending friend requests`);
-        }
-
-        // Select avatar
-        function selectAvatar(element) {
-            document.querySelectorAll('.avatar-option').forEach(opt => {
-                opt.classList.remove('selected');
-            });
-            element.classList.add('selected');
-            selectedAvatar = element.getAttribute('data-avatar');
-        }
-
-        // AI Challenge Functions
-        function generateAIChallenges() {
-            currentAIChallenges = [];
-            const categories = Object.keys(aiChallengeDatabase);
-            
-            for (let i = 0; i < 3; i++) {
-                const randomCategory = categories[Math.floor(Math.random() * categories.length)];
-                const categoryPool = aiChallengeDatabase[randomCategory];
-                const randomChallenge = categoryPool[Math.floor(Math.random() * categoryPool.length)];
-                
-                const rewardVariation = Math.floor(Math.random() * 50) - 25;
-                const adjustedReward = Math.max(50, randomChallenge.reward + rewardVariation);
-                
-                const challenge = {
-                    id: `ai_${Date.now()}_${i}`,
-                    title: randomChallenge.title,
-                    description: randomChallenge.description,
-                    category: randomCategory,
-                    difficulty: randomChallenge.difficulty,
-                    reward: adjustedReward,
-                    timeLimit: randomChallenge.timeLimit,
-                    createdAt: new Date(),
-                    isAI: true
-                };
-                
-                currentAIChallenges.push(challenge);
-            }
-            
-            renderAIChallenges();
-        }
-
-        function renderAIChallenges() {
-            const aiChallengesGrid = document.getElementById('aiChallengesGrid');
-            if (!aiChallengesGrid) return;
-            
-            aiChallengesGrid.innerHTML = '';
-            
-            currentAIChallenges.forEach((challenge, index) => {
-                const challengeCard = document.createElement('div');
-                challengeCard.className = 'ai-challenge-card';
-                challengeCard.setAttribute('data-challenge-id', challenge.id);
-                challengeCard.onclick = () => selectAIChallenge(challenge.id);
-                
-                const difficultyColor = {
-                    'easy': '#4CAF50',
-                    'medium': '#FF9800',
-                    'hard': '#F44336'
-                };
-                
-                challengeCard.innerHTML = `
-                    <div class="ai-challenge-category" style="background: ${difficultyColor[challenge.difficulty]};">
-                        ${getCategoryIcon(challenge.category)} ${challenge.difficulty.toUpperCase()}
-                    </div>
-                    <div class="ai-challenge-title">${challenge.title}</div>
-                    <div class="ai-challenge-description">${challenge.description}</div>
-                    <div class="ai-challenge-details">
-                        <span>⏱️ ${challenge.timeLimit}h limit</span>
-                        <span class="ai-challenge-reward">+${challenge.reward} tokens</span>
-                    </div>
-                `;
-                
-                aiChallengesGrid.appendChild(challengeCard);
-            });
-        }
-
-        window.selectAIChallenge = function(challengeId) {
-            document.querySelectorAll('.ai-challenge-card').forEach(card => {
-                card.classList.remove('selected');
-            });
-            
-            const challengeCard = document.querySelector(`[data-challenge-id="${challengeId}"]`);
-            if (challengeCard) {
-                challengeCard.classList.add('selected');
-                selectedAIChallenge = currentAIChallenges.find(c => c.id === challengeId);
-                
-                document.getElementById('targetSelector').classList.add('show');
-                loadTargets('friends');
-                showMessage(`🎯 Selected: ${selectedAIChallenge.title}`, 'success');
-            }
-        };
-
-        function loadTargets(tabType) {
-            const targetList = document.getElementById('targetList');
-            if (!targetList) return;
-            
-            targetList.innerHTML = '';
-            selectedTargets = [];
-            
-            if (tabType === 'friends') {
-                if (friends.length === 0) {
-                    targetList.innerHTML = `
-                        <div class="empty-state">
-                            <p>👥 No friends available</p>
-                            <p style="font-size: 0.8rem; opacity: 0.7;">Add some friends first!</p>
-                        </div>
-                    `;
-                    return;
-                }
-                
-                friends.forEach(friend => {
-                    const targetItem = document.createElement('div');
-                    targetItem.className = 'target-item';
-                    targetItem.onclick = () => toggleTarget(friend.id, targetItem);
-                    
-                    let avatarHtml;
-                    if (friend.avatar && friend.avatar.startsWith('data:')) {
-                        avatarHtml = `<img src="${friend.avatar}" alt="${friend.name}" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;">`;
-                    } else {
-                        avatarHtml = friend.avatar || '👤';
-                    }
-                    
-                    targetItem.innerHTML = `
-                        <div class="target-checkbox"></div>
-                        <div class="target-avatar">
-                            ${avatarHtml}
-                            ${friend.online ? '<div class="target-online-indicator"></div>' : ''}
-                        </div>
-                        <div class="target-info">
-                            <div class="target-name">${friend.name}</div>
-                            <div class="target-status">${friend.online ? 'Online' : 'Offline'} • Level ${friend.level}</div>
-                        </div>
-                    `;
-                    
-                    targetList.appendChild(targetItem);
-                });
-            } else if (tabType === 'random') {
-                targetList.innerHTML = `
-                    <div class="empty-state">
-                        <p>🎲 Random Matching</p>
-                        <p style="font-size: 0.8rem; opacity: 0.7;">Challenge will be sent to a random online player!</p>
-                        <button class="btn btn-primary" style="margin-top: 15px;" onclick="selectRandomTarget()">
-                            Select Random Player
-                        </button>
-                    </div>
-                `;
-            }
-        }
-
-        function toggleTarget(targetId, element) {
-            const checkbox = element.querySelector('.target-checkbox');
-            const isSelected = selectedTargets.includes(targetId);
-            
-            if (isSelected) {
-                selectedTargets = selectedTargets.filter(id => id !== targetId);
-                element.classList.remove('selected');
-                checkbox.classList.remove('checked');
-            } else {
-                selectedTargets.push(targetId);
-                element.classList.add('selected');
-                checkbox.classList.add('checked');
-            }
-            
-            updateSendButton();
-        }
-
-        function updateSendButton() {
-            const sendBtn = document.getElementById('sendChallengeBtn');
-            if (sendBtn) {
-                const count = selectedTargets.length;
-                const cost = 25 * count;
-                sendBtn.textContent = count > 0 ? 
-                    `Send to ${count} player${count > 1 ? 's' : ''} (${cost} tokens)` : 
-                    'Select at least 1 player';
-                sendBtn.disabled = count === 0;
-            }
-        }
-
-        window.sendSelectedAIChallenge = async function() {
-            if (!selectedAIChallenge || selectedTargets.length === 0) {
-                showMessage('❌ Please select a challenge and at least one target!', 'error');
-                return;
-            }
-            
-            const cost = 25 * selectedTargets.length;
-            if (userData.tokens < cost) {
-                showMessage(`❌ Not enough tokens! You need ${cost} tokens.`, 'error');
-                return;
-            }
-            
-            try {
-                const sendBtn = document.getElementById('sendChallengeBtn');
-                sendBtn.disabled = true;
-                sendBtn.classList.add('loading');
-                
-                // Get sender details
-                const senderDoc = await db.collection('users').doc(currentUser.uid).get();
-                const senderData = senderDoc.data();
-                
-                const challengeData = {
-                    title: selectedAIChallenge.title,
-                    description: selectedAIChallenge.description,
-                    category: selectedAIChallenge.category,
-                    reward: selectedAIChallenge.reward,
-                    difficulty: selectedAIChallenge.difficulty,
-                    timeLimit: selectedAIChallenge.timeLimit,
-                    creatorId: 'ai_system',
-                    creatorName: 'AI Challenge Bot',
-                    senderId: currentUser.uid,
-                    senderName: userData.name,
-                    senderAvatar: userData.avatar,
-                    participants: [currentUser.uid, ...selectedTargets],
-                    status: 'active',
-                    responses: {},
-                    createdAt: firebase.firestore.FieldValue.serverTimestamp(),
-                    expiresAt: new Date(Date.now() + selectedAIChallenge.timeLimit * 60 * 60 * 1000),
-                    isAI: true
-                };
-                
-                await db.collection('challenges').add(challengeData);
-                
-                await db.collection('users').doc(currentUser.uid).update({
-                    tokens: firebase.firestore.FieldValue.increment(-cost),
-                    aiChallengesSent: firebase.firestore.FieldValue.increment(1)
-                });
-                
-                userData.tokens -= cost;
-                updateUserDisplay();
-                
-                showMessage(`🤖 AI Challenge sent to ${selectedTargets.length} player${selectedTargets.length > 1 ? 's' : ''}! (-${cost} tokens)`, 'success');
-                
-                cancelChallengeSelection();
-                
-            } catch (error) {
-                console.error('Error sending AI challenge:', error);
-                showMessage('❌ Failed to send challenge. Please try again.', 'error');
-            }
-        };
-
-        window.cancelChallengeSelection = function() {
-            selectedAIChallenge = null;
-            selectedTargets = [];
-            document.getElementById('targetSelector').classList.remove('show');
-            document.querySelectorAll('.ai-challenge-card').forEach(card => {
-                card.classList.remove('selected');
-            });
-        };
-
-        function startAITimer() {
-            if (aiChallengeActive) {
-                aiChallengeTimer = setTimeout(() => {
-                    generateAIChallenges();
-                    showMessage('🤖 New AI challenges available!', 'info');
-                    startAITimer();
-                }, aiChallengeInterval);
-            }
-        }
-
-        function startTimerCountdown() {
-            aiTimerCountdown = 120;
-            updateTimerDisplay();
-            
-            if (aiTimerInterval) {
-                clearInterval(aiTimerInterval);
-            }
-            
-            aiTimerInterval = setInterval(() => {
-                if (aiChallengeActive) {
-                    aiTimerCountdown--;
-                    updateTimerDisplay();
-                    
-                    if (aiTimerCountdown <= 0) {
-                        aiTimerCountdown = 120;
-                    }
-                }
-            }, 1000);
-        }
-
-        function updateTimerDisplay() {
-            const minutes = Math.floor(aiTimerCountdown / 60);
-            const seconds = aiTimerCountdown % 60;
-            const display = `${minutes}:${seconds.toString().padStart(2, '0')}`;
-            
-            const timerElement = document.getElementById('aiTimerCount');
-            if (timerElement) {
-                timerElement.textContent = display;
-            }
-        }
-
-        window.toggleAIChallenge = function() {
-            aiChallengeActive = !aiChallengeActive;
-            const toggleBtn = document.getElementById('toggleAIBtn');
-            
-            if (aiChallengeActive) {
-                toggleBtn.innerHTML = '⏸️ Pause Timer';
-                startAITimer();
-                startTimerCountdown();
-                showMessage('▶️ AI Challenge timer resumed', 'info');
-            } else {
-                toggleBtn.innerHTML = '▶️ Resume Timer';
-                if (aiChallengeTimer) {
-                    clearTimeout(aiChallengeTimer);
-                }
-                if (aiTimerInterval) {
-                    clearInterval(aiTimerInterval);
-                }
-                showMessage('⏸️ AI Challenge timer paused', 'info');
-            }
         };
 
         // Quick Challenge Functions
@@ -7177,3 +5298,2025 @@
     </script>
 </body>
 </html>
+
+        // Initialize Firebase first
+        let app = null;
+        let db = null;
+        let storage = null;
+
+        // Global variables
+        let currentUser = null;
+        let selectedAvatar = null;
+        let userData = {
+            name: '',
+            avatar: '👤',
+            tokens: 1000,
+            level: 1,
+            friendsCount: 0
+        };
+        let friends = [];
+        let challenges = [];
+        let friendRequestsListener = null;
+        let challengesListener = null;
+        let friendsListener = null;
+
+        // AI Challenge System Variables
+        let aiChallengeTimer = null;
+        let aiChallengeInterval = 120000; // 2 minutes in milliseconds
+        let aiChallengeActive = true;
+        let currentAIChallenges = [];
+        let selectedAIChallenge = null;
+        let selectedTargets = [];
+        let aiTimerCountdown = 120; // 2 minutes in seconds
+        let aiTimerInterval = null;
+        let selectedChallengeTargets = [];
+
+        // Global variable for proof upload
+        let currentProofFile = null;
+        let currentProofPreview = null;
+
+        // AI Challenge Database
+        const aiChallengeDatabase = {
+            fitness: [
+                {
+                    title: "Perfect Plank Challenge",
+                    description: "Hold a plank position for 60 seconds with perfect form. Show your stopwatch!",
+                    difficulty: "medium",
+                    reward: 150,
+                    timeLimit: 24
+                },
+                {
+                    title: "Stairs Sprint",
+                    description: "Run up and down a flight of stairs 5 times. Record your time!",
+                    difficulty: "hard",
+                    reward: 200,
+                    timeLimit: 12
+                },
+                {
+                    title: "Push-Up Power",
+                    description: "Do 20 push-ups in under 2 minutes. Show your form!",
+                    difficulty: "medium",
+                    reward: 125,
+                    timeLimit: 18
+                },
+                {
+                    title: "Squat Squad",
+                    description: "Complete 30 squats with proper form. Film yourself!",
+                    difficulty: "easy",
+                    reward: 100,
+                    timeLimit: 24
+                }
+            ],
+            creative: [
+                {
+                    title: "Doodle Master",
+                    description: "Draw a self-portrait using only your non-dominant hand!",
+                    difficulty: "medium",
+                    reward: 150,
+                    timeLimit: 24
+                },
+                {
+                    title: "Origami Expert",
+                    description: "Fold a paper crane and take a photo with it on your head!",
+                    difficulty: "easy",
+                    reward: 100,
+                    timeLimit: 36
+                }
+            ],
+            social: [
+                {
+                    title: "Random Act of Kindness",
+                    description: "Do something nice for a stranger and share the story!",
+                    difficulty: "easy",
+                    reward: 200,
+                    timeLimit: 24
+                },
+                {
+                    title: "Compliment Chain",
+                    description: "Give genuine compliments to 5 different people today!",
+                    difficulty: "medium",
+                    reward: 150,
+                    timeLimit: 12
+                }
+            ],
+            food: [
+                {
+                    title: "Smoothie Master",
+                    description: "Create a healthy smoothie with at least 3 fruits!",
+                    difficulty: "easy",
+                    reward: 100,
+                    timeLimit: 24
+                },
+                {
+                    title: "No-Cook Creation",
+                    description: "Make a delicious meal without using heat!",
+                    difficulty: "medium",
+                    reward: 150,
+                    timeLimit: 18
+                }
+            ],
+            adventure: [
+                {
+                    title: "Local Explorer",
+                    description: "Visit a place in your city you've never been to!",
+                    difficulty: "easy",
+                    reward: 150,
+                    timeLimit: 24
+                },
+                {
+                    title: "Nature Walk",
+                    description: "Take a 30-minute walk in nature and photograph 5 different plants!",
+                    difficulty: "easy",
+                    reward: 100,
+                    timeLimit: 36
+                }
+            ]
+        };
+
+        // Initialize app when DOM is ready
+        document.addEventListener('DOMContentLoaded', async function() {
+            console.log('DOM loaded, initializing app...');
+            
+            try {
+                // Initialize Firebase
+                if (!firebase.apps.length) {
+                    app = firebase.initializeApp(firebaseConfig);
+                } else {
+                    app = firebase.app();
+                }
+                
+                db = firebase.firestore();
+                storage = firebase.storage();
+                
+                // Enable offline persistence
+                try {
+                    await db.enablePersistence();
+                } catch (err) {
+                    if (err.code == 'failed-precondition') {
+                        console.log('Multiple tabs open, persistence can only be enabled in one tab at a a time.');
+                    } else if (err.code == 'unimplemented') {
+                        console.log('The current browser does not support persistence.');
+                    }
+                }
+                
+                console.log('Firebase initialized successfully');
+                
+                // Setup UI
+                createStarfield();
+                setupEventListeners();
+                
+                // Check for existing session
+                checkExistingSession();
+                
+            } catch (error) {
+                console.error('Initialization error:', error);
+                showError('Failed to initialize app. Please refresh the page.');
+            }
+        });
+
+        // Create starfield background
+        function createStarfield() {
+            const starfield = document.getElementById('starfield');
+            if (!starfield) return;
+            
+            const starCount = 100;
+            
+            for (let i = 0; i < starCount; i++) {
+                const star = document.createElement('div');
+                star.className = 'star';
+                
+                const size = Math.random();
+                if (size < 0.3) star.classList.add('small');
+                else if (size < 0.7) star.classList.add('medium');
+                else star.classList.add('large');
+                
+                star.style.left = Math.random() * 100 + '%';
+                star.style.top = Math.random() * 100 + '%';
+                star.style.animationDelay = Math.random() * 2 + 's';
+                
+                starfield.appendChild(star);
+            }
+        }
+
+        // Setup event listeners
+        function setupEventListeners() {
+            // Phone form
+            const phoneForm = document.getElementById('phoneAuthForm');
+            if (phoneForm) {
+                phoneForm.addEventListener('submit', handlePhoneSubmit);
+            }
+
+            // Username form
+            const usernameForm = document.getElementById('usernameForm');
+            if (usernameForm) {
+                usernameForm.addEventListener('submit', handleUsernameSubmit);
+            }
+
+            // Phone number formatting
+            const phoneInput = document.getElementById('phoneNumber');
+            if (phoneInput) {
+                phoneInput.addEventListener('input', function(e) {
+                    e.target.value = e.target.value.replace(/\D/g, '');
+                });
+            }
+
+            // Avatar selection
+            document.querySelectorAll('.avatar-option').forEach(avatar => {
+                avatar.addEventListener('click', function() {
+                    selectAvatar(this);
+                });
+            });
+        }
+
+        // Check existing session
+        async function checkExistingSession() {
+            const savedPhone = localStorage.getItem('jombro_phone');
+            const savedUserId = localStorage.getItem('jombro_userId');
+            
+            if (savedPhone && savedUserId) {
+                try {
+                    const userDoc = await db.collection('users').doc(savedUserId).get();
+                    
+                    if (userDoc.exists) {
+                        currentUser = {
+                            uid: savedUserId,
+                            phoneNumber: savedPhone
+                        };
+                        
+                        await loadUserData();
+                        hideAuthModal();
+                        showMessage('Welcome back! 🎮', 'success');
+                    } else {
+                        // Clear invalid session
+                        localStorage.removeItem('jombro_phone');
+                        localStorage.removeItem('jombro_userId');
+                    }
+                } catch (error) {
+                    console.error('Session check error:', error);
+                }
+            }
+        }
+
+        // Handle phone submission
+        async function handlePhoneSubmit(e) {
+            e.preventDefault();
+            
+            const countryCode = document.getElementById('countryCode').value;
+            const phoneNumber = document.getElementById('phoneNumber').value.trim();
+            const loginButton = document.getElementById('loginButton');
+            
+            if (!phoneNumber || phoneNumber.length < 6) {
+                showError('Please enter a valid phone number');
+                return;
+            }
+            
+            const fullNumber = countryCode + phoneNumber;
+            
+            try {
+                setButtonLoading(loginButton, true);
+                hideError();
+                
+                // Create user ID from phone number
+                const userId = 'user_' + fullNumber.replace(/\D/g, '');
+                
+                // Check if user exists
+                const userDoc = await db.collection('users').doc(userId).get();
+                
+                if (userDoc.exists) {
+                    // Existing user - login
+                    currentUser = {
+                        uid: userId,
+                        phoneNumber: fullNumber
+                    };
+                    
+                    // Save session
+                    localStorage.setItem('jombro_phone', fullNumber);
+                    localStorage.setItem('jombro_userId', userId);
+                    
+                    await loadUserData();
+                    hideAuthModal();
+                    showMessage('Welcome back! 🎮', 'success');
+                } else {
+                    // New user - show username form
+                    currentUser = {
+                        uid: userId,
+                        phoneNumber: fullNumber
+                    };
+                    
+                    document.getElementById('phoneAuthForm').style.display = 'none';
+                    document.getElementById('usernameForm').style.display = 'block';
+                    document.getElementById('username').focus();
+                }
+                
+            } catch (error) {
+                console.error('Login error:', error);
+                showError('Failed to login. Please try again.');
+            } finally {
+                setButtonLoading(loginButton, false);
+            }
+        }
+
+        // Handle username submission
+        async function handleUsernameSubmit(e) {
+            e.preventDefault();
+            
+            const username = document.getElementById('username').value.trim();
+            const startButton = document.getElementById('startPlayingButton');
+            
+            if (!username || username.length < 3) {
+                showError('Username must be at least 3 characters');
+                return;
+            }
+            
+            if (!selectedAvatar) {
+                showError('Please select an avatar');
+                return;
+            }
+            
+            try {
+                setButtonLoading(startButton, true);
+                hideError();
+                
+                // Create user document
+                await db.collection('users').doc(currentUser.uid).set({
+                    name: username,
+                    phoneNumber: currentUser.phoneNumber,
+                    avatar: selectedAvatar,
+                    tokens: 1000,
+                    level: 1,
+                    friendsCount: 0,
+                    createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+                    lastActive: firebase.firestore.FieldValue.serverTimestamp(),
+                    online: true
+                });
+                
+                // Save session
+                localStorage.setItem('jombro_phone', currentUser.phoneNumber);
+                localStorage.setItem('jombro_userId', currentUser.uid);
+                
+                await loadUserData();
+                hideAuthModal();
+                showMessage('🎉 Welcome to JomBro! You got 1000 starter tokens!', 'success');
+                
+            } catch (error) {
+                console.error('Profile creation error:', error);
+                showError('Failed to create profile. Please try again.');
+            } finally {
+                setButtonLoading(startButton, false);
+            }
+        }
+
+        // Load user data
+        async function loadUserData() {
+            try {
+                const userDoc = await db.collection('users').doc(currentUser.uid).get();
+                
+                if (userDoc.exists) {
+                    const data = userDoc.data();
+                    userData = {
+                        name: data.name,
+                        avatar: data.avatar,
+                        tokens: data.tokens || 1000,
+                        level: data.level || 1,
+                        friendsCount: data.friendsCount || 0
+                    };
+                    
+                    // Update UI
+                    updateUserDisplay();
+                    
+                    // Update online status
+                    await db.collection('users').doc(currentUser.uid).update({
+                        online: true,
+                        lastActive: firebase.firestore.FieldValue.serverTimestamp()
+                    });
+                    
+                    // Load friends and challenges
+                    loadFriends();
+                    loadChallenges();
+                    loadNearbyPlayers();
+                    
+                    // Initialize AI Challenge System
+                    generateAIChallenges();
+                    startAITimer();
+                    startTimerCountdown();
+                    
+                    // Setup real-time listeners
+                    setupRealtimeListeners();
+                    
+                    // Show app content
+                    document.getElementById('appContent').classList.add('loaded');
+                }
+            } catch (error) {
+                console.error('Error loading user data:', error);
+                showError('Failed to load user data');
+            }
+        }
+
+        // Update user display
+        function updateUserDisplay() {
+            document.getElementById('userName').textContent = userData.name;
+            
+            // Handle avatar display (emoji or image)
+            const avatarElement = document.getElementById('userAvatar');
+            if (userData.avatar && userData.avatar.startsWith('data:')) {
+                avatarElement.innerHTML = `<img src="${userData.avatar}" alt="Avatar">`;
+            } else {
+                avatarElement.innerHTML = '';
+                avatarElement.textContent = userData.avatar || '👤';
+            }
+            
+            document.getElementById('userTokens').textContent = userData.tokens;
+            document.getElementById('userLevel').textContent = userData.level;
+            document.getElementById('userFriends').textContent = userData.friendsCount;
+        }
+
+        // Load friends
+        async function loadFriends() {
+            try {
+                const friendshipsSnapshot = await db.collection('friendships')
+                    .where('users', 'array-contains', currentUser.uid)
+                    .get();
+                
+                friends = [];
+                
+                for (const doc of friendshipsSnapshot.docs) {
+                    const friendship = doc.data();
+                    const friendId = friendship.users.find(id => id !== currentUser.uid);
+                    
+                    if (friendId) {
+                        const friendDoc = await db.collection('users').doc(friendId).get();
+                        if (friendDoc.exists) {
+                            const friendData = friendDoc.data();
+                            friends.push({
+                                id: friendId,
+                                name: friendData.name,
+                                avatar: friendData.avatar,
+                                level: friendData.level || 1,
+                                tokens: friendData.tokens || 0,
+                                online: friendData.online || false,
+                                lastActive: friendData.lastActive
+                            });
+                        }
+                    }
+                }
+                
+                renderFriends();
+                
+            } catch (error) {
+                console.error('Error loading friends:', error);
+            }
+        }
+
+        // Render friends
+        function renderFriends() {
+            const friendsCarousel = document.getElementById('friendsCarousel');
+            const friendsList = document.getElementById('friendsList');
+            const viewAllBtn = document.getElementById('viewAllFriendsBtn');
+            const onlineCount = friends.filter(f => f.online).length;
+            
+            document.getElementById('onlineCount').textContent = onlineCount;
+            document.getElementById('totalFriends').textContent = friends.length;
+            
+            if (friends.length === 0) {
+                friendsCarousel.innerHTML = `
+                    <div class="empty-state" style="width: 100%; text-align: center; padding: 40px 20px;">
+                        <h4>👥 No friends yet</h4>
+                        <p>Add friends to start challenging each other!</p>
+                        <button class="btn btn-primary" onclick="showAddFriendModal()" style="margin-top: 15px;">
+                            Add Your First Friend
+                        </button>
+                    </div>
+                `;
+                viewAllBtn.style.display = 'none';
+                friendsList.innerHTML = '';
+                return;
+            }
+            
+            // Render carousel
+            friendsCarousel.innerHTML = '';
+            friends.forEach((friend) => {
+                const carouselItem = document.createElement('div');
+                carouselItem.className = 'friend-carousel-item';
+                carouselItem.onclick = () => showFriendProfile(friend.id);
+                
+                let avatarHtml;
+                if (friend.avatar && friend.avatar.startsWith('data:')) {
+                    avatarHtml = `<img src="${friend.avatar}" alt="${friend.name}">`;
+                } else {
+                    avatarHtml = friend.avatar || '👤';
+                }
+                
+                carouselItem.innerHTML = `
+                    <div class="friend-carousel-avatar">
+                        ${avatarHtml}
+                        ${friend.online ? '<div class="carousel-online-indicator"></div>' : ''}
+                    </div>
+                    <div class="friend-carousel-name">${friend.name}</div>
+                `;
+                
+                friendsCarousel.appendChild(carouselItem);
+            });
+            
+            // Show View All button if more than 5 friends
+            if (friends.length > 5) {
+                viewAllBtn.style.display = 'block';
+            } else {
+                viewAllBtn.style.display = 'none';
+            }
+            
+            // Render full list (hidden by default)
+            friendsList.innerHTML = '';
+            friends.forEach((friend) => {
+                const friendElement = document.createElement('div');
+                friendElement.className = 'friend-item';
+                
+                const statusText = friend.online ? 'Online' : 'Offline';
+                let avatarHtml;
+                if (friend.avatar && friend.avatar.startsWith('data:')) {
+                    avatarHtml = `<img src="${friend.avatar}" alt="${friend.name}">`;
+                } else {
+                    avatarHtml = friend.avatar || '👤';
+                }
+                
+                friendElement.innerHTML = `
+                    <div class="friend-info">
+                        <div class="friend-avatar-circle">
+                            ${avatarHtml}
+                            ${friend.online ? '<div class="online-indicator"></div>' : ''}
+                        </div>
+                        <div class="friend-details">
+                            <h4>${friend.name}</h4>
+                            <p>${statusText} • Level ${friend.level}</p>
+                        </div>
+                    </div>
+                    <div class="friend-actions">
+                        <button class="btn btn-primary btn-small" onclick="challengeFriend('${friend.id}')" ${!friend.online ? 'disabled' : ''}>
+                            Challenge
+                        </button>
+                    </div>
+                `;
+                
+                friendsList.appendChild(friendElement);
+            });
+        }
+
+        // Toggle friends list view
+        window.toggleFriendsList = function() {
+            const friendsList = document.getElementById('friendsList');
+            const viewAllText = document.getElementById('viewAllText');
+            
+            if (friendsList.classList.contains('show')) {
+                friendsList.classList.remove('show');
+                viewAllText.textContent = 'View All Friends';
+            } else {
+                friendsList.classList.add('show');
+                viewAllText.textContent = 'Hide Friends List';
+            }
+        };
+
+        // Load nearby players
+        async function loadNearbyPlayers() {
+            const strangersTrack = document.getElementById('strangersTrack');
+            
+            try {
+                // For now, show online players as "nearby"
+                const onlineUsers = await db.collection('users')
+                    .where('online', '==', true)
+                    .limit(8)
+                    .get();
+                
+                // Get current user's friends
+                const friendshipsSnapshot = await db.collection('friendships')
+                    .where('users', 'array-contains', currentUser.uid)
+                    .get();
+                
+                const friendIds = new Set();
+                friendshipsSnapshot.forEach(doc => {
+                    const data = doc.data();
+                    data.users.forEach(userId => {
+                        if (userId !== currentUser.uid) friendIds.add(userId);
+                    });
+                });
+                
+                // Get pending requests
+                const pendingSnapshot = await db.collection('friendRequests')
+                    .where('from', '==', currentUser.uid)
+                    .where('status', '==', 'pending')
+                    .get();
+                
+                const pendingIds = new Set();
+                pendingSnapshot.forEach(doc => {
+                    pendingIds.add(doc.data().to);
+                });
+                
+                // Filter suggested friends
+                const nearbyPlayers = [];
+                onlineUsers.forEach(doc => {
+                    if (doc.id !== currentUser.uid && 
+                        !friendIds.has(doc.id) && 
+                        !pendingIds.has(doc.id)) {
+                        nearbyPlayers.push({ id: doc.id, ...doc.data() });
+                    }
+                });
+                
+                if (nearbyPlayers.length === 0) {
+                    strangersTrack.innerHTML = `
+                        <div class="empty-state" style="width: 100%; padding: 30px 20px; text-align: center;">
+                            <h4 style="font-size: 1.1rem; margin-bottom: 8px;">👥 No Players Nearby</h4>
+                            <p style="font-size: 0.8rem; opacity: 0.7;">Invite friends to join the fun!</p>
+                            <button class="btn btn-primary btn-small" onclick="shareInviteLink()" style="margin-top: 10px;">
+                                Share Invite
+                            </button>
+                        </div>
+                    `;
+                    return;
+                }
+                
+                strangersTrack.innerHTML = '';
+                nearbyPlayers.forEach(player => {
+                    const playerItem = document.createElement('div');
+                    playerItem.className = 'friend-carousel-item';
+                    playerItem.onclick = () => showPlayerProfile(player);
+                    
+                    let avatarHtml;
+                    if (player.avatar && player.avatar.startsWith('data:')) {
+                        avatarHtml = `<img src="${player.avatar}" alt="${player.name}">`;
+                    } else {
+                        avatarHtml = player.avatar || '👤';
+                    }
+                    
+                    playerItem.innerHTML = `
+                        <div class="friend-carousel-avatar">
+                            ${avatarHtml}
+                            <div class="carousel-online-indicator"></div>
+                        </div>
+                        <div class="friend-carousel-name">${player.name}</div>
+                    `;
+                    
+                    strangersTrack.appendChild(playerItem);
+                });
+                
+            } catch (error) {
+                console.error('Error loading nearby players:', error);
+                strangersTrack.innerHTML = `
+                    <div class="empty-state" style="width: 100%; padding: 30px 20px;">
+                        <h4>📍 Coming Soon!</h4>
+                        <p style="font-size: 0.8rem; opacity: 0.7;">Location features in next update</p>
+                    </div>
+                `;
+            }
+        }
+
+        // Show player profile (for non-friends)
+        window.showPlayerProfile = function(player) {
+            const modal = document.createElement('div');
+            modal.className = 'friend-modal';
+            
+            let avatarHtml;
+            if (player.avatar && player.avatar.startsWith('data:')) {
+                avatarHtml = `<img src="${player.avatar}" alt="${player.name}">`;
+            } else {
+                avatarHtml = player.avatar || '👤';
+            }
+            
+            modal.innerHTML = `
+                <div class="friend-modal-content" style="max-width: 400px;">
+                    <div class="friend-modal-header">
+                        <h2>Player Profile</h2>
+                        <button class="close-modal" onclick="closeModal(this)">×</button>
+                    </div>
+                    <div style="text-align: center; padding: 20px;">
+                        <div class="user-avatar" style="width: 100px; height: 100px; font-size: 3rem; margin: 0 auto 20px;">
+                            ${avatarHtml}
+                            <div class="online-indicator" style="width: 20px; height: 20px; border-width: 4px;"></div>
+                        </div>
+                        <h2 style="margin-bottom: 10px;">${player.name}</h2>
+                        <p style="opacity: 0.8; margin-bottom: 20px;">
+                            🟢 Online Now • Level ${player.level || 1}
+                        </p>
+                        <div class="profile-stats-grid" style="margin-bottom: 20px;">
+                            <div class="profile-stat-box">
+                                <div class="profile-stat-value">${player.tokens || 0}</div>
+                                <div class="profile-stat-label">Tokens</div>
+                            </div>
+                            <div class="profile-stat-box">
+                                <div class="profile-stat-value">${player.level || 1}</div>
+                                <div class="profile-stat-label">Level</div>
+                            </div>
+                        </div>
+                        <button class="btn btn-primary" onclick="quickAddFriend('${player.id}', '${player.name}', this)" style="width: 100%;">
+                            👥 Add as Friend
+                        </button>
+                    </div>
+                </div>
+            `;
+            
+            document.body.appendChild(modal);
+        };
+
+        // Setup real-time listeners
+        function setupRealtimeListeners() {
+            // Listen for new challenges
+            if (challengesListener) challengesListener();
+            challengesListener = db.collection('challenges')
+                .where('participants', 'array-contains', currentUser.uid)
+                .where('status', '==', 'active')
+                .onSnapshot((snapshot) => {
+                    snapshot.docChanges().forEach((change) => {
+                        if (change.type === 'added') {
+                            const challenge = change.doc.data();
+                            if (challenge.createdAt && 
+                                challenge.createdAt.toDate() > new Date(Date.now() - 60000) &&
+                                challenge.creatorId !== currentUser.uid) {
+                                // Show alert for new challenges
+                                showChallengeAlert(challenge);
+                            }
+                        }
+                    });
+                    
+                    // Reload challenges
+                    loadChallenges();
+                });
+            
+            // Listen for friend requests
+            if (friendRequestsListener) friendRequestsListener();
+            friendRequestsListener = db.collection('friendRequests')
+                .where('to', '==', currentUser.uid)
+                .where('status', '==', 'pending')
+                .onSnapshot((snapshot) => {
+                    let pendingCount = 0;
+                    snapshot.docChanges().forEach((change) => {
+                        if (change.type === 'added') {
+                            const request = { id: change.doc.id, ...change.doc.data() };
+                            // Show alert for new friend requests
+                            if (request.createdAt && 
+                                request.createdAt.toDate() > new Date(Date.now() - 60000)) {
+                                showFriendRequestAlert(request);
+                            }
+                        }
+                    });
+                    
+                    // Update pending count badge on main button
+                    pendingCount = snapshot.size;
+                    const mainBadge = document.getElementById('mainPendingBadge');
+                    if (mainBadge) {
+                        if (pendingCount > 0) {
+                            mainBadge.textContent = pendingCount;
+                            mainBadge.style.display = 'block';
+                        } else {
+                            mainBadge.style.display = 'none';
+                        }
+                    }
+                });
+            
+            // Listen for friends updates
+            if (friendsListener) friendsListener();
+            friendsListener = db.collection('friendships')
+                .where('users', 'array-contains', currentUser.uid)
+                .onSnapshot(() => {
+                    loadFriends();
+                });
+        }
+
+        // Show friend request alert
+        function showFriendRequestAlert(request) {
+            // Play notification sound
+            playNotificationSound();
+            
+            const alertDiv = document.createElement('div');
+            alertDiv.className = 'friend-request-alert';
+            
+            let avatarHtml;
+            if (request.fromAvatar && request.fromAvatar.startsWith('data:')) {
+                avatarHtml = `<img src="${request.fromAvatar}" alt="${request.fromName}">`;
+            } else {
+                avatarHtml = request.fromAvatar || '👤';
+            }
+            
+            alertDiv.innerHTML = `
+                <div class="friend-request-alert-header">👥 Friend Request!</div>
+                <div class="friend-request-alert-sender">
+                    <div class="friend-request-alert-avatar">${avatarHtml}</div>
+                    <div>
+                        <div class="friend-request-alert-name">${request.fromName}</div>
+                    </div>
+                </div>
+                <div class="friend-request-alert-message">
+                    wants to be your friend!
+                </div>
+                <div class="friend-request-alert-actions">
+                    <button class="friend-request-alert-btn friend-request-alert-accept" onclick="acceptFriendRequestFromAlert('${request.id}', '${request.from}', this)">
+                        Accept
+                    </button>
+                    <button class="friend-request-alert-btn friend-request-alert-dismiss" onclick="dismissAlert(this)">
+                        Later
+                    </button>
+                </div>
+            `;
+            
+            document.body.appendChild(alertDiv);
+            
+            // Auto dismiss after 10 seconds
+            setTimeout(() => {
+                if (alertDiv.parentElement) {
+                    alertDiv.remove();
+                }
+            }, 10000);
+        }
+
+        // Accept friend request from alert
+        window.acceptFriendRequestFromAlert = async function(requestId, fromUserId, button) {
+            const alertDiv = button.closest('.friend-request-alert');
+            await acceptFriendRequest(requestId, fromUserId);
+            alertDiv.remove();
+        };
+
+        // Show avatar selector with upload option
+        window.showAvatarSelector = function() {
+            const modal = document.createElement('div');
+            modal.className = 'avatar-selector-modal';
+            
+            const avatars = ['😎', '🌸', '🚀', '💪', '🎵', '🎨', '🤠', '🌟', '🎯', '🎭', '🎪', '🌈', '🎲', '🎊', '🌺', '⚡', '🌙', '🔥'];
+            
+            let avatarPreview;
+            if (userData.avatar && userData.avatar.startsWith('data:')) {
+                avatarPreview = `<img src="${userData.avatar}" alt="Avatar">`;
+            } else {
+                avatarPreview = userData.avatar || '👤';
+            }
+            
+            modal.innerHTML = `
+                <div class="avatar-selector-content">
+                    <div class="avatar-selector-header">
+                        <h2>Choose Your Avatar</h2>
+                        <button class="close-modal" onclick="closeModal(this)">×</button>
+                    </div>
+                    
+                    <div class="avatar-upload-section">
+                        <div class="current-avatar-preview" id="avatarPreview">
+                            ${avatarPreview}
+                        </div>
+                        <div class="upload-btn-container">
+                            <label for="avatarUpload" class="upload-label">
+                                📷 Upload Photo
+                            </label>
+                            <input type="file" id="avatarUpload" accept="image/*" onchange="handleAvatarUpload(event)">
+                        </div>
+                        <p style="font-size: 0.8rem; opacity: 0.6; margin-top: 10px;">Upload your photo or select an emoji below</p>
+                    </div>
+                    
+                    <div class="avatar-selector-grid">
+                        ${avatars.map(avatar => {
+                            const isCurrent = userData.avatar === avatar;
+                            return `
+                                <div class="avatar-selector-option ${isCurrent ? 'current' : ''}" 
+                                     onclick="selectEmojiAvatar('${avatar}', this)">
+                                    ${avatar}
+                                </div>
+                            `;
+                        }).join('')}
+                    </div>
+                    
+                    <button class="done-button" onclick="saveSelectedAvatar(this)">
+                        ✅ Done
+                    </button>
+                </div>
+            `;
+            
+            document.body.appendChild(modal);
+        };
+
+        // Handle avatar image upload
+        window.handleAvatarUpload = function(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            
+            if (file.size > 2 * 1024 * 1024) { // 2MB limit
+                showMessage('❌ Image size must be less than 2MB', 'error');
+                return;
+            }
+            
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const img = new Image();
+                img.onload = function() {
+                    // Create canvas for resizing
+                    const canvas = document.createElement('canvas');
+                    const ctx = canvas.getContext('2d');
+                    
+                    // Calculate square crop
+                    const size = Math.min(img.width, img.height);
+                    const x = (img.width - size) / 2;
+                    const y = (img.height - size) / 2;
+                    
+                    // Set canvas size (200x200 for avatar)
+                    canvas.width = 200;
+                    canvas.height = 200;
+                    
+                    // Draw and crop image
+                    ctx.drawImage(img, x, y, size, size, 0, 0, 200, 200);
+                    
+                    // Convert to base64
+                    const resizedImage = canvas.toDataURL('image/jpeg', 0.8);
+                    
+                    // Update preview
+                    document.getElementById('avatarPreview').innerHTML = `<img src="${resizedImage}" alt="Avatar">`;
+                    
+                    // Store temporarily
+                    window.tempAvatarImage = resizedImage;
+                    
+                    // Deselect emoji avatars
+                    document.querySelectorAll('.avatar-selector-option').forEach(opt => {
+                        opt.classList.remove('current');
+                    });
+                    
+                    showMessage('✅ Photo uploaded! Click Done to save.', 'success');
+                };
+                img.src = e.target.result;
+            };
+            reader.readAsDataURL(file);
+        };
+
+        // Select emoji avatar
+        window.selectEmojiAvatar = function(emoji, element) {
+            document.querySelectorAll('.avatar-selector-option').forEach(opt => {
+                opt.classList.remove('current');
+            });
+            element.classList.add('current');
+            
+            // Update preview
+            document.getElementById('avatarPreview').innerHTML = emoji;
+            
+            // Store selection
+            window.tempAvatarEmoji = emoji;
+            window.tempAvatarImage = null; // Clear image selection
+        };
+
+        // Save selected avatar
+        window.saveSelectedAvatar = async function(button) {
+            let newAvatar = userData.avatar; // Default to current
+            
+            // Check what was selected
+            if (window.tempAvatarImage) {
+                newAvatar = window.tempAvatarImage;
+            } else if (window.tempAvatarEmoji) {
+                newAvatar = window.tempAvatarEmoji;
+            }
+            
+            try {
+                // Update UI immediately
+                userData.avatar = newAvatar;
+                const avatarElement = document.getElementById('userAvatar');
+                if (newAvatar.startsWith('data:')) {
+                    avatarElement.innerHTML = `<img src="${newAvatar}" alt="Avatar">`;
+                } else {
+                    avatarElement.innerHTML = '';
+                    avatarElement.textContent = newAvatar;
+                }
+                
+                // Update in database
+                await db.collection('users').doc(currentUser.uid).update({
+                    avatar: newAvatar
+                });
+                
+                // Clean up temp variables
+                window.tempAvatarImage = null;
+                window.tempAvatarEmoji = null;
+                
+                showMessage('Avatar updated! 🎨', 'success');
+                closeModal(button);
+                
+            } catch (error) {
+                console.error('Error updating avatar:', error);
+                showError('Failed to update avatar');
+            }
+        };
+
+        // Close modal helper
+        window.closeModal = function(element) {
+            const modal = element.closest('.friend-modal, .avatar-selector-modal, .profile-modal, .challenge-detail-modal, .how-to-play-modal, .submit-challenge-modal');
+            if (modal) modal.remove();
+        };
+
+        // Update friend request badge
+        function updateFriendRequestBadge(count) {
+            // Could add a badge to the Add Friend button if needed
+            console.log(`You have ${count} pending friend requests`);
+        }
+
+        // Select avatar
+        function selectAvatar(element) {
+            document.querySelectorAll('.avatar-option').forEach(opt => {
+                opt.classList.remove('selected');
+            });
+            element.classList.add('selected');
+            selectedAvatar = element.getAttribute('data-avatar');
+        }
+
+        // AI Challenge Functions
+        function generateAIChallenges() {
+            currentAIChallenges = [];
+            const categories = Object.keys(aiChallengeDatabase);
+            
+            for (let i = 0; i < 3; i++) {
+                const randomCategory = categories[Math.floor(Math.random() * categories.length)];
+                const categoryPool = aiChallengeDatabase[randomCategory];
+                const randomChallenge = categoryPool[Math.floor(Math.random() * categoryPool.length)];
+                
+                const rewardVariation = Math.floor(Math.random() * 50) - 25;
+                const adjustedReward = Math.max(50, randomChallenge.reward + rewardVariation);
+                
+                const challenge = {
+                    id: `ai_${Date.now()}_${i}`,
+                    title: randomChallenge.title,
+                    description: randomChallenge.description,
+                    category: randomCategory,
+                    difficulty: randomChallenge.difficulty,
+                    reward: adjustedReward,
+                    timeLimit: randomChallenge.timeLimit,
+                    createdAt: new Date(),
+                    isAI: true
+                };
+                
+                currentAIChallenges.push(challenge);
+            }
+            
+            renderAIChallenges();
+        }
+
+        function renderAIChallenges() {
+            const aiChallengesGrid = document.getElementById('aiChallengesGrid');
+            if (!aiChallengesGrid) return;
+            
+            aiChallengesGrid.innerHTML = '';
+            
+            currentAIChallenges.forEach((challenge, index) => {
+                const challengeCard = document.createElement('div');
+                challengeCard.className = 'ai-challenge-card';
+                challengeCard.setAttribute('data-challenge-id', challenge.id);
+                challengeCard.onclick = () => selectAIChallenge(challenge.id);
+                
+                const difficultyColor = {
+                    'easy': '#4CAF50',
+                    'medium': '#FF9800',
+                    'hard': '#F44336'
+                };
+                
+                challengeCard.innerHTML = `
+                    <div class="ai-challenge-category" style="background: ${difficultyColor[challenge.difficulty]};">
+                        ${getCategoryIcon(challenge.category)} ${challenge.difficulty.toUpperCase()}
+                    </div>
+                    <div class="ai-challenge-title">${challenge.title}</div>
+                    <div class="ai-challenge-description">${challenge.description}</div>
+                    <div class="ai-challenge-details">
+                        <span>⏱️ ${challenge.timeLimit}h limit</span>
+                        <span class="ai-challenge-reward">+${challenge.reward} tokens</span>
+                    </div>
+                `;
+                
+                aiChallengesGrid.appendChild(challengeCard);
+            });
+        }
+
+        window.selectAIChallenge = function(challengeId) {
+            document.querySelectorAll('.ai-challenge-card').forEach(card => {
+                card.classList.remove('selected');
+            });
+            
+            const challengeCard = document.querySelector(`[data-challenge-id="${challengeId}"]`);
+            if (challengeCard) {
+                challengeCard.classList.add('selected');
+                selectedAIChallenge = currentAIChallenges.find(c => c.id === challengeId);
+                
+                document.getElementById('targetSelector').classList.add('show');
+                loadTargets('friends');
+                showMessage(`🎯 Selected: ${selectedAIChallenge.title}`, 'success');
+            }
+        };
+
+        function loadTargets(tabType) {
+            const targetList = document.getElementById('targetList');
+            if (!targetList) return;
+            
+            targetList.innerHTML = '';
+            selectedTargets = [];
+            
+            if (tabType === 'friends') {
+                if (friends.length === 0) {
+                    targetList.innerHTML = `
+                        <div class="empty-state">
+                            <p>👥 No friends available</p>
+                            <p style="font-size: 0.8rem; opacity: 0.7;">Add some friends first!</p>
+                        </div>
+                    `;
+                    return;
+                }
+                
+                friends.forEach(friend => {
+                    const targetItem = document.createElement('div');
+                    targetItem.className = 'target-item';
+                    targetItem.onclick = () => toggleTarget(friend.id, targetItem);
+                    
+                    let avatarHtml;
+                    if (friend.avatar && friend.avatar.startsWith('data:')) {
+                        avatarHtml = `<img src="${friend.avatar}" alt="${friend.name}" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;">`;
+                    } else {
+                        avatarHtml = friend.avatar || '👤';
+                    }
+                    
+                    targetItem.innerHTML = `
+                        <div class="target-checkbox"></div>
+                        <div class="target-avatar">
+                            ${avatarHtml}
+                            ${friend.online ? '<div class="target-online-indicator"></div>' : ''}
+                        </div>
+                        <div class="target-info">
+                            <div class="target-name">${friend.name}</div>
+                            <div class="target-status">${friend.online ? 'Online' : 'Offline'} • Level ${friend.level}</div>
+                        </div>
+                    `;
+                    
+                    targetList.appendChild(targetItem);
+                });
+            } else if (tabType === 'random') {
+                targetList.innerHTML = `
+                    <div class="empty-state">
+                        <p>🎲 Random Matching</p>
+                        <p style="font-size: 0.8rem; opacity: 0.7;">Challenge will be sent to a random online player!</p>
+                        <button class="btn btn-primary" style="margin-top: 15px;" onclick="selectRandomTarget()">
+                            Select Random Player
+                        </button>
+                    </div>
+                `;
+            }
+        }
+
+        function toggleTarget(targetId, element) {
+            const checkbox = element.querySelector('.target-checkbox');
+            const isSelected = selectedTargets.includes(targetId);
+            
+            if (isSelected) {
+                selectedTargets = selectedTargets.filter(id => id !== targetId);
+                element.classList.remove('selected');
+                checkbox.classList.remove('checked');
+            } else {
+                selectedTargets.push(targetId);
+                element.classList.add('selected');
+                checkbox.classList.add('checked');
+            }
+            
+            updateSendButton();
+        }
+
+        function updateSendButton() {
+            const sendBtn = document.getElementById('sendChallengeBtn');
+            if (sendBtn) {
+                const count = selectedTargets.length;
+                const cost = 25 * count;
+                sendBtn.textContent = count > 0 ? 
+                    `Send to ${count} player${count > 1 ? 's' : ''} (${cost} tokens)` : 
+                    'Select at least 1 player';
+                sendBtn.disabled = count === 0;
+            }
+        }
+
+        window.sendSelectedAIChallenge = async function() {
+            if (!selectedAIChallenge || selectedTargets.length === 0) {
+                showMessage('❌ Please select a challenge and at least one target!', 'error');
+                return;
+            }
+            
+            const cost = 25 * selectedTargets.length;
+            if (userData.tokens < cost) {
+                showMessage(`❌ Not enough tokens! You need ${cost} tokens.`, 'error');
+                return;
+            }
+            
+            try {
+                const sendBtn = document.getElementById('sendChallengeBtn');
+                sendBtn.disabled = true;
+                sendBtn.classList.add('loading');
+                
+                // Get sender details
+                const senderDoc = await db.collection('users').doc(currentUser.uid).get();
+                const senderData = senderDoc.data();
+                
+                const challengeData = {
+                    title: selectedAIChallenge.title,
+                    description: selectedAIChallenge.description,
+                    category: selectedAIChallenge.category,
+                    reward: selectedAIChallenge.reward,
+                    difficulty: selectedAIChallenge.difficulty,
+                    timeLimit: selectedAIChallenge.timeLimit,
+                    creatorId: 'ai_system',
+                    creatorName: 'AI Challenge Bot',
+                    senderId: currentUser.uid,
+                    senderName: userData.name,
+                    senderAvatar: userData.avatar,
+                    participants: [currentUser.uid, ...selectedTargets],
+                    status: 'active',
+                    responses: {},
+                    createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+                    expiresAt: new Date(Date.now() + selectedAIChallenge.timeLimit * 60 * 60 * 1000),
+                    isAI: true
+                };
+                
+                await db.collection('challenges').add(challengeData);
+                
+                await db.collection('users').doc(currentUser.uid).update({
+                    tokens: firebase.firestore.FieldValue.increment(-cost),
+                    aiChallengesSent: firebase.firestore.FieldValue.increment(1)
+                });
+                
+                userData.tokens -= cost;
+                updateUserDisplay();
+                
+                showMessage(`🤖 AI Challenge sent to ${selectedTargets.length} player${selectedTargets.length > 1 ? 's' : ''}! (-${cost} tokens)`, 'success');
+                
+                cancelChallengeSelection();
+                
+            } catch (error) {
+                console.error('Error sending AI challenge:', error);
+                showMessage('❌ Failed to send challenge. Please try again.', 'error');
+            }
+        };
+
+        window.cancelChallengeSelection = function() {
+            selectedAIChallenge = null;
+            selectedTargets = [];
+            document.getElementById('targetSelector').classList.remove('show');
+            document.querySelectorAll('.ai-challenge-card').forEach(card => {
+                card.classList.remove('selected');
+            });
+        };
+
+        function startAITimer() {
+            if (aiChallengeActive) {
+                aiChallengeTimer = setTimeout(() => {
+                    generateAIChallenges();
+                    showMessage('🤖 New AI challenges available!', 'info');
+                    startAITimer();
+                }, aiChallengeInterval);
+            }
+        }
+
+        function startTimerCountdown() {
+            aiTimerCountdown = 120;
+            updateTimerDisplay();
+            
+            if (aiTimerInterval) {
+                clearInterval(aiTimerInterval);
+            }
+            
+            aiTimerInterval = setInterval(() => {
+                if (aiChallengeActive) {
+                    aiTimerCountdown--;
+                    updateTimerDisplay();
+                    
+                    if (aiTimerCountdown <= 0) {
+                        aiTimerCountdown = 120;
+                    }
+                }
+            }, 1000);
+        }
+
+        function updateTimerDisplay() {
+            const minutes = Math.floor(aiTimerCountdown / 60);
+            const seconds = aiTimerCountdown % 60;
+            const display = `${minutes}:${seconds.toString().padStart(2, '0')}`;
+            
+            const timerElement = document.getElementById('aiTimerCount');
+            if (timerElement) {
+                timerElement.textContent = display;
+            }
+        }
+
+        window.toggleAIChallenge = function() {
+            aiChallengeActive = !aiChallengeActive;
+            const toggleBtn = document.getElementById('toggleAIBtn');
+            
+            if (aiChallengeActive) {
+                toggleBtn.innerHTML = '⏸️ Pause Timer';
+                startAITimer();
+                startTimerCountdown();
+                showMessage('▶️ AI Challenge timer resumed', 'info');
+            } else {
+                toggleBtn.innerHTML = '▶️ Resume Timer';
+                if (aiChallengeTimer) {
+                    clearTimeout(aiChallengeTimer);
+                }
+                if (aiTimerInterval) {
+                    clearInterval(aiTimerInterval);
+                }
+                showMessage('⏸️ AI Challenge timer paused', 'info');
+            }
+        };
+
+        // Play notification sound
+        function playNotificationSound() {
+            try {
+                // Create audio context
+                const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                
+                // Create oscillator for beep sound
+                const oscillator = audioContext.createOscillator();
+                const gainNode = audioContext.createGain();
+                
+                oscillator.connect(gainNode);
+                gainNode.connect(audioContext.destination);
+                
+                oscillator.frequency.value = 800; // Frequency in Hz
+                gainNode.gain.value = 0.3; // Volume
+                
+                oscillator.start();
+                oscillator.stop(audioContext.currentTime + 0.2); // Beep duration
+                
+                // Second beep
+                setTimeout(() => {
+                    const osc2 = audioContext.createOscillator();
+                    const gain2 = audioContext.createGain();
+                    
+                    osc2.connect(gain2);
+                    gain2.connect(audioContext.destination);
+                    
+                    osc2.frequency.value = 1000;
+                    gain2.gain.value = 0.3;
+                    
+                    osc2.start();
+                    osc2.stop(audioContext.currentTime + 0.2);
+                }, 250);
+                
+            } catch (error) {
+                console.log('Could not play sound:', error);
+            }
+        }
+
+        // Show challenge alert
+        function showChallengeAlert(challenge) {
+            // Play notification sound
+            playNotificationSound();
+            
+            const alertDiv = document.createElement('div');
+            alertDiv.className = 'challenge-alert';
+            
+            const avatar = challenge.creatorAvatar || challenge.senderAvatar || '🎮';
+            let avatarHtml;
+            if (avatar && avatar.startsWith('data:')) {
+                avatarHtml = `<img src="${avatar}" alt="${challenge.creatorName}">`;
+            } else {
+                avatarHtml = avatar;
+            }
+            
+            alertDiv.innerHTML = `
+                <div class="challenge-alert-header">🚨 New Challenge Alert!</div>
+                <div class="challenge-alert-sender">
+                    <div class="challenge-alert-avatar">${avatarHtml}</div>
+                    <div>
+                        <div class="challenge-alert-name">${challenge.creatorName}</div>
+                    </div>
+                </div>
+                <div class="challenge-alert-message">
+                    sent you a challenge:<br>
+                    <strong>"${challenge.title}"</strong>
+                </div>
+                <div class="challenge-alert-actions">
+                    <button class="challenge-alert-btn challenge-alert-view" onclick="viewChallengeFromAlert('${challenge.id}', this)">
+                        View Details
+                    </button>
+                    <button class="challenge-alert-btn challenge-alert-dismiss" onclick="dismissAlert(this)">
+                        Later
+                    </button>
+                </div>
+            `;
+            
+            document.body.appendChild(alertDiv);
+            
+            // Auto dismiss after 10 seconds
+            setTimeout(() => {
+                if (alertDiv.parentElement) {
+                    alertDiv.remove();
+                }
+            }, 10000);
+        }
+
+        // View challenge from alert
+        window.viewChallengeFromAlert = function(challengeId, button) {
+            const alertDiv = button.closest('.challenge-alert');
+            alertDiv.remove();
+            
+            // Find and show challenge
+            const challenge = challenges.find(c => c.id === challengeId);
+            if (challenge) {
+                showChallengeDetail(challenge);
+            } else {
+                // Load challenge if not in list
+                db.collection('challenges').doc(challengeId).get().then(doc => {
+                    if (doc.exists) {
+                        showChallengeDetail({ id: doc.id, ...doc.data() });
+                    }
+                });
+            }
+        };
+
+        // Dismiss alert
+        window.dismissAlert = function(button) {
+            const alertDiv = button.closest('.challenge-alert, .friend-request-alert');
+            alertDiv.remove();
+        };
+
+        // Show friend detail modal
+        window.showFriendDetail = function(friend) {
+            const modal = document.createElement('div');
+            modal.className = 'friend-modal';
+            
+            let avatarHtml;
+            if (friend.avatar && friend.avatar.startsWith('data:')) {
+                avatarHtml = `<img src="${friend.avatar}" alt="${friend.name}">`;
+            } else {
+                avatarHtml = friend.avatar || '👤';
+            }
+            
+            modal.innerHTML = `
+                <div class="friend-modal-content" style="max-width: 400px;">
+                    <div class="friend-modal-header">
+                        <h2>Friend Profile</h2>
+                        <button class="close-modal" onclick="closeModal(this)">×</button>
+                    </div>
+                    <div style="text-align: center; padding: 20px;">
+                        <div class="user-avatar" style="width: 100px; height: 100px; font-size: 3rem; margin: 0 auto 20px;">
+                            ${avatarHtml}
+                            ${friend.online ? '<div class="online-indicator" style="width: 20px; height: 20px; border-width: 4px;"></div>' : ''}
+                        </div>
+                        <h2 style="margin-bottom: 10px;">${friend.name}</h2>
+                        <p style="opacity: 0.8; margin-bottom: 20px;">
+                            ${friend.online ? '🟢 Online Now' : '⚫ Offline'} • Level ${friend.level}
+                        </p>
+                        <div class="profile-stats-grid" style="margin-bottom: 20px;">
+                            <div class="profile-stat-box">
+                                <div class="profile-stat-value">${friend.tokens || 0}</div>
+                                <div class="profile-stat-label">Tokens</div>
+                            </div>
+                            <div class="profile-stat-box">
+                                <div class="profile-stat-value">${friend.level}</div>
+                                <div class="profile-stat-label">Level</div>
+                            </div>
+                        </div>
+                        <button class="btn btn-primary" onclick="challengeFriend('${friend.id}')" ${!friend.online ? 'disabled' : ''} style="width: 100%;">
+                            ${friend.online ? '⚡ Challenge Now' : '⏸️ Currently Offline'}
+                        </button>
+                    </div>
+                </div>
+            `;
+            
+            document.body.appendChild(modal);
+        };
+
+        // Load challenges
+        async function loadChallenges() {
+            try {
+                const challengesSnapshot = await db.collection('challenges')
+                    .where('participants', 'array-contains', currentUser.uid)
+                    .where('status', '==', 'active')
+                    .orderBy('createdAt', 'desc')
+                    .limit(20)
+                    .get();
+                
+                challenges = [];
+                
+                challengesSnapshot.forEach(doc => {
+                    challenges.push({
+                        id: doc.id,
+                        ...doc.data()
+                    });
+                });
+                
+                renderChallenges();
+                
+            } catch (error) {
+                console.error('Error loading challenges:', error);
+            }
+        }
+
+        // Render challenges
+        function renderChallenges() {
+            const challengesList = document.getElementById('challengesList');
+            const activeCount = challenges.filter(c => c.status === 'active').length;
+            
+            document.getElementById('activeChallengesCount').textContent = activeCount;
+            
+            if (challenges.length === 0) {
+                challengesList.innerHTML = `
+                    <div class="empty-state">
+                        <h4>🎯 No active challenges</h4>
+                        <p>Create a challenge or wait for friends to challenge you!</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            challengesList.innerHTML = '';
+            
+            challenges.forEach((challenge) => {
+                const challengeElement = document.createElement('div');
+                challengeElement.className = 'challenge-item';
+                challengeElement.onclick = () => showChallengeDetail(challenge);
+                
+                const isCreator = challenge.creatorId === currentUser.uid;
+                const isSender = challenge.senderId === currentUser.uid;
+                const userResponse = challenge.responses && challenge.responses[currentUser.uid];
+                const responseStatus = userResponse ? userResponse.response : 'pending';
+                
+                let actionButtons = '';
+                let statusBadge = '';
+                
+                if (!isCreator && !isSender && responseStatus === 'pending') {
+                    actionButtons = `
+                        <button class="btn btn-primary btn-small" onclick="event.stopPropagation(); respondToChallenge('${challenge.id}', 'accepted')">Accept</button>
+                        <button class="btn btn-secondary btn-small" onclick="event.stopPropagation(); respondToChallenge('${challenge.id}', 'declined')">Decline</button>
+                    `;
+                } else if (!isCreator && !isSender && responseStatus === 'accepted' && (!userResponse || !userResponse.proofUrl)) {
+                    actionButtons = `
+                        <button class="btn btn-primary btn-small" onclick="event.stopPropagation(); showSubmitChallengeModal('${challenge.id}')">📸 Submit Proof</button>
+                    `;
+                    statusBadge = '<span style="font-size: 0.7rem; background: rgba(255, 165, 0, 0.6); padding: 2px 8px; border-radius: 10px; color: white;">Accepted</span>';
+                } else if (userResponse && userResponse.proofUrl) {
+                    statusBadge = '<span style="font-size: 0.7rem; background: rgba(76, 175, 80, 0.6); padding: 2px 8px; border-radius: 10px; color: white;">✅ Completed</span>';
+                } else if (responseStatus === 'declined') {
+                    statusBadge = '<span style="font-size: 0.7rem; background: rgba(244, 67, 54, 0.6); padding: 2px 8px; border-radius: 10px; color: white;">Declined</span>';
+                }
+                
+                const creatorDisplay = challenge.isAI ? 
+                    `🤖 AI Bot` : 
+                    challenge.creatorName;
+                
+                challengeElement.innerHTML = `
+                    <div style="margin-bottom: 10px;">
+                        <h4 style="margin: 0; display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
+                            ${getCategoryIcon(challenge.category)} ${challenge.title}
+                            ${challenge.isAI ? '<span style="font-size: 0.7rem; background: rgba(74, 144, 226, 0.6); padding: 2px 8px; border-radius: 10px; color: white;">AI</span>' : ''}
+                            ${statusBadge}
+                        </h4>
+                        <p style="margin: 5px 0; opacity: 0.8; font-size: 0.9rem;">${challenge.description}</p>
+                        <p style="margin: 5px 0; font-size: 0.8rem; opacity: 0.6;">
+                            ${creatorDisplay} • ${challenge.reward} tokens • ${formatTimeAgo(challenge.createdAt)}
+                        </p>
+                    </div>
+                    <div style="display: flex; gap: 8px; align-items: center; justify-content: space-between; flex-wrap: wrap;">
+                        <div style="display: flex; gap: 8px;">
+                            ${actionButtons}
+                        </div>
+                    </div>
+                `;
+                
+                challengesList.appendChild(challengeElement);
+            });
+        }
+
+        // FIXED: Show submit challenge modal with proper file handling
+        window.showSubmitChallengeModal = function(challengeId) {
+            const challenge = challenges.find(c => c.id === challengeId);
+            if (!challenge) return;
+            
+            // Reset global variables
+            currentProofFile = null;
+            currentProofPreview = null;
+            
+            const modal = document.createElement('div');
+            modal.className = 'submit-challenge-modal';
+            modal.innerHTML = `
+                <div class="submit-challenge-content">
+                    <div class="submit-challenge-header">
+                        <h2>Submit Challenge Proof</h2>
+                        <button class="close-modal" onclick="closeModal(this)">×</button>
+                    </div>
+                    <div class="submit-challenge-description">
+                        <strong>Challenge:</strong> ${challenge.title}<br>
+                        <strong>Task:</strong> ${challenge.description}
+                    </div>
+                    
+                    <div class="proof-upload-section" id="proofUploadSection">
+                        <div class="proof-upload-icon">📸</div>
+                        <label for="proofUpload" class="proof-upload-label">
+                            Upload Photo/Video Proof
+                        </label>
+                        <input type="file" id="proofUpload" accept="image/*,video/*" onchange="handleProofUpload(event, '${challengeId}')">
+                        <p style="font-size: 0.8rem; opacity: 0.6; margin-top: 10px;">Max file size: 10MB</p>
+                    </div>
+                    
+                    <div class="proof-preview" id="proofPreview" style="display: none;">
+                        <!-- Preview will be shown here -->
+                    </div>
+                    
+                    <div class="upload-progress" id="uploadProgress" style="display: none;">
+                        <div class="upload-progress-bar">
+                            <div class="upload-progress-fill" id="uploadProgressFill"></div>
+                        </div>
+                        <div class="upload-progress-text" id="uploadProgressText">Uploading...</div>
+                    </div>
+                    
+                    <div class="proof-caption">
+                        <input type="text" class="proof-caption-input" id="proofCaption" placeholder="Add a caption (optional)" maxlength="100">
+                    </div>
+                    
+                    <div class="submit-challenge-actions">
+                        <button class="submit-btn" onclick="submitChallengeProof('${challengeId}')" id="submitProofBtn" disabled>
+                            Submit Proof
+                        </button>
+                        <button class="cancel-btn" onclick="closeModal(this)">
+                            Cancel
+                        </button>
+                    </div>
+                </div>
+            `;
+            
+            document.body.appendChild(modal);
+        };
+
+        // FIXED: Handle proof upload with proper preview
+        window.handleProofUpload = function(event, challengeId) {
+            const file = event.target.files[0];
+            if (!file) return;
+            
+            // Validate file size (10MB limit)
+            if (file.size > 10 * 1024 * 1024) {
+                showMessage('❌ File size must be less than 10MB', 'error');
+                event.target.value = ''; // Reset input
+                return;
+            }
+            
+            // Validate file type
+            if (!file.type.startsWith('image/') && !file.type.startsWith('video/')) {
+                showMessage('❌ Please upload an image or video file', 'error');
+                event.target.value = ''; // Reset input
+                return;
+            }
+            
+            const preview = document.getElementById('proofPreview');
+            const submitBtn = document.getElementById('submitProofBtn');
+            const uploadSection = document.getElementById('proofUploadSection');
+            
+            // Store file globally
+            currentProofFile = file;
+            
+            // Show preview
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                preview.style.display = 'block';
+                uploadSection.classList.add('has-file');
+                
+                if (file.type.startsWith('image/')) {
+                    preview.innerHTML = `
+                        <img src="${e.target.result}" alt="Proof" style="max-width: 100%; max-height: 300px; border-radius: 15px;">
+                        <p style="margin-top: 10px; font-size: 0.9rem; opacity: 0.8;">✅ Image ready to upload</p>
+                    `;
+                } else if (file.type.startsWith('video/')) {
+                    preview.innerHTML = `
+                        <video src="${e.target.result}" controls style="max-width: 100%; max-height: 300px; border-radius: 15px;"></video>
+                        <p style="margin-top: 10px; font-size: 0.9rem; opacity: 0.8;">✅ Video ready to upload</p>
+                    `;
+                }
+                
+                currentProofPreview = e.target.result;
+                
+                // Enable submit button
+                submitBtn.disabled = false;
+            };
+            
+            reader.onerror = function() {
+                showMessage('❌ Failed to read file. Please try again.', 'error');
+                event.target.value = ''; // Reset input
+            };
+            
+            reader.readAsDataURL(file);
+        };
+
+        // FIXED: Submit challenge proof with proper error handling
+        window.submitChallengeProof = async function(challengeId) {
+            if (!currentProofFile) {
+                showMessage('❌ Please upload proof first', 'error');
+                return;
+            }
+            
+            const submitBtn = document.getElementById('submitProofBtn');
+            const uploadProgress = document.getElementById('uploadProgress');
+            const uploadProgressFill = document.getElementById('uploadProgressFill');
+            const uploadProgressText = document.getElementById('uploadProgressText');
+            const caption = document.getElementById('proofCaption').value.trim();
+            
+            try {
+                submitBtn.disabled = true;
+                submitBtn.classList.add('loading');
+                uploadProgress.style.display = 'block';
+                
+                // Create unique filename
+                const timestamp = Date.now();
+                const fileExtension = currentProofFile.name.split('.').pop();
+                const fileName = `challenges/${challengeId}/${currentUser.uid}_${timestamp}.${fileExtension}`;
+                
+                console.log('Uploading file:', fileName);
+                
+                // Upload file to Firebase Storage with progress tracking
+                const storageRef = storage.ref(fileName);
+                const uploadTask = storageRef.put(currentProofFile);
+                
+                // Monitor upload progress
+                uploadTask.on('state_changed', 
+                    (snapshot) => {
+                        // Progress tracking
+                        const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+                        uploadProgressFill.style.width = progress + '%';
+                        uploadProgressText.textContent = `Uploading... ${Math.round(progress)}%`;
+                    }, 
+                    (error) => {
+                        // Handle unsuccessful uploads
+                        console.error('Upload error:', error);
+                        showMessage('❌ Failed to upload file. Please try again.', 'error');
+                        submitBtn.disabled = false;
+                        submitBtn.classList.remove('loading');
+                        uploadProgress.style.display = 'none';
+                    }, 
+                    async () => {
+                        // Handle successful uploads
+                        try {
+                            uploadProgressText.textContent = 'Processing...';
+                            
+                            const proofUrl = await uploadTask.snapshot.ref.getDownloadURL();
+                            console.log('File uploaded successfully:', proofUrl);
+                            
+                            // Update challenge with proof
+                            await db.collection('challenges').doc(challengeId).update({
+                                [`responses.${currentUser.uid}`]: {
+                                    response: 'completed',
+                                    proofUrl: proofUrl,
+                                    proofType: currentProofFile.type.startsWith('image/') ? 'image' : 'video',
+                                    caption: caption,
+                                    submittedAt: firebase.firestore.FieldValue.serverTimestamp()
+                                }
+                            });
+                            
+                            // Award tokens
+                            const challenge = challenges.find(c => c.id === challengeId);
+                            if (challenge) {
+                                await db.collection('users').doc(currentUser.uid).update({
+                                    tokens: firebase.firestore.FieldValue.increment(challenge.reward)
+                                });
+                                
+                                userData.tokens += challenge.reward;
+                                updateUserDisplay();
+                                
+                                // Animate token update
+                                const tokenElement = document.getElementById('userTokens');
+                                tokenElement.classList.add('updating');
+                                setTimeout(() => tokenElement.classList.remove('updating'), 500);
+                            }
+                            
+                            showMessage(`🎉 Challenge completed! You earned ${challenge.reward} tokens!`, 'success');
+                            
+                            // Clean up
+                            currentProofFile = null;
+                            currentProofPreview = null;
+                            
+                            // Close modal
+                            const modal = submitBtn.closest('.submit-challenge-modal');
+                            if (modal) modal.remove();
+                            
+                            // Reload challenges
+                            loadChallenges();
+                            
+                        } catch (error) {
+                            console.error('Error updating challenge:', error);
+                            showMessage('❌ Failed to submit proof. Please try again.', 'error');
+                            submitBtn.disabled = false;
+                            submitBtn.classList.remove('loading');
+                            uploadProgress.style.display = 'none';
+                        }
+                    }
+                );
+                
+            } catch (error) {
+                console.error('Error submitting proof:', error);
+                showMessage('❌ Failed to submit proof. Please try again.', 'error');
+                submitBtn.disabled = false;
+                submitBtn.classList.remove('loading');
+                uploadProgress.style.display = 'none';
+            }
+        };
+
+    <!-- App Content -->
+    <div class="app-content" id="appContent">
+        <div class="container">
+            <!-- Header -->
+            <div class="header floating-element">
+                <div class="header-top">
+                    <div class="logo-section">
+                        <div class="logo">JomBro</div>
+                        <div class="slogan">Let's Go! Let's Go!</div>
+                        <div class="user-name" id="userName" onclick="showUsernameEdit()">Loading...</div>
+                    </div>
+                    <div class="user-avatar" id="userAvatar" onclick="showAvatarSelector()">👤</div>
+                </div>
+                <div class="user-stats">
+                    <div class="stat-item" onclick="showProfileEditor()">
+                        <div class="stat-number" id="userTokens">0</div>
+                        <div class="stat-label">Tokens</div>
+                    </div>
+                    <div class="stat-item" onclick="showProfileEditor()">
+                        <div class="stat-number" id="userLevel">1</div>
+                        <div class="stat-label">Level</div>
+                    </div>
+                    <div class="stat-item" onclick="showProfileEditor()">
+                        <div class="stat-number" id="userFriends">0</div>
+                        <div class="stat-label">Friends</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Main Content -->
+            <div class="main-content">
+                <!-- Nearby Players Section -->
+                <div class="card floating-element">
+                    <div class="card-title">
+                        <span>🎮</span>
+                        <span>Online Nearby Players</span>
+                    </div>
+                    
+                    <div class="strangers-section">
+                        <div class="strangers-carousel">
+                            <div class="strangers-track" id="strangersTrack">
+                                <!-- Players populated here -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Friends Section -->
+                <div class="card floating-element">
+                    <div class="card-title">
+                        <span>👥</span>
+                        <span>Friends</span>
+                    </div>
+                    
+                    <div class="friends-section">
+                        <div class="friends-header">
+                            <div class="friends-count">
+                                <span class="online-count" id="onlineCount">0</span> online • 
+                                <span id="totalFriends">0</span> total
+                            </div>
+                            <button class="btn btn-secondary btn-small" onclick="showAddFriendModal()" style="position: relative;">
+                                Add Friend
+                                <span class="friend-counter-badge" id="mainPendingBadge" style="display: none;"></span>
+                            </button>
+                        </div>
+                        
+                        <!-- Friends Carousel -->
+                        <div class="friends-carousel-container">
+                            <div class="friends-carousel" id="friendsCarousel">
+                                <!-- Friends carousel will be populated here -->
+                            </div>
+                        </div>
+                        
+                        <!-- View All Button -->
+                        <div class="view-all-friends-btn" id="viewAllFriendsBtn" style="display: none;">
+                            <button class="view-all-btn" onclick="toggleFriendsList()">
+                                <span id="viewAllText">View All Friends</span>
+                            </button>
+                        </div>
+                        
+                        <!-- Full Friends List (Hidden by default) -->
+                        <div class="friends-list" id="friendsList">
+                            <!-- Friends will be populated here -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- AI Challenge Generator -->
+                <div class="card floating-element ai-challenges-section">
+                    <div class="ai-challenges-header">
+                        <div class="ai-challenges-title">
+                            <span>🤖</span>
+                            <span>AI Challenge Generator</span>
+                        </div>
+                        <div class="ai-timer">
+                            <span>⏱️ <span class="ai-timer-count" id="aiTimerCount">2:00</span></span>
+                        </div>
+                    </div>
+                    
+                    <div class="ai-challenges-grid" id="aiChallengesGrid">
+                        <!-- AI Generated challenges will be populated here -->
+                    </div>
+                    
+                    <div class="ai-challenge-actions">
+                        <button class="btn btn-ai" onclick="generateAIChallenges()" id="generateBtn">
+                            🎯 Generate New Challenges
+                        </button>
+                        <button class="btn btn-secondary" onclick="toggleAIChallenge()" id="toggleAIBtn">
+                            ⏸️ Pause Timer
+                        </button>
+                    </div>
+                    
+                    <!-- Target Selector (Hidden by default) -->
+                    <div class="ai-challenge-target-selector" id="targetSelector">
+                        <div class="target-selector-title">
+                            <span>🎯</span>
+                            <span>Send Challenge To:</span>
+                        </div>
+                        
+                        <div class="target-tabs">
+                            <div class="target-tab active" onclick="switchTargetTab('friends')">Friends</div>
+                            <div class="target-tab" onclick="switchTargetTab('random')">Random</div>
+                        </div>
+                        
+                        <div class="target-list" id="targetList">
+                            <!-- Target list will be populated here -->
+                        </div>
+                        
+                        <div class="send-challenge-actions">
+                            <button class="btn btn-primary" onclick="sendSelectedAIChallenge()" id="sendChallengeBtn">
+                                Send Challenge (25 tokens)
+                            </button>
+                            <button class="btn btn-secondary" onclick="cancelChallengeSelection()">
+                                Cancel
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Quick Challenge Creator -->
+                <div class="card floating-element quick-challenge-creator">
+                    <div class="quick-challenge-header">
+                        <div class="quick-challenge-title">
+                            <span>⚡</span>
+                            <span>Quick Challenge</span>
+                        </div>
+                        <div class="quick-toggle-container">
+                            <div class="quick-toggle active" id="quickToggle" onclick="toggleQuickChallenge()">
+                                <div class="toggle-switch"></div>
+                            </div>
+                            <span class="quick-toggle-label">Create & Send</span>
+                        </div>
+                    </div>
+                    
+                    <div class="quick-challenge-form" id="quickChallengeForm">
+                        <div class="quick-input-group">
+                            <input type="text" class="quick-input" id="quickChallengeTitle" placeholder="Challenge title (e.g., Do 10 push-ups)" maxlength="60">
+                        </div>
+                        <div class="quick-input-group">
+                            <textarea class="quick-input quick-textarea" id="quickChallengeDesc" placeholder="What do they need to do? (They'll need to upload photo/video proof)"></textarea>
+                        </div>
+                        <div class="quick-options">
+                            <div class="quick-option-group">
+                                <select class="quick-select" id="quickCategory">
+                                    <option value="fitness">💪 Fitness</option>
+                                    <option value="creative">🎨 Creative</option>
+                                    <option value="social">👥 Social</option>
+                                    <option value="food">🍕 Food</option>
+                                    <option value="adventure">🗺️ Adventure</option>
+                                </select>
+                            </div>
+                            <div class="quick-option-group">
+                                <select class="quick-select" id="quickReward">
+                                    <option value="100">🪙 100 Tokens</option>
+                                    <option value="200">🪙 200 Tokens</option>
+                                    <option value="500">🪙 500 Tokens</option>
+                                    <option value="1000">🪙 1000 Tokens</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="quick-actions">
+                            <button class="btn btn-primary quick-create-btn" onclick="selectChallengeTargets()">Select Friends & Send (50 tokens)</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Active Challenges Section -->
+                <div class="card floating-element">
+                    <div class="card-title">
+                        <span>🎯</span>
+                        <span>Active Challenges</span>
+                    </div>
+                    
+                    <div class="challenges-section">
+                        <div class="challenges-header">
+                            <div class="challenges-count">
+                                <span class="online-count" id="activeChallengesCount">0</span> active
+                            </div>
+                            <button class="btn btn-secondary btn-small" onclick="refreshChallenges()">Refresh</button>
+                        </div>
+                        
+                        <div class="challenges-list" id="challengesList">
+                            <!-- Challenges will be populated here -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- How to Play Button -->
+        <div class="how-to-play-btn" onclick="showHowToPlay()">
+            <span style="font-size: 1.5rem;">❓</span>
+            <div class="btn-text">
+                <span class="btn-title">How to Play</span>
+                <span class="btn-subtitle">JomBro!</span>
+            </div>
+        </div>
+    </div>
