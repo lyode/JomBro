@@ -1,41 +1,3 @@
-   // Add duration options for challenges
-        const challengeDurations = {
-            '6': { label: '6 Hours', hours: 6 },
-            '12': { label: '12 Hours', hours: 12 },
-            '24': { label: '1 Day', hours: 24 },
-            '48': { label: '2 Days', hours: 48 },
-            '72': { label: '3 Days', hours: 72 },
-            '168': { label: '1 Week', hours: 168 }
-        };
-
-        // Check if challenge is expired
-        function isChallengeExpired(expiresAt) {
-            if (!expiresAt) return false;
-            const expiry = expiresAt.toDate ? expiresAt.toDate() : new Date(expiresAt);
-            return new Date() > expiry;
-        }
-
-        // Get time remaining for challenge
-        function getTimeRemaining(expiresAt) {
-            if (!expiresAt) return null;
-            
-            const expiry = expiresAt.toDate ? expiresAt.toDate() : new Date(expiresAt);
-            const now = new Date();
-            const diff = expiry - now;
-            
-            if (diff <= 0) return 'Expired';
-            
-            const hours = Math.floor(diff / (1000 * 60 * 60));
-            const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-            
-            if (hours > 24) {
-                const days = Math.floor(hours / 24);
-                return `${days} day${days > 1 ? 's' : ''} left`;
-            } else if (hours > 0) {
-                return `${hours}h ${minutes}m left`;
-            } else {
-                return `${minutes}m left`;
-            }
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -2640,6 +2602,45 @@
         }
 
         /* Challenge Detail Modal */
+          // Add duration options for challenges
+        const challengeDurations = {
+            '6': { label: '6 Hours', hours: 6 },
+            '12': { label: '12 Hours', hours: 12 },
+            '24': { label: '1 Day', hours: 24 },
+            '48': { label: '2 Days', hours: 48 },
+            '72': { label: '3 Days', hours: 72 },
+            '168': { label: '1 Week', hours: 168 }
+        };
+
+        // Check if challenge is expired
+        function isChallengeExpired(expiresAt) {
+            if (!expiresAt) return false;
+            const expiry = expiresAt.toDate ? expiresAt.toDate() : new Date(expiresAt);
+            return new Date() > expiry;
+        }
+
+        // Get time remaining for challenge
+        function getTimeRemaining(expiresAt) {
+            if (!expiresAt) return null;
+            
+            const expiry = expiresAt.toDate ? expiresAt.toDate() : new Date(expiresAt);
+            const now = new Date();
+            const diff = expiry - now;
+            
+            if (diff <= 0) return 'Expired';
+            
+            const hours = Math.floor(diff / (1000 * 60 * 60));
+            const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+            
+            if (hours > 24) {
+                const days = Math.floor(hours / 24);
+                return `${days} day${days > 1 ? 's' : ''} left`;
+            } else if (hours > 0) {
+                return `${hours}h ${minutes}m left`;
+            } else {
+                return `${minutes}m left`;
+            }
+        }<!DOCTYPE html>
         .challenge-detail-modal {
             position: fixed;
             top: 0;
