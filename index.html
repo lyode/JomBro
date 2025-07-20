@@ -15,6 +15,801 @@
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-storage-compat.js"></script>
     
     <style>
+        <!-- Add these styles to your existing <style> section -->
+<style>
+/* Completed Challenges Styles */
+.completed-challenges-section {
+    margin-top: 20px;
+    padding-top: 20px;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.completed-challenges-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+}
+
+.completed-challenges-tabs {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 15px;
+}
+
+.challenge-tab {
+    padding: 8px 16px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 20px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-size: 0.9rem;
+}
+
+.challenge-tab.active {
+    background: linear-gradient(45deg, #9b59b6, #e91e63);
+    border-color: transparent;
+    color: white;
+    box-shadow: 0 4px 15px rgba(155, 89, 182, 0.3);
+}
+
+.challenge-tab:hover {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.challenge-tab.active:hover {
+    background: linear-gradient(45deg, #9b59b6, #e91e63);
+}
+
+.completed-challenge-item {
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 15px;
+    padding: 15px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    margin-bottom: 15px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.completed-challenge-item::before {
+    content: '✅';
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    font-size: 1.2rem;
+    opacity: 0.6;
+}
+
+.completed-challenge-item:hover {
+    background: rgba(255, 255, 255, 0.08);
+    border-color: rgba(155, 89, 182, 0.3);
+    transform: translateY(-2px);
+}
+
+.challenge-proof-badge {
+    position: absolute;
+    top: 10px;
+    right: 40px;
+    font-size: 1.2rem;
+}
+
+.challenge-proof-badge.photo {
+    content: '📸';
+}
+
+.challenge-proof-badge.video {
+    content: '🎥';
+}
+
+/* Proof Viewer Modal */
+.proof-viewer-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.95);
+    z-index: 3000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    animation: fadeIn 0.3s ease;
+}
+
+.proof-viewer-content {
+    background: rgba(20, 20, 30, 0.98);
+    backdrop-filter: blur(20px);
+    border-radius: 24px;
+    padding: 30px;
+    width: 100%;
+    max-width: 800px;
+    max-height: 90vh;
+    overflow-y: auto;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+    border: 2px solid rgba(155, 89, 182, 0.3);
+    animation: slideUp 0.4s ease-out;
+}
+
+.proof-viewer-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 20px;
+}
+
+.proof-viewer-title {
+    font-size: 1.3rem;
+    font-weight: 600;
+    color: white;
+    flex: 1;
+    padding-right: 20px;
+}
+
+.proof-viewer-meta {
+    display: flex;
+    gap: 15px;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+}
+
+.proof-viewer-meta-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(255, 255, 255, 0.05);
+    padding: 6px 12px;
+    border-radius: 15px;
+    font-size: 0.85rem;
+}
+
+.proof-viewer-user {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.proof-viewer-avatar {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    background: linear-gradient(45deg, #9b59b6, #e91e63);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1rem;
+    overflow: hidden;
+}
+
+.proof-viewer-media {
+    margin: 20px 0;
+    text-align: center;
+}
+
+.proof-viewer-media img,
+.proof-viewer-media video {
+    max-width: 100%;
+    max-height: 500px;
+    border-radius: 15px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+}
+
+.proof-viewer-caption {
+    background: rgba(255, 255, 255, 0.05);
+    padding: 15px;
+    border-radius: 12px;
+    margin-top: 20px;
+    font-style: italic;
+    opacity: 0.9;
+}
+
+.proof-viewer-reactions {
+    display: flex;
+    gap: 10px;
+    margin-top: 20px;
+    justify-content: center;
+}
+
+.reaction-btn {
+    padding: 10px 20px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 20px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-size: 1.2rem;
+}
+
+.reaction-btn:hover {
+    background: rgba(255, 255, 255, 0.1);
+    transform: translateY(-2px);
+}
+
+.reaction-btn.selected {
+    background: rgba(155, 89, 182, 0.3);
+    border-color: #9b59b6;
+}
+
+/* Other Participants Section */
+.other-participants-section {
+    margin-top: 30px;
+    padding-top: 20px;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.other-participants-title {
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin-bottom: 15px;
+    color: #9b59b6;
+}
+
+.other-participants-grid {
+    display: grid;
+    gap: 10px;
+}
+
+.other-participant-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px;
+    background: rgba(255, 255, 255, 0.03);
+    border-radius: 12px;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.other-participant-item:hover {
+    background: rgba(255, 255, 255, 0.05);
+    border-color: rgba(155, 89, 182, 0.3);
+}
+
+.other-participant-info {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.view-proof-btn {
+    background: linear-gradient(45deg, #4a90e2, #5c7cfa);
+    color: white;
+    padding: 6px 14px;
+    border: none;
+    border-radius: 15px;
+    font-size: 0.8rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.view-proof-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(74, 144, 226, 0.4);
+}
+
+/* Mobile optimizations */
+@media (max-width: 480px) {
+    .proof-viewer-content {
+        padding: 20px;
+        margin: 10px;
+    }
+    
+    .proof-viewer-media img,
+    .proof-viewer-media video {
+        max-height: 300px;
+    }
+    
+    .completed-challenges-tabs {
+        flex-wrap: wrap;
+    }
+    
+    .challenge-tab {
+        padding: 6px 12px;
+        font-size: 0.85rem;
+    }
+}
+</style>
+
+<!-- JavaScript to add to your existing script section -->
+<script>
+// Add these variables at the top with other global variables
+let completedChallenges = [];
+let currentChallengeView = 'my'; // 'my' or 'all'
+
+// Update the loadChallenges function to also load completed challenges
+async function loadChallenges() {
+    try {
+        // Load active challenges (existing code)
+        const activeChallengesSnapshot = await db.collection('challenges')
+            .where('participants', 'array-contains', currentUser.uid)
+            .where('status', '==', 'active')
+            .orderBy('createdAt', 'desc')
+            .limit(20)
+            .get();
+        
+        challenges = [];
+        activeChallengesSnapshot.forEach(doc => {
+            challenges.push({
+                id: doc.id,
+                ...doc.data()
+            });
+        });
+        
+        // Load completed challenges
+        const completedChallengesSnapshot = await db.collection('challenges')
+            .where('participants', 'array-contains', currentUser.uid)
+            .where('status', '==', 'completed')
+            .orderBy('createdAt', 'desc')
+            .limit(50)
+            .get();
+        
+        completedChallenges = [];
+        completedChallengesSnapshot.forEach(doc => {
+            completedChallenges.push({
+                id: doc.id,
+                ...doc.data()
+            });
+        });
+        
+        renderChallenges();
+        renderCompletedChallenges();
+        
+    } catch (error) {
+        console.error('Error loading challenges:', error);
+        // Fallback without orderBy
+        try {
+            const activeChallengesSnapshot = await db.collection('challenges')
+                .where('participants', 'array-contains', currentUser.uid)
+                .where('status', '==', 'active')
+                .limit(20)
+                .get();
+            
+            challenges = [];
+            activeChallengesSnapshot.forEach(doc => {
+                challenges.push({
+                    id: doc.id,
+                    ...doc.data()
+                });
+            });
+            
+            challenges.sort((a, b) => {
+                const timeA = a.createdAt ? a.createdAt.toDate() : new Date(0);
+                const timeB = b.createdAt ? b.createdAt.toDate() : new Date(0);
+                return timeB - timeA;
+            });
+            
+            renderChallenges();
+        } catch (retryError) {
+            console.error('Error loading challenges (retry):', retryError);
+        }
+    }
+}
+
+// Add completed challenges section to the challenges card
+function renderCompletedChallenges() {
+    const challengesSection = document.querySelector('.challenges-section');
+    if (!challengesSection) return;
+    
+    // Check if completed section already exists
+    let completedSection = document.querySelector('.completed-challenges-section');
+    if (!completedSection) {
+        completedSection = document.createElement('div');
+        completedSection.className = 'completed-challenges-section';
+        challengesSection.appendChild(completedSection);
+    }
+    
+    // Filter completed challenges based on current view
+    let displayChallenges = [];
+    if (currentChallengeView === 'my') {
+        // Show only challenges where current user has submitted proof
+        displayChallenges = completedChallenges.filter(challenge => {
+            const userResponse = challenge.responses && challenge.responses[currentUser.uid];
+            return userResponse && userResponse.proofUrl;
+        });
+    } else {
+        // Show all completed challenges with any submissions
+        displayChallenges = completedChallenges.filter(challenge => {
+            return Object.values(challenge.responses || {}).some(r => r.proofUrl);
+        });
+    }
+    
+    completedSection.innerHTML = `
+        <div class="completed-challenges-header">
+            <h4 style="font-size: 1.1rem; margin: 0;">🏆 Completed Challenges</h4>
+            <span style="font-size: 0.9rem; opacity: 0.7;">${displayChallenges.length} completed</span>
+        </div>
+        <div class="completed-challenges-tabs">
+            <div class="challenge-tab ${currentChallengeView === 'my' ? 'active' : ''}" onclick="switchChallengeView('my')">
+                My Completions
+            </div>
+            <div class="challenge-tab ${currentChallengeView === 'all' ? 'active' : ''}" onclick="switchChallengeView('all')">
+                All Completions
+            </div>
+        </div>
+        <div class="completed-challenges-list" id="completedChallengesList">
+            ${displayChallenges.length === 0 ? 
+                `<div class="empty-state">
+                    <p style="opacity: 0.6;">No completed challenges to show</p>
+                </div>` :
+                displayChallenges.map(challenge => renderCompletedChallengeItem(challenge)).join('')
+            }
+        </div>
+    `;
+}
+
+// Render individual completed challenge item
+function renderCompletedChallengeItem(challenge) {
+    const userResponse = challenge.responses && challenge.responses[currentUser.uid];
+    const hasMyProof = userResponse && userResponse.proofUrl;
+    const proofType = userResponse && userResponse.proofType;
+    
+    // Count how many people completed it
+    const completionCount = Object.values(challenge.responses || {}).filter(r => r.proofUrl).length;
+    
+    return `
+        <div class="completed-challenge-item" onclick="viewChallengeProof('${challenge.id}')">
+            ${proofType === 'video' ? '<span class="challenge-proof-badge">🎥</span>' : '<span class="challenge-proof-badge">📸</span>'}
+            <h4 style="margin: 0 0 8px 0; padding-right: 60px;">
+                ${getCategoryIcon(challenge.category)} ${challenge.title}
+            </h4>
+            <p style="margin: 0 0 8px 0; opacity: 0.8; font-size: 0.9rem;">${challenge.description}</p>
+            <div style="display: flex; justify-content: space-between; align-items: center; font-size: 0.85rem; opacity: 0.7;">
+                <span>${challenge.isAI ? '🤖 AI Challenge' : `👤 ${challenge.creatorName}`}</span>
+                <span>${completionCount} ${completionCount === 1 ? 'person' : 'people'} completed</span>
+            </div>
+            ${hasMyProof ? 
+                `<div style="margin-top: 8px; color: #4CAF50; font-size: 0.85rem;">
+                    ✅ You earned ${challenge.reward} tokens
+                </div>` : ''
+            }
+        </div>
+    `;
+}
+
+// Switch between my completions and all completions
+window.switchChallengeView = function(view) {
+    currentChallengeView = view;
+    renderCompletedChallenges();
+};
+
+// View challenge proof details
+window.viewChallengeProof = async function(challengeId) {
+    const challenge = completedChallenges.find(c => c.id === challengeId) || 
+                     challenges.find(c => c.id === challengeId);
+    
+    if (!challenge) {
+        try {
+            const doc = await db.collection('challenges').doc(challengeId).get();
+            if (doc.exists) {
+                challenge = { id: doc.id, ...doc.data() };
+            } else {
+                showMessage('Challenge not found', 'error');
+                return;
+            }
+        } catch (error) {
+            console.error('Error loading challenge:', error);
+            showMessage('Failed to load challenge', 'error');
+            return;
+        }
+    }
+    
+    // Find user's proof
+    const userResponse = challenge.responses && challenge.responses[currentUser.uid];
+    const hasMyProof = userResponse && userResponse.proofUrl;
+    
+    // Get all participants with proof
+    const participantsWithProof = [];
+    for (const [userId, response] of Object.entries(challenge.responses || {})) {
+        if (response.proofUrl) {
+            try {
+                const userDoc = await db.collection('users').doc(userId).get();
+                if (userDoc.exists) {
+                    const userData = userDoc.data();
+                    participantsWithProof.push({
+                        id: userId,
+                        name: userData.name,
+                        avatar: userData.avatar,
+                        response: response
+                    });
+                }
+            } catch (error) {
+                console.error('Error loading user:', error);
+            }
+        }
+    }
+    
+    // Show the first proof (current user's if available)
+    const firstProof = hasMyProof ? 
+        { user: { id: currentUser.uid, name: userData.name, avatar: userData.avatar }, response: userResponse } :
+        participantsWithProof.length > 0 ? 
+            { user: participantsWithProof[0], response: participantsWithProof[0].response } : null;
+    
+    if (!firstProof) {
+        showMessage('No proof submissions found', 'info');
+        return;
+    }
+    
+    showProofViewer(challenge, firstProof.user, firstProof.response, participantsWithProof);
+};
+
+// Show proof viewer modal
+function showProofViewer(challenge, user, response, allParticipants) {
+    const modal = document.createElement('div');
+    modal.className = 'proof-viewer-modal';
+    
+    let userAvatarHtml;
+    if (user.avatar && user.avatar.startsWith('data:')) {
+        userAvatarHtml = `<img src="${user.avatar}" alt="${user.name}" style="width: 100%; height: 100%; object-fit: cover;">`;
+    } else {
+        userAvatarHtml = user.avatar || '👤';
+    }
+    
+    const isCurrentUser = user.id === currentUser.uid;
+    const submittedTime = response.submittedAt ? formatTimeAgo(response.submittedAt) : 'Unknown time';
+    
+    modal.innerHTML = `
+        <div class="proof-viewer-content">
+            <div class="proof-viewer-header">
+                <div>
+                    <h2 class="proof-viewer-title">${challenge.title}</h2>
+                    <p style="opacity: 0.8; margin-top: 5px;">${challenge.description}</p>
+                </div>
+                <button class="close-modal" onclick="closeModal(this)">×</button>
+            </div>
+            
+            <div class="proof-viewer-meta">
+                <div class="proof-viewer-meta-item">
+                    <div class="proof-viewer-user">
+                        <div class="proof-viewer-avatar">${userAvatarHtml}</div>
+                        <span>${isCurrentUser ? 'You' : user.name}</span>
+                    </div>
+                </div>
+                <div class="proof-viewer-meta-item">
+                    🪙 ${challenge.reward} tokens earned
+                </div>
+                <div class="proof-viewer-meta-item">
+                    ⏰ ${submittedTime}
+                </div>
+            </div>
+            
+            <div class="proof-viewer-media">
+                ${response.proofType === 'video' ? 
+                    `<video src="${response.proofUrl}" controls style="width: 100%;"></video>` :
+                    `<img src="${response.proofUrl}" alt="Challenge proof">`
+                }
+            </div>
+            
+            ${response.caption ? 
+                `<div class="proof-viewer-caption">
+                    "${response.caption}"
+                </div>` : ''
+            }
+            
+            <div class="proof-viewer-reactions">
+                <button class="reaction-btn" onclick="reactToProof('${challenge.id}', '${user.id}', '👏')">
+                    👏 <span id="clap-count">0</span>
+                </button>
+                <button class="reaction-btn" onclick="reactToProof('${challenge.id}', '${user.id}', '🔥')">
+                    🔥 <span id="fire-count">0</span>
+                </button>
+                <button class="reaction-btn" onclick="reactToProof('${challenge.id}', '${user.id}', '😂')">
+                    😂 <span id="laugh-count">0</span>
+                </button>
+                <button class="reaction-btn" onclick="reactToProof('${challenge.id}', '${user.id}', '💪')">
+                    💪 <span id="strong-count">0</span>
+                </button>
+            </div>
+            
+            ${allParticipants && allParticipants.length > 1 ? `
+                <div class="other-participants-section">
+                    <h3 class="other-participants-title">Other Completions (${allParticipants.length - 1})</h3>
+                    <div class="other-participants-grid">
+                        ${allParticipants.filter(p => p.id !== user.id).map(participant => {
+                            let participantAvatarHtml;
+                            if (participant.avatar && participant.avatar.startsWith('data:')) {
+                                participantAvatarHtml = `<img src="${participant.avatar}" alt="${participant.name}" style="width: 100%; height: 100%; object-fit: cover;">`;
+                            } else {
+                                participantAvatarHtml = participant.avatar || '👤';
+                            }
+                            
+                            return `
+                                <div class="other-participant-item" onclick="switchProofView('${challenge.id}', '${participant.id}', this)">
+                                    <div class="other-participant-info">
+                                        <div class="proof-viewer-avatar">${participantAvatarHtml}</div>
+                                        <div>
+                                            <div style="font-weight: 500;">${participant.id === currentUser.uid ? 'You' : participant.name}</div>
+                                            <div style="font-size: 0.8rem; opacity: 0.7;">
+                                                ${participant.response.proofType === 'video' ? '🎥 Video' : '📸 Photo'}
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <button class="view-proof-btn" onclick="event.stopPropagation(); switchProofView('${challenge.id}', '${participant.id}', this)">
+                                        View
+                                    </button>
+                                </div>
+                            `;
+                        }).join('')}
+                    </div>
+                </div>
+            ` : ''}
+        </div>
+    `;
+    
+    document.body.appendChild(modal);
+}
+
+// Switch to view another participant's proof
+window.switchProofView = async function(challengeId, userId, element) {
+    // Close current modal
+    const currentModal = element.closest('.proof-viewer-modal');
+    if (currentModal) currentModal.remove();
+    
+    // Load challenge
+    const challenge = completedChallenges.find(c => c.id === challengeId) || 
+                     challenges.find(c => c.id === challengeId);
+    
+    if (!challenge) return;
+    
+    // Get user data
+    try {
+        const userDoc = await db.collection('users').doc(userId).get();
+        if (userDoc.exists) {
+            const userData = userDoc.data();
+            const userResponse = challenge.responses[userId];
+            
+            // Get all participants for the navigation
+            const participantsWithProof = [];
+            for (const [uid, response] of Object.entries(challenge.responses || {})) {
+                if (response.proofUrl) {
+                    const pDoc = await db.collection('users').doc(uid).get();
+                    if (pDoc.exists) {
+                        const pData = pDoc.data();
+                        participantsWithProof.push({
+                            id: uid,
+                            name: pData.name,
+                            avatar: pData.avatar,
+                            response: response
+                        });
+                    }
+                }
+            }
+            
+            showProofViewer(challenge, {
+                id: userId,
+                name: userData.name,
+                avatar: userData.avatar
+            }, userResponse, participantsWithProof);
+        }
+    } catch (error) {
+        console.error('Error switching proof view:', error);
+        showMessage('Failed to load proof', 'error');
+    }
+};
+
+// React to proof (placeholder - you can implement reactions storage)
+window.reactToProof = function(challengeId, userId, reaction) {
+    showMessage(`You reacted with ${reaction}!`, 'success');
+    
+    // Toggle selected state
+    const btn = event.target.closest('.reaction-btn');
+    btn.classList.toggle('selected');
+    
+    // You can implement storing reactions in Firebase here
+    // For now, just increment the count visually
+    const countSpan = btn.querySelector('span');
+    const currentCount = parseInt(countSpan.textContent) || 0;
+    const newCount = btn.classList.contains('selected') ? currentCount + 1 : Math.max(0, currentCount - 1);
+    countSpan.textContent = newCount;
+};
+
+// Update the challenge completion flow to mark challenges as completed
+window.submitChallengeProof = async function(challengeId) {
+    if (!window.tempProofFile || window.tempProofFile.challengeId !== challengeId) {
+        showMessage('❌ Please upload proof first', 'error');
+        return;
+    }
+    
+    const submitBtn = document.getElementById('submitProofBtn');
+    const caption = document.getElementById('proofCaption').value.trim();
+    
+    try {
+        submitBtn.disabled = true;
+        submitBtn.classList.add('loading');
+        
+        // Upload file to Firebase Storage
+        const fileName = `challenges/${challengeId}/${currentUser.uid}_${Date.now()}_${window.tempProofFile.file.name}`;
+        const storageRef = storage.ref(fileName);
+        const uploadTask = await storageRef.put(window.tempProofFile.file);
+        const proofUrl = await uploadTask.ref.getDownloadURL();
+        
+        // Update challenge with proof
+        await db.collection('challenges').doc(challengeId).update({
+            [`responses.${currentUser.uid}`]: {
+                response: 'completed',
+                proofUrl: proofUrl,
+                proofType: window.tempProofFile.file.type.startsWith('image/') ? 'image' : 'video',
+                caption: caption,
+                submittedAt: firebase.firestore.FieldValue.serverTimestamp()
+            }
+        });
+        
+        // Check if all participants have completed
+        const challengeDoc = await db.collection('challenges').doc(challengeId).get();
+        const challengeData = challengeDoc.data();
+        const allCompleted = challengeData.participants.every(participantId => {
+            const response = challengeData.responses && challengeData.responses[participantId];
+            return response && (response.response === 'completed' || response.response === 'declined');
+        });
+        
+        // If all participants have responded, mark challenge as completed
+        if (allCompleted) {
+            await db.collection('challenges').doc(challengeId).update({
+                status: 'completed',
+                completedAt: firebase.firestore.FieldValue.serverTimestamp()
+            });
+        }
+        
+        // Award tokens
+        const challenge = challenges.find(c => c.id === challengeId);
+        if (challenge) {
+            await db.collection('users').doc(currentUser.uid).update({
+                tokens: firebase.firestore.FieldValue.increment(challenge.reward)
+            });
+            
+            userData.tokens += challenge.reward;
+            updateUserDisplay();
+        }
+        
+        showMessage(`🎉 Challenge completed! You earned ${challenge.reward} tokens!`, 'success');
+        
+        // Clean up
+        window.tempProofFile = null;
+        
+        // Close modal
+        const modal = submitBtn.closest('.submit-challenge-modal');
+        if (modal) modal.remove();
+        
+        // Reload challenges
+        loadChallenges();
+        
+    } catch (error) {
+        console.error('Error submitting proof:', error);
+        showMessage('❌ Failed to submit proof. Please try again.', 'error');
+    } finally {
+        submitBtn.disabled = false;
+        submitBtn.classList.remove('loading');
+    }
+};
+
+// Also check for completed challenges with expired timers
+async function checkAndUpdateExpiredChallenges() {
+    try {
+        const expiredChallenges = await db.collection('challenges')
+            .where('status', '==', 'active')
+            .where('expiresAt', '<=', new Date())
+            .get();
+        
+        const batch = db.batch();
+        expiredChallenges.forEach(doc => {
+            batch.update(doc.ref, {
+                status: 'completed',
+                completedAt: firebase.firestore.FieldValue.serverTimestamp()
+            });
+        });
+        
+        await batch.commit();
+    } catch (error) {
+        console.error('Error updating expired challenges:', error);
+    }
+}
+
+// Call this periodically or on app load
+setInterval(checkAndUpdateExpiredChallenges, 60000); // Check every minute
+</script>
         * {
             margin: 0;
             padding: 0;
