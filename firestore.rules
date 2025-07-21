@@ -1884,7 +1884,7 @@
 
         // Hide auth modal
         function hideAuthModal() {
-            document.getElementById('authModal').style.display = 'none';
+            document.getElementById('authModal').classList.remove('show');
             document.getElementById('mainApp').classList.remove('hidden');
         }
 
@@ -1906,6 +1906,9 @@
                         online: true,
                         lastActive: firebase.firestore.FieldValue.serverTimestamp()
                     });
+                    
+                    // Listen for real-time updates
+                    setupRealtimeListeners();
                 }
             } catch (error) {
                 console.error('Error loading user data:', error);
@@ -1916,11 +1919,10 @@
         function updateUI() {
             if (!userData) return;
             
-            document.getElementById('userName').textContent = userData.name || 'Anonymous';
+            document.getElementById('userName').textContent = userData.name || 'User';
             document.getElementById('userLevel').textContent = `Level ${userData.level || 1}`;
             document.getElementById('userAvatarIcon').textContent = userData.avatar || '😎';
             
-            // Update stats with animation
             updateStat('tokensCount', userData.tokens || 0);
             updateStat('friendsCount', userData.friendsCount || 0);
             updateStat('challengesCount', userData.activeChallenges || 0);
@@ -1931,12 +1933,41 @@
             const element = document.getElementById(elementId);
             if (!element) return;
             
+            element.textContent = value;
             element.classList.add('updating');
-            element.textContent = value.toLocaleString();
+            setTimeout(() => element.classList.remove('updating'), 500);
+        }
+
+        // Setup real-time listeners
+        function setupRealtimeListeners() {
+            if (!currentUser) return;
             
-            setTimeout(() => {
-                element.classList.remove('updating');
-            }, 500);
+            // Listen for user updates
+            db.collection('users').doc(currentUser.uid).onSnapshot(doc => {
+                if (doc.exists) {
+                    userData = doc.data();
+                    updateUI();
+                }
+            });
+            
+            // Listen for friend requests
+            db.collection('friendRequests')
+                .where('to', '==', currentUser.uid)
+                .where('status', '==', 'pending')
+                .onSnapshot(snapshot => {
+                    const pendingCount = snapshot.size;
+                    if (pendingCount > 0) {
+                        showMessage(`You have ${pendingCount} new friend request${pendingCount > 1 ? 's' : ''}! 👥`, 'success');
+                    }
+                });
+            
+            // Listen for challenges
+            db.collection('challenges')
+                .where('participants', 'array-contains', currentUser.uid)
+                .where('status', '==', 'active')
+                .onSnapshot(snapshot => {
+                    updateStat('challengesCount', snapshot.size);
+                });
         }
 
         // Load friends
@@ -1951,33 +1982,41 @@
                     .get();
                 
                 const carousel = document.getElementById('friendCarousel');
-                // Keep the add friend button
-                const addFriendBtn = carousel.querySelector('.friend-carousel-item');
-                carousel.innerHTML = '';
-                carousel.appendChild(addFriendBtn);
+                
+                // Clear existing friends (except add button)
+                const existingFriends = carousel.querySelectorAll('.friend-carousel-item:not(:first-child)');
+                existingFriends.forEach(item => item.remove());
                 
                 friendsSnapshot.forEach(doc => {
                     const friend = doc.data();
-                    const friendItem = document.createElement('div');
-                    friendItem.className = 'friend-carousel-item';
-                    friendItem.onclick = () => showFriendProfile(doc.id);
-                    
-                    friendItem.innerHTML = `
-                        <div class="friend-carousel-avatar ${friend.online ? 'online' : ''}">
-                            ${friend.avatar || '👤'}
-                        </div>
-                        <div class="friend-carousel-name">${friend.name || 'Friend'}</div>
-                    `;
-                    
+                    const friendItem = createFriendCarouselItem(friend);
                     carousel.appendChild(friendItem);
                 });
-                
-                // Update friends count
-                updateStat('friendsCount', friendsSnapshot.size);
                 
             } catch (error) {
                 console.error('Error loading friends:', error);
             }
+        }
+
+        // Create friend carousel item
+        function createFriendCarouselItem(friend) {
+            const item = document.createElement('div');
+            item.className = 'friend-carousel-item';
+            item.onclick = () => selectFriend(friend.uid);
+            
+            const avatar = document.createElement('div');
+            avatar.className = 'friend-carousel-avatar';
+            if (friend.online) avatar.classList.add('online');
+            avatar.innerHTML = `<span>${friend.avatar || '😎'}</span>`;
+            
+            const name = document.createElement('div');
+            name.className = 'friend-carousel-name';
+            name.textContent = friend.name || 'Friend';
+            
+            item.appendChild(avatar);
+            item.appendChild(name);
+            
+            return item;
         }
 
         // Load challenges
@@ -1987,110 +2026,892 @@
             try {
                 const challengesSnapshot = await db.collection('challenges')
                     .where('participants', 'array-contains', currentUser.uid)
-                    .where('status', 'in', ['pending', 'active'])
+                    .where('status', '==', 'active')
                     .orderBy('createdAt', 'desc')
-                    .limit(10)
+                    .limit(5)
                     .get();
                 
                 const challengesList = document.getElementById('challengesList');
                 challengesList.innerHTML = '';
                 
                 if (challengesSnapshot.empty) {
-                    challengesList.innerHTML = `
-                        <div style="text-align: center; padding: 20px; opacity: 0.7;">
-                            No active challenges yet!<br>
-                            <small>Create one or wait for friends to challenge you</small>
-                        </div>
-                    `;
-                } else {
-                    challengesSnapshot.forEach(doc => {
-                        const challenge = doc.data();
-                        const challengeItem = document.createElement('div');
-                        challengeItem.className = 'challenge-item';
-                        challengeItem.onclick = () => showChallengeDetails(doc.id);
-                        
-                        const statusClass = challenge.status === 'active' ? 'status-active' : 'status-pending';
-                        const statusText = challenge.status === 'active' ? 'Active' : 'Pending';
-                        
-                        challengeItem.innerHTML = `
-                            <div class="challenge-info">
-                                <div class="challenge-title">
-                                    <span>${challenge.title || 'Untitled Challenge'}</span>
-                                    <span style="font-size: 0.8rem;">💰 ${challenge.reward || 0}</span>
-                                </div>
-                                <div class="challenge-details">
-                                    ${challenge.creatorName || 'Someone'} • ${getTimeRemaining(challenge.timeLimit, challenge.createdAt)}
-                                </div>
-                            </div>
-                            <div class="challenge-status ${statusClass}">${statusText}</div>
-                        `;
-                        
-                        challengesList.appendChild(challengeItem);
-                    });
+                    challengesList.innerHTML = '<div style="text-align: center; opacity: 0.6; padding: 20px;">No active challenges</div>';
+                    return;
                 }
                 
-                // Update challenges count
-                document.getElementById('activeChallengesCount').textContent = challengesSnapshot.size;
-                updateStat('challengesCount', challengesSnapshot.size);
+                challengesSnapshot.forEach(doc => {
+                    const challenge = { id: doc.id, ...doc.data() };
+                    const challengeItem = createChallengeItem(challenge);
+                    challengesList.appendChild(challengeItem);
+                });
                 
             } catch (error) {
                 console.error('Error loading challenges:', error);
             }
         }
 
+        // Create challenge item
+        function createChallengeItem(challenge) {
+            const item = document.createElement('div');
+            item.className = 'challenge-item';
+            item.onclick = () => viewChallenge(challenge.id);
+            
+            const info = document.createElement('div');
+            info.className = 'challenge-info';
+            
+            const title = document.createElement('div');
+            title.className = 'challenge-title';
+            title.innerHTML = `<span>${challenge.icon || '🎯'}</span> ${challenge.title}`;
+            
+            const details = document.createElement('div');
+            details.className = 'challenge-details';
+            details.textContent = `${challenge.reward} tokens • ${getTimeRemaining(challenge.deadline)}`;
+            
+            info.appendChild(title);
+            info.appendChild(details);
+            
+            const status = document.createElement('div');
+            status.className = `challenge-status status-${challenge.userStatus || 'pending'}`;
+            status.textContent = challenge.userStatus || 'Pending';
+            
+            item.appendChild(info);
+            item.appendChild(status);
+            
+            return item;
+        }
+
         // Get time remaining
-        function getTimeRemaining(timeLimit, createdAt) {
-            if (!timeLimit || !createdAt) return 'No limit';
+        function getTimeRemaining(deadline) {
+            if (!deadline) return 'No deadline';
             
-            const created = createdAt.toDate ? createdAt.toDate() : new Date(createdAt);
-            const deadline = new Date(created.getTime() + (timeLimit * 60 * 60 * 1000));
             const now = new Date();
-            const remaining = deadline - now;
+            const end = deadline.toDate ? deadline.toDate() : new Date(deadline);
+            const diff = end - now;
             
-            if (remaining <= 0) return 'Expired';
+            if (diff <= 0) return 'Expired';
             
-            const hours = Math.floor(remaining / (1000 * 60 * 60));
-            const minutes = Math.floor((remaining % (1000 * 60 * 60)) / (1000 * 60));
+            const hours = Math.floor(diff / (1000 * 60 * 60));
+            const days = Math.floor(hours / 24);
             
-            if (hours > 24) {
-                const days = Math.floor(hours / 24);
-                return `${days}d left`;
-            } else if (hours > 0) {
-                return `${hours}h ${minutes}m left`;
-            } else {
-                return `${minutes}m left`;
-            }
+            if (days > 0) return `${days}d left`;
+            if (hours > 0) return `${hours}h left`;
+            return 'Less than 1h';
         }
 
         // Show message
         function showMessage(text, type = 'success') {
+            const existingMessage = document.querySelector('.message');
+            if (existingMessage) existingMessage.remove();
+            
             const message = document.createElement('div');
             message.className = `message ${type}`;
-            message.textContent = text;
+            message.innerHTML = `<span>${text}</span>`;
             
             document.body.appendChild(message);
             
             setTimeout(() => {
                 message.style.opacity = '0';
-                setTimeout(() => {
-                    message.remove();
-                }, 300);
+                setTimeout(() => message.remove(), 300);
             }, 3000);
         }
 
-        // Generate friend code
-        function generateFriendCode(userId) {
-            const hash = userId.split('').reduce((acc, char) => {
-                return acc + char.charCodeAt(0);
-            }, 0);
+        // Select friend
+        function selectFriend(friendId) {
+            console.log('Selected friend:', friendId);
+            // TODO: Implement friend selection
+        }
+
+        // Refresh challenges
+        function refreshChallenges() {
+            loadChallenges();
+            showMessage('Challenges refreshed! 🔄', 'success');
+        }
+
+        // View challenge details
+        async function viewChallenge(challengeId) {
+            try {
+                const challengeDoc = await db.collection('challenges').doc(challengeId).get();
+                
+                if (!challengeDoc.exists) {
+                    showMessage('Challenge not found', 'error');
+                    return;
+                }
+                
+                const challenge = { id: challengeDoc.id, ...challengeDoc.data() };
+                showChallengeDetails(challenge);
+                
+            } catch (error) {
+                console.error('Error viewing challenge:', error);
+                showMessage('Failed to load challenge', 'error');
+            }
+        }
+
+        // Show challenge details modal
+        function showChallengeDetails(challenge) {
+            const modal = document.createElement('div');
+            modal.className = 'modal-overlay';
+            modal.onclick = (e) => {
+                if (e.target === modal) closeModal(modal);
+            };
             
-            const code = hash.toString(36).toUpperCase().padEnd(8, 'X').substring(0, 8);
-            return code;
+            const isCreator = challenge.creatorId === currentUser.uid;
+            const userResponse = challenge.responses && challenge.responses[currentUser.uid];
+            const canSubmit = !userResponse && challenge.status === 'active';
+            
+            modal.innerHTML = `
+                <div class="modal-content">
+                    <button class="close-modal" onclick="closeModal(this.closest('.modal-overlay'))">×</button>
+                    
+                    <h2 style="margin-bottom: 20px; display: flex; align-items: center; gap: 10px;">
+                        <span>${challenge.icon || '🎯'}</span>
+                        ${challenge.title}
+                    </h2>
+                    
+                    <div style="background: rgba(255, 255, 255, 0.05); padding: 15px; border-radius: 15px; margin-bottom: 20px;">
+                        <p style="margin-bottom: 10px;">${challenge.description}</p>
+                        <div style="display: flex; gap: 20px; font-size: 0.9rem; opacity: 0.8;">
+                            <span>💰 ${challenge.reward} tokens</span>
+                            <span>⏱️ ${getTimeRemaining(challenge.deadline)}</span>
+                            <span>🔥 ${challenge.difficulty || 'Medium'}</span>
+                        </div>
+                    </div>
+                    
+                    ${canSubmit ? `
+                        <div style="text-align: center; margin-top: 30px;">
+                            <button class="btn btn-primary" onclick="submitProof('${challenge.id}')">
+                                📸 Submit Proof
+                            </button>
+                        </div>
+                    ` : ''}
+                    
+                    ${userResponse ? `
+                        <div style="background: rgba(76, 175, 80, 0.1); border: 1px solid rgba(76, 175, 80, 0.3); padding: 15px; border-radius: 15px; margin-top: 20px;">
+                            <p style="color: #4caf50; font-weight: 600;">✅ You've completed this challenge!</p>
+                            ${userResponse.status === 'pending' ? '<p style="font-size: 0.9rem; opacity: 0.8; margin-top: 5px;">Waiting for verification...</p>' : ''}
+                        </div>
+                    ` : ''}
+                    
+                    ${isCreator && challenge.responses ? `
+                        <div style="margin-top: 30px;">
+                            <h3>Submissions</h3>
+                            <div id="submissionsList"></div>
+                        </div>
+                    ` : ''}
+                </div>
+            `;
+            
+            document.body.appendChild(modal);
+            
+            if (isCreator && challenge.responses) {
+                loadSubmissions(challenge);
+            }
+        }
+
+        // Close modal
+        function closeModal(element) {
+            const modal = element.closest('.modal-overlay') || element;
+            modal.style.opacity = '0';
+            setTimeout(() => modal.remove(), 300);
+        }
+
+        // Submit proof
+        async function submitProof(challengeId) {
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.accept = 'image/*,video/*';
+            
+            input.onchange = async (e) => {
+                const file = e.target.files[0];
+                if (!file) return;
+                
+                try {
+                    showMessage('Uploading proof... 📤', 'success');
+                    
+                    // Upload to storage
+                    const storageRef = storage.ref(`proofs/${challengeId}/${currentUser.uid}/${file.name}`);
+                    const uploadTask = await storageRef.put(file);
+                    const proofUrl = await uploadTask.ref.getDownloadURL();
+                    
+                    // Update challenge response
+                    await db.collection('challenges').doc(challengeId).update({
+                        [`responses.${currentUser.uid}`]: {
+                            proofUrl,
+                            submittedAt: firebase.firestore.FieldValue.serverTimestamp(),
+                            status: 'pending',
+                            userName: userData.name,
+                            userAvatar: userData.avatar
+                        }
+                    });
+                    
+                    showMessage('Proof submitted! Waiting for verification 🎯', 'success');
+                    closeModal(document.querySelector('.modal-overlay'));
+                    loadChallenges();
+                    
+                } catch (error) {
+                    console.error('Error submitting proof:', error);
+                    showMessage('Failed to submit proof', 'error');
+                }
+            };
+            
+            input.click();
+        }
+
+        // Show Quick Challenge
+        function showQuickChallenge() {
+            const modal = document.createElement('div');
+            modal.className = 'modal-overlay';
+            modal.onclick = (e) => {
+                if (e.target === modal) closeModal(modal);
+            };
+            
+            modal.innerHTML = `
+                <div class="modal-content">
+                    <button class="close-modal" onclick="closeModal(this.closest('.modal-overlay'))">×</button>
+                    
+                    <h2 style="margin-bottom: 20px;">⚡ Create Quick Challenge</h2>
+                    
+                    <form onsubmit="createQuickChallenge(event)">
+                        <div class="form-group">
+                            <label class="form-label">Challenge Title</label>
+                            <input type="text" class="form-input" id="challengeTitle" placeholder="Name your challenge" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">Description</label>
+                            <textarea class="form-input" id="challengeDescription" rows="3" placeholder="What's the dare?" required></textarea>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">Reward Tokens</label>
+                            <input type="number" class="form-input" id="challengeReward" min="50" max="500" value="100" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">Time Limit (hours)</label>
+                            <input type="number" class="form-input" id="challengeTimeLimit" min="1" max="168" value="24" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">Select Friends</label>
+                            <div id="friendSelector" style="display: flex; flex-wrap: wrap; gap: 10px; margin-top: 10px;">
+                                <!-- Friends will be populated here -->
+                            </div>
+                        </div>
+                        
+                        <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 20px;">
+                            Create Challenge 🚀
+                        </button>
+                    </form>
+                </div>
+            `;
+            
+            document.body.appendChild(modal);
+            loadFriendSelector();
+        }
+
+        // Load friend selector
+        async function loadFriendSelector() {
+            const selector = document.getElementById('friendSelector');
+            if (!selector) return;
+            
+            try {
+                const friendsSnapshot = await db.collection('users')
+                    .doc(currentUser.uid)
+                    .collection('friends')
+                    .get();
+                
+                if (friendsSnapshot.empty) {
+                    selector.innerHTML = '<p style="opacity: 0.6;">Add friends first to challenge them!</p>';
+                    return;
+                }
+                
+                friendsSnapshot.forEach(doc => {
+                    const friend = doc.data();
+                    
+                    const friendOption = document.createElement('label');
+                    friendOption.style.cssText = 'display: flex; align-items: center; gap: 8px; cursor: pointer; padding: 8px; background: rgba(255, 255, 255, 0.05); border-radius: 10px; transition: all 0.3s ease;';
+                    
+                    friendOption.innerHTML = `
+                        <input type="checkbox" value="${friend.uid}" style="cursor: pointer;">
+                        <span>${friend.avatar || '😎'}</span>
+                        <span>${friend.name}</span>
+                    `;
+                    
+                    friendOption.onmouseover = () => {
+                        friendOption.style.background = 'rgba(155, 89, 182, 0.2)';
+                    };
+                    
+                    friendOption.onmouseout = () => {
+                        friendOption.style.background = 'rgba(255, 255, 255, 0.05)';
+                    };
+                    
+                    selector.appendChild(friendOption);
+                });
+                
+            } catch (error) {
+                console.error('Error loading friends:', error);
+            }
+        }
+
+        // Create quick challenge
+        async function createQuickChallenge(event) {
+            event.preventDefault();
+            
+            const title = document.getElementById('challengeTitle').value;
+            const description = document.getElementById('challengeDescription').value;
+            const reward = parseInt(document.getElementById('challengeReward').value);
+            const timeLimit = parseInt(document.getElementById('challengeTimeLimit').value);
+            
+            const selectedFriends = Array.from(document.querySelectorAll('#friendSelector input:checked'))
+                .map(input => input.value);
+            
+            if (selectedFriends.length === 0) {
+                showMessage('Please select at least one friend', 'error');
+                return;
+            }
+            
+            try {
+                const deadline = new Date();
+                deadline.setHours(deadline.getHours() + timeLimit);
+                
+                const challenge = {
+                    title,
+                    description,
+                    reward,
+                    deadline,
+                    creatorId: currentUser.uid,
+                    creatorName: userData.name,
+                    creatorAvatar: userData.avatar,
+                    participants: [currentUser.uid, ...selectedFriends],
+                    status: 'active',
+                    responses: {},
+                    createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+                    icon: '⚡'
+                };
+                
+                await db.collection('challenges').add(challenge);
+                
+                showMessage('Challenge created! 🎯', 'success');
+                closeModal(document.querySelector('.modal-overlay'));
+                loadChallenges();
+                
+            } catch (error) {
+                console.error('Error creating challenge:', error);
+                showMessage('Failed to create challenge', 'error');
+            }
+        }
+
+        // Show AI Challenge
+        function showAIChallenge() {
+            const modal = document.createElement('div');
+            modal.className = 'modal-overlay';
+            modal.onclick = (e) => {
+                if (e.target === modal) closeModal(modal);
+            };
+            
+            modal.innerHTML = `
+                <div class="modal-content">
+                    <button class="close-modal" onclick="closeModal(this.closest('.modal-overlay'))">×</button>
+                    
+                    <h2 style="margin-bottom: 20px;">🤖 AI Challenge Suggestions</h2>
+                    
+                    <div style="display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap;">
+                        <button class="btn btn-small ${selectedDifficulty === 'easy' ? 'btn-primary' : 'btn-secondary'}" onclick="filterAIChallenges('easy')">Easy</button>
+                        <button class="btn btn-small ${selectedDifficulty === 'medium' ? 'btn-primary' : 'btn-secondary'}" onclick="filterAIChallenges('medium')">Medium</button>
+                        <button class="btn btn-small ${selectedDifficulty === 'hard' ? 'btn-primary' : 'btn-secondary'}" onclick="filterAIChallenges('hard')">Hard</button>
+                        <button class="btn btn-small ${selectedDifficulty === 'trending' ? 'btn-primary' : 'btn-secondary'}" onclick="filterAIChallenges('trending')">Trending 🔥</button>
+                    </div>
+                    
+                    <div id="aiChallengesList" style="display: flex; flex-direction: column; gap: 10px;">
+                        <!-- AI challenges will be populated here -->
+                    </div>
+                </div>
+            `;
+            
+            document.body.appendChild(modal);
+            
+            // Default to easy challenges
+            window.selectedDifficulty = 'easy';
+            filterAIChallenges('easy');
+        }
+
+        // Filter AI challenges
+        function filterAIChallenges(difficulty) {
+            window.selectedDifficulty = difficulty;
+            
+            const list = document.getElementById('aiChallengesList');
+            const challenges = aiChallengeTemplates[difficulty] || [];
+            
+            list.innerHTML = '';
+            
+            challenges.forEach((template, index) => {
+                const item = document.createElement('div');
+                item.className = 'challenge-item';
+                item.style.cursor = 'pointer';
+                
+                item.innerHTML = `
+                    <div class="challenge-info">
+                        <div class="challenge-title">
+                            <span>🤖</span> ${template.title}
+                        </div>
+                        <div class="challenge-details">${template.description}</div>
+                        <div style="margin-top: 8px; font-size: 0.8rem; opacity: 0.7;">
+                            💰 ${template.reward} tokens • ⏱️ ${template.timeLimit}h
+                        </div>
+                    </div>
+                    <button class="btn btn-ai btn-small" onclick="useAIChallenge(${index})">
+                        Use This
+                    </button>
+                `;
+                
+                list.appendChild(item);
+            });
+            
+            // Update difficulty buttons
+            document.querySelectorAll('.modal-content .btn').forEach(btn => {
+                if (btn.textContent.toLowerCase().includes(difficulty)) {
+                    btn.classList.remove('btn-secondary');
+                    btn.classList.add('btn-primary');
+                } else if (!btn.textContent.includes('Use This')) {
+                    btn.classList.remove('btn-primary');
+                    btn.classList.add('btn-secondary');
+                }
+            });
+        }
+
+        // Use AI challenge template
+        async function useAIChallenge(index) {
+            const template = aiChallengeTemplates[window.selectedDifficulty][index];
+            
+            if (!template) return;
+            
+            // Close AI modal
+            closeModal(document.querySelector('.modal-overlay'));
+            
+            // Show friend selector modal
+            const modal = document.createElement('div');
+            modal.className = 'modal-overlay';
+            modal.onclick = (e) => {
+                if (e.target === modal) closeModal(modal);
+            };
+            
+            modal.innerHTML = `
+                <div class="modal-content">
+                    <button class="close-modal" onclick="closeModal(this.closest('.modal-overlay'))">×</button>
+                    
+                    <h2 style="margin-bottom: 20px;">Select Friends for Challenge</h2>
+                    
+                    <div style="background: rgba(255, 255, 255, 0.05); padding: 15px; border-radius: 15px; margin-bottom: 20px;">
+                        <h3 style="margin-bottom: 10px;">${template.title}</h3>
+                        <p style="opacity: 0.8;">${template.description}</p>
+                        <div style="margin-top: 10px; font-size: 0.9rem;">
+                            💰 ${template.reward} tokens • ⏱️ ${template.timeLimit}h
+                        </div>
+                    </div>
+                    
+                    <div id="aiFriendSelector" style="display: flex; flex-wrap: wrap; gap: 10px;">
+                        <!-- Friends will be populated here -->
+                    </div>
+                    
+                    <button class="btn btn-primary" style="width: 100%; margin-top: 20px;" onclick="createAIChallenge(${JSON.stringify(template).replace(/"/g, '&quot;')})">
+                        Send Challenge 🚀
+                    </button>
+                </div>
+            `;
+            
+            document.body.appendChild(modal);
+            loadAIFriendSelector();
+        }
+
+        // Load AI friend selector
+        async function loadAIFriendSelector() {
+            const selector = document.getElementById('aiFriendSelector');
+            if (!selector) return;
+            
+            try {
+                const friendsSnapshot = await db.collection('users')
+                    .doc(currentUser.uid)
+                    .collection('friends')
+                    .get();
+                
+                if (friendsSnapshot.empty) {
+                    selector.innerHTML = '<p style="opacity: 0.6; text-align: center; width: 100%;">Add friends first to challenge them!</p>';
+                    return;
+                }
+                
+                friendsSnapshot.forEach(doc => {
+                    const friend = doc.data();
+                    
+                    const friendOption = document.createElement('label');
+                    friendOption.style.cssText = 'display: flex; align-items: center; gap: 8px; cursor: pointer; padding: 10px; background: rgba(255, 255, 255, 0.05); border-radius: 10px; transition: all 0.3s ease;';
+                    
+                    friendOption.innerHTML = `
+                        <input type="checkbox" value="${friend.uid}" style="cursor: pointer;">
+                        <span style="font-size: 1.5rem;">${friend.avatar || '😎'}</span>
+                        <span>${friend.name}</span>
+                    `;
+                    
+                    friendOption.onmouseover = () => {
+                        friendOption.style.background = 'rgba(74, 144, 226, 0.2)';
+                    };
+                    
+                    friendOption.onmouseout = () => {
+                        friendOption.style.background = 'rgba(255, 255, 255, 0.05)';
+                    };
+                    
+                    selector.appendChild(friendOption);
+                });
+                
+            } catch (error) {
+                console.error('Error loading friends:', error);
+            }
+        }
+
+        // Create AI challenge
+        async function createAIChallenge(template) {
+            const selectedFriends = Array.from(document.querySelectorAll('#aiFriendSelector input:checked'))
+                .map(input => input.value);
+            
+            if (selectedFriends.length === 0) {
+                showMessage('Please select at least one friend', 'error');
+                return;
+            }
+            
+            try {
+                const deadline = new Date();
+                deadline.setHours(deadline.getHours() + template.timeLimit);
+                
+                const challenge = {
+                    ...template,
+                    deadline,
+                    creatorId: currentUser.uid,
+                    creatorName: userData.name,
+                    creatorAvatar: userData.avatar,
+                    participants: [currentUser.uid, ...selectedFriends],
+                    status: 'active',
+                    responses: {},
+                    createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+                    icon: '🤖',
+                    isAIGenerated: true
+                };
+                
+                await db.collection('challenges').add(challenge);
+                
+                showMessage('AI Challenge sent! 🤖', 'success');
+                closeModal(document.querySelector('.modal-overlay'));
+                loadChallenges();
+                
+            } catch (error) {
+                console.error('Error creating AI challenge:', error);
+                showMessage('Failed to create challenge', 'error');
+            }
+        }
+
+        // Show Add Friend
+        function showAddFriend() {
+            const modal = document.createElement('div');
+            modal.className = 'modal-overlay';
+            modal.onclick = (e) => {
+                if (e.target === modal) closeModal(modal);
+            };
+            
+            modal.innerHTML = `
+                <div class="modal-content">
+                    <button class="close-modal" onclick="closeModal(this.closest('.modal-overlay'))">×</button>
+                    
+                    <h2 style="margin-bottom: 20px;">👥 Add Friends</h2>
+                    
+                    <div style="margin-bottom: 20px;">
+                        <label class="form-label">Search by Username or Friend Code</label>
+                        <input type="text" class="form-input" id="friendSearchInput" placeholder="Enter username or 8-digit code">
+                    </div>
+                    
+                    <button class="btn btn-primary" style="width: 100%;" onclick="searchFriend()">
+                        Search Friend 🔍
+                    </button>
+                    
+                    <div style="margin: 30px 0; text-align: center; position: relative;">
+                        <hr style="border: none; border-top: 1px solid rgba(255, 255, 255, 0.1);">
+                        <span style="position: absolute; top: -10px; left: 50%; transform: translateX(-50%); background: rgba(20, 20, 30, 0.98); padding: 0 15px;">OR</span>
+                    </div>
+                    
+                    <div style="text-align: center;">
+                        <p style="margin-bottom: 15px; opacity: 0.8;">Your Friend Code</p>
+                        <div style="background: rgba(155, 89, 182, 0.1); border: 2px solid rgba(155, 89, 182, 0.3); padding: 15px; border-radius: 15px; font-size: 1.5rem; font-weight: bold; letter-spacing: 2px; margin-bottom: 15px;">
+                            ${generateFriendCode(currentUser.uid)}
+                        </div>
+                        <button class="btn btn-secondary" onclick="shareMyCode()">
+                            Share Code 📤
+                        </button>
+                    </div>
+                    
+                    <div id="friendSearchResults" style="margin-top: 20px;"></div>
+                </div>
+            `;
+            
+            document.body.appendChild(modal);
+        }
+
+        // Generate friend code
+        function generateFriendCode(uid) {
+            // Simple hash function to generate 8-character code
+            let hash = 0;
+            for (let i = 0; i < uid.length; i++) {
+                const char = uid.charCodeAt(i);
+                hash = ((hash << 5) - hash) + char;
+                hash = hash & hash;
+            }
+            
+            return Math.abs(hash).toString(36).toUpperCase().padEnd(8, '0').substring(0, 8);
+        }
+
+        // Share my code
+        function shareMyCode() {
+            const code = generateFriendCode(currentUser.uid);
+            const text = `My JomBro friend code: ${code}`;
+            
+            if (navigator.share) {
+                navigator.share({
+                    title: 'JomBro Friend Code',
+                    text: text
+                }).catch(err => {
+                    if (err.name !== 'AbortError') {
+                        copyToClipboard(text);
+                    }
+                });
+            } else {
+                copyToClipboard(text);
+            }
+        }
+
+        // Copy to clipboard
+        function copyToClipboard(text) {
+            navigator.clipboard.writeText(text);
+            showMessage('Copied to clipboard! 📋', 'success');
+        }
+
+        // Search friend
+        async function searchFriend() {
+            const searchValue = document.getElementById('friendSearchInput').value.trim();
+            const resultsDiv = document.getElementById('friendSearchResults');
+            
+            if (!searchValue) {
+                showMessage('Please enter a username or friend code', 'error');
+                return;
+            }
+            
+            try {
+                resultsDiv.innerHTML = '<div style="text-align: center;"><div class="loading-spinner"></div></div>';
+                
+                let userDoc;
+                
+                // Check if it's a friend code (8 characters)
+                if (searchValue.length === 8 && /^[A-Z0-9]+$/.test(searchValue.toUpperCase())) {
+                    // Search by friend code
+                    const usersSnapshot = await db.collection('users').get();
+                    
+                    for (const doc of usersSnapshot.docs) {
+                        if (generateFriendCode(doc.id) === searchValue.toUpperCase()) {
+                            userDoc = doc;
+                            break;
+                        }
+                    }
+                } else {
+                    // Search by username
+                    const usersSnapshot = await db.collection('users')
+                        .where('name', '==', searchValue)
+                        .limit(1)
+                        .get();
+                    
+                    if (!usersSnapshot.empty) {
+                        userDoc = usersSnapshot.docs[0];
+                    }
+                }
+                
+                if (userDoc && userDoc.id !== currentUser.uid) {
+                    const user = userDoc.data();
+                    
+                    resultsDiv.innerHTML = `
+                        <div style="background: rgba(255, 255, 255, 0.05); padding: 15px; border-radius: 15px; display: flex; align-items: center; justify-content: space-between;">
+                            <div style="display: flex; align-items: center; gap: 15px;">
+                                <div style="font-size: 2rem;">${user.avatar || '😎'}</div>
+                                <div>
+                                    <div style="font-weight: 600;">${user.name}</div>
+                                    <div style="font-size: 0.8rem; opacity: 0.7;">Level ${user.level || 1}</div>
+                                </div>
+                            </div>
+                            <button class="btn btn-primary btn-small" onclick="sendFriendRequest('${userDoc.id}')">
+                                Add Friend
+                            </button>
+                        </div>
+                    `;
+                } else if (userDoc && userDoc.id === currentUser.uid) {
+                    resultsDiv.innerHTML = '<p style="text-align: center; opacity: 0.6;">That\'s you! 😄</p>';
+                } else {
+                    resultsDiv.innerHTML = '<p style="text-align: center; opacity: 0.6;">No user found with that username or code</p>';
+                }
+                
+            } catch (error) {
+                console.error('Error searching friend:', error);
+                resultsDiv.innerHTML = '<p style="text-align: center; color: #f44336;">Search failed. Please try again.</p>';
+            }
+        }
+
+        // Send friend request
+        async function sendFriendRequest(targetUserId) {
+            try {
+                // Check if already friends
+                const existingFriend = await db.collection('users')
+                    .doc(currentUser.uid)
+                    .collection('friends')
+                    .doc(targetUserId)
+                    .get();
+                
+                if (existingFriend.exists) {
+                    showMessage('You are already friends! 👥', 'error');
+                    return;
+                }
+                
+                // Create friend request
+                await db.collection('friendRequests').add({
+                    from: currentUser.uid,
+                    fromName: userData.name,
+                    fromAvatar: userData.avatar,
+                    to: targetUserId,
+                    status: 'pending',
+                    createdAt: firebase.firestore.FieldValue.serverTimestamp()
+                });
+                
+                showMessage('Friend request sent! 📤', 'success');
+                closeModal(document.querySelector('.modal-overlay'));
+                
+            } catch (error) {
+                console.error('Error sending friend request:', error);
+                showMessage('Failed to send friend request', 'error');
+            }
+        }
+
+        // Show Profile
+        function showProfile() {
+            const modal = document.createElement('div');
+            modal.className = 'modal-overlay';
+            modal.onclick = (e) => {
+                if (e.target === modal) closeModal(modal);
+            };
+            
+            modal.innerHTML = `
+                <div class="modal-content">
+                    <button class="close-modal" onclick="closeModal(this.closest('.modal-overlay'))">×</button>
+                    
+                    <h2 style="margin-bottom: 20px;">👤 My Profile</h2>
+                    
+                    <div style="text-align: center; margin-bottom: 30px;">
+                        <div style="font-size: 4rem; margin-bottom: 10px;">${userData.avatar || '😎'}</div>
+                        <h3>${userData.name}</h3>
+                        <p style="opacity: 0.7;">Level ${userData.level || 1}</p>
+                    </div>
+                    
+                    <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin-bottom: 30px;">
+                        <div style="text-align: center; background: rgba(255, 255, 255, 0.05); padding: 15px; border-radius: 15px;">
+                            <div style="font-size: 1.5rem; font-weight: bold;">${userData.tokens || 0}</div>
+                            <div style="font-size: 0.8rem; opacity: 0.7;">Tokens</div>
+                        </div>
+                        <div style="text-align: center; background: rgba(255, 255, 255, 0.05); padding: 15px; border-radius: 15px;">
+                            <div style="font-size: 1.5rem; font-weight: bold;">${userData.friendsCount || 0}</div>
+                            <div style="font-size: 0.8rem; opacity: 0.7;">Friends</div>
+                        </div>
+                        <div style="text-align: center; background: rgba(255, 255, 255, 0.05); padding: 15px; border-radius: 15px;">
+                            <div style="font-size: 1.5rem; font-weight: bold;">${userData.completedChallenges || 0}</div>
+                            <div style="font-size: 0.8rem; opacity: 0.7;">Completed</div>
+                        </div>
+                    </div>
+                    
+                    <div style="background: rgba(155, 89, 182, 0.1); border: 2px solid rgba(155, 89, 182, 0.3); padding: 15px; border-radius: 15px; margin-bottom: 20px;">
+                        <p style="margin-bottom: 10px; font-weight: 600;">Friend Code</p>
+                        <div style="font-size: 1.3rem; letter-spacing: 2px; font-weight: bold;">${generateFriendCode(currentUser.uid)}</div>
+                    </div>
+                    
+                    <button class="btn btn-secondary" style="width: 100%;" onclick="logout()">
+                        Logout
+                    </button>
+                </div>
+            `;
+            
+            document.body.appendChild(modal);
+        }
+
+        // Show How to Play
+        function showHowToPlay() {
+            const modal = document.createElement('div');
+            modal.className = 'modal-overlay';
+            modal.onclick = (e) => {
+                if (e.target === modal) closeModal(modal);
+            };
+            
+            modal.innerHTML = `
+                <div class="modal-content">
+                    <button class="close-modal" onclick="closeModal(this.closest('.modal-overlay'))">×</button>
+                    
+                    <h2 style="margin-bottom: 20px;">❓ How to Play JomBro</h2>
+                    
+                    <div style="display: flex; flex-direction: column; gap: 20px;">
+                        <div style="background: rgba(255, 255, 255, 0.05); padding: 20px; border-radius: 15px;">
+                            <h3 style="margin-bottom: 10px;">1️⃣ Add Friends</h3>
+                            <p style="opacity: 0.8;">Connect with friends using their username or unique friend code. The more friends, the more fun!</p>
+                        </div>
+                        
+                        <div style="background: rgba(255, 255, 255, 0.05); padding: 20px; border-radius: 15px;">
+                            <h3 style="margin-bottom: 10px;">2️⃣ Create Challenges</h3>
+                            <p style="opacity: 0.8;">Use Quick Challenge to create your own dares, or let AI suggest fun challenges for you!</p>
+                        </div>
+                        
+                        <div style="background: rgba(255, 255, 255, 0.05); padding: 20px; border-radius: 15px;">
+                            <h3 style="margin-bottom: 10px;">3️⃣ Complete & Earn</h3>
+                            <p style="opacity: 0.8;">Do the challenge, submit photo/video proof, and earn tokens when verified!</p>
+                        </div>
+                        
+                        <div style="background: rgba(255, 255, 255, 0.05); padding: 20px; border-radius: 15px;">
+                            <h3 style="margin-bottom: 10px;">4️⃣ Level Up</h3>
+                            <p style="opacity: 0.8;">Complete challenges to gain experience, level up, and unlock new features!</p>
+                        </div>
+                    </div>
+                    
+                    <div style="margin-top: 30px; text-align: center;">
+                        <p style="font-size: 1.2rem; font-weight: 600;">Ready to start? 🚀</p>
+                        <p style="opacity: 0.7;">Challenge your friends and have fun!</p>
+                    </div>
+                </div>
+            `;
+            
+            document.body.appendChild(modal);
+        }
+
+        // Logout
+        async function logout() {
+            try {
+                // Update online status
+                await db.collection('users').doc(currentUser.uid).update({
+                    online: false,
+                    lastActive: firebase.firestore.FieldValue.serverTimestamp()
+                });
+                
+                // Clear session
+                localStorage.removeItem('jombro_phone');
+                localStorage.removeItem('jombro_userId');
+                
+                // Reload page
+                window.location.reload();
+                
+            } catch (error) {
+                console.error('Logout error:', error);
+                // Force reload anyway
+                window.location.reload();
+            }
         }
 
         // Format time ago
         function formatTimeAgo(timestamp) {
-            if (!timestamp) return 'Unknown';
+            if (!timestamp) return 'just now';
             
             const date = timestamp.toDate ? timestamp.toDate() : new Date(timestamp);
             const now = new Date();
@@ -2100,7 +2921,7 @@
             const hours = Math.floor(diff / 3600000);
             const days = Math.floor(diff / 86400000);
             
-            if (minutes < 1) return 'Just now';
+            if (minutes < 1) return 'just now';
             if (minutes < 60) return `${minutes}m ago`;
             if (hours < 24) return `${hours}h ago`;
             if (days < 7) return `${days}d ago`;
@@ -2108,855 +2929,33 @@
             return date.toLocaleDateString();
         }
 
-        // Show Quick Challenge
-        window.showQuickChallenge = function() {
-            const modal = document.createElement('div');
-            modal.className = 'modal-overlay';
-            modal.innerHTML = `
-                <div class="modal-content">
-                    <button class="close-modal" onclick="closeModal(this)">×</button>
-                    
-                    <h2 style="margin-bottom: 20px;">⚡ Quick Challenge</h2>
-                    
-                    <form id="quickChallengeForm" onsubmit="createQuickChallenge(event)">
-                        <div class="form-group">
-                            <label class="form-label">Challenge Title</label>
-                            <input type="text" class="form-input" id="challengeTitle" 
-                                   placeholder="Name your challenge" required>
-                        </div>
-                        
-                        <div class="form-group">
-                            <label class="form-label">Description</label>
-                            <textarea class="form-input" id="challengeDescription" rows="3" 
-                                      placeholder="What's the dare?" required></textarea>
-                        </div>
-                        
-                        <div class="form-group">
-                            <label class="form-label">Reward Tokens</label>
-                            <input type="number" class="form-input" id="challengeReward" 
-                                   min="50" max="1000" value="100" required>
-                        </div>
-                        
-                        <div class="form-group">
-                            <label class="form-label">Time Limit (hours)</label>
-                            <select class="form-input" id="challengeTimeLimit">
-                                <option value="12">12 hours</option>
-                                <option value="24" selected>24 hours</option>
-                                <option value="48">48 hours</option>
-                                <option value="72">72 hours</option>
-                                <option value="168">1 week</option>
-                            </select>
-                        </div>
-                        
-                        <div class="form-group">
-                            <label class="form-label">Select Friends</label>
-                            <div id="friendSelector" style="max-height: 150px; overflow-y: auto;">
-                                <!-- Friends will be loaded here -->
-                            </div>
-                        </div>
-                        
-                        <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 20px;">
-                            Create Challenge
-                        </button>
-                    </form>
-                </div>
-            `;
-            
-            document.body.appendChild(modal);
-            loadFriendSelector();
-        };
-
-        // Show AI Challenge
-        window.showAIChallenge = function() {
-            const modal = document.createElement('div');
-            modal.className = 'modal-overlay';
-            modal.innerHTML = `
-                <div class="modal-content">
-                    <button class="close-modal" onclick="closeModal(this)">×</button>
-                    
-                    <h2 style="margin-bottom: 20px;">🤖 AI Challenge Suggestions</h2>
-                    
-                    <div style="display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap;">
-                        <button class="btn btn-secondary btn-small" onclick="filterAIChallenges('easy')">Easy</button>
-                        <button class="btn btn-secondary btn-small" onclick="filterAIChallenges('medium')">Medium</button>
-                        <button class="btn btn-secondary btn-small" onclick="filterAIChallenges('hard')">Hard</button>
-                        <button class="btn btn-secondary btn-small" onclick="filterAIChallenges('trending')">Trending</button>
-                    </div>
-                    
-                    <div id="aiChallengesList" style="display: flex; flex-direction: column; gap: 10px;">
-                        <!-- AI challenges will be loaded here -->
-                    </div>
-                </div>
-            `;
-            
-            document.body.appendChild(modal);
-            filterAIChallenges('easy');
-        };
-
-        // Filter AI Challenges
-        window.filterAIChallenges = function(difficulty) {
-            const challenges = aiChallengeTemplates[difficulty] || aiChallengeTemplates.easy;
-            const container = document.getElementById('aiChallengesList');
-            
-            container.innerHTML = challenges.map(challenge => `
-                <div class="challenge-item" style="cursor: pointer;" 
-                     onclick='selectAIChallenge(${JSON.stringify(challenge)})'>
-                    <div class="challenge-info">
-                        <div class="challenge-title">
-                            <span>${challenge.title}</span>
-                            <span style="font-size: 0.8rem;">💰 ${challenge.reward}</span>
-                        </div>
-                        <div class="challenge-details">${challenge.description}</div>
-                        <div style="margin-top: 5px;">
-                            <span class="challenge-status status-${challenge.difficulty}">
-                                ${challenge.difficulty}
-                            </span>
-                            <span style="font-size: 0.7rem; opacity: 0.7; margin-left: 10px;">
-                                ⏱️ ${challenge.timeLimit}h limit
-                            </span>
-                        </div>
-                    </div>
-                </div>
-            `).join('');
-        };
-
-        // Select AI Challenge
-        window.selectAIChallenge = function(challenge) {
-            closeModal(document.querySelector('.modal-overlay .close-modal'));
-            
-            // Show friend selector for this challenge
-            const modal = document.createElement('div');
-            modal.className = 'modal-overlay';
-            modal.innerHTML = `
-                <div class="modal-content">
-                    <button class="close-modal" onclick="closeModal(this)">×</button>
-                    
-                    <h2 style="margin-bottom: 20px;">Send Challenge</h2>
-                    
-                    <div style="background: rgba(255,255,255,0.05); padding: 15px; border-radius: 10px; margin-bottom: 20px;">
-                        <h3>${challenge.title}</h3>
-                        <p style="opacity: 0.8; margin: 10px 0;">${challenge.description}</p>
-                        <div style="display: flex; gap: 15px; margin-top: 10px;">
-                            <span>💰 ${challenge.reward} tokens</span>
-                            <span>⏱️ ${challenge.timeLimit}h limit</span>
-                        </div>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label class="form-label">Select Friends to Challenge</label>
-                        <div id="friendSelector" style="max-height: 200px; overflow-y: auto;">
-                            <!-- Friends will be loaded here -->
-                        </div>
-                    </div>
-                    
-                    <button class="btn btn-primary" style="width: 100%; margin-top: 20px;"
-                            onclick='sendAIChallenge(${JSON.stringify(challenge)})'>
-                        Send Challenge
-                    </button>
-                </div>
-            `;
-            
-            document.body.appendChild(modal);
-            loadFriendSelector();
-        };
-
-        // Load friend selector
-        async function loadFriendSelector() {
-            const selector = document.getElementById('friendSelector');
-            if (!selector || !currentUser) return;
-            
-            try {
-                const friendsSnapshot = await db.collection('users')
-                    .doc(currentUser.uid)
-                    .collection('friends')
-                    .get();
-                
-                if (friendsSnapshot.empty) {
-                    selector.innerHTML = `
-                        <div style="text-align: center; padding: 20px; opacity: 0.7;">
-                            No friends yet! Add some friends first.
-                        </div>
-                    `;
-                } else {
-                    selector.innerHTML = friendsSnapshot.docs.map(doc => {
-                        const friend = doc.data();
-                        return `
-                            <label style="display: flex; align-items: center; padding: 10px; cursor: pointer;">
-                                <input type="checkbox" value="${doc.id}" style="margin-right: 10px;">
-                                <span style="font-size: 1.5rem; margin-right: 10px;">${friend.avatar || '👤'}</span>
-                                <span>${friend.name || 'Friend'}</span>
-                            </label>
-                        `;
-                    }).join('');
-                }
-            } catch (error) {
-                console.error('Error loading friends:', error);
-                selector.innerHTML = '<div style="color: #f44336;">Error loading friends</div>';
-            }
-        }
-
-        // Create quick challenge
-        window.createQuickChallenge = async function(event) {
-            event.preventDefault();
-            
-            const title = document.getElementById('challengeTitle').value;
-            const description = document.getElementById('challengeDescription').value;
-            const reward = parseInt(document.getElementById('challengeReward').value);
-            const timeLimit = parseInt(document.getElementById('challengeTimeLimit').value);
-            
-            const selectedFriends = Array.from(
-                document.querySelectorAll('#friendSelector input[type="checkbox"]:checked')
-            ).map(cb => cb.value);
-            
-            if (selectedFriends.length === 0) {
-                showMessage('Please select at least one friend', 'error');
-                return;
-            }
-            
-            try {
-                const challenge = {
-                    title,
-                    description,
-                    reward,
-                    timeLimit,
-                    creatorId: currentUser.uid,
-                    creatorName: userData.name,
-                    participants: [currentUser.uid, ...selectedFriends],
-                    status: 'pending',
-                    createdAt: firebase.firestore.FieldValue.serverTimestamp(),
-                    responses: {}
-                };
-                
-                await db.collection('challenges').add(challenge);
-                
-                showMessage('Challenge created! 🎯', 'success');
-                closeModal(document.querySelector('.modal-overlay .close-modal'));
-                loadChallenges();
-                
-            } catch (error) {
-                console.error('Error creating challenge:', error);
-                showMessage('Failed to create challenge', 'error');
-            }
-        };
-
-        // Send AI challenge
-        window.sendAIChallenge = async function(challenge) {
-            const selectedFriends = Array.from(
-                document.querySelectorAll('#friendSelector input[type="checkbox"]:checked')
-            ).map(cb => cb.value);
-            
-            if (selectedFriends.length === 0) {
-                showMessage('Please select at least one friend', 'error');
-                return;
-            }
-            
-            try {
-                const challengeData = {
-                    ...challenge,
-                    creatorId: currentUser.uid,
-                    creatorName: userData.name,
-                    participants: [currentUser.uid, ...selectedFriends],
-                    status: 'pending',
-                    createdAt: firebase.firestore.FieldValue.serverTimestamp(),
-                    responses: {},
-                    isAIGenerated: true
-                };
-                
-                await db.collection('challenges').add(challengeData);
-                
-                showMessage('Challenge sent! 🚀', 'success');
-                closeModal(document.querySelector('.modal-overlay .close-modal'));
-                loadChallenges();
-                
-            } catch (error) {
-                console.error('Error sending challenge:', error);
-                showMessage('Failed to send challenge', 'error');
-            }
-        };
-
-        // Show Add Friend
-        window.showAddFriend = function() {
-            const modal = document.createElement('div');
-            modal.className = 'modal-overlay';
-            modal.innerHTML = `
-                <div class="modal-content">
-                    <button class="close-modal" onclick="closeModal(this)">×</button>
-                    
-                    <h2 style="margin-bottom: 20px;">👥 Add Friends</h2>
-                    
-                    <div class="form-group">
-                        <label class="form-label">Enter Friend Code</label>
-                        <input type="text" class="form-input" id="friendCodeInput" 
-                               placeholder="Enter 8-character code" maxlength="8" style="text-transform: uppercase;">
-                        <button class="btn btn-primary" style="margin-top: 10px; width: 100%;" 
-                                onclick="addFriendByCode()">Add Friend</button>
-                    </div>
-                    
-                    <div style="text-align: center; margin: 20px 0;">
-                        <div style="opacity: 0.7;">— OR —</div>
-                    </div>
-                    
-                    <div style="text-align: center;">
-                        <p style="margin-bottom: 15px;">Share your friend code:</p>
-                        <div style="background: rgba(255,255,255,0.1); padding: 15px; border-radius: 10px; 
-                                    font-size: 1.5rem; letter-spacing: 2px; font-weight: bold;">
-                            ${generateFriendCode(currentUser.uid)}
-                        </div>
-                        <button class="btn btn-secondary" style="margin-top: 15px;" 
-                                onclick="shareMyCode()">Share Code</button>
-                    </div>
-                </div>
-            `;
-            
-            document.body.appendChild(modal);
-        };
-
-        // Add friend by code
-        window.addFriendByCode = async function() {
-            const code = document.getElementById('friendCodeInput').value.trim().toUpperCase();
-            
-            if (!code || code.length !== 8) {
-                showMessage('Please enter a valid 8-character code', 'error');
-                return;
-            }
-            
-            try {
-                // Find user with this code
-                const usersSnapshot = await db.collection('users').get();
-                let friendFound = null;
-                
-                usersSnapshot.forEach(doc => {
-                    if (generateFriendCode(doc.id) === code && doc.id !== currentUser.uid) {
-                        friendFound = { id: doc.id, data: doc.data() };
-                    }
-                });
-                
-                if (!friendFound) {
-                    showMessage('Friend code not found', 'error');
-                    return;
-                }
-                
-                // Check if already friends
-                const existingFriend = await db.collection('users')
-                    .doc(currentUser.uid)
-                    .collection('friends')
-                    .doc(friendFound.id)
-                    .get();
-                
-                if (existingFriend.exists) {
-                    showMessage('Already friends!', 'error');
-                    return;
-                }
-                
-                // Add friend to both users
-                await db.collection('users').doc(currentUser.uid).collection('friends').doc(friendFound.id).set({
-                    name: friendFound.data.name,
-                    avatar: friendFound.data.avatar,
-                    addedAt: firebase.firestore.FieldValue.serverTimestamp()
-                });
-                
-                await db.collection('users').doc(friendFound.id).collection('friends').doc(currentUser.uid).set({
-                    name: userData.name,
-                    avatar: userData.avatar,
-                    addedAt: firebase.firestore.FieldValue.serverTimestamp()
-                });
-                
-                // Update friend counts
-                await db.collection('users').doc(currentUser.uid).update({
-                    friendsCount: firebase.firestore.FieldValue.increment(1)
-                });
-                
-                await db.collection('users').doc(friendFound.id).update({
-                    friendsCount: firebase.firestore.FieldValue.increment(1)
-                });
-                
-                showMessage(`Added ${friendFound.data.name} as friend! 🎉`, 'success');
-                closeModal(document.querySelector('.modal-overlay .close-modal'));
-                loadFriends();
-                
-            } catch (error) {
-                console.error('Error adding friend:', error);
-                showMessage('Failed to add friend', 'error');
-            }
-        };
-
-        // Share my code
-        window.shareMyCode = function() {
-            const code = generateFriendCode(currentUser.uid);
-            
-            if (navigator.share) {
-                navigator.share({
-                    title: 'Add me on JomBro!',
-                    text: `My JomBro friend code is: ${code}`,
-                }).catch(err => console.log('Error sharing:', err));
+        // Window resize handler for mobile
+        window.addEventListener('resize', () => {
+            if (window.innerHeight < 500) {
+                document.body.style.paddingBottom = '150px';
             } else {
-                // Copy to clipboard
-                navigator.clipboard.writeText(code);
-                showMessage('Friend code copied to clipboard!', 'success');
+                document.body.style.paddingBottom = '100px';
             }
-        };
+        });
 
-        // Show friend profile
-        window.showFriendProfile = async function(friendId) {
-            try {
-                const friendDoc = await db.collection('users').doc(friendId).get();
-                
-                if (!friendDoc.exists) {
-                    showMessage('Friend not found', 'error');
-                    return;
-                }
-                
-                const friend = friendDoc.data();
-                
-                const modal = document.createElement('div');
-                modal.className = 'modal-overlay';
-                modal.innerHTML = `
-                    <div class="modal-content">
-                        <button class="close-modal" onclick="closeModal(this)">×</button>
-                        
-                        <div style="text-align: center; margin-bottom: 20px;">
-                            <div style="font-size: 4rem; margin-bottom: 10px;">${friend.avatar || '👤'}</div>
-                            <h2>${friend.name || 'Friend'}</h2>
-                            <p style="opacity: 0.7;">Level ${friend.level || 1}</p>
-                        </div>
-                        
-                        <div style="display: flex; justify-content: space-around; margin: 20px 0;">
-                            <div style="text-align: center;">
-                                <div style="font-size: 1.5rem; font-weight: bold;">${friend.tokens || 0}</div>
-                                <div style="font-size: 0.8rem; opacity: 0.7;">Tokens</div>
-                            </div>
-                            <div style="text-align: center;">
-                                <div style="font-size: 1.5rem; font-weight: bold;">${friend.friendsCount || 0}</div>
-                                <div style="font-size: 0.8rem; opacity: 0.7;">Friends</div>
-                            </div>
-                        </div>
-                        
-                        <button class="btn btn-primary" style="width: 100%; margin-top: 20px;"
-                                onclick="challengeFriend('${friendId}')">
-                            Challenge ${friend.name}
-                        </button>
-                        
-                        <button class="remove-friend-btn" style="width: 100%; margin-top: 10px;"
-                                onclick="confirmRemoveFriend('${friendId}', '${friend.name}')">
-                            Remove Friend
-                        </button>
-                    </div>
-                `;
-                
-                document.body.appendChild(modal);
-                
-            } catch (error) {
-                console.error('Error showing friend profile:', error);
-                showMessage('Failed to load profile', 'error');
-            }
-        };
-
-        // Challenge friend directly
-        window.challengeFriend = function(friendId) {
-            closeModal(document.querySelector('.modal-overlay .close-modal'));
-            showQuickChallenge();
-            
-            // Pre-select the friend
-            setTimeout(() => {
-                const checkbox = document.querySelector(`#friendSelector input[value="${friendId}"]`);
-                if (checkbox) checkbox.checked = true;
-            }, 100);
-        };
-
-        // Confirm remove friend
-        window.confirmRemoveFriend = function(friendId, friendName) {
-            const dialog = document.createElement('div');
-            dialog.className = 'confirm-dialog';
-            dialog.innerHTML = `
-                <h3>Remove Friend?</h3>
-                <p>Are you sure you want to remove ${friendName} from your friends?</p>
-                <div class="confirm-dialog-actions">
-                    <button class="confirm-btn confirm-btn-cancel" onclick="this.parentElement.parentElement.remove()">
-                        Cancel
-                    </button>
-                    <button class="confirm-btn confirm-btn-danger" onclick="removeFriend('${friendId}')">
-                        Remove
-                    </button>
-                </div>
-            `;
-            
-            document.body.appendChild(dialog);
-        };
-
-        // Remove friend
-        window.removeFriend = async function(friendId) {
-            try {
-                // Remove from both users
-                await db.collection('users').doc(currentUser.uid).collection('friends').doc(friendId).delete();
-                await db.collection('users').doc(friendId).collection('friends').doc(currentUser.uid).delete();
-                
-                // Update friend counts
-                await db.collection('users').doc(currentUser.uid).update({
-                    friendsCount: firebase.firestore.FieldValue.increment(-1)
-                });
-                
-                await db.collection('users').doc(friendId).update({
-                    friendsCount: firebase.firestore.FieldValue.increment(-1)
-                });
-                
-                showMessage('Friend removed', 'success');
-                document.querySelector('.confirm-dialog').remove();
-                closeModal(document.querySelector('.modal-overlay .close-modal'));
-                loadFriends();
-                
-            } catch (error) {
-                console.error('Error removing friend:', error);
-                showMessage('Failed to remove friend', 'error');
-            }
-        };
-
-        // Show profile
-        window.showProfile = function() {
-            const modal = document.createElement('div');
-            modal.className = 'modal-overlay';
-            modal.innerHTML = `
-                <div class="modal-content">
-                    <button class="close-modal" onclick="closeModal(this)">×</button>
-                    
-                    <h2 style="margin-bottom: 20px;">👤 My Profile</h2>
-                    
-                    <div style="text-align: center; margin-bottom: 20px;">
-                        <div style="font-size: 4rem; margin-bottom: 10px;">${userData.avatar || '😎'}</div>
-                        <h3>${userData.name || 'Anonymous'}</h3>
-                        <p style="opacity: 0.7;">Level ${userData.level || 1}</p>
-                    </div>
-                    
-                    <div style="background: rgba(255,255,255,0.05); padding: 15px; border-radius: 10px; margin-bottom: 20px;">
-                        <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
-                            <span>Phone:</span>
-                            <span>${userData.phoneNumber || 'Unknown'}</span>
-                        </div>
-                        <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
-                            <span>Friend Code:</span>
-                            <span style="font-weight: bold; letter-spacing: 1px;">
-                                ${generateFriendCode(currentUser.uid)}
-                            </span>
-                        </div>
-                        <div style="display: flex; justify-content: space-between;">
-                            <span>Member Since:</span>
-                            <span>${userData.createdAt ? formatTimeAgo(userData.createdAt) : 'Unknown'}</span>
-                        </div>
-                    </div>
-                    
-                    <button class="btn btn-secondary" style="width: 100%; margin-bottom: 10px;"
-                            onclick="shareMyCode()">
-                        Share Friend Code
-                    </button>
-                    
-                    <button class="btn" style="width: 100%; background: rgba(244, 67, 54, 0.2); 
-                            border-color: rgba(244, 67, 54, 0.4); color: #ff6b6b;"
-                            onclick="logout()">
-                        Logout
-                    </button>
-                </div>
-            `;
-            
-            document.body.appendChild(modal);
-        };
-
-        // Show challenge details
-        window.showChallengeDetails = async function(challengeId) {
-            try {
-                const challengeDoc = await db.collection('challenges').doc(challengeId).get();
-                
-                if (!challengeDoc.exists) {
-                    showMessage('Challenge not found', 'error');
-                    return;
-                }
-                
-                const challenge = challengeDoc.data();
-                const isCreator = challenge.creatorId === currentUser.uid;
-                const hasResponded = challenge.responses && challenge.responses[currentUser.uid];
-                
-                const modal = document.createElement('div');
-                modal.className = 'modal-overlay';
-                modal.innerHTML = `
-                    <div class="modal-content">
-                        <button class="close-modal" onclick="closeModal(this)">×</button>
-                        
-                        <h2 style="margin-bottom: 20px;">${challenge.title || 'Challenge'}</h2>
-                        
-                        <div style="background: rgba(255,255,255,0.05); padding: 15px; border-radius: 10px; margin-bottom: 20px;">
-                            <p style="margin-bottom: 15px;">${challenge.description || 'No description'}</p>
-                            
-                            <div style="display: flex; gap: 15px; flex-wrap: wrap;">
-                                <span>💰 ${challenge.reward || 0} tokens</span>
-                                <span>⏱️ ${getTimeRemaining(challenge.timeLimit, challenge.createdAt)}</span>
-                                <span>👤 ${challenge.creatorName || 'Someone'}</span>
-                            </div>
-                        </div>
-                        
-                        <div style="margin-bottom: 20px;">
-                            <h3 style="margin-bottom: 10px;">Participants</h3>
-                            <div id="participantsList">
-                                <!-- Participants will be loaded here -->
-                            </div>
-                        </div>
-                        
-                        ${!isCreator && !hasResponded && challenge.status === 'pending' ? `
-                            <button class="btn btn-primary" style="width: 100%;"
-                                    onclick="acceptChallenge('${challengeId}')">
-                                Accept Challenge
-                            </button>
-                        ` : ''}
-                        
-                        ${!hasResponded && challenge.status === 'active' ? `
-                            <button class="btn btn-primary" style="width: 100%;"
-                                    onclick="submitProof('${challengeId}')">
-                                Submit Proof
-                            </button>
-                        ` : ''}
-                        
-                        ${hasResponded ? `
-                            <div style="text-align: center; padding: 15px; background: rgba(76, 175, 80, 0.2); 
-                                        border-radius: 10px; color: #4caf50;">
-                                ✅ You've completed this challenge!
-                            </div>
-                        ` : ''}
-                    </div>
-                `;
-                
-                document.body.appendChild(modal);
-                
-                // Load participants
-                loadChallengeParticipants(challengeId, challenge);
-                
-            } catch (error) {
-                console.error('Error showing challenge details:', error);
-                showMessage('Failed to load challenge', 'error');
-            }
-        };
-
-        // Load challenge participants
-        async function loadChallengeParticipants(challengeId, challenge) {
-            const container = document.getElementById('participantsList');
-            if (!container) return;
+        // Handle visibility change (for online status)
+        document.addEventListener('visibilitychange', async () => {
+            if (!currentUser) return;
             
             try {
-                const participantPromises = challenge.participants.map(async (userId) => {
-                    const userDoc = await db.collection('users').doc(userId).get();
-                    return { id: userId, data: userDoc.exists ? userDoc.data() : null };
-                });
-                
-                const participants = await Promise.all(participantPromises);
-                
-                container.innerHTML = participants.map(p => {
-                    if (!p.data) return '';
-                    
-                    const hasResponded = challenge.responses && challenge.responses[p.id];
-                    const status = hasResponded ? 'Completed' : 'Pending';
-                    const statusClass = hasResponded ? 'status-completed' : 'status-pending';
-                    
-                    return `
-                        <div style="display: flex; align-items: center; justify-content: space-between; 
-                                    padding: 10px; background: rgba(255,255,255,0.03); border-radius: 8px; 
-                                    margin-bottom: 8px;">
-                            <div style="display: flex; align-items: center; gap: 10px;">
-                                <span style="font-size: 1.5rem;">${p.data.avatar || '👤'}</span>
-                                <span>${p.data.name || 'Unknown'}</span>
-                            </div>
-                            <span class="challenge-status ${statusClass}">${status}</span>
-                        </div>
-                    `;
-                }).join('');
-                
-            } catch (error) {
-                console.error('Error loading participants:', error);
-            }
-        }
-
-        // Accept challenge
-        window.acceptChallenge = async function(challengeId) {
-            try {
-                await db.collection('challenges').doc(challengeId).update({
-                    status: 'active',
-                    acceptedAt: firebase.firestore.FieldValue.serverTimestamp()
-                });
-                
-                showMessage('Challenge accepted! 💪', 'success');
-                closeModal(document.querySelector('.modal-overlay .close-modal'));
-                loadChallenges();
-                
-            } catch (error) {
-                console.error('Error accepting challenge:', error);
-                showMessage('Failed to accept challenge', 'error');
-            }
-        };
-
-        // Submit proof
-        window.submitProof = function(challengeId) {
-            const modal = document.createElement('div');
-            modal.className = 'modal-overlay';
-            modal.innerHTML = `
-                <div class="modal-content">
-                    <button class="close-modal" onclick="closeModal(this)">×</button>
-                    
-                    <h2 style="margin-bottom: 20px;">📸 Submit Proof</h2>
-                    
-                    <form onsubmit="uploadProof(event, '${challengeId}')">
-                        <div class="form-group">
-                            <label class="form-label">Upload Photo/Video</label>
-                            <input type="file" class="form-input" id="proofFile" 
-                                   accept="image/*,video/*" required>
-                        </div>
-                        
-                        <div class="form-group">
-                            <label class="form-label">Comment (optional)</label>
-                            <textarea class="form-input" id="proofComment" rows="3" 
-                                      placeholder="Add a comment about your challenge..."></textarea>
-                        </div>
-                        
-                        <button type="submit" class="btn btn-primary" style="width: 100%;">
-                            Submit Proof
-                        </button>
-                    </form>
-                </div>
-            `;
-            
-            document.body.appendChild(modal);
-        };
-
-        // Upload proof
-        window.uploadProof = async function(event, challengeId) {
-            event.preventDefault();
-            
-            const file = document.getElementById('proofFile').files[0];
-            const comment = document.getElementById('proofComment').value;
-            
-            if (!file) {
-                showMessage('Please select a file', 'error');
-                return;
-            }
-            
-            try {
-                showMessage('Uploading proof...', 'success');
-                
-                // Create file reference
-                const timestamp = Date.now();
-                const fileName = `${challengeId}_${currentUser.uid}_${timestamp}`;
-                const storageRef = storage.ref(`proofs/${fileName}`);
-                
-                // Upload file
-                const snapshot = await storageRef.put(file);
-                const downloadURL = await snapshot.ref.getDownloadURL();
-                
-                // Update challenge with proof
-                await db.collection('challenges').doc(challengeId).update({
-                    [`responses.${currentUser.uid}`]: {
-                        proofURL: downloadURL,
-                        comment: comment,
-                        submittedAt: firebase.firestore.FieldValue.serverTimestamp()
-                    }
-                });
-                
-                // Award tokens
-                const challengeDoc = await db.collection('challenges').doc(challengeId).get();
-                const challenge = challengeDoc.data();
-                
-                await db.collection('users').doc(currentUser.uid).update({
-                    tokens: firebase.firestore.FieldValue.increment(challenge.reward || 0)
-                });
-                
-                showMessage(`Challenge completed! +${challenge.reward} tokens 🎉`, 'success');
-                closeModal(document.querySelector('.modal-overlay .close-modal'));
-                loadChallenges();
-                loadUserData();
-                
-            } catch (error) {
-                console.error('Error uploading proof:', error);
-                showMessage('Failed to upload proof', 'error');
-            }
-        };
-
-        // Show How to Play
-        window.showHowToPlay = function() {
-            const modal = document.createElement('div');
-            modal.className = 'modal-overlay';
-            modal.innerHTML = `
-                <div class="modal-content" style="max-width: 600px;">
-                    <button class="close-modal" onclick="closeModal(this)">×</button>
-                    
-                    <h2 style="margin-bottom: 20px;">❓ How to Play JomBro</h2>
-                    
-                    <div style="display: flex; flex-direction: column; gap: 20px;">
-                        <div>
-                            <h3 style="margin-bottom: 10px;">1️⃣ Add Friends</h3>
-                            <p style="opacity: 0.8;">Share your friend code or enter your friends' codes to connect. 
-                            The more friends you have, the more fun challenges you can do!</p>
-                        </div>
-                        
-                        <div>
-                            <h3 style="margin-bottom: 10px;">2️⃣ Create Challenges</h3>
-                            <p style="opacity: 0.8;">Use Quick Challenge to create custom dares, or pick from 
-                            AI-generated suggestions. Set rewards and time limits!</p>
-                        </div>
-                        
-                        <div>
-                            <h3 style="margin-bottom: 10px;">3️⃣ Complete & Earn</h3>
-                            <p style="opacity: 0.8;">Accept challenges from friends, complete them, and upload 
-                            photo/video proof. Earn tokens for every challenge you complete!</p>
-                        </div>
-                        
-                        <div>
-                            <h3 style="margin-bottom: 10px;">4️⃣ Level Up</h3>
-                            <p style="opacity: 0.8;">Use tokens to level up and unlock new features. The more 
-                            challenges you complete, the higher your level!</p>
-                        </div>
-                        
-                        <div style="background: rgba(155, 89, 182, 0.1); padding: 15px; border-radius: 10px; 
-                                    border: 1px solid rgba(155, 89, 182, 0.3);">
-                            <p style="text-align: center; margin: 0;">
-                                <strong>Remember:</strong> Stay safe and have fun! 🎮
-                            </p>
-                        </div>
-                    </div>
-                </div>
-            `;
-            
-            document.body.appendChild(modal);
-        };
-
-        // Refresh challenges
-        window.refreshChallenges = function() {
-            loadChallenges();
-            showMessage('Challenges refreshed!', 'success');
-        };
-
-        // Close modal
-        window.closeModal = function(button) {
-            const modal = button.closest('.modal-overlay');
-            if (modal) {
-                modal.style.opacity = '0';
-                setTimeout(() => modal.remove(), 300);
-            }
-        };
-
-        // Logout
-        window.logout = function() {
-            if (confirm('Are you sure you want to logout?')) {
-                localStorage.removeItem('jombro_phone');
-                localStorage.removeItem('jombro_userId');
-                
-                if (currentUser) {
-                    db.collection('users').doc(currentUser.uid).update({
+                if (document.hidden) {
+                    await db.collection('users').doc(currentUser.uid).update({
                         online: false,
                         lastActive: firebase.firestore.FieldValue.serverTimestamp()
                     });
+                } else {
+                    await db.collection('users').doc(currentUser.uid).update({
+                        online: true,
+                        lastActive: firebase.firestore.FieldValue.serverTimestamp()
+                    });
                 }
-                
-                location.reload();
-            }
-        };
-
-        // Set user offline on page unload
-        window.addEventListener('beforeunload', () => {
-            if (currentUser) {
-                navigator.sendBeacon('/api/offline', JSON.stringify({ userId: currentUser.uid }));
+            } catch (error) {
+                console.error('Error updating online status:', error);
             }
         });
     </script>
