@@ -4407,24 +4407,28 @@
 
     <script>
         // Fixed Firebase Configuration
-        const firebaseConfig = {
-            apiKey: "AIzaSyC_orriRUuf1ynDiFaJAPrO6-Gu3GeURxQ",
-            authDomain: "jombro-9d129.firebaseapp.com",
-            projectId: "jombro-9d129",
-            storageBucket: "jombro-9d129.firebasestorage.app",
-            messagingSenderId: "390572076435",
-            appId: "1:390572076435:web:781f9f62b84542eb834c66",
-            measurementId: "G-J84HS0WPCP"
-        };
+const firebaseConfig = {
+  apiKey: "AIzaSyC_orriRUuf1ynDiFaJAPrO6-Gu3GeURxQ",
+  authDomain: "jombro-9d129.firebaseapp.com",
+  databaseURL: "https://jombro-9d129-default-rtdb.asia-southeast1.firebasedatabase.app",
+  projectId: "jombro-9d129",
+  storageBucket: "jombro-9d129.firebasestorage.app",
+  messagingSenderId: "390572076435",
+  appId: "1:390572076435:web:781f9f62b84542eb834c66",
+  measurementId: "G-J84HS0WPCP"
+};
 
         // Initialize Firebase first
         let app = null;
         let db = null;
         let storage = null;
 
-        // Global variables
-        let currentUser = null;
-        let selectedAvatar = null;
+       // Global variables
+let app, auth, db, storage;
+let currentUser = null;
+let confirmationResult = null;
+let recaptchaVerifier = null;
+let selectedAvatar = null;
         let userData = {
             name: '',
             avatar: '👤',
@@ -4552,45 +4556,53 @@
         };
 
         // Initialize app when DOM is ready
-        document.addEventListener('DOMContentLoaded', async function() {
-            console.log('DOM loaded, initializing app...');
-            
-            try {
-                // Initialize Firebase
-                if (!firebase.apps.length) {
-                    app = firebase.initializeApp(firebaseConfig);
-                } else {
-                    app = firebase.app();
-                }
-                
-                db = firebase.firestore();
-                storage = firebase.storage();
-                
-                // Enable offline persistence
-                try {
-                    await db.enablePersistence();
-                } catch (err) {
-                    if (err.code == 'failed-precondition') {
-                        console.log('Multiple tabs open, persistence can only be enabled in one tab at a a time.');
-                    } else if (err.code == 'unimplemented') {
-                        console.log('The current browser does not support persistence.');
-                    }
-                }
-                
-                console.log('Firebase initialized successfully');
-                
-                // Setup UI
-                createStarfield();
-                setupEventListeners();
-                
-                // Check for existing session
-                checkExistingSession();
-                
-            } catch (error) {
-                console.error('Initialization error:', error);
-                showError('Failed to initialize app. Please refresh the page.');
+       document.addEventListener('DOMContentLoaded', async function() {
+    console.log('🚀 Initializing JomBro...');
+    
+    try {
+        // Initialize Firebase
+        if (!firebase.apps.length) {
+            app = firebase.initializeApp(firebaseConfig);
+        } else {
+            app = firebase.app();
+        }
+        
+        auth = firebase.auth();
+        db = firebase.firestore();
+        storage = firebase.storage();
+        
+        // Set language code (optional)
+        auth.languageCode = 'en';
+        
+        // Enable offline persistence
+        try {
+            await db.enablePersistence();
+            console.log('✅ Offline persistence enabled');
+        } catch (err) {
+            if (err.code == 'failed-precondition') {
+                console.warn('⚠️ Multiple tabs open, persistence only works in one tab');
+            } else if (err.code == 'unimplemented') {
+                console.warn('⚠️ Browser doesn\'t support persistence');
             }
-        });
+        }
+        
+        console.log('✅ Firebase initialized successfully');
+        
+        // Setup reCAPTCHA
+        await setupRecaptcha();
+        
+        // Setup UI
+        createStarfield();
+        setupEventListeners();
+        
+        // Setup auth state listener
+        auth.onAuthStateChanged(handleAuthStateChange);
+        
+    } catch (error) {
+        console.error('❌ Initialization error:', error);
+        showError('Failed to initialize app. Please refresh the page.');
+    }
+});
 
         // Create starfield background
         function createStarfield() {
@@ -4735,55 +4747,176 @@
         }
 
         // Handle username submission
-        async function handleUsernameSubmit(e) {
-            e.preventDefault();
-            
-            const username = document.getElementById('username').value.trim();
-            const startButton = document.getElementById('startPlayingButton');
-            
-            if (!username || username.length < 3) {
-                showError('Username must be at least 3 characters');
-                return;
-            }
-            
-            if (!selectedAvatar) {
-                showError('Please select an avatar');
-                return;
-            }
-            
-            try {
-                setButtonLoading(startButton, true);
-                hideError();
-                
-                // Create user document
-                await db.collection('users').doc(currentUser.uid).set({
-                    name: username,
-                    phoneNumber: currentUser.phoneNumber,
-                    avatar: selectedAvatar,
-                    tokens: 1000,
-                    level: 1,
-                    friendsCount: 0,
-                    createdAt: firebase.firestore.FieldValue.serverTimestamp(),
-                    lastActive: firebase.firestore.FieldValue.serverTimestamp(),
-                    online: true
-                });
-                
-                // Save session
-                localStorage.setItem('jombro_phone', currentUser.phoneNumber);
-                localStorage.setItem('jombro_userId', currentUser.uid);
-                
-                await loadUserData();
-                hideAuthModal();
-                showMessage('🎉 Welcome to JomBro! You got 1000 starter tokens!', 'success');
-                
-            } catch (error) {
-                console.error('Profile creation error:', error);
-                showError('Failed to create profile. Please try again.');
-            } finally {
-                setButtonLoading(startButton, false);
-            }
-        }
+        // ============================================
+// 7. USER PROFILE CREATION
+// ============================================
 
+async function handleUsernameSubmit(e) {
+    e.preventDefault();
+    console.log('👤 Creating user profile...');
+    
+    const username = document.getElementById('username').value.trim();
+    const startButton = document.getElementById('startPlayingButton');
+    
+    // Validation
+    if (!username || username.length < 3) {
+        showError('Username must be at least 3 characters');
+        return;
+    }
+    
+    if (!selectedAvatar) {
+        showError('Please select an avatar');
+        return;
+    }
+    
+    try {
+        setButtonLoading(startButton, true);
+        hideError();
+        
+        // Create user document with Firebase Auth UID
+        await db.collection('users').doc(currentUser.uid).set({
+            name: username,
+            phoneNumber: currentUser.phoneNumber,
+            avatar: selectedAvatar,
+            tokens: 1000,
+            level: 1,
+            friendsCount: 0,
+            createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+            lastActive: firebase.firestore.FieldValue.serverTimestamp(),
+            online: true
+        });
+        
+        console.log('✅ User profile created successfully');
+        
+        await loadUserData();
+        hideAuthModal();
+        showMessage('🎉 Welcome to JomBro! You got 1000 starter tokens!', 'success');
+        
+    } catch (error) {
+        console.error('❌ Profile creation error:', error);
+        
+        if (error.code === 'permission-denied') {
+            showError('Permission denied. Please check your security rules.');
+        } else {
+            showError('Failed to create profile. Please try again.');
+        }
+    } finally {
+        setButtonLoading(startButton, false);
+    }
+}
+// ============================================
+// 8. ERROR HANDLING
+// ============================================
+
+function handlePhoneAuthError(error) {
+    console.error('Phone auth error details:', error);
+    
+    const errorMessages = {
+        'auth/invalid-phone-number': 'Invalid phone number format. Please check and try again.',
+        'auth/missing-phone-number': 'Please enter a phone number.',
+        'auth/quota-exceeded': 'SMS quota exceeded. Please try again later.',
+        'auth/user-disabled': 'This phone number has been disabled.',
+        'auth/operation-not-allowed': 'Phone authentication is not enabled. Please contact support.',
+        'auth/too-many-requests': 'Too many attempts. Please wait a few minutes and try again.',
+        'auth/app-not-authorized': 'This app is not authorized to use Firebase Authentication.',
+        'auth/captcha-check-failed': 'reCAPTCHA verification failed. Please refresh and try again.',
+        'auth/missing-app-credential': 'Phone authentication setup error. Please contact support.'
+    };
+    
+    const message = errorMessages[error.code] || 'Failed to send verification code. Please try again.';
+    showError(message);
+}
+
+function handleVerificationError(error) {
+    console.error('Verification error details:', error);
+    
+    const errorMessages = {
+        'auth/invalid-verification-code': 'Invalid verification code. Please check and try again.',
+        'auth/missing-verification-code': 'Please enter the verification code.',
+        'auth/code-expired': 'Verification code expired. Please request a new one.',
+        'auth/invalid-verification-id': 'Verification session expired. Please start over.',
+        'auth/session-expired': 'Session expired. Please request a new verification code.'
+    };
+    
+    const message = errorMessages[error.code] || 'Failed to verify code. Please try again.';
+    showError(message);
+}
+
+// ============================================
+// 9. UI HELPER FUNCTIONS
+// ============================================
+
+function showAuthModal() {
+    document.getElementById('authModal').classList.add('show');
+    document.getElementById('appContent').classList.remove('loaded');
+    
+    // Reset forms
+    document.getElementById('phoneAuthForm').style.display = 'block';
+    document.getElementById('verificationForm').style.display = 'none';
+    document.getElementById('usernameForm').style.display = 'none';
+}
+
+function hideAuthModal() {
+    document.getElementById('authModal').classList.remove('show');
+    document.getElementById('appContent').classList.add('loaded');
+}
+
+function showVerificationForm(phoneNumber) {
+    document.getElementById('phoneAuthForm').style.display = 'none';
+    document.getElementById('verificationForm').style.display = 'block';
+    document.getElementById('phoneDisplay').textContent = phoneNumber;
+    document.getElementById('verificationCode').value = '';
+    document.getElementById('verificationCode').focus();
+}
+
+function showUsernameForm() {
+    document.getElementById('phoneAuthForm').style.display = 'none';
+    document.getElementById('verificationForm').style.display = 'none';
+    document.getElementById('usernameForm').style.display = 'block';
+    document.getElementById('username').focus();
+}
+
+function backToPhone() {
+    document.getElementById('verificationForm').style.display = 'none';
+    document.getElementById('phoneAuthForm').style.display = 'block';
+    document.getElementById('phoneNumber').value = '';
+    document.getElementById('phoneNumber').focus();
+    confirmationResult = null;
+}
+
+// ============================================
+// 10. LOGOUT FUNCTIONALITY
+// ============================================
+
+async function logout() {
+    console.log('🚪 Logging out...');
+    
+    try {
+        // Update user as offline
+        if (currentUser) {
+            await db.collection('users').doc(currentUser.uid).update({
+                online: false,
+                lastActive: firebase.firestore.FieldValue.serverTimestamp()
+            });
+        }
+        
+        // Sign out from Firebase Auth
+        await auth.signOut();
+        console.log('✅ Logged out successfully');
+        
+        // Clear any local data
+        currentUser = null;
+        confirmationResult = null;
+        
+        // Show auth modal
+        showAuthModal();
+        showMessage('👋 Logged out successfully', 'success');
+        
+    } catch (error) {
+        console.error('❌ Logout error:', error);
+        showError('Failed to logout. Please try again.');
+    }
+}
         // Load user data
         async function loadUserData() {
             try {
@@ -8020,7 +8153,177 @@
                 });
             });
         }
+// ============================================
+// 3. RECAPTCHA SETUP
+// ============================================
 
+async function setupRecaptcha() {
+    try {
+        // Create invisible reCAPTCHA
+        recaptchaVerifier = new firebase.auth.RecaptchaVerifier('recaptcha-container', {
+            'size': 'invisible',
+            'callback': (response) => {
+                console.log('✅ reCAPTCHA solved');
+                // reCAPTCHA solved, allow signInWithPhoneNumber
+            },
+            'expired-callback': () => {
+                console.warn('⚠️ reCAPTCHA expired');
+                showError('Security check expired. Please try again.');
+            }
+        });
+        
+        // Render the reCAPTCHA
+        await recaptchaVerifier.render();
+        console.log('✅ reCAPTCHA configured');
+        
+    } catch (error) {
+        console.error('❌ reCAPTCHA setup error:', error);
+        
+        // For development, you might want to continue without reCAPTCHA
+        if (window.location.hostname === 'localhost') {
+            console.warn('⚠️ Running locally - reCAPTCHA might not work properly');
+        }
+    }
+}
+
+// ============================================
+// 4. AUTHENTICATION STATE MANAGEMENT
+// ============================================
+
+async function handleAuthStateChange(user) {
+    console.log('🔄 Auth state changed:', user ? user.uid : 'No user');
+    
+    if (user) {
+        // User is signed in
+        currentUser = user;
+        console.log('✅ User authenticated:', {
+            uid: user.uid,
+            phone: user.phoneNumber
+        });
+        
+        try {
+            // Check if user profile exists
+            const userDoc = await db.collection('users').doc(user.uid).get();
+            
+            if (userDoc.exists) {
+                // Existing user - load their data
+                await loadUserData();
+                hideAuthModal();
+                showMessage('Welcome back! 🎮', 'success');
+            } else {
+                // New user - show username form
+                console.log('📝 New user - showing profile setup');
+                showUsernameForm();
+            }
+        } catch (error) {
+            console.error('❌ Error checking user profile:', error);
+            showError('Failed to load user data. Please try again.');
+        }
+    } else {
+        // No user signed in
+        console.log('👤 No authenticated user');
+        currentUser = null;
+        showAuthModal();
+    }
+}
+
+// ============================================
+// 5. PHONE AUTHENTICATION FLOW
+// ============================================
+
+async function handlePhoneSubmit(e) {
+    e.preventDefault();
+    console.log('📱 Starting phone authentication...');
+    
+    const countryCode = document.getElementById('countryCode').value;
+    const phoneNumber = document.getElementById('phoneNumber').value.trim();
+    const loginButton = document.getElementById('loginButton');
+    
+    // Validation
+    if (!phoneNumber || phoneNumber.length < 6) {
+        showError('Please enter a valid phone number');
+        return;
+    }
+    
+    const fullNumber = countryCode + phoneNumber;
+    console.log('📞 Attempting to sign in with:', fullNumber);
+    
+    try {
+        setButtonLoading(loginButton, true);
+        hideError();
+        
+        // Check if reCAPTCHA is ready
+        if (!recaptchaVerifier) {
+            console.warn('⚠️ reCAPTCHA not ready, setting up...');
+            await setupRecaptcha();
+        }
+        
+        // Send verification code
+        confirmationResult = await auth.signInWithPhoneNumber(fullNumber, recaptchaVerifier);
+        console.log('✅ Verification code sent successfully');
+        
+        // Store phone number for display
+        window.tempPhoneNumber = fullNumber;
+        
+        // Show verification form
+        showVerificationForm(fullNumber);
+        
+        showMessage('📱 Verification code sent! Check your SMS.', 'success');
+        
+    } catch (error) {
+        console.error('❌ Phone auth error:', error);
+        handlePhoneAuthError(error);
+        
+        // Reset reCAPTCHA on error
+        if (recaptchaVerifier) {
+            try {
+                await recaptchaVerifier.clear();
+                await setupRecaptcha();
+            } catch (e) {
+                console.error('Failed to reset reCAPTCHA:', e);
+            }
+        }
+    } finally {
+        setButtonLoading(loginButton, false);
+    }
+}
+
+// ============================================
+// 6. VERIFICATION CODE HANDLING
+// ============================================
+
+async function handleVerificationSubmit(e) {
+    e.preventDefault();
+    console.log('🔢 Verifying code...');
+    
+    const code = document.getElementById('verificationCode').value.trim();
+    const verifyButton = document.getElementById('verifyButton');
+    
+    // Validation
+    if (!code || code.length !== 6) {
+        showError('Please enter a 6-digit verification code');
+        return;
+    }
+    
+    try {
+        setButtonLoading(verifyButton, true);
+        hideError();
+        
+        // Verify the code
+        const result = await confirmationResult.confirm(code);
+        console.log('✅ Code verified successfully');
+        
+        currentUser = result.user;
+        
+        // Auth state observer will handle the rest
+        
+    } catch (error) {
+        console.error('❌ Verification error:', error);
+        handleVerificationError(error);
+    } finally {
+        setButtonLoading(verifyButton, false);
+    }
+}
         // Global functions
         window.generateAIChallenges = generateAIChallenges;
         window.toggleAIChallenge = toggleAIChallenge;
