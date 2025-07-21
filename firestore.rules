@@ -1,40 +1,2964 @@
-rules_version = '2';
-service cloud.firestore {
-  match /databases/{database}/documents {
-    // Users can read and update their own profile
-    match /users/{userId} {
-      allow read: if request.auth != null;
-      allow write: if request.auth != null && request.auth.uid == userId;
-    }
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="JomBro">
+    <title>JomBro - AI Challenge System</title>
     
-    // Challenges
-    match /challenges/{challengeId} {
-      allow read: if request.auth != null;
-      allow create: if request.auth != null;
-      allow update: if request.auth != null 
-        && request.auth.uid in resource.data.participants;
-    }
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-storage-compat.js"></script>
     
-    // Friendships
-    match /friendships/{friendshipId} {
-      allow read: if request.auth != null 
-        && request.auth.uid in resource.data.users;
-      allow create: if request.auth != null;
-      allow delete: if request.auth != null 
-        && request.auth.uid in resource.data.users;
-    }
-    
-    // Friend requests
-    match /friendRequests/{requestId} {
-      allow read: if request.auth != null 
-        && (request.auth.uid == resource.data.from 
-        || request.auth.uid == resource.data.to);
-      allow create: if request.auth != null;
-      allow update: if request.auth != null 
-        && request.auth.uid == resource.data.to;
-      allow delete: if request.auth != null 
-        && (request.auth.uid == resource.data.from 
-        || request.auth.uid == resource.data.to);
-    }
-  }
-}
+    <style>
+        /* Basic Reset and Global Styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #0a0a0a;
+            color: white;
+            overflow-x: hidden;
+            min-height: 100vh;
+            position: relative;
+            padding-bottom: 100px;
+            scroll-behavior: smooth;
+        }
+        
+        .container {
+            max-width: 100%;
+            margin: 0 auto;
+            padding: 15px;
+            position: relative;
+            z-index: 10;
+            scroll-behavior: smooth;
+        }
+        
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        
+        ::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 4px;
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background: rgba(155, 89, 182, 0.6);
+            border-radius: 4px;
+        }
+        
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(155, 89, 182, 0.8);
+        }
+
+        /* Ensure all avatar images display properly */
+        .user-avatar img,
+        .friend-carousel-avatar img,
+        .friend-avatar-circle img,
+        .target-avatar img,
+        .participant-avatar img,
+        .suggested-friend-avatar img,
+        .friend-request-alert-avatar img,
+        .challenge-alert-avatar img,
+        .current-avatar-preview img,
+        .avatar-selector-option img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 50%;
+        }
+
+        /* Starfield Background */
+        .starfield {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+            overflow: hidden;
+            pointer-events: none;
+        }
+
+        .star {
+            position: absolute;
+            background: white;
+            border-radius: 50%;
+            animation: twinkle 2s ease-in-out infinite;
+        }
+
+        .star.small {
+            width: 1px;
+            height: 1px;
+            opacity: 0.5;
+        }
+
+        .star.medium {
+            width: 2px;
+            height: 2px;
+            opacity: 0.7;
+        }
+
+        .star.large {
+            width: 3px;
+            height: 3px;
+            opacity: 0.9;
+        }
+
+        @keyframes twinkle {
+            0%, 100% { opacity: 0.3; }
+            50% { opacity: 1; }
+        }
+
+        /* Header */
+        .header {
+            background: rgba(20, 20, 30, 0.95);
+            backdrop-filter: blur(20px);
+            border-radius: 20px;
+            padding: 15px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(155, 89, 182, 0.6), transparent);
+            animation: shimmer 3s ease-in-out infinite;
+        }
+
+        @keyframes shimmer {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+
+        .logo-section {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .logo {
+            font-size: 2rem;
+            font-weight: bold;
+            background: linear-gradient(45deg, #9b59b6, #e91e63);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 0 0 20px rgba(155, 89, 182, 0.5);
+        }
+
+        .slogan {
+            font-size: 0.8rem;
+            opacity: 0.7;
+            font-style: italic;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .user-avatar {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            background: linear-gradient(45deg, #9b59b6, #e91e63);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .user-avatar:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 20px rgba(155, 89, 182, 0.6);
+        }
+
+        .user-avatar.online::after {
+            content: '';
+            position: absolute;
+            bottom: 2px;
+            right: 2px;
+            width: 10px;
+            height: 10px;
+            background: #4caf50;
+            border-radius: 50%;
+            border: 2px solid #0a0a0a;
+        }
+
+        .user-name {
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        .user-level {
+            font-size: 0.7rem;
+            opacity: 0.7;
+        }
+
+        /* Stats Bar */
+        .stats-bar {
+            background: rgba(20, 20, 30, 0.95);
+            backdrop-filter: blur(20px);
+            border-radius: 20px;
+            padding: 15px;
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-around;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .stat-item {
+            text-align: center;
+            flex: 1;
+            position: relative;
+            padding: 10px;
+        }
+
+        .stat-item:not(:last-child)::after {
+            content: '';
+            position: absolute;
+            right: 0;
+            top: 50%;
+            transform: translateY(-50%);
+            height: 30px;
+            width: 1px;
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .stat-number {
+            font-size: 1.5rem;
+            font-weight: bold;
+            background: linear-gradient(45deg, #9b59b6, #e91e63);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            transition: all 0.3s ease;
+        }
+
+        .stat-number.updating {
+            animation: pulse-number 0.5s ease;
+        }
+
+        @keyframes pulse-number {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.2); color: #fff; }
+        }
+
+        .stat-label {
+            font-size: 0.7rem;
+            opacity: 0.8;
+            margin-top: 2px;
+        }
+
+        /* Main Content */
+        .main-content {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .card {
+            padding: 20px;
+            transition: all 0.3s ease;
+        }
+
+        .card-title {
+            font-size: 1.4rem;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            text-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
+        }
+
+        /* Enhanced Futuristic Auth Modal */
+        .auth-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #0a0a0a;
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .auth-modal.show {
+            display: flex;
+        }
+
+        /* Animated Background Grid */
+        .auth-background {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            z-index: 1;
+        }
+
+        .grid-line {
+            position: absolute;
+            background: linear-gradient(90deg, transparent, rgba(155, 89, 182, 0.3), transparent);
+            animation: gridFlow 10s linear infinite;
+        }
+
+        .grid-line.horizontal {
+            width: 100%;
+            height: 1px;
+        }
+
+        .grid-line.vertical {
+            width: 1px;
+            height: 100%;
+            animation-duration: 15s;
+        }
+
+        @keyframes gridFlow {
+            0% { transform: translate(-100%, 0); }
+            100% { transform: translate(100%, 0); }
+        }
+
+        /* Glowing Orbs */
+        .glow-orb {
+            position: absolute;
+            width: 300px;
+            height: 300px;
+            border-radius: 50%;
+            filter: blur(100px);
+            opacity: 0.3;
+            animation: orbFloat 20s ease-in-out infinite;
+        }
+
+        .glow-orb.purple {
+            background: radial-gradient(circle, #9b59b6, transparent);
+            top: -150px;
+            left: -150px;
+        }
+
+        .glow-orb.pink {
+            background: radial-gradient(circle, #e91e63, transparent);
+            bottom: -150px;
+            right: -150px;
+            animation-delay: -10s;
+        }
+
+        .glow-orb.blue {
+            background: radial-gradient(circle, #4a90e2, transparent);
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            animation-delay: -5s;
+        }
+
+        @keyframes orbFloat {
+            0%, 100% { transform: translateY(0) scale(1); }
+            50% { transform: translateY(-30px) scale(1.1); }
+        }
+
+        /* Auth Container */
+        .auth-container {
+            background: rgba(20, 20, 30, 0.95);
+            backdrop-filter: blur(30px);
+            border-radius: 30px;
+            padding: 40px;
+            max-width: 450px;
+            width: 100%;
+            box-shadow: 
+                0 20px 60px rgba(0, 0, 0, 0.5),
+                inset 0 0 0 1px rgba(255, 255, 255, 0.1);
+            position: relative;
+            z-index: 2;
+            overflow: hidden;
+        }
+
+        .auth-container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, #9b59b6, #e91e63, transparent);
+            animation: borderGlow 3s ease-in-out infinite;
+        }
+
+        @keyframes borderGlow {
+            0%, 100% { opacity: 0.5; }
+            50% { opacity: 1; }
+        }
+
+        .auth-title {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .auth-title h1 {
+            font-size: 3rem;
+            font-weight: bold;
+            background: linear-gradient(135deg, #9b59b6, #e91e63);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 10px;
+            text-shadow: 0 0 30px rgba(155, 89, 182, 0.5);
+            animation: titlePulse 2s ease-in-out infinite;
+        }
+
+        @keyframes titlePulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.02); }
+        }
+
+        .auth-title p {
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 1.1rem;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 8px;
+            font-size: 0.9rem;
+            color: rgba(255, 255, 255, 0.8);
+            font-weight: 500;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 14px 18px;
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            background: rgba(255, 255, 255, 0.05);
+            color: white;
+            backdrop-filter: blur(10px);
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: #9b59b6;
+            box-shadow: 0 0 0 3px rgba(155, 89, 182, 0.2);
+            transform: translateY(-1px);
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .auth-button {
+            width: 100%;
+            padding: 16px;
+            border: none;
+            border-radius: 20px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            margin-bottom: 16px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .auth-button-primary {
+            background: linear-gradient(135deg, #9b59b6, #e91e63);
+            color: white;
+            box-shadow: 
+                0 4px 15px rgba(155, 89, 182, 0.4),
+                inset 0 0 0 1px rgba(255, 255, 255, 0.2);
+        }
+
+        .auth-button-primary::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+            transition: left 0.5s ease;
+        }
+
+        .auth-button-primary:hover::before {
+            left: 100%;
+        }
+
+        .auth-button-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 
+                0 6px 20px rgba(155, 89, 182, 0.6),
+                inset 0 0 0 1px rgba(255, 255, 255, 0.3);
+        }
+
+        .auth-button.loading {
+            color: transparent;
+        }
+
+        .auth-button.loading::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 20px;
+            height: 20px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-top: 2px solid white;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: translate(-50%, -50%) rotate(0deg); }
+            100% { transform: translate(-50%, -50%) rotate(360deg); }
+        }
+
+        .avatar-grid {
+            display: grid;
+            grid-template-columns: repeat(6, 1fr);
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .avatar-option {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 3px solid transparent;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .avatar-option::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            background: radial-gradient(circle, rgba(155, 89, 182, 0.5), transparent);
+            transition: all 0.3s ease;
+            transform: translate(-50%, -50%);
+        }
+
+        .avatar-option:hover {
+            transform: scale(1.1);
+            border-color: rgba(155, 89, 182, 0.5);
+            background: rgba(155, 89, 182, 0.1);
+        }
+
+        .avatar-option:hover::before {
+            width: 100px;
+            height: 100px;
+        }
+
+        .avatar-option.selected {
+            border-color: #9b59b6;
+            background: linear-gradient(135deg, rgba(155, 89, 182, 0.2), rgba(233, 30, 99, 0.2));
+            box-shadow: 0 0 20px rgba(155, 89, 182, 0.4);
+            transform: scale(1.1);
+        }
+
+        /* Buttons */
+        .btn {
+            padding: 12px 18px;
+            border: none;
+            border-radius: 20px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+            position: relative;
+            overflow: hidden;
+            min-width: 100px;
+            text-align: center;
+        }
+
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            transition: width 0.6s, height 0.6s;
+        }
+
+        .btn:hover::before {
+            width: 300px;
+            height: 300px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(45deg, #9b59b6, #e91e63);
+            color: white;
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+        }
+
+        .btn-ai {
+            background: linear-gradient(45deg, #4a90e2, #5c7cfa);
+            color: white;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
+        }
+
+        .btn-small {
+            padding: 8px 14px;
+            font-size: 0.8rem;
+            min-width: 80px;
+        }
+
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        /* Floating Elements */
+        .floating-element {
+            background: rgba(20, 20, 30, 0.95);
+            backdrop-filter: blur(20px);
+            border-radius: 20px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .floating-element::before {
+            content: '';
+            position: absolute;
+            top: -2px;
+            left: -2px;
+            right: -2px;
+            bottom: -2px;
+            background: linear-gradient(45deg, transparent, rgba(155, 89, 182, 0.3), transparent);
+            border-radius: 20px;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            animation: rotate 4s linear infinite;
+        }
+
+        .floating-element:hover::before {
+            opacity: 1;
+        }
+
+        @keyframes rotate {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Action Buttons Grid */
+        .action-buttons-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .action-btn {
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .action-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: radial-gradient(circle at center, rgba(155, 89, 182, 0.1), transparent);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .action-btn:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+            border-color: rgba(155, 89, 182, 0.3);
+        }
+
+        .action-btn:hover::before {
+            opacity: 1;
+        }
+
+        .action-icon {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            filter: drop-shadow(0 0 10px rgba(255, 255, 255, 0.3));
+            animation: float 3s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-5px); }
+        }
+
+        .action-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        .action-subtitle {
+            font-size: 0.8rem;
+            opacity: 0.7;
+        }
+
+        /* Friend Carousel */
+        .friend-carousel-container {
+            position: relative;
+            overflow: hidden;
+            margin-bottom: 20px;
+        }
+
+        .friend-carousel {
+            display: flex;
+            gap: 12px;
+            overflow-x: auto;
+            padding: 10px 0;
+            scroll-behavior: smooth;
+            -webkit-overflow-scrolling: touch;
+            scrollbar-width: none;
+        }
+
+        .friend-carousel::-webkit-scrollbar {
+            display: none;
+        }
+
+        .friend-carousel-item {
+            flex: 0 0 auto;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .friend-carousel-item:hover {
+            transform: scale(1.05);
+        }
+
+        .friend-carousel-avatar {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: linear-gradient(45deg, #9b59b6, #e91e63);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            margin-bottom: 5px;
+            position: relative;
+            border: 2px solid transparent;
+            transition: all 0.3s ease;
+        }
+
+        .friend-carousel-avatar.online::after {
+            content: '';
+            position: absolute;
+            bottom: 2px;
+            right: 2px;
+            width: 12px;
+            height: 12px;
+            background: #4caf50;
+            border-radius: 50%;
+            border: 2px solid #0a0a0a;
+        }
+
+        .friend-carousel-item:hover .friend-carousel-avatar {
+            border-color: rgba(155, 89, 182, 0.6);
+            box-shadow: 0 0 15px rgba(155, 89, 182, 0.5);
+        }
+
+        .friend-carousel-name {
+            font-size: 0.7rem;
+            opacity: 0.8;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 70px;
+        }
+
+        /* Add Friend Button */
+        .add-friend-btn {
+            background: linear-gradient(45deg, rgba(155, 89, 182, 0.2), rgba(233, 30, 99, 0.2));
+            border: 2px dashed rgba(155, 89, 182, 0.5);
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-bottom: 5px;
+        }
+
+        .add-friend-btn:hover {
+            background: linear-gradient(45deg, rgba(155, 89, 182, 0.3), rgba(233, 30, 99, 0.3));
+            border-color: rgba(155, 89, 182, 0.8);
+            transform: scale(1.1);
+        }
+
+        /* Challenges Section */
+        .challenges-section {
+            margin-top: 10px;
+        }
+
+        .challenges-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .challenges-count {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .online-count {
+            background: linear-gradient(45deg, #4caf50, #45a049);
+            color: white;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        .challenges-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .challenge-item {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .challenge-item:hover {
+            background: rgba(255, 255, 255, 0.05);
+            border-color: rgba(155, 89, 182, 0.3);
+            transform: translateX(5px);
+        }
+
+        .challenge-info {
+            flex: 1;
+        }
+
+        .challenge-title {
+            font-weight: 600;
+            margin-bottom: 4px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .challenge-details {
+            font-size: 0.8rem;
+            opacity: 0.7;
+        }
+
+        .challenge-status {
+            padding: 4px 10px;
+            border-radius: 10px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            white-space: nowrap;
+        }
+
+        .status-pending {
+            background: rgba(255, 193, 7, 0.2);
+            color: #ffc107;
+        }
+
+        .status-active {
+            background: rgba(76, 175, 80, 0.2);
+            color: #4caf50;
+        }
+
+        .status-completed {
+            background: rgba(33, 150, 243, 0.2);
+            color: #2196f3;
+        }
+
+        /* How to Play Button */
+        .how-to-play-btn {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: rgba(20, 20, 30, 0.95);
+            backdrop-filter: blur(20px);
+            border-radius: 20px;
+            padding: 12px 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            z-index: 100;
+        }
+
+        .how-to-play-btn:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 32px rgba(0, 0, 0, 0.5);
+            border-color: rgba(155, 89, 182, 0.3);
+        }
+
+        .btn-text {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+        }
+
+        .btn-title {
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        .btn-subtitle {
+            font-size: 0.7rem;
+            opacity: 0.7;
+        }
+
+        /* Modals */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(10px);
+            z-index: 2000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            overflow-y: auto;
+        }
+
+        .modal-content {
+            background: rgba(20, 20, 30, 0.98);
+            backdrop-filter: blur(30px);
+            border-radius: 25px;
+            padding: 30px;
+            max-width: 500px;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            position: relative;
+            animation: modalSlideIn 0.3s ease;
+        }
+
+        @keyframes modalSlideIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .close-modal {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: rgba(255, 255, 255, 0.1);
+            border: none;
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 1.2rem;
+            color: white;
+        }
+
+        .close-modal:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: rotate(90deg);
+        }
+
+        /* Error and Success Messages */
+        .message {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            padding: 15px 25px;
+            border-radius: 15px;
+            backdrop-filter: blur(20px);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+            z-index: 3000;
+            animation: messageSlide 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            max-width: 90%;
+        }
+
+        @keyframes messageSlide {
+            from {
+                opacity: 0;
+                transform: translateX(-50%) translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(-50%) translateY(0);
+            }
+        }
+
+        .message.success {
+            background: rgba(76, 175, 80, 0.2);
+            border: 1px solid rgba(76, 175, 80, 0.4);
+            color: #4caf50;
+        }
+
+        .message.error {
+            background: rgba(244, 67, 54, 0.2);
+            border: 1px solid rgba(244, 67, 54, 0.4);
+            color: #f44336;
+        }
+
+        /* Loading States */
+        .loading-spinner {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-top-color: white;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        /* Mobile Optimizations */
+        @media (max-width: 480px) {
+            .container {
+                padding: 10px;
+            }
+            
+            .header {
+                padding: 10px;
+                gap: 8px;
+            }
+            
+            .logo {
+                font-size: 1.5rem;
+            }
+            
+            .slogan {
+                font-size: 0.7rem;
+            }
+            
+            .user-name {
+                font-size: 0.8rem;
+            }
+            
+            .user-avatar {
+                width: 40px;
+                height: 40px;
+                font-size: 1.2rem;
+            }
+            
+            .stats-bar {
+                padding: 10px;
+            }
+            
+            .stat-number {
+                font-size: 1.2rem;
+            }
+            
+            .stat-label {
+                font-size: 0.65rem;
+            }
+            
+            .action-buttons-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .how-to-play-btn {
+                bottom: 10px;
+                right: 10px;
+                padding: 10px 15px;
+            }
+        }
+
+        /* Hidden Elements */
+        .hidden {
+            display: none !important;
+        }
+
+        /* Remove Friend Button Styles */
+        .remove-friend-btn {
+            background: rgba(244, 67, 54, 0.2);
+            border: 1px solid rgba(244, 67, 54, 0.4);
+            color: #ff6b6b;
+            padding: 8px 14px;
+            border-radius: 15px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+
+        .remove-friend-btn:hover {
+            background: rgba(244, 67, 54, 0.3);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(244, 67, 54, 0.3);
+        }
+
+        /* Confirm dialog styles */
+        .confirm-dialog {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(20, 20, 30, 0.98);
+            backdrop-filter: blur(20px);
+            padding: 25px;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+            z-index: 3001;
+            max-width: 350px;
+            width: 90%;
+            animation: scaleIn 0.3s ease;
+            border: 2px solid rgba(244, 67, 54, 0.3);
+            text-align: center;
+        }
+
+        .confirm-dialog h3 {
+            font-size: 1.2rem;
+            margin-bottom: 15px;
+            color: white;
+        }
+
+        .confirm-dialog p {
+            margin-bottom: 20px;
+            opacity: 0.8;
+        }
+
+        .confirm-dialog-actions {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+        }
+
+        .confirm-btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .confirm-btn-danger {
+            background: #f44336;
+            color: white;
+        }
+
+        .confirm-btn-danger:hover {
+            background: #da190b;
+            transform: translateY(-2px);
+        }
+
+        .confirm-btn-cancel {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+        }
+
+        .confirm-btn-cancel:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        @keyframes scaleIn {
+            from {
+                opacity: 0;
+                transform: translate(-50%, -50%) scale(0.9);
+            }
+            to {
+                opacity: 1;
+                transform: translate(-50%, -50%) scale(1);
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Starfield Background -->
+    <div class="starfield" id="starfield"></div>
+
+    <!-- Auth Modal -->
+    <div class="auth-modal show" id="authModal">
+        <div class="auth-background">
+            <!-- Animated Grid -->
+            <div class="grid-line horizontal" style="top: 10%;"></div>
+            <div class="grid-line horizontal" style="top: 30%;"></div>
+            <div class="grid-line horizontal" style="top: 50%;"></div>
+            <div class="grid-line horizontal" style="top: 70%;"></div>
+            <div class="grid-line horizontal" style="top: 90%;"></div>
+            <div class="grid-line vertical" style="left: 10%;"></div>
+            <div class="grid-line vertical" style="left: 30%;"></div>
+            <div class="grid-line vertical" style="left: 50%;"></div>
+            <div class="grid-line vertical" style="left: 70%;"></div>
+            <div class="grid-line vertical" style="left: 90%;"></div>
+            
+            <!-- Glowing Orbs -->
+            <div class="glow-orb purple"></div>
+            <div class="glow-orb pink"></div>
+            <div class="glow-orb blue"></div>
+        </div>
+        
+        <div class="auth-container">
+            <!-- Phone Auth Step -->
+            <div id="phoneAuthStep">
+                <div class="auth-title">
+                    <h1>JomBro</h1>
+                    <p>Challenge Your Friends</p>
+                </div>
+                
+                <form id="phoneAuthForm">
+                    <div class="form-group">
+                        <label class="form-label">Enter Your Phone Number</label>
+                        <input type="tel" 
+                               id="phoneNumber" 
+                               class="form-input" 
+                               placeholder="60123456789" 
+                               required 
+                               minlength="10" 
+                               maxlength="12">
+                    </div>
+                    
+                    <button type="submit" class="auth-button auth-button-primary" id="loginButton">
+                        Start Playing
+                    </button>
+                </form>
+                
+                <div class="error-message" id="authError" style="display: none;"></div>
+            </div>
+            
+            <!-- Username Setup Step -->
+            <div id="usernameStep" style="display: none;">
+                <div class="auth-title">
+                    <h1>Almost There!</h1>
+                    <p>Create Your Profile</p>
+                </div>
+                
+                <form id="usernameForm">
+                    <div class="form-group">
+                        <label class="form-label">Choose Your Username</label>
+                        <input type="text" 
+                               id="username" 
+                               class="form-input" 
+                               placeholder="Enter a cool username" 
+                               required 
+                               minlength="3" 
+                               maxlength="20">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Pick Your Avatar</label>
+                        <div class="avatar-grid">
+                            <div class="avatar-option" data-avatar="😎">😎</div>
+                            <div class="avatar-option" data-avatar="🥷">🥷</div>
+                            <div class="avatar-option" data-avatar="👾">👾</div>
+                            <div class="avatar-option" data-avatar="🤖">🤖</div>
+                            <div class="avatar-option" data-avatar="🦸">🦸</div>
+                            <div class="avatar-option" data-avatar="🧙">🧙</div>
+                            <div class="avatar-option" data-avatar="🎮">🎮</div>
+                            <div class="avatar-option" data-avatar="🚀">🚀</div>
+                            <div class="avatar-option" data-avatar="⚡">⚡</div>
+                            <div class="avatar-option" data-avatar="🔥">🔥</div>
+                            <div class="avatar-option" data-avatar="💎">💎</div>
+                            <div class="avatar-option" data-avatar="🌟">🌟</div>
+                        </div>
+                    </div>
+                    
+                    <button type="submit" class="auth-button auth-button-primary" id="startPlayingButton">
+                        Let's Go!
+                    </button>
+                </form>
+                
+                <div class="error-message" id="profileError" style="display: none;"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main App Container -->
+    <div class="container hidden" id="mainApp">
+        <!-- Header -->
+        <div class="header">
+            <div class="logo-section">
+                <div class="logo">JomBro</div>
+                <div class="slogan">Challenge Accepted!</div>
+            </div>
+            
+            <div class="user-info">
+                <div class="user-details">
+                    <div class="user-name" id="userName">Loading...</div>
+                    <div class="user-level" id="userLevel">Level 1</div>
+                </div>
+                <div class="user-avatar online" id="userAvatar" onclick="showProfile()">
+                    <span id="userAvatarIcon">😎</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Stats Bar -->
+        <div class="stats-bar">
+            <div class="stat-item">
+                <div class="stat-number" id="tokensCount">0</div>
+                <div class="stat-label">Tokens</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-number" id="friendsCount">0</div>
+                <div class="stat-label">Friends</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-number" id="challengesCount">0</div>
+                <div class="stat-label">Challenges</div>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Action Buttons -->
+            <div class="action-buttons-grid">
+                <div class="action-btn" onclick="showQuickChallenge()">
+                    <div class="action-icon">⚡</div>
+                    <div class="action-title">Quick Challenge</div>
+                    <div class="action-subtitle">Create instant dare</div>
+                </div>
+                
+                <div class="action-btn" onclick="showAIChallenge()">
+                    <div class="action-icon">🤖</div>
+                    <div class="action-title">AI Challenge</div>
+                    <div class="action-subtitle">Get suggestions</div>
+                </div>
+            </div>
+
+            <!-- Friends Section -->
+            <div class="card floating-element">
+                <div class="card-title">
+                    <span>👥</span>
+                    <span>Friends</span>
+                </div>
+                
+                <div class="friend-carousel-container">
+                    <div class="friend-carousel" id="friendCarousel">
+                        <div class="friend-carousel-item" onclick="showAddFriend()">
+                            <div class="add-friend-btn">
+                                <span style="font-size: 1.5rem;">+</span>
+                            </div>
+                            <div class="friend-carousel-name">Add Friend</div>
+                        </div>
+                        <!-- Friends will be populated here -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Active Challenges Section -->
+            <div class="card floating-element">
+                <div class="card-title">
+                    <span>🎯</span>
+                    <span>Active Challenges</span>
+                </div>
+                
+                <div class="challenges-section">
+                    <div class="challenges-header">
+                        <div class="challenges-count">
+                            <span class="online-count" id="activeChallengesCount">0</span> active
+                        </div>
+                        <button class="btn btn-secondary btn-small" onclick="refreshChallenges()">Refresh</button>
+                    </div>
+                    
+                    <div class="challenges-list" id="challengesList">
+                        <!-- Challenges will be populated here -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- How to Play Button -->
+    <div class="how-to-play-btn" onclick="showHowToPlay()">
+        <span style="font-size: 1.5rem;">❓</span>
+        <div class="btn-text">
+            <span class="btn-title">How to Play</span>
+            <span class="btn-subtitle">JomBro!</span>
+        </div>
+    </div>
+
+    <script>
+        // Fixed Firebase Configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyC_orriRUuf1ynDiFaJAPrO6-Gu3GeURxQ",
+            authDomain: "jombro-9d129.firebaseapp.com",
+            projectId: "jombro-9d129",
+            storageBucket: "jombro-9d129.appspot.com",
+            messagingSenderId: "532095080330",
+            appId: "1:532095080330:web:aa19e7e29c3f27cf3e8f09"
+        };
+
+        // Global Variables
+        let app, db, storage;
+        let currentUser = null;
+        let userData = null;
+        let selectedAvatar = null;
+
+        // AI Challenge Templates
+        const aiChallengeTemplates = {
+            easy: [
+                {
+                    title: "Dance Challenge",
+                    description: "Record yourself dancing to your favorite song for 30 seconds!",
+                    difficulty: "easy",
+                    reward: 100,
+                    timeLimit: 24
+                },
+                {
+                    title: "Funny Face Contest",
+                    description: "Make the funniest face you can and hold it for 5 seconds!",
+                    difficulty: "easy",
+                    reward: 80,
+                    timeLimit: 12
+                },
+                {
+                    title: "Tongue Twister Master",
+                    description: "Say 'She sells seashells by the seashore' 5 times fast without mistakes!",
+                    difficulty: "easy",
+                    reward: 120,
+                    timeLimit: 24
+                },
+                {
+                    title: "Paper Airplane Pro",
+                    description: "Make a paper airplane and fly it across the room!",
+                    difficulty: "easy",
+                    reward: 90,
+                    timeLimit: 12
+                }
+            ],
+            medium: [
+                {
+                    title: "Handstand Hero",
+                    description: "Do a handstand against the wall for 10 seconds!",
+                    difficulty: "medium",
+                    reward: 200,
+                    timeLimit: 48
+                },
+                {
+                    title: "Blindfold Drawing",
+                    description: "Draw a cat while blindfolded and let others guess what it is!",
+                    difficulty: "medium",
+                    reward: 180,
+                    timeLimit: 24
+                },
+                {
+                    title: "Random Act of Kindness",
+                    description: "Do something nice for a stranger and document it!",
+                    difficulty: "medium",
+                    reward: 250,
+                    timeLimit: 72
+                },
+                {
+                    title: "Ice Bucket Mini",
+                    description: "Pour a cup of ice water on your head outside!",
+                    difficulty: "medium",
+                    reward: 220,
+                    timeLimit: 48
+                }
+            ],
+            hard: [
+                {
+                    title: "Public Performance",
+                    description: "Sing a song in a public place for at least 1 minute!",
+                    difficulty: "hard",
+                    reward: 500,
+                    timeLimit: 168
+                },
+                {
+                    title: "Extreme Makeover",
+                    description: "Let your friends give you a complete makeover!",
+                    difficulty: "hard",
+                    reward: 400,
+                    timeLimit: 72
+                },
+                {
+                    title: "Cold Shower Challenge",
+                    description: "Take a cold shower for 2 minutes straight!",
+                    difficulty: "hard",
+                    reward: 350,
+                    timeLimit: 48
+                },
+                {
+                    title: "24 Hour Vegan",
+                    description: "Go completely vegan for 24 hours and document your meals!",
+                    difficulty: "hard",
+                    reward: 300,
+                    timeLimit: 48
+                }
+            ],
+            trending: [
+                {
+                    title: "TikTok Dance",
+                    description: "Learn and perform the latest trending TikTok dance!",
+                    difficulty: "medium",
+                    reward: 200,
+                    timeLimit: 48
+                },
+                {
+                    title: "Room Makeover",
+                    description: "Rearrange your room completely and show before/after!",
+                    difficulty: "easy",
+                    reward: 150,
+                    timeLimit: 24
+                },
+                {
+                    title: "Nature Walk",
+                    description: "Take a 30-minute walk in nature and photograph 5 different plants!",
+                    difficulty: "easy",
+                    reward: 100,
+                    timeLimit: 36
+                }
+            ]
+        };
+
+        // Initialize app when DOM is ready
+        document.addEventListener('DOMContentLoaded', async function() {
+            console.log('DOM loaded, initializing app...');
+            
+            try {
+                // Initialize Firebase
+                if (!firebase.apps.length) {
+                    app = firebase.initializeApp(firebaseConfig);
+                } else {
+                    app = firebase.app();
+                }
+                
+                db = firebase.firestore();
+                storage = firebase.storage();
+                
+                // Enable offline persistence
+                try {
+                    await db.enablePersistence();
+                } catch (err) {
+                    if (err.code == 'failed-precondition') {
+                        console.log('Multiple tabs open, persistence can only be enabled in one tab at a time.');
+                    } else if (err.code == 'unimplemented') {
+                        console.log('The current browser does not support persistence.');
+                    }
+                }
+                
+                console.log('Firebase initialized successfully');
+                
+                // Setup UI
+                createStarfield();
+                setupEventListeners();
+                
+                // Check for existing session
+                checkExistingSession();
+                
+            } catch (error) {
+                console.error('Initialization error:', error);
+                showError('Failed to initialize app. Please refresh the page.');
+            }
+        });
+
+        // Create starfield background
+        function createStarfield() {
+            const starfield = document.getElementById('starfield');
+            if (!starfield) return;
+            
+            const starCount = 100;
+            
+            for (let i = 0; i < starCount; i++) {
+                const star = document.createElement('div');
+                star.className = 'star';
+                
+                const size = Math.random();
+                if (size < 0.3) star.classList.add('small');
+                else if (size < 0.7) star.classList.add('medium');
+                else star.classList.add('large');
+                
+                star.style.left = Math.random() * 100 + '%';
+                star.style.top = Math.random() * 100 + '%';
+                star.style.animationDelay = Math.random() * 2 + 's';
+                
+                starfield.appendChild(star);
+            }
+        }
+
+        // Setup event listeners
+        function setupEventListeners() {
+            // Phone form
+            const phoneForm = document.getElementById('phoneAuthForm');
+            if (phoneForm) {
+                phoneForm.addEventListener('submit', handlePhoneSubmit);
+            }
+
+            // Username form
+            const usernameForm = document.getElementById('usernameForm');
+            if (usernameForm) {
+                usernameForm.addEventListener('submit', handleUsernameSubmit);
+            }
+
+            // Phone number formatting
+            const phoneInput = document.getElementById('phoneNumber');
+            if (phoneInput) {
+                phoneInput.addEventListener('input', function(e) {
+                    e.target.value = e.target.value.replace(/\D/g, '');
+                });
+            }
+
+            // Avatar selection
+            document.querySelectorAll('.avatar-option').forEach(avatar => {
+                avatar.addEventListener('click', function() {
+                    selectAvatar(this);
+                });
+            });
+        }
+
+        // Check existing session
+        async function checkExistingSession() {
+            const savedPhone = localStorage.getItem('jombro_phone');
+            const savedUserId = localStorage.getItem('jombro_userId');
+            
+            if (savedPhone && savedUserId) {
+                try {
+                    const userDoc = await db.collection('users').doc(savedUserId).get();
+                    
+                    if (userDoc.exists) {
+                        currentUser = {
+                            uid: savedUserId,
+                            phoneNumber: savedPhone
+                        };
+                        
+                        await loadUserData();
+                        hideAuthModal();
+                        showMessage('Welcome back! 🎮', 'success');
+                    } else {
+                        // Clear invalid session
+                        localStorage.removeItem('jombro_phone');
+                        localStorage.removeItem('jombro_userId');
+                    }
+                } catch (error) {
+                    console.error('Session check error:', error);
+                }
+            }
+        }
+
+        // Select avatar
+        function selectAvatar(element) {
+            document.querySelectorAll('.avatar-option').forEach(opt => {
+                opt.classList.remove('selected');
+            });
+            
+            element.classList.add('selected');
+            selectedAvatar = element.dataset.avatar;
+        }
+
+        // Show/Hide error messages
+        function showError(message) {
+            const errorElement = document.querySelector('.error-message:not([style*="display: none"])') || 
+                               document.getElementById('authError');
+            if (errorElement) {
+                errorElement.textContent = message;
+                errorElement.style.display = 'block';
+                errorElement.style.color = '#f44336';
+                errorElement.style.marginTop = '10px';
+                errorElement.style.fontSize = '0.9rem';
+                errorElement.style.textAlign = 'center';
+            }
+        }
+
+        function hideError() {
+            document.querySelectorAll('.error-message').forEach(el => {
+                el.style.display = 'none';
+            });
+        }
+
+        // Set button loading state
+        function setButtonLoading(button, loading) {
+            if (loading) {
+                button.classList.add('loading');
+                button.disabled = true;
+            } else {
+                button.classList.remove('loading');
+                button.disabled = false;
+            }
+        }
+
+        // Handle phone submission
+        async function handlePhoneSubmit(e) {
+            e.preventDefault();
+            
+            const phoneNumber = document.getElementById('phoneNumber').value.trim();
+            const loginButton = document.getElementById('loginButton');
+            
+            if (!phoneNumber || phoneNumber.length < 10) {
+                showError('Please enter a valid phone number');
+                return;
+            }
+            
+            try {
+                setButtonLoading(loginButton, true);
+                hideError();
+                
+                // Generate a simple user ID based on phone number
+                const userId = 'user_' + phoneNumber;
+                
+                // Check if user exists
+                const userDoc = await db.collection('users').doc(userId).get();
+                
+                if (userDoc.exists) {
+                    // Existing user - login
+                    currentUser = {
+                        uid: userId,
+                        phoneNumber: phoneNumber
+                    };
+                    
+                    localStorage.setItem('jombro_phone', phoneNumber);
+                    localStorage.setItem('jombro_userId', userId);
+                    
+                    await loadUserData();
+                    hideAuthModal();
+                    showMessage('Welcome back! 🎮', 'success');
+                } else {
+                    // New user - show username setup
+                    currentUser = {
+                        uid: userId,
+                        phoneNumber: phoneNumber
+                    };
+                    
+                    document.getElementById('phoneAuthStep').style.display = 'none';
+                    document.getElementById('usernameStep').style.display = 'block';
+                }
+                
+            } catch (error) {
+                console.error('Phone auth error:', error);
+                showError('Failed to authenticate. Please try again.');
+            } finally {
+                setButtonLoading(loginButton, false);
+            }
+        }
+
+        // Handle username submission
+        async function handleUsernameSubmit(e) {
+            e.preventDefault();
+            
+            const username = document.getElementById('username').value.trim();
+            const startButton = document.getElementById('startPlayingButton');
+            
+            if (!username || username.length < 3) {
+                showError('Username must be at least 3 characters');
+                return;
+            }
+            
+            if (!selectedAvatar) {
+                showError('Please select an avatar');
+                return;
+            }
+            
+            try {
+                setButtonLoading(startButton, true);
+                hideError();
+                
+                // Create user document
+                await db.collection('users').doc(currentUser.uid).set({
+                    name: username,
+                    phoneNumber: currentUser.phoneNumber,
+                    avatar: selectedAvatar,
+                    tokens: 1000,
+                    level: 1,
+                    friendsCount: 0,
+                    createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+                    lastActive: firebase.firestore.FieldValue.serverTimestamp(),
+                    online: true
+                });
+                
+                // Save session
+                localStorage.setItem('jombro_phone', currentUser.phoneNumber);
+                localStorage.setItem('jombro_userId', currentUser.uid);
+                
+                await loadUserData();
+                hideAuthModal();
+                showMessage('🎉 Welcome to JomBro! You got 1000 starter tokens!', 'success');
+                
+            } catch (error) {
+                console.error('Profile creation error:', error);
+                showError('Failed to create profile. Please try again.');
+            } finally {
+                setButtonLoading(startButton, false);
+            }
+        }
+
+        // Hide auth modal
+        function hideAuthModal() {
+            document.getElementById('authModal').style.display = 'none';
+            document.getElementById('mainApp').classList.remove('hidden');
+        }
+
+        // Load user data
+        async function loadUserData() {
+            if (!currentUser) return;
+            
+            try {
+                const userDoc = await db.collection('users').doc(currentUser.uid).get();
+                
+                if (userDoc.exists) {
+                    userData = userDoc.data();
+                    updateUI();
+                    loadFriends();
+                    loadChallenges();
+                    
+                    // Update online status
+                    await db.collection('users').doc(currentUser.uid).update({
+                        online: true,
+                        lastActive: firebase.firestore.FieldValue.serverTimestamp()
+                    });
+                }
+            } catch (error) {
+                console.error('Error loading user data:', error);
+            }
+        }
+
+        // Update UI with user data
+        function updateUI() {
+            if (!userData) return;
+            
+            document.getElementById('userName').textContent = userData.name || 'Anonymous';
+            document.getElementById('userLevel').textContent = `Level ${userData.level || 1}`;
+            document.getElementById('userAvatarIcon').textContent = userData.avatar || '😎';
+            
+            // Update stats with animation
+            updateStat('tokensCount', userData.tokens || 0);
+            updateStat('friendsCount', userData.friendsCount || 0);
+            updateStat('challengesCount', userData.activeChallenges || 0);
+        }
+
+        // Update stat with animation
+        function updateStat(elementId, value) {
+            const element = document.getElementById(elementId);
+            if (!element) return;
+            
+            element.classList.add('updating');
+            element.textContent = value.toLocaleString();
+            
+            setTimeout(() => {
+                element.classList.remove('updating');
+            }, 500);
+        }
+
+        // Load friends
+        async function loadFriends() {
+            if (!currentUser) return;
+            
+            try {
+                const friendsSnapshot = await db.collection('users')
+                    .doc(currentUser.uid)
+                    .collection('friends')
+                    .limit(10)
+                    .get();
+                
+                const carousel = document.getElementById('friendCarousel');
+                // Keep the add friend button
+                const addFriendBtn = carousel.querySelector('.friend-carousel-item');
+                carousel.innerHTML = '';
+                carousel.appendChild(addFriendBtn);
+                
+                friendsSnapshot.forEach(doc => {
+                    const friend = doc.data();
+                    const friendItem = document.createElement('div');
+                    friendItem.className = 'friend-carousel-item';
+                    friendItem.onclick = () => showFriendProfile(doc.id);
+                    
+                    friendItem.innerHTML = `
+                        <div class="friend-carousel-avatar ${friend.online ? 'online' : ''}">
+                            ${friend.avatar || '👤'}
+                        </div>
+                        <div class="friend-carousel-name">${friend.name || 'Friend'}</div>
+                    `;
+                    
+                    carousel.appendChild(friendItem);
+                });
+                
+                // Update friends count
+                updateStat('friendsCount', friendsSnapshot.size);
+                
+            } catch (error) {
+                console.error('Error loading friends:', error);
+            }
+        }
+
+        // Load challenges
+        async function loadChallenges() {
+            if (!currentUser) return;
+            
+            try {
+                const challengesSnapshot = await db.collection('challenges')
+                    .where('participants', 'array-contains', currentUser.uid)
+                    .where('status', 'in', ['pending', 'active'])
+                    .orderBy('createdAt', 'desc')
+                    .limit(10)
+                    .get();
+                
+                const challengesList = document.getElementById('challengesList');
+                challengesList.innerHTML = '';
+                
+                if (challengesSnapshot.empty) {
+                    challengesList.innerHTML = `
+                        <div style="text-align: center; padding: 20px; opacity: 0.7;">
+                            No active challenges yet!<br>
+                            <small>Create one or wait for friends to challenge you</small>
+                        </div>
+                    `;
+                } else {
+                    challengesSnapshot.forEach(doc => {
+                        const challenge = doc.data();
+                        const challengeItem = document.createElement('div');
+                        challengeItem.className = 'challenge-item';
+                        challengeItem.onclick = () => showChallengeDetails(doc.id);
+                        
+                        const statusClass = challenge.status === 'active' ? 'status-active' : 'status-pending';
+                        const statusText = challenge.status === 'active' ? 'Active' : 'Pending';
+                        
+                        challengeItem.innerHTML = `
+                            <div class="challenge-info">
+                                <div class="challenge-title">
+                                    <span>${challenge.title || 'Untitled Challenge'}</span>
+                                    <span style="font-size: 0.8rem;">💰 ${challenge.reward || 0}</span>
+                                </div>
+                                <div class="challenge-details">
+                                    ${challenge.creatorName || 'Someone'} • ${getTimeRemaining(challenge.timeLimit, challenge.createdAt)}
+                                </div>
+                            </div>
+                            <div class="challenge-status ${statusClass}">${statusText}</div>
+                        `;
+                        
+                        challengesList.appendChild(challengeItem);
+                    });
+                }
+                
+                // Update challenges count
+                document.getElementById('activeChallengesCount').textContent = challengesSnapshot.size;
+                updateStat('challengesCount', challengesSnapshot.size);
+                
+            } catch (error) {
+                console.error('Error loading challenges:', error);
+            }
+        }
+
+        // Get time remaining
+        function getTimeRemaining(timeLimit, createdAt) {
+            if (!timeLimit || !createdAt) return 'No limit';
+            
+            const created = createdAt.toDate ? createdAt.toDate() : new Date(createdAt);
+            const deadline = new Date(created.getTime() + (timeLimit * 60 * 60 * 1000));
+            const now = new Date();
+            const remaining = deadline - now;
+            
+            if (remaining <= 0) return 'Expired';
+            
+            const hours = Math.floor(remaining / (1000 * 60 * 60));
+            const minutes = Math.floor((remaining % (1000 * 60 * 60)) / (1000 * 60));
+            
+            if (hours > 24) {
+                const days = Math.floor(hours / 24);
+                return `${days}d left`;
+            } else if (hours > 0) {
+                return `${hours}h ${minutes}m left`;
+            } else {
+                return `${minutes}m left`;
+            }
+        }
+
+        // Show message
+        function showMessage(text, type = 'success') {
+            const message = document.createElement('div');
+            message.className = `message ${type}`;
+            message.textContent = text;
+            
+            document.body.appendChild(message);
+            
+            setTimeout(() => {
+                message.style.opacity = '0';
+                setTimeout(() => {
+                    message.remove();
+                }, 300);
+            }, 3000);
+        }
+
+        // Generate friend code
+        function generateFriendCode(userId) {
+            const hash = userId.split('').reduce((acc, char) => {
+                return acc + char.charCodeAt(0);
+            }, 0);
+            
+            const code = hash.toString(36).toUpperCase().padEnd(8, 'X').substring(0, 8);
+            return code;
+        }
+
+        // Format time ago
+        function formatTimeAgo(timestamp) {
+            if (!timestamp) return 'Unknown';
+            
+            const date = timestamp.toDate ? timestamp.toDate() : new Date(timestamp);
+            const now = new Date();
+            const diff = now - date;
+            
+            const minutes = Math.floor(diff / 60000);
+            const hours = Math.floor(diff / 3600000);
+            const days = Math.floor(diff / 86400000);
+            
+            if (minutes < 1) return 'Just now';
+            if (minutes < 60) return `${minutes}m ago`;
+            if (hours < 24) return `${hours}h ago`;
+            if (days < 7) return `${days}d ago`;
+            
+            return date.toLocaleDateString();
+        }
+
+        // Show Quick Challenge
+        window.showQuickChallenge = function() {
+            const modal = document.createElement('div');
+            modal.className = 'modal-overlay';
+            modal.innerHTML = `
+                <div class="modal-content">
+                    <button class="close-modal" onclick="closeModal(this)">×</button>
+                    
+                    <h2 style="margin-bottom: 20px;">⚡ Quick Challenge</h2>
+                    
+                    <form id="quickChallengeForm" onsubmit="createQuickChallenge(event)">
+                        <div class="form-group">
+                            <label class="form-label">Challenge Title</label>
+                            <input type="text" class="form-input" id="challengeTitle" 
+                                   placeholder="Name your challenge" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">Description</label>
+                            <textarea class="form-input" id="challengeDescription" rows="3" 
+                                      placeholder="What's the dare?" required></textarea>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">Reward Tokens</label>
+                            <input type="number" class="form-input" id="challengeReward" 
+                                   min="50" max="1000" value="100" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">Time Limit (hours)</label>
+                            <select class="form-input" id="challengeTimeLimit">
+                                <option value="12">12 hours</option>
+                                <option value="24" selected>24 hours</option>
+                                <option value="48">48 hours</option>
+                                <option value="72">72 hours</option>
+                                <option value="168">1 week</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">Select Friends</label>
+                            <div id="friendSelector" style="max-height: 150px; overflow-y: auto;">
+                                <!-- Friends will be loaded here -->
+                            </div>
+                        </div>
+                        
+                        <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 20px;">
+                            Create Challenge
+                        </button>
+                    </form>
+                </div>
+            `;
+            
+            document.body.appendChild(modal);
+            loadFriendSelector();
+        };
+
+        // Show AI Challenge
+        window.showAIChallenge = function() {
+            const modal = document.createElement('div');
+            modal.className = 'modal-overlay';
+            modal.innerHTML = `
+                <div class="modal-content">
+                    <button class="close-modal" onclick="closeModal(this)">×</button>
+                    
+                    <h2 style="margin-bottom: 20px;">🤖 AI Challenge Suggestions</h2>
+                    
+                    <div style="display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap;">
+                        <button class="btn btn-secondary btn-small" onclick="filterAIChallenges('easy')">Easy</button>
+                        <button class="btn btn-secondary btn-small" onclick="filterAIChallenges('medium')">Medium</button>
+                        <button class="btn btn-secondary btn-small" onclick="filterAIChallenges('hard')">Hard</button>
+                        <button class="btn btn-secondary btn-small" onclick="filterAIChallenges('trending')">Trending</button>
+                    </div>
+                    
+                    <div id="aiChallengesList" style="display: flex; flex-direction: column; gap: 10px;">
+                        <!-- AI challenges will be loaded here -->
+                    </div>
+                </div>
+            `;
+            
+            document.body.appendChild(modal);
+            filterAIChallenges('easy');
+        };
+
+        // Filter AI Challenges
+        window.filterAIChallenges = function(difficulty) {
+            const challenges = aiChallengeTemplates[difficulty] || aiChallengeTemplates.easy;
+            const container = document.getElementById('aiChallengesList');
+            
+            container.innerHTML = challenges.map(challenge => `
+                <div class="challenge-item" style="cursor: pointer;" 
+                     onclick='selectAIChallenge(${JSON.stringify(challenge)})'>
+                    <div class="challenge-info">
+                        <div class="challenge-title">
+                            <span>${challenge.title}</span>
+                            <span style="font-size: 0.8rem;">💰 ${challenge.reward}</span>
+                        </div>
+                        <div class="challenge-details">${challenge.description}</div>
+                        <div style="margin-top: 5px;">
+                            <span class="challenge-status status-${challenge.difficulty}">
+                                ${challenge.difficulty}
+                            </span>
+                            <span style="font-size: 0.7rem; opacity: 0.7; margin-left: 10px;">
+                                ⏱️ ${challenge.timeLimit}h limit
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        };
+
+        // Select AI Challenge
+        window.selectAIChallenge = function(challenge) {
+            closeModal(document.querySelector('.modal-overlay .close-modal'));
+            
+            // Show friend selector for this challenge
+            const modal = document.createElement('div');
+            modal.className = 'modal-overlay';
+            modal.innerHTML = `
+                <div class="modal-content">
+                    <button class="close-modal" onclick="closeModal(this)">×</button>
+                    
+                    <h2 style="margin-bottom: 20px;">Send Challenge</h2>
+                    
+                    <div style="background: rgba(255,255,255,0.05); padding: 15px; border-radius: 10px; margin-bottom: 20px;">
+                        <h3>${challenge.title}</h3>
+                        <p style="opacity: 0.8; margin: 10px 0;">${challenge.description}</p>
+                        <div style="display: flex; gap: 15px; margin-top: 10px;">
+                            <span>💰 ${challenge.reward} tokens</span>
+                            <span>⏱️ ${challenge.timeLimit}h limit</span>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Select Friends to Challenge</label>
+                        <div id="friendSelector" style="max-height: 200px; overflow-y: auto;">
+                            <!-- Friends will be loaded here -->
+                        </div>
+                    </div>
+                    
+                    <button class="btn btn-primary" style="width: 100%; margin-top: 20px;"
+                            onclick='sendAIChallenge(${JSON.stringify(challenge)})'>
+                        Send Challenge
+                    </button>
+                </div>
+            `;
+            
+            document.body.appendChild(modal);
+            loadFriendSelector();
+        };
+
+        // Load friend selector
+        async function loadFriendSelector() {
+            const selector = document.getElementById('friendSelector');
+            if (!selector || !currentUser) return;
+            
+            try {
+                const friendsSnapshot = await db.collection('users')
+                    .doc(currentUser.uid)
+                    .collection('friends')
+                    .get();
+                
+                if (friendsSnapshot.empty) {
+                    selector.innerHTML = `
+                        <div style="text-align: center; padding: 20px; opacity: 0.7;">
+                            No friends yet! Add some friends first.
+                        </div>
+                    `;
+                } else {
+                    selector.innerHTML = friendsSnapshot.docs.map(doc => {
+                        const friend = doc.data();
+                        return `
+                            <label style="display: flex; align-items: center; padding: 10px; cursor: pointer;">
+                                <input type="checkbox" value="${doc.id}" style="margin-right: 10px;">
+                                <span style="font-size: 1.5rem; margin-right: 10px;">${friend.avatar || '👤'}</span>
+                                <span>${friend.name || 'Friend'}</span>
+                            </label>
+                        `;
+                    }).join('');
+                }
+            } catch (error) {
+                console.error('Error loading friends:', error);
+                selector.innerHTML = '<div style="color: #f44336;">Error loading friends</div>';
+            }
+        }
+
+        // Create quick challenge
+        window.createQuickChallenge = async function(event) {
+            event.preventDefault();
+            
+            const title = document.getElementById('challengeTitle').value;
+            const description = document.getElementById('challengeDescription').value;
+            const reward = parseInt(document.getElementById('challengeReward').value);
+            const timeLimit = parseInt(document.getElementById('challengeTimeLimit').value);
+            
+            const selectedFriends = Array.from(
+                document.querySelectorAll('#friendSelector input[type="checkbox"]:checked')
+            ).map(cb => cb.value);
+            
+            if (selectedFriends.length === 0) {
+                showMessage('Please select at least one friend', 'error');
+                return;
+            }
+            
+            try {
+                const challenge = {
+                    title,
+                    description,
+                    reward,
+                    timeLimit,
+                    creatorId: currentUser.uid,
+                    creatorName: userData.name,
+                    participants: [currentUser.uid, ...selectedFriends],
+                    status: 'pending',
+                    createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+                    responses: {}
+                };
+                
+                await db.collection('challenges').add(challenge);
+                
+                showMessage('Challenge created! 🎯', 'success');
+                closeModal(document.querySelector('.modal-overlay .close-modal'));
+                loadChallenges();
+                
+            } catch (error) {
+                console.error('Error creating challenge:', error);
+                showMessage('Failed to create challenge', 'error');
+            }
+        };
+
+        // Send AI challenge
+        window.sendAIChallenge = async function(challenge) {
+            const selectedFriends = Array.from(
+                document.querySelectorAll('#friendSelector input[type="checkbox"]:checked')
+            ).map(cb => cb.value);
+            
+            if (selectedFriends.length === 0) {
+                showMessage('Please select at least one friend', 'error');
+                return;
+            }
+            
+            try {
+                const challengeData = {
+                    ...challenge,
+                    creatorId: currentUser.uid,
+                    creatorName: userData.name,
+                    participants: [currentUser.uid, ...selectedFriends],
+                    status: 'pending',
+                    createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+                    responses: {},
+                    isAIGenerated: true
+                };
+                
+                await db.collection('challenges').add(challengeData);
+                
+                showMessage('Challenge sent! 🚀', 'success');
+                closeModal(document.querySelector('.modal-overlay .close-modal'));
+                loadChallenges();
+                
+            } catch (error) {
+                console.error('Error sending challenge:', error);
+                showMessage('Failed to send challenge', 'error');
+            }
+        };
+
+        // Show Add Friend
+        window.showAddFriend = function() {
+            const modal = document.createElement('div');
+            modal.className = 'modal-overlay';
+            modal.innerHTML = `
+                <div class="modal-content">
+                    <button class="close-modal" onclick="closeModal(this)">×</button>
+                    
+                    <h2 style="margin-bottom: 20px;">👥 Add Friends</h2>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Enter Friend Code</label>
+                        <input type="text" class="form-input" id="friendCodeInput" 
+                               placeholder="Enter 8-character code" maxlength="8" style="text-transform: uppercase;">
+                        <button class="btn btn-primary" style="margin-top: 10px; width: 100%;" 
+                                onclick="addFriendByCode()">Add Friend</button>
+                    </div>
+                    
+                    <div style="text-align: center; margin: 20px 0;">
+                        <div style="opacity: 0.7;">— OR —</div>
+                    </div>
+                    
+                    <div style="text-align: center;">
+                        <p style="margin-bottom: 15px;">Share your friend code:</p>
+                        <div style="background: rgba(255,255,255,0.1); padding: 15px; border-radius: 10px; 
+                                    font-size: 1.5rem; letter-spacing: 2px; font-weight: bold;">
+                            ${generateFriendCode(currentUser.uid)}
+                        </div>
+                        <button class="btn btn-secondary" style="margin-top: 15px;" 
+                                onclick="shareMyCode()">Share Code</button>
+                    </div>
+                </div>
+            `;
+            
+            document.body.appendChild(modal);
+        };
+
+        // Add friend by code
+        window.addFriendByCode = async function() {
+            const code = document.getElementById('friendCodeInput').value.trim().toUpperCase();
+            
+            if (!code || code.length !== 8) {
+                showMessage('Please enter a valid 8-character code', 'error');
+                return;
+            }
+            
+            try {
+                // Find user with this code
+                const usersSnapshot = await db.collection('users').get();
+                let friendFound = null;
+                
+                usersSnapshot.forEach(doc => {
+                    if (generateFriendCode(doc.id) === code && doc.id !== currentUser.uid) {
+                        friendFound = { id: doc.id, data: doc.data() };
+                    }
+                });
+                
+                if (!friendFound) {
+                    showMessage('Friend code not found', 'error');
+                    return;
+                }
+                
+                // Check if already friends
+                const existingFriend = await db.collection('users')
+                    .doc(currentUser.uid)
+                    .collection('friends')
+                    .doc(friendFound.id)
+                    .get();
+                
+                if (existingFriend.exists) {
+                    showMessage('Already friends!', 'error');
+                    return;
+                }
+                
+                // Add friend to both users
+                await db.collection('users').doc(currentUser.uid).collection('friends').doc(friendFound.id).set({
+                    name: friendFound.data.name,
+                    avatar: friendFound.data.avatar,
+                    addedAt: firebase.firestore.FieldValue.serverTimestamp()
+                });
+                
+                await db.collection('users').doc(friendFound.id).collection('friends').doc(currentUser.uid).set({
+                    name: userData.name,
+                    avatar: userData.avatar,
+                    addedAt: firebase.firestore.FieldValue.serverTimestamp()
+                });
+                
+                // Update friend counts
+                await db.collection('users').doc(currentUser.uid).update({
+                    friendsCount: firebase.firestore.FieldValue.increment(1)
+                });
+                
+                await db.collection('users').doc(friendFound.id).update({
+                    friendsCount: firebase.firestore.FieldValue.increment(1)
+                });
+                
+                showMessage(`Added ${friendFound.data.name} as friend! 🎉`, 'success');
+                closeModal(document.querySelector('.modal-overlay .close-modal'));
+                loadFriends();
+                
+            } catch (error) {
+                console.error('Error adding friend:', error);
+                showMessage('Failed to add friend', 'error');
+            }
+        };
+
+        // Share my code
+        window.shareMyCode = function() {
+            const code = generateFriendCode(currentUser.uid);
+            
+            if (navigator.share) {
+                navigator.share({
+                    title: 'Add me on JomBro!',
+                    text: `My JomBro friend code is: ${code}`,
+                }).catch(err => console.log('Error sharing:', err));
+            } else {
+                // Copy to clipboard
+                navigator.clipboard.writeText(code);
+                showMessage('Friend code copied to clipboard!', 'success');
+            }
+        };
+
+        // Show friend profile
+        window.showFriendProfile = async function(friendId) {
+            try {
+                const friendDoc = await db.collection('users').doc(friendId).get();
+                
+                if (!friendDoc.exists) {
+                    showMessage('Friend not found', 'error');
+                    return;
+                }
+                
+                const friend = friendDoc.data();
+                
+                const modal = document.createElement('div');
+                modal.className = 'modal-overlay';
+                modal.innerHTML = `
+                    <div class="modal-content">
+                        <button class="close-modal" onclick="closeModal(this)">×</button>
+                        
+                        <div style="text-align: center; margin-bottom: 20px;">
+                            <div style="font-size: 4rem; margin-bottom: 10px;">${friend.avatar || '👤'}</div>
+                            <h2>${friend.name || 'Friend'}</h2>
+                            <p style="opacity: 0.7;">Level ${friend.level || 1}</p>
+                        </div>
+                        
+                        <div style="display: flex; justify-content: space-around; margin: 20px 0;">
+                            <div style="text-align: center;">
+                                <div style="font-size: 1.5rem; font-weight: bold;">${friend.tokens || 0}</div>
+                                <div style="font-size: 0.8rem; opacity: 0.7;">Tokens</div>
+                            </div>
+                            <div style="text-align: center;">
+                                <div style="font-size: 1.5rem; font-weight: bold;">${friend.friendsCount || 0}</div>
+                                <div style="font-size: 0.8rem; opacity: 0.7;">Friends</div>
+                            </div>
+                        </div>
+                        
+                        <button class="btn btn-primary" style="width: 100%; margin-top: 20px;"
+                                onclick="challengeFriend('${friendId}')">
+                            Challenge ${friend.name}
+                        </button>
+                        
+                        <button class="remove-friend-btn" style="width: 100%; margin-top: 10px;"
+                                onclick="confirmRemoveFriend('${friendId}', '${friend.name}')">
+                            Remove Friend
+                        </button>
+                    </div>
+                `;
+                
+                document.body.appendChild(modal);
+                
+            } catch (error) {
+                console.error('Error showing friend profile:', error);
+                showMessage('Failed to load profile', 'error');
+            }
+        };
+
+        // Challenge friend directly
+        window.challengeFriend = function(friendId) {
+            closeModal(document.querySelector('.modal-overlay .close-modal'));
+            showQuickChallenge();
+            
+            // Pre-select the friend
+            setTimeout(() => {
+                const checkbox = document.querySelector(`#friendSelector input[value="${friendId}"]`);
+                if (checkbox) checkbox.checked = true;
+            }, 100);
+        };
+
+        // Confirm remove friend
+        window.confirmRemoveFriend = function(friendId, friendName) {
+            const dialog = document.createElement('div');
+            dialog.className = 'confirm-dialog';
+            dialog.innerHTML = `
+                <h3>Remove Friend?</h3>
+                <p>Are you sure you want to remove ${friendName} from your friends?</p>
+                <div class="confirm-dialog-actions">
+                    <button class="confirm-btn confirm-btn-cancel" onclick="this.parentElement.parentElement.remove()">
+                        Cancel
+                    </button>
+                    <button class="confirm-btn confirm-btn-danger" onclick="removeFriend('${friendId}')">
+                        Remove
+                    </button>
+                </div>
+            `;
+            
+            document.body.appendChild(dialog);
+        };
+
+        // Remove friend
+        window.removeFriend = async function(friendId) {
+            try {
+                // Remove from both users
+                await db.collection('users').doc(currentUser.uid).collection('friends').doc(friendId).delete();
+                await db.collection('users').doc(friendId).collection('friends').doc(currentUser.uid).delete();
+                
+                // Update friend counts
+                await db.collection('users').doc(currentUser.uid).update({
+                    friendsCount: firebase.firestore.FieldValue.increment(-1)
+                });
+                
+                await db.collection('users').doc(friendId).update({
+                    friendsCount: firebase.firestore.FieldValue.increment(-1)
+                });
+                
+                showMessage('Friend removed', 'success');
+                document.querySelector('.confirm-dialog').remove();
+                closeModal(document.querySelector('.modal-overlay .close-modal'));
+                loadFriends();
+                
+            } catch (error) {
+                console.error('Error removing friend:', error);
+                showMessage('Failed to remove friend', 'error');
+            }
+        };
+
+        // Show profile
+        window.showProfile = function() {
+            const modal = document.createElement('div');
+            modal.className = 'modal-overlay';
+            modal.innerHTML = `
+                <div class="modal-content">
+                    <button class="close-modal" onclick="closeModal(this)">×</button>
+                    
+                    <h2 style="margin-bottom: 20px;">👤 My Profile</h2>
+                    
+                    <div style="text-align: center; margin-bottom: 20px;">
+                        <div style="font-size: 4rem; margin-bottom: 10px;">${userData.avatar || '😎'}</div>
+                        <h3>${userData.name || 'Anonymous'}</h3>
+                        <p style="opacity: 0.7;">Level ${userData.level || 1}</p>
+                    </div>
+                    
+                    <div style="background: rgba(255,255,255,0.05); padding: 15px; border-radius: 10px; margin-bottom: 20px;">
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+                            <span>Phone:</span>
+                            <span>${userData.phoneNumber || 'Unknown'}</span>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+                            <span>Friend Code:</span>
+                            <span style="font-weight: bold; letter-spacing: 1px;">
+                                ${generateFriendCode(currentUser.uid)}
+                            </span>
+                        </div>
+                        <div style="display: flex; justify-content: space-between;">
+                            <span>Member Since:</span>
+                            <span>${userData.createdAt ? formatTimeAgo(userData.createdAt) : 'Unknown'}</span>
+                        </div>
+                    </div>
+                    
+                    <button class="btn btn-secondary" style="width: 100%; margin-bottom: 10px;"
+                            onclick="shareMyCode()">
+                        Share Friend Code
+                    </button>
+                    
+                    <button class="btn" style="width: 100%; background: rgba(244, 67, 54, 0.2); 
+                            border-color: rgba(244, 67, 54, 0.4); color: #ff6b6b;"
+                            onclick="logout()">
+                        Logout
+                    </button>
+                </div>
+            `;
+            
+            document.body.appendChild(modal);
+        };
+
+        // Show challenge details
+        window.showChallengeDetails = async function(challengeId) {
+            try {
+                const challengeDoc = await db.collection('challenges').doc(challengeId).get();
+                
+                if (!challengeDoc.exists) {
+                    showMessage('Challenge not found', 'error');
+                    return;
+                }
+                
+                const challenge = challengeDoc.data();
+                const isCreator = challenge.creatorId === currentUser.uid;
+                const hasResponded = challenge.responses && challenge.responses[currentUser.uid];
+                
+                const modal = document.createElement('div');
+                modal.className = 'modal-overlay';
+                modal.innerHTML = `
+                    <div class="modal-content">
+                        <button class="close-modal" onclick="closeModal(this)">×</button>
+                        
+                        <h2 style="margin-bottom: 20px;">${challenge.title || 'Challenge'}</h2>
+                        
+                        <div style="background: rgba(255,255,255,0.05); padding: 15px; border-radius: 10px; margin-bottom: 20px;">
+                            <p style="margin-bottom: 15px;">${challenge.description || 'No description'}</p>
+                            
+                            <div style="display: flex; gap: 15px; flex-wrap: wrap;">
+                                <span>💰 ${challenge.reward || 0} tokens</span>
+                                <span>⏱️ ${getTimeRemaining(challenge.timeLimit, challenge.createdAt)}</span>
+                                <span>👤 ${challenge.creatorName || 'Someone'}</span>
+                            </div>
+                        </div>
+                        
+                        <div style="margin-bottom: 20px;">
+                            <h3 style="margin-bottom: 10px;">Participants</h3>
+                            <div id="participantsList">
+                                <!-- Participants will be loaded here -->
+                            </div>
+                        </div>
+                        
+                        ${!isCreator && !hasResponded && challenge.status === 'pending' ? `
+                            <button class="btn btn-primary" style="width: 100%;"
+                                    onclick="acceptChallenge('${challengeId}')">
+                                Accept Challenge
+                            </button>
+                        ` : ''}
+                        
+                        ${!hasResponded && challenge.status === 'active' ? `
+                            <button class="btn btn-primary" style="width: 100%;"
+                                    onclick="submitProof('${challengeId}')">
+                                Submit Proof
+                            </button>
+                        ` : ''}
+                        
+                        ${hasResponded ? `
+                            <div style="text-align: center; padding: 15px; background: rgba(76, 175, 80, 0.2); 
+                                        border-radius: 10px; color: #4caf50;">
+                                ✅ You've completed this challenge!
+                            </div>
+                        ` : ''}
+                    </div>
+                `;
+                
+                document.body.appendChild(modal);
+                
+                // Load participants
+                loadChallengeParticipants(challengeId, challenge);
+                
+            } catch (error) {
+                console.error('Error showing challenge details:', error);
+                showMessage('Failed to load challenge', 'error');
+            }
+        };
+
+        // Load challenge participants
+        async function loadChallengeParticipants(challengeId, challenge) {
+            const container = document.getElementById('participantsList');
+            if (!container) return;
+            
+            try {
+                const participantPromises = challenge.participants.map(async (userId) => {
+                    const userDoc = await db.collection('users').doc(userId).get();
+                    return { id: userId, data: userDoc.exists ? userDoc.data() : null };
+                });
+                
+                const participants = await Promise.all(participantPromises);
+                
+                container.innerHTML = participants.map(p => {
+                    if (!p.data) return '';
+                    
+                    const hasResponded = challenge.responses && challenge.responses[p.id];
+                    const status = hasResponded ? 'Completed' : 'Pending';
+                    const statusClass = hasResponded ? 'status-completed' : 'status-pending';
+                    
+                    return `
+                        <div style="display: flex; align-items: center; justify-content: space-between; 
+                                    padding: 10px; background: rgba(255,255,255,0.03); border-radius: 8px; 
+                                    margin-bottom: 8px;">
+                            <div style="display: flex; align-items: center; gap: 10px;">
+                                <span style="font-size: 1.5rem;">${p.data.avatar || '👤'}</span>
+                                <span>${p.data.name || 'Unknown'}</span>
+                            </div>
+                            <span class="challenge-status ${statusClass}">${status}</span>
+                        </div>
+                    `;
+                }).join('');
+                
+            } catch (error) {
+                console.error('Error loading participants:', error);
+            }
+        }
+
+        // Accept challenge
+        window.acceptChallenge = async function(challengeId) {
+            try {
+                await db.collection('challenges').doc(challengeId).update({
+                    status: 'active',
+                    acceptedAt: firebase.firestore.FieldValue.serverTimestamp()
+                });
+                
+                showMessage('Challenge accepted! 💪', 'success');
+                closeModal(document.querySelector('.modal-overlay .close-modal'));
+                loadChallenges();
+                
+            } catch (error) {
+                console.error('Error accepting challenge:', error);
+                showMessage('Failed to accept challenge', 'error');
+            }
+        };
+
+        // Submit proof
+        window.submitProof = function(challengeId) {
+            const modal = document.createElement('div');
+            modal.className = 'modal-overlay';
+            modal.innerHTML = `
+                <div class="modal-content">
+                    <button class="close-modal" onclick="closeModal(this)">×</button>
+                    
+                    <h2 style="margin-bottom: 20px;">📸 Submit Proof</h2>
+                    
+                    <form onsubmit="uploadProof(event, '${challengeId}')">
+                        <div class="form-group">
+                            <label class="form-label">Upload Photo/Video</label>
+                            <input type="file" class="form-input" id="proofFile" 
+                                   accept="image/*,video/*" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">Comment (optional)</label>
+                            <textarea class="form-input" id="proofComment" rows="3" 
+                                      placeholder="Add a comment about your challenge..."></textarea>
+                        </div>
+                        
+                        <button type="submit" class="btn btn-primary" style="width: 100%;">
+                            Submit Proof
+                        </button>
+                    </form>
+                </div>
+            `;
+            
+            document.body.appendChild(modal);
+        };
+
+        // Upload proof
+        window.uploadProof = async function(event, challengeId) {
+            event.preventDefault();
+            
+            const file = document.getElementById('proofFile').files[0];
+            const comment = document.getElementById('proofComment').value;
+            
+            if (!file) {
+                showMessage('Please select a file', 'error');
+                return;
+            }
+            
+            try {
+                showMessage('Uploading proof...', 'success');
+                
+                // Create file reference
+                const timestamp = Date.now();
+                const fileName = `${challengeId}_${currentUser.uid}_${timestamp}`;
+                const storageRef = storage.ref(`proofs/${fileName}`);
+                
+                // Upload file
+                const snapshot = await storageRef.put(file);
+                const downloadURL = await snapshot.ref.getDownloadURL();
+                
+                // Update challenge with proof
+                await db.collection('challenges').doc(challengeId).update({
+                    [`responses.${currentUser.uid}`]: {
+                        proofURL: downloadURL,
+                        comment: comment,
+                        submittedAt: firebase.firestore.FieldValue.serverTimestamp()
+                    }
+                });
+                
+                // Award tokens
+                const challengeDoc = await db.collection('challenges').doc(challengeId).get();
+                const challenge = challengeDoc.data();
+                
+                await db.collection('users').doc(currentUser.uid).update({
+                    tokens: firebase.firestore.FieldValue.increment(challenge.reward || 0)
+                });
+                
+                showMessage(`Challenge completed! +${challenge.reward} tokens 🎉`, 'success');
+                closeModal(document.querySelector('.modal-overlay .close-modal'));
+                loadChallenges();
+                loadUserData();
+                
+            } catch (error) {
+                console.error('Error uploading proof:', error);
+                showMessage('Failed to upload proof', 'error');
+            }
+        };
+
+        // Show How to Play
+        window.showHowToPlay = function() {
+            const modal = document.createElement('div');
+            modal.className = 'modal-overlay';
+            modal.innerHTML = `
+                <div class="modal-content" style="max-width: 600px;">
+                    <button class="close-modal" onclick="closeModal(this)">×</button>
+                    
+                    <h2 style="margin-bottom: 20px;">❓ How to Play JomBro</h2>
+                    
+                    <div style="display: flex; flex-direction: column; gap: 20px;">
+                        <div>
+                            <h3 style="margin-bottom: 10px;">1️⃣ Add Friends</h3>
+                            <p style="opacity: 0.8;">Share your friend code or enter your friends' codes to connect. 
+                            The more friends you have, the more fun challenges you can do!</p>
+                        </div>
+                        
+                        <div>
+                            <h3 style="margin-bottom: 10px;">2️⃣ Create Challenges</h3>
+                            <p style="opacity: 0.8;">Use Quick Challenge to create custom dares, or pick from 
+                            AI-generated suggestions. Set rewards and time limits!</p>
+                        </div>
+                        
+                        <div>
+                            <h3 style="margin-bottom: 10px;">3️⃣ Complete & Earn</h3>
+                            <p style="opacity: 0.8;">Accept challenges from friends, complete them, and upload 
+                            photo/video proof. Earn tokens for every challenge you complete!</p>
+                        </div>
+                        
+                        <div>
+                            <h3 style="margin-bottom: 10px;">4️⃣ Level Up</h3>
+                            <p style="opacity: 0.8;">Use tokens to level up and unlock new features. The more 
+                            challenges you complete, the higher your level!</p>
+                        </div>
+                        
+                        <div style="background: rgba(155, 89, 182, 0.1); padding: 15px; border-radius: 10px; 
+                                    border: 1px solid rgba(155, 89, 182, 0.3);">
+                            <p style="text-align: center; margin: 0;">
+                                <strong>Remember:</strong> Stay safe and have fun! 🎮
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            document.body.appendChild(modal);
+        };
+
+        // Refresh challenges
+        window.refreshChallenges = function() {
+            loadChallenges();
+            showMessage('Challenges refreshed!', 'success');
+        };
+
+        // Close modal
+        window.closeModal = function(button) {
+            const modal = button.closest('.modal-overlay');
+            if (modal) {
+                modal.style.opacity = '0';
+                setTimeout(() => modal.remove(), 300);
+            }
+        };
+
+        // Logout
+        window.logout = function() {
+            if (confirm('Are you sure you want to logout?')) {
+                localStorage.removeItem('jombro_phone');
+                localStorage.removeItem('jombro_userId');
+                
+                if (currentUser) {
+                    db.collection('users').doc(currentUser.uid).update({
+                        online: false,
+                        lastActive: firebase.firestore.FieldValue.serverTimestamp()
+                    });
+                }
+                
+                location.reload();
+            }
+        };
+
+        // Set user offline on page unload
+        window.addEventListener('beforeunload', () => {
+            if (currentUser) {
+                navigator.sendBeacon('/api/offline', JSON.stringify({ userId: currentUser.uid }));
+            }
+        });
+    </script>
+</body>
+</html>
