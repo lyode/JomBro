@@ -69,12 +69,9 @@
         
         .app-title {
             font-size: 3rem;
-            font-weight: bold;
+            font-weight: 400;
             margin-bottom: 10px;
-            background: linear-gradient(45deg, #f06, #40f);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
+            color: white;
         }
         
         .app-subtitle {
@@ -124,7 +121,7 @@
             background: #000;
         }
         
-        /* Video/Image Container */
+        /* Post Media with Frames */
         .post-media {
             width: 100%;
             height: 100%;
@@ -142,15 +139,332 @@
             object-fit: cover;
         }
         
-        /* Gradient Overlays */
+        /* AI Generated Frame Styles */
+        .frame-wrapper {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 15;
+        }
+        
+        /* Frame Style 1: Gradient Border */
+        .frame-gradient-border {
+            background: linear-gradient(45deg, #ff006e, #8338ec, #3a86ff, #06c, #ff006e);
+            background-size: 400% 400%;
+            animation: gradientShift 10s ease infinite;
+            padding: 3px;
+        }
+        
+        .frame-gradient-border::after {
+            content: '';
+            position: absolute;
+            top: 3px;
+            left: 3px;
+            right: 3px;
+            bottom: 3px;
+            background: #000;
+        }
+        
+        /* Frame Style 2: Neon Glow */
+        .frame-neon-glow {
+            box-shadow: 
+                inset 0 0 50px #fff,
+                inset 20px 0 80px #f0f,
+                inset -20px 0 80px #0ff,
+                inset 20px 0 300px #f0f,
+                inset -20px 0 300px #0ff,
+                0 0 50px #fff,
+                -10px 0 80px #f0f,
+                10px 0 80px #0ff;
+        }
+        
+        /* Frame Style 3: Geometric Corners */
+        .frame-geometric::before,
+        .frame-geometric::after {
+            content: '';
+            position: absolute;
+            width: 100px;
+            height: 100px;
+            border: 3px solid var(--frame-color, #fff);
+        }
+        
+        .frame-geometric::before {
+            top: 20px;
+            left: 20px;
+            border-right: none;
+            border-bottom: none;
+        }
+        
+        .frame-geometric::after {
+            bottom: 20px;
+            right: 20px;
+            border-left: none;
+            border-top: none;
+        }
+        
+        /* Additional Frame Styles */
+        /* Frame Style 11: Circular Vignette */
+        .frame-vignette::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: radial-gradient(circle, transparent 50%, rgba(0,0,0,0.4) 100%);
+        }
+        
+        /* Frame Style 12: Film Strip */
+        .frame-film-strip::before,
+        .frame-film-strip::after {
+            content: '';
+            position: absolute;
+            left: 0;
+            right: 0;
+            height: 40px;
+            background: #fff;
+            background-image: repeating-linear-gradient(
+                90deg,
+                transparent,
+                transparent 30px,
+                #000 30px,
+                #000 40px
+            );
+        }
+        
+        .frame-film-strip::before {
+            top: 0;
+        }
+        
+        .frame-film-strip::after {
+            bottom: 0;
+        }
+        
+        /* Frame Style 13: Polaroid */
+        .frame-polaroid {
+            padding: 20px 20px 80px 20px;
+            background: #fff;
+        }
+        
+        .frame-polaroid::after {
+            content: 'JomBro Challenge';
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-family: 'Courier New', monospace;
+            color: #333;
+            font-size: 14px;
+        }
+        
+        /* Frame Style 14: Torn Edges */
+        .frame-torn {
+            -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cpath d='M10,10 Q20,5 30,10 T50,10 Q70,5 90,10 L90,90 Q80,95 70,90 T50,90 Q30,95 10,90 Z' fill='white'/%3E%3C/svg%3E");
+            mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cpath d='M10,10 Q20,5 30,10 T50,10 Q70,5 90,10 L90,90 Q80,95 70,90 T50,90 Q30,95 10,90 Z' fill='white'/%3E%3C/svg%3E");
+            -webkit-mask-size: 100% 100%;
+            mask-size: 100% 100%;
+        }
+        
+        /* Frame Style 15: LED Border */
+        .frame-led {
+            border: 5px solid transparent;
+            background: linear-gradient(#000, #000) padding-box,
+                        linear-gradient(45deg, #ff0080, #ff8c00, #40e0d0, #ff0080) border-box;
+            animation: ledRotate 3s linear infinite;
+        }
+        
+        /* Frame Style 16: Double Border */
+        .frame-double-border::before {
+            content: '';
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            right: 10px;
+            bottom: 10px;
+            border: 2px solid rgba(255, 255, 255, 0.8);
+        }
+        
+        .frame-double-border::after {
+            content: '';
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            right: 20px;
+            bottom: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.4);
+        }
+        
+        /* Frame Style 17: Gradient Mesh */
+        .frame-gradient-mesh {
+            background-image: 
+                radial-gradient(at 20% 80%, rgba(120, 200, 255, 0.3) 0px, transparent 50%),
+                radial-gradient(at 80% 20%, rgba(255, 120, 160, 0.3) 0px, transparent 50%),
+                radial-gradient(at 40% 40%, rgba(120, 255, 180, 0.3) 0px, transparent 50%),
+                radial-gradient(at 90% 70%, rgba(255, 200, 120, 0.3) 0px, transparent 50%);
+        }
+        
+        /* Frame Style 18: Sparkle Effect */
+        .frame-sparkle::before {
+            content: '✨';
+            position: absolute;
+            top: 30px;
+            left: 30px;
+            font-size: 24px;
+            animation: sparkle 2s ease-in-out infinite;
+        }
+        
+        .frame-sparkle::after {
+            content: '⭐';
+            position: absolute;
+            bottom: 30px;
+            right: 30px;
+            font-size: 20px;
+            animation: sparkle 2s ease-in-out infinite reverse;
+        }
+        
+        @keyframes sparkle {
+            0%, 100% { 
+                transform: scale(1) rotate(0deg); 
+                opacity: 0.8;
+            }
+            50% { 
+                transform: scale(1.2) rotate(180deg); 
+                opacity: 1;
+            }
+        }
+        
+        @keyframes ledRotate {
+            0% { filter: hue-rotate(0deg); }
+            100% { filter: hue-rotate(360deg); }
+        }
+        
+        /* Frame Style 4: Animated Lines */
+        .frame-animated-lines::before,
+        .frame-animated-lines::after {
+            content: '';
+            position: absolute;
+            background: linear-gradient(90deg, transparent, #fff, transparent);
+            animation: lineMove 3s linear infinite;
+        }
+        
+        .frame-animated-lines::before {
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+        }
+        
+        .frame-animated-lines::after {
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            animation-delay: 1.5s;
+        }
+        
+        /* Frame Style 5: Dotted Pattern */
+        .frame-dotted {
+            background-image: radial-gradient(circle, #fff 2px, transparent 2px);
+            background-size: 20px 20px;
+            background-position: 0 0, 10px 10px;
+        }
+        
+        /* Frame Style 6: Vintage Film */
+        .frame-vintage::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: repeating-linear-gradient(
+                to bottom,
+                transparent,
+                transparent 4px,
+                rgba(255, 255, 255, 0.1) 4px,
+                rgba(255, 255, 255, 0.1) 8px
+            );
+        }
+        
+        /* Frame Style 7: Hexagon Pattern */
+        .frame-hexagon {
+            clip-path: polygon(30% 0%, 70% 0%, 100% 30%, 100% 70%, 70% 100%, 30% 100%, 0% 70%, 0% 30%);
+        }
+        
+        /* Frame Style 8: Wave Border */
+        .frame-wave::before {
+            content: '';
+            position: absolute;
+            top: -5px;
+            left: 0;
+            width: 100%;
+            height: 20px;
+            background: white;
+            -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1200 20'%3E%3Cpath d='M0,10 Q300,0 600,10 T1200,10 L1200,20 L0,20 Z' fill='white'/%3E%3C/svg%3E");
+            mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1200 20'%3E%3Cpath d='M0,10 Q300,0 600,10 T1200,10 L1200,20 L0,20 Z' fill='white'/%3E%3C/svg%3E");
+            -webkit-mask-size: 100% 100%;
+            mask-size: 100% 100%;
+        }
+        
+        /* Frame Style 9: Glitch Effect */
+        .frame-glitch {
+            animation: glitch 2s infinite;
+        }
+        
+        @keyframes glitch {
+            0%, 100% { filter: hue-rotate(0deg); }
+            20% { filter: hue-rotate(90deg); }
+            40% { filter: hue-rotate(180deg); }
+            60% { filter: hue-rotate(270deg); }
+            80% { filter: hue-rotate(360deg); }
+        }
+        
+        /* Frame Style 10: Rainbow Prism */
+        .frame-prism::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(45deg, 
+                rgba(255,0,0,0.1), 
+                rgba(255,154,0,0.1), 
+                rgba(208,222,33,0.1), 
+                rgba(79,220,74,0.1), 
+                rgba(63,218,216,0.1), 
+                rgba(47,201,226,0.1), 
+                rgba(28,127,238,0.1), 
+                rgba(95,21,242,0.1), 
+                rgba(186,12,248,0.1), 
+                rgba(251,7,217,0.1)
+            );
+            mix-blend-mode: screen;
+        }
+        
+        @keyframes gradientShift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+        
+        @keyframes lineMove {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+        
+        /* Gradient Overlays - Floating */
         .gradient-overlay-top {
             position: absolute;
             top: 0;
             left: 0;
             right: 0;
             height: 120px;
-            background: linear-gradient(to bottom, rgba(0,0,0,0.6), transparent);
-            z-index: 10;
+            background: linear-gradient(to bottom, rgba(0,0,0,0.8), transparent);
+            z-index: 20;
             pointer-events: none;
         }
         
@@ -162,6 +476,7 @@
             height: 200px;
             background: linear-gradient(to top, rgba(0,0,0,0.8), transparent);
             z-index: 10;
+            pointer-events: none;
         }
         
         /* TikTok Style Header */
@@ -170,23 +485,20 @@
             top: 0;
             left: 0;
             right: 0;
-            z-index: 100;
+            z-index: 200;
             padding: 20px;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            background: linear-gradient(to bottom, rgba(0,0,0,0.8), transparent);
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
+            background: linear-gradient(to bottom, rgba(0,0,0,0.9), rgba(0,0,0,0.4), transparent);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
         }
         
         .header-left {
             font-size: 1.8rem;
-            font-weight: bold;
-            background: linear-gradient(45deg, #f06, #40f);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
+            font-weight: 400;
+            color: white;
             flex-shrink: 0;
         }
         
@@ -1128,7 +1440,75 @@
             }
         };
         
-        // AI Challenge Generator
+        // Frame generation system
+        const frameStyles = [
+            'frame-gradient-border',
+            'frame-neon-glow',
+            'frame-geometric',
+            'frame-animated-lines',
+            'frame-dotted',
+            'frame-vintage',
+            'frame-hexagon',
+            'frame-wave',
+            'frame-glitch',
+            'frame-prism',
+            'frame-vignette',
+            'frame-film-strip',
+            'frame-polaroid',
+            'frame-torn',
+            'frame-led',
+            'frame-double-border',
+            'frame-gradient-mesh',
+            'frame-sparkle'
+        ];
+        
+        const frameColors = [
+            { primary: '#ff006e', secondary: '#8338ec' },
+            { primary: '#3a86ff', secondary: '#06c' },
+            { primary: '#fb5607', secondary: '#ffbe0b' },
+            { primary: '#8338ec', secondary: '#ff006e' },
+            { primary: '#06ffa5', secondary: '#00bbf9' },
+            { primary: '#ff4365', secondary: '#00d9ff' },
+            { primary: '#72ddf7', secondary: '#8093f1' },
+            { primary: '#ffd60a', secondary: '#003566' },
+            { primary: '#7209b7', secondary: '#f72585' },
+            { primary: '#4cc9f0', secondary: '#4361ee' },
+            { primary: '#ff6b6b', secondary: '#4ecdc4' },
+            { primary: '#f72585', secondary: '#b5179e' },
+            { primary: '#7209b7', secondary: '#560bad' },
+            { primary: '#480ca8', secondary: '#3a0ca3' },
+            { primary: '#3f37c9', secondary: '#4361ee' }
+        ];
+        
+        // Track used frame combinations
+        let usedFrameCombinations = new Set();
+        
+        // Generate unique frame for each post
+        function generateUniqueFrame(index) {
+            let frameClass, colorScheme;
+            let combination;
+            
+            // Try to find an unused combination
+            let attempts = 0;
+            do {
+                frameClass = frameStyles[Math.floor(Math.random() * frameStyles.length)];
+                colorScheme = frameColors[Math.floor(Math.random() * frameColors.length)];
+                combination = `${frameClass}-${colorScheme.primary}-${colorScheme.secondary}`;
+                attempts++;
+                
+                // If we've tried too many times, just use the index to ensure uniqueness
+                if (attempts > 50) {
+                    frameClass = frameStyles[index % frameStyles.length];
+                    colorScheme = frameColors[index % frameColors.length];
+                    combination = `${frameClass}-${index}`;
+                    break;
+                }
+            } while (usedFrameCombinations.has(combination));
+            
+            usedFrameCombinations.add(combination);
+            
+            return { frameClass, colorScheme };
+        }
         const challengeTemplates = {
             fitness: [
                 { title: "Plank Challenge", desc: "Hold a plank for {time} seconds", params: { time: [30, 45, 60, 90] }},
@@ -1302,6 +1682,9 @@
         async function loadFeed() {
             const container = document.getElementById('feedContainer');
             
+            // Reset used frame combinations when loading feed
+            usedFrameCombinations.clear();
+            
             // Create sample posts
             const samplePosts = [
                 {
@@ -1348,6 +1731,36 @@
                     comments: 156,
                     mediaType: 'image',
                     mediaUrl: 'https://picsum.photos/400/800?random=3'
+                },
+                {
+                    id: 'post4',
+                    user: { name: 'adventure_seeker', avatar: '🏃' },
+                    challenge: { 
+                        title: 'Sunrise Photo Hunt', 
+                        category: 'adventure', 
+                        reward: 180,
+                        dedication: 'open-public'
+                    },
+                    caption: 'Caught the perfect sunrise! 🌅 Who else is up for the challenge?',
+                    likes: 423,
+                    comments: 67,
+                    mediaType: 'image',
+                    mediaUrl: 'https://picsum.photos/400/800?random=4'
+                },
+                {
+                    id: 'post5',
+                    user: { name: 'artist_soul', avatar: '🎨' },
+                    challenge: { 
+                        title: 'Speed Art Challenge', 
+                        category: 'creative', 
+                        reward: 250,
+                        dedication: 'people-i-know'
+                    },
+                    caption: 'Created this in 60 seconds! Can you do better? 🎨✨',
+                    likes: 789,
+                    comments: 123,
+                    mediaType: 'image',
+                    mediaUrl: 'https://picsum.photos/400/800?random=5'
                 }
             ];
             
@@ -1374,9 +1787,23 @@
             postDiv.className = 'feed-post';
             postDiv.setAttribute('data-index', index);
             
+            // Generate unique frame for this post
+            const { frameClass, colorScheme } = generateUniqueFrame(index);
+            
+            // Apply custom colors to certain frame styles
+            let frameStyle = '';
+            if (frameClass === 'frame-gradient-border') {
+                frameStyle = `style="background: linear-gradient(45deg, ${colorScheme.primary}, ${colorScheme.secondary}, ${colorScheme.primary});"`;
+            } else if (frameClass === 'frame-neon-glow') {
+                frameStyle = `style="box-shadow: inset 0 0 50px ${colorScheme.primary}, inset 20px 0 80px ${colorScheme.primary}, inset -20px 0 80px ${colorScheme.secondary}, 0 0 50px ${colorScheme.secondary};"`;
+            } else if (frameClass === 'frame-geometric') {
+                frameStyle = `style="--frame-color: ${colorScheme.primary};"`;
+            }
+            
             postDiv.innerHTML = `
                 <div class="post-media">
                     <img class="post-image" src="${post.mediaUrl}" alt="Challenge">
+                    <div class="frame-wrapper ${frameClass}" ${frameStyle}></div>
                 </div>
                 
                 <div class="gradient-overlay-top"></div>
