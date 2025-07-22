@@ -705,6 +705,162 @@
             font-size: 0.9rem;
         }
         
+        /* AI Challenge Cards */
+        .ai-challenge-container {
+            position: absolute;
+            bottom: 150px;
+            left: 0;
+            right: 0;
+            padding: 20px;
+            display: none;
+        }
+        
+        .ai-challenge-header {
+            text-align: center;
+            margin-bottom: 15px;
+            color: white;
+        }
+        
+        .ai-challenge-timer {
+            display: inline-block;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            margin-bottom: 10px;
+        }
+        
+        .ai-challenges-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        
+        .ai-challenge-card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 15px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+            position: relative;
+        }
+        
+        .ai-challenge-card.selected {
+            background: rgba(155, 89, 182, 0.3);
+            border-color: #9b59b6;
+            transform: scale(1.02);
+        }
+        
+        .ai-challenge-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
+        }
+        
+        .ai-badge {
+            position: absolute;
+            top: -10px;
+            right: 10px;
+            background: linear-gradient(45deg, #4a90e2, #5c7cfa);
+            color: white;
+            padding: 3px 10px;
+            border-radius: 10px;
+            font-size: 0.7rem;
+            font-weight: bold;
+        }
+        
+        .challenge-difficulty {
+            display: flex;
+            gap: 2px;
+            margin-top: 5px;
+        }
+        
+        .difficulty-star {
+            color: #ffd700;
+            font-size: 0.8rem;
+        }
+        
+        /* AI Score Display */
+        .ai-score-overlay {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(0, 0, 0, 0.9);
+            backdrop-filter: blur(10px);
+            padding: 30px;
+            border-radius: 20px;
+            text-align: center;
+            z-index: 100;
+            display: none;
+        }
+        
+        .ai-score-title {
+            font-size: 1.5rem;
+            margin-bottom: 20px;
+            color: #4a90e2;
+        }
+        
+        .ai-score-circle {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            background: conic-gradient(
+                from 0deg,
+                #4caf50 0deg,
+                #4caf50 var(--score),
+                rgba(255, 255, 255, 0.1) var(--score)
+            );
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 20px;
+            position: relative;
+        }
+        
+        .ai-score-circle::before {
+            content: '';
+            position: absolute;
+            width: 120px;
+            height: 120px;
+            background: #000;
+            border-radius: 50%;
+        }
+        
+        .ai-score-value {
+            font-size: 3rem;
+            font-weight: bold;
+            color: white;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .ai-score-feedback {
+            font-size: 1.1rem;
+            margin-bottom: 10px;
+        }
+        
+        .ai-score-details {
+            font-size: 0.9rem;
+            opacity: 0.8;
+            margin-bottom: 20px;
+        }
+        
+        /* Timer Display */
+        .timer-display {
+            position: absolute;
+            top: 80px;
+            right: 20px;
+            background: rgba(0, 0, 0, 0.5);
+            padding: 10px 20px;
+            border-radius: 20px;
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: white;
+            z-index: 50;
+        }
+        
         /* Empty State */
         .empty-state {
             text-align: center;
@@ -775,11 +931,36 @@
             <video class="camera-video" id="cameraVideo" autoplay muted playsinline></video>
             <button class="camera-btn camera-close" onclick="closeCamera()">✕</button>
             
-            <div class="challenge-selector">
-                <p style="text-align: center; margin-bottom: 10px;">Select Challenge</p>
+            <!-- AI Challenges Display -->
+            <div class="ai-challenge-container" id="aiChallengeContainer">
+                <div class="ai-challenge-header">
+                    <div class="ai-challenge-timer" id="challengeTimer">New challenges in: 10:00</div>
+                    <h3>🤖 AI Generated Challenges</h3>
+                </div>
+                <div class="ai-challenges-grid" id="aiChallengesGrid">
+                    <!-- AI challenges will be loaded here -->
+                </div>
+            </div>
+            
+            <!-- Regular Challenge Selector -->
+            <div class="challenge-selector" id="regularChallengeSelector" style="display: none;">
+                <p style="text-align: center; margin-bottom: 10px;">Or Choose From:</p>
                 <div class="challenge-options" id="challengeOptions">
                     <!-- Challenge options will be loaded here -->
                 </div>
+            </div>
+            
+            <div class="timer-display" id="timerDisplay" style="display: none;">00:00</div>
+            
+            <!-- AI Score Overlay -->
+            <div class="ai-score-overlay" id="aiScoreOverlay">
+                <h3 class="ai-score-title">🤖 AI Score</h3>
+                <div class="ai-score-circle" id="scoreCircle">
+                    <div class="ai-score-value" id="scoreValue">0%</div>
+                </div>
+                <div class="ai-score-feedback" id="scoreFeedback">Calculating...</div>
+                <div class="ai-score-details" id="scoreDetails">AI is analyzing your performance</div>
+                <button class="submit-btn" onclick="acceptScore()">Accept & Post</button>
             </div>
             
             <div class="camera-controls">
@@ -878,6 +1059,9 @@
         let isRecording = false;
         let selectedChallenge = null;
         let videoStream = null;
+        let aiChallenges = [];
+        let usedChallenges = new Set();
+        let challengeTimer = null;
         
         // Initialize app
         window.onload = function() {
@@ -886,10 +1070,141 @@
                 db = firebase.firestore();
                 storage = firebase.storage();
                 console.log('Firebase initialized!');
+                
+                // Load saved challenges from localStorage
+                const saved = localStorage.getItem('usedChallenges');
+                if (saved) {
+                    usedChallenges = new Set(JSON.parse(saved));
+                }
             } catch (error) {
                 console.error('Firebase error:', error);
             }
         };
+        
+        // AI Challenge Generator
+        const challengeTemplates = {
+            fitness: [
+                { title: "Plank Challenge", desc: "Hold a plank for {time} seconds", params: { time: [30, 45, 60, 90] }},
+                { title: "Jumping Jacks", desc: "Do {count} jumping jacks without stopping", params: { count: [20, 30, 50, 75] }},
+                { title: "Wall Sit Challenge", desc: "Wall sit for {time} seconds", params: { time: [30, 45, 60] }},
+                { title: "Push-up Challenge", desc: "Complete {count} push-ups", params: { count: [10, 15, 20, 30] }},
+                { title: "Squat Challenge", desc: "Do {count} squats with proper form", params: { count: [20, 30, 40, 50] }},
+                { title: "Burpee Challenge", desc: "Complete {count} burpees", params: { count: [5, 10, 15, 20] }},
+                { title: "High Knees", desc: "Do high knees for {time} seconds", params: { time: [30, 45, 60] }},
+                { title: "Mountain Climbers", desc: "Do mountain climbers for {time} seconds", params: { time: [20, 30, 45] }}
+            ],
+            creative: [
+                { title: "Dance Battle", desc: "Create a {time}-second dance to trending music", params: { time: [15, 30, 45] }},
+                { title: "Lip Sync Challenge", desc: "Lip sync to a {genre} song dramatically", params: { genre: ["pop", "rock", "rap", "country"] }},
+                { title: "Drawing Challenge", desc: "Draw {object} blindfolded in 30 seconds", params: { object: ["a cat", "a house", "your friend", "a car"] }},
+                { title: "Impersonation", desc: "Impersonate {person} for 30 seconds", params: { person: ["a celebrity", "your teacher", "a cartoon character", "a superhero"] }},
+                { title: "Object Acting", desc: "Act out {object} without speaking", params: { object: ["a washing machine", "a tree", "a robot", "a dinosaur"] }},
+                { title: "Speed Art", desc: "Create art using only {material} in 60 seconds", params: { material: ["toilet paper", "coins", "pencils", "food items"] }}
+            ],
+            social: [
+                { title: "Compliment Challenge", desc: "Give {count} genuine compliments to strangers", params: { count: [3, 5, 10] }},
+                { title: "Phone a Friend", desc: "Call a friend and tell them {message}", params: { message: ["you appreciate them", "a funny joke", "a childhood memory"] }},
+                { title: "Random Acts", desc: "Do {count} random acts of kindness", params: { count: [1, 3, 5] }},
+                { title: "Teach Something", desc: "Teach someone {skill} in 2 minutes", params: { skill: ["a magic trick", "a dance move", "a tongue twister", "origami"] }},
+                { title: "Interview Challenge", desc: "Interview {count} people about their day", params: { count: [3, 5, 7] }}
+            ],
+            food: [
+                { title: "Spicy Challenge", desc: "Eat {food} without drinking water", params: { food: ["a raw chili", "spicy noodles", "hot sauce", "wasabi"] }},
+                { title: "Speed Eating", desc: "Eat {food} in under {time} seconds", params: { food: ["a banana", "crackers", "an apple"], time: [30, 45, 60] }},
+                { title: "Blindfold Taste", desc: "Guess {count} foods while blindfolded", params: { count: [3, 5, 7] }},
+                { title: "Cooking Challenge", desc: "Make {dish} in under 5 minutes", params: { dish: ["a sandwich", "instant noodles", "a smoothie", "toast art"] }},
+                { title: "No Hands Challenge", desc: "Eat {food} without using hands", params: { food: ["a donut", "a slice of pizza", "chips", "fruit"] }}
+            ],
+            adventure: [
+                { title: "Photo Hunt", desc: "Take photos of {count} different {object}", params: { count: [5, 7, 10], object: ["birds", "flowers", "cars", "strangers smiling"] }},
+                { title: "Scavenger Hunt", desc: "Find {count} items that are {color}", params: { count: [5, 10, 15], color: ["red", "blue", "yellow", "green"] }},
+                { title: "Distance Challenge", desc: "Travel {distance} km using only {method}", params: { distance: [1, 2, 5], method: ["walking", "skipping", "hopping", "running backwards"] }},
+                { title: "Stranger Challenge", desc: "Get {count} strangers to {action}", params: { count: [3, 5, 10], action: ["high-five you", "take a selfie", "dance with you", "sing a song"] }}
+            ]
+        };
+        
+        // Generate unique AI challenges
+        function generateAIChallenges() {
+            const challenges = [];
+            const categories = Object.keys(challengeTemplates);
+            
+            // Generate 3 unique challenges
+            while (challenges.length < 3) {
+                const category = categories[Math.floor(Math.random() * categories.length)];
+                const templates = challengeTemplates[category];
+                const template = templates[Math.floor(Math.random() * templates.length)];
+                
+                // Create challenge from template
+                let title = template.title;
+                let desc = template.desc;
+                
+                // Replace parameters
+                for (const [param, values] of Object.entries(template.params)) {
+                    const value = values[Math.floor(Math.random() * values.length)];
+                    desc = desc.replace(`{${param}}`, value);
+                    title = title.replace(`{${param}}`, value);
+                }
+                
+                // Calculate reward based on difficulty
+                const difficulty = Math.floor(Math.random() * 5) + 1;
+                const reward = 50 + (difficulty * 50);
+                
+                const challengeId = `${category}_${title.replace(/\s+/g, '_')}_${Date.now()}`;
+                
+                // Check if already used
+                if (!usedChallenges.has(challengeId)) {
+                    challenges.push({
+                        id: challengeId,
+                        title,
+                        description: desc,
+                        category,
+                        reward,
+                        difficulty,
+                        aiGenerated: true,
+                        expiresAt: new Date(Date.now() + 10 * 60 * 1000) // 10 minutes
+                    });
+                    
+                    // Mark as used
+                    usedChallenges.add(challengeId);
+                }
+            }
+            
+            // Save used challenges
+            localStorage.setItem('usedChallenges', JSON.stringify(Array.from(usedChallenges)));
+            
+            // Clear old challenges if too many
+            if (usedChallenges.size > 100) {
+                const arr = Array.from(usedChallenges);
+                usedChallenges = new Set(arr.slice(-50));
+            }
+            
+            return challenges;
+        }
+        
+        // Start AI challenge timer
+        function startChallengeTimer() {
+            // Generate initial challenges
+            aiChallenges = generateAIChallenges();
+            
+            // Update every 10 minutes
+            challengeTimer = setInterval(() => {
+                aiChallenges = generateAIChallenges();
+                showToast('🤖 New AI challenges available!');
+                
+                // Update UI if camera is open
+                if (document.getElementById('cameraInterface').style.display === 'block') {
+                    loadChallengeOptions();
+                }
+            }, 10 * 60 * 1000); // 10 minutes
+        }
+        
+        // Calculate AI Score
+        function calculateAIScore() {
+            // Simulate AI scoring (in real app, this would analyze the video)
+            const baseScore = 60 + Math.floor(Math.random() * 30); // 60-90 base
+            const bonus = Math.floor(Math.random() * 10); // 0-10 bonus
+            return Math.min(baseScore + bonus, 100);
+        }
         
         // Quick start
         async function quickStart() {
@@ -925,6 +1240,9 @@
             
             // Update profile
             updateProfile();
+            
+            // Start AI challenge timer
+            startChallengeTimer();
             
             // Load feed
             loadFeed();
@@ -1037,6 +1355,12 @@
                     <div class="challenge-badge">
                         🎯 ${post.challenge.title} • 🪙 ${post.challenge.reward}
                     </div>
+                    
+                    ${post.aiScore ? `
+                        <div style="display: inline-block; background: rgba(74, 144, 226, 0.2); padding: 5px 12px; border-radius: 15px; margin: 5px 0; font-size: 0.9rem;">
+                            🤖 AI Score: ${post.aiScore}%
+                        </div>
+                    ` : ''}
                     
                     <div class="post-caption">${post.caption}</div>
                     
@@ -1152,17 +1476,85 @@
                 
                 document.getElementById('cameraVideo').srcObject = videoStream;
                 
-                // Load challenges
-                loadChallengeOptions();
+                // Show AI challenges
+                showAIChallenges();
                 
-                // Show create challenge option
-                showCreateChallengeOption();
+                // Start challenge countdown timer
+                updateChallengeCountdown();
                 
             } catch (error) {
                 console.error('Camera error:', error);
                 showToast('Camera access denied');
                 closeCamera();
             }
+        }
+        
+        // Show AI challenges
+        function showAIChallenges() {
+            const container = document.getElementById('aiChallengeContainer');
+            const grid = document.getElementById('aiChallengesGrid');
+            
+            container.style.display = 'block';
+            grid.innerHTML = '';
+            
+            // Display 3 AI challenges
+            aiChallenges.forEach((challenge, index) => {
+                const card = document.createElement('div');
+                card.className = 'ai-challenge-card';
+                card.innerHTML = `
+                    <div class="ai-badge">🤖 AI Challenge</div>
+                    <h4 class="challenge-title">${challenge.title}</h4>
+                    <p style="font-size: 0.9rem; opacity: 0.9; margin: 5px 0;">${challenge.description}</p>
+                    <div class="challenge-meta">
+                        <div class="challenge-difficulty">
+                            ${'⭐'.repeat(challenge.difficulty)}
+                        </div>
+                        <div class="challenge-reward">🪙 ${challenge.reward}</div>
+                    </div>
+                `;
+                
+                card.onclick = () => selectAIChallenge(card, challenge);
+                grid.appendChild(card);
+            });
+        }
+        
+        // Select AI challenge
+        function selectAIChallenge(element, challenge) {
+            document.querySelectorAll('.ai-challenge-card').forEach(card => {
+                card.classList.remove('selected');
+            });
+            element.classList.add('selected');
+            selectedChallenge = challenge;
+            
+            showToast(`Selected: ${challenge.title}`);
+        }
+        
+        // Update countdown timer
+        function updateChallengeCountdown() {
+            const timerElement = document.getElementById('challengeTimer');
+            
+            const updateTimer = () => {
+                if (!aiChallenges.length) return;
+                
+                const now = Date.now();
+                const expiresAt = aiChallenges[0].expiresAt.getTime();
+                const remaining = Math.max(0, expiresAt - now);
+                
+                const minutes = Math.floor(remaining / 60000);
+                const seconds = Math.floor((remaining % 60000) / 1000);
+                
+                timerElement.textContent = `New challenges in: ${minutes}:${seconds.toString().padStart(2, '0')}`;
+                
+                if (remaining <= 0) {
+                    // Generate new challenges
+                    aiChallenges = generateAIChallenges();
+                    showAIChallenges();
+                    showToast('🤖 New AI challenges available!');
+                }
+            };
+            
+            updateTimer();
+            setInterval(updateTimer, 1000);
         }
         
         // Close camera
@@ -1240,7 +1632,11 @@
             document.getElementById('recordBtn').classList.add('recording');
             document.getElementById('recordIcon').textContent = '⏹️';
             
-            showToast('Recording started! Max 15 seconds');
+            // Show timer
+            document.getElementById('timerDisplay').style.display = 'block';
+            startRecordingTimer();
+            
+            showToast(`Recording: ${selectedChallenge.title}`);
             
             // Auto stop after 15 seconds
             setTimeout(() => {
@@ -1255,20 +1651,128 @@
             isRecording = false;
             document.getElementById('recordBtn').classList.remove('recording');
             document.getElementById('recordIcon').textContent = '⏺️';
+            document.getElementById('timerDisplay').style.display = 'none';
             
-            showToast('Recording complete! 🎉');
+            // Stop timer
+            if (recordingTimer) {
+                clearInterval(recordingTimer);
+            }
             
-            // For demo, just close camera and show success
-            setTimeout(() => {
-                closeCamera();
-                
-                // Award tokens
-                userData.tokens += 100;
-                userData.completedChallenges++;
-                updateProfile();
-                
-                showToast('Challenge completed! +100 tokens 🪙');
+            // Show AI scoring
+            showAIScoring();
+        }
+        
+        // Start recording timer
+        let recordingTimer = null;
+        let recordingSeconds = 0;
+        
+        function startRecordingTimer() {
+            recordingSeconds = 0;
+            recordingTimer = setInterval(() => {
+                recordingSeconds++;
+                const minutes = Math.floor(recordingSeconds / 60);
+                const seconds = recordingSeconds % 60;
+                document.getElementById('timerDisplay').textContent = 
+                    `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
             }, 1000);
+        }
+        
+        // Show AI scoring
+        function showAIScoring() {
+            const overlay = document.getElementById('aiScoreOverlay');
+            overlay.style.display = 'block';
+            
+            // Animate scoring
+            let currentScore = 0;
+            const targetScore = calculateAIScore();
+            const scoreCircle = document.getElementById('scoreCircle');
+            const scoreValue = document.getElementById('scoreValue');
+            const scoreFeedback = document.getElementById('scoreFeedback');
+            const scoreDetails = document.getElementById('scoreDetails');
+            
+            // Animate score
+            const scoreAnimation = setInterval(() => {
+                currentScore += 2;
+                if (currentScore >= targetScore) {
+                    currentScore = targetScore;
+                    clearInterval(scoreAnimation);
+                    
+                    // Show feedback
+                    if (targetScore >= 90) {
+                        scoreFeedback.textContent = '🔥 Perfect! Outstanding performance!';
+                        scoreDetails.textContent = 'You nailed every aspect of the challenge!';
+                    } else if (targetScore >= 75) {
+                        scoreFeedback.textContent = '✨ Great job! Well done!';
+                        scoreDetails.textContent = 'You completed the challenge successfully!';
+                    } else if (targetScore >= 60) {
+                        scoreFeedback.textContent = '👍 Good effort! Keep it up!';
+                        scoreDetails.textContent = 'You met the basic requirements!';
+                    } else {
+                        scoreFeedback.textContent = '💪 Nice try! Practice makes perfect!';
+                        scoreDetails.textContent = 'Try again for a better score!';
+                    }
+                }
+                
+                scoreValue.textContent = currentScore + '%';
+                scoreCircle.style.setProperty('--score', `${currentScore * 3.6}deg`);
+            }, 20);
+        }
+        
+        // Accept score and post
+        window.acceptScore = function() {
+            const score = parseInt(document.getElementById('scoreValue').textContent);
+            
+            // Calculate reward based on score
+            const baseReward = selectedChallenge.reward;
+            const actualReward = Math.floor(baseReward * (score / 100));
+            
+            // Award tokens
+            userData.tokens += actualReward;
+            userData.completedChallenges++;
+            
+            // Level up every 5 challenges
+            if (userData.completedChallenges % 5 === 0) {
+                userData.level++;
+                showToast(`🎉 LEVEL UP! You're now level ${userData.level}!`);
+            }
+            
+            updateProfile();
+            
+            // Close everything
+            document.getElementById('aiScoreOverlay').style.display = 'none';
+            closeCamera();
+            
+            showToast(`Challenge completed! +${actualReward} tokens (${score}% score) 🪙`);
+            
+            // Add to feed (in real app, this would upload the video)
+            addToFeed(selectedChallenge, score);
+        }
+        
+        // Add completed challenge to feed
+        function addToFeed(challenge, score) {
+            const newPost = {
+                id: 'post_' + Date.now(),
+                user: { name: userData.name, avatar: userData.avatar },
+                challenge: challenge,
+                caption: `Just completed: ${challenge.title} with ${score}% AI score! 🔥`,
+                likes: 0,
+                comments: 0,
+                mediaType: 'image',
+                mediaUrl: 'https://picsum.photos/400/800?random=' + Date.now(),
+                aiScore: score
+            };
+            
+            feedPosts.unshift(newPost);
+            loadFeed();
+        }
+        
+        // Toggle recording
+        function toggleRecording() {
+            if (isRecording) {
+                stopRecording();
+            } else {
+                startRecording();
+            }
         }
         
         // Flip camera
@@ -1396,11 +1900,6 @@
             setTimeout(() => toast.remove(), 3000);
         }
         
-        // Show create challenge option
-        function showCreateChallengeOption() {
-            // This would show the option to create a new challenge
-        }
-        
         // Handle swipe gestures (optional)
         let startY = 0;
         let endY = 0;
@@ -1444,6 +1943,13 @@
             }
         `;
         document.head.appendChild(style);
+        
+        // Cleanup on page unload
+        window.addEventListener('beforeunload', () => {
+            if (challengeTimer) {
+                clearInterval(challengeTimer);
+            }
+        });
     </script>
 </body>
 </html>
