@@ -71,6 +71,10 @@
             font-size: 3rem;
             font-weight: bold;
             margin-bottom: 10px;
+            background: linear-gradient(45deg, #f06, #40f);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
         }
         
         .app-subtitle {
@@ -147,6 +151,7 @@
             height: 120px;
             background: linear-gradient(to bottom, rgba(0,0,0,0.6), transparent);
             z-index: 10;
+            pointer-events: none;
         }
         
         .gradient-overlay-bottom {
@@ -170,10 +175,19 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
+            background: linear-gradient(to bottom, rgba(0,0,0,0.8), transparent);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
         }
         
         .header-left {
-            font-size: 1.5rem;
+            font-size: 1.8rem;
+            font-weight: bold;
+            background: linear-gradient(45deg, #f06, #40f);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            flex-shrink: 0;
         }
         
         .header-center {
@@ -314,6 +328,7 @@
             border-radius: 20px;
             margin-bottom: 10px;
             font-size: 0.9rem;
+            flex-wrap: wrap;
         }
         
         .post-caption {
@@ -660,6 +675,29 @@
             border-color: #9b59b6;
         }
         
+        /* Dedication Buttons */
+        .dedication-btn {
+            padding: 8px 16px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 20px;
+            color: #e7e9ea;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 0.9rem;
+        }
+        
+        .dedication-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+            border-color: rgba(255, 255, 255, 0.3);
+        }
+        
+        .dedication-btn.active {
+            background: linear-gradient(45deg, #9b59b6, #e91e63);
+            border-color: transparent;
+            color: white;
+        }
+        
         .submit-btn {
             width: 100%;
             padding: 15px;
@@ -891,10 +929,10 @@
     <div class="feed-container" id="feedContainer">
         <!-- Feed Header -->
         <div class="feed-header">
-            <div class="header-left">🔴</div>
+            <div class="header-left">JomBro</div>
             <div class="header-center">
-                <button class="header-tab" onclick="switchFeed('following')">Following</button>
-                <button class="header-tab active" onclick="switchFeed('foryou')">For You</button>
+                <button class="header-tab" onclick="switchFeed('notstalking')">Not Stalking</button>
+                <button class="header-tab active" onclick="switchFeed('trustmebro')">Trust Me Bro!</button>
             </div>
             <div class="header-right" onclick="showSearch()">🔍</div>
         </div>
@@ -1032,6 +1070,15 @@
                     </select>
                 </div>
                 <div class="form-group">
+                    <label style="color: #e7e9ea; margin-bottom: 10px; display: block;">Dedicate To:</label>
+                    <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                        <button type="button" class="dedication-btn" onclick="selectDedication(this, 'people-i-know')">People I Know</button>
+                        <button type="button" class="dedication-btn" onclick="selectDedication(this, 'people-i-dont-know')">People I Don't Know</button>
+                        <button type="button" class="dedication-btn active" onclick="selectDedication(this, 'open-public')">Open to Public</button>
+                    </div>
+                    <input type="hidden" id="challengeDedication" value="open-public">
+                </div>
+                <div class="form-group">
                     <input type="number" id="challengeReward" class="form-input" placeholder="Reward tokens" value="100" min="10" max="1000" required>
                 </div>
                 <button type="submit" class="submit-btn">Create Challenge (50 tokens)</button>
@@ -1160,6 +1207,7 @@
                         category,
                         reward,
                         difficulty,
+                        dedication: 'open-public',
                         aiGenerated: true,
                         expiresAt: new Date(Date.now() + 10 * 60 * 1000) // 10 minutes
                     });
@@ -1259,8 +1307,13 @@
                 {
                     id: 'post1',
                     user: { name: 'alex_gamer', avatar: '😎' },
-                    challenge: { title: '20 Pushup Challenge', category: 'fitness', reward: 100 },
-                    caption: 'Just crushed the pushup challenge! 💪',
+                    challenge: { 
+                        title: '20 Pushup Challenge', 
+                        category: 'fitness', 
+                        reward: 100,
+                        dedication: 'people-i-know'
+                    },
+                    caption: 'Just crushed the pushup challenge! 💪 Challenge dedicated to my gym buddies!',
                     likes: 234,
                     comments: 45,
                     mediaType: 'image',
@@ -1269,8 +1322,13 @@
                 {
                     id: 'post2',
                     user: { name: 'dance_queen', avatar: '💃' },
-                    challenge: { title: 'TikTok Dance', category: 'creative', reward: 150 },
-                    caption: 'New dance moves! Who wants to try? 🕺',
+                    challenge: { 
+                        title: 'TikTok Dance', 
+                        category: 'creative', 
+                        reward: 150,
+                        dedication: 'open-public'
+                    },
+                    caption: 'New dance moves! Who wants to try? 🕺 Open challenge for everyone!',
                     likes: 567,
                     comments: 89,
                     mediaType: 'image',
@@ -1279,8 +1337,13 @@
                 {
                     id: 'post3',
                     user: { name: 'foodie_bro', avatar: '🍔' },
-                    challenge: { title: 'Spicy Noodle Challenge', category: 'food', reward: 200 },
-                    caption: 'This was INSANE! 🔥🍜 #SpicyChallenge',
+                    challenge: { 
+                        title: 'Spicy Noodle Challenge', 
+                        category: 'food', 
+                        reward: 200,
+                        dedication: 'people-i-dont-know'
+                    },
+                    caption: 'This was INSANE! 🔥🍜 #SpicyChallenge Challenging strangers to beat this!',
                     likes: 890,
                     comments: 156,
                     mediaType: 'image',
@@ -1354,6 +1417,11 @@
                     
                     <div class="challenge-badge">
                         🎯 ${post.challenge.title} • 🪙 ${post.challenge.reward}
+                        ${post.challenge.dedication ? ` • 👥 ${
+                            post.challenge.dedication === 'people-i-know' ? 'People I Know' : 
+                            post.challenge.dedication === 'people-i-dont-know' ? "People I Don't Know" : 
+                            'Open to Public'
+                        }` : ''}
                     </div>
                     
                     ${post.aiScore ? `
@@ -1446,7 +1514,8 @@
             });
             event.target.classList.add('active');
             
-            showToast(`Switched to ${type} feed`);
+            const displayName = type === 'notstalking' ? 'Not Stalking' : 'Trust Me Bro!';
+            showToast(`Switched to ${displayName} feed`);
             loadFeed(); // Reload with different content
         }
         
@@ -1754,7 +1823,11 @@
                 id: 'post_' + Date.now(),
                 user: { name: userData.name, avatar: userData.avatar },
                 challenge: challenge,
-                caption: `Just completed: ${challenge.title} with ${score}% AI score! 🔥`,
+                caption: `Just completed: ${challenge.title} with ${score}% AI score! 🔥 ${
+                    challenge.dedication === 'people-i-know' ? 'Challenge for friends!' : 
+                    challenge.dedication === 'people-i-dont-know' ? 'Challenge for strangers!' : 
+                    'Open challenge for everyone!'
+                }`,
                 likes: 0,
                 comments: 0,
                 mediaType: 'image',
@@ -1766,13 +1839,18 @@
             loadFeed();
         }
         
-        // Toggle recording
-        function toggleRecording() {
-            if (isRecording) {
-                stopRecording();
-            } else {
-                startRecording();
-            }
+        // Select dedication option
+        function selectDedication(button, value) {
+            // Remove active class from all buttons
+            document.querySelectorAll('.dedication-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            
+            // Add active class to clicked button
+            button.classList.add('active');
+            
+            // Update hidden input
+            document.getElementById('challengeDedication').value = value;
         }
         
         // Flip camera
@@ -1818,6 +1896,7 @@
             const description = document.getElementById('challengeDesc').value;
             const category = document.getElementById('challengeCategory').value;
             const reward = parseInt(document.getElementById('challengeReward').value);
+            const dedication = document.getElementById('challengeDedication').value;
             
             if (userData.tokens < 50) {
                 showToast('Not enough tokens! Need 50 tokens.');
@@ -1834,6 +1913,7 @@
                 description,
                 category,
                 reward,
+                dedication,
                 creator: currentUser.name,
                 createdAt: new Date()
             };
@@ -1846,11 +1926,17 @@
                 }
             }
             
-            showToast('Challenge created! -50 tokens');
+            // Show dedication in toast
+            const dedicationText = dedication === 'people-i-know' ? 'People I Know' : 
+                                 dedication === 'people-i-dont-know' ? "People I Don't Know" : 
+                                 'Open to Public';
+            
+            showToast(`Challenge created for ${dedicationText}! -50 tokens`);
             closeModal('createModal');
             
             // Reset form
             e.target.reset();
+            document.getElementById('challengeDedication').value = 'open-public';
         }
         
         // Show comments
