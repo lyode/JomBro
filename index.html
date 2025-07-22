@@ -2,336 +2,126 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <title>JomBro - Let's Go!</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JomBro - Simple Version</title>
     
     <!-- Firebase SDK -->
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-storage-compat.js"></script>
     
     <style>
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            -webkit-tap-highlight-color: transparent;
         }
         
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            font-family: Arial, sans-serif;
             background: #000;
             color: white;
-            overflow: hidden;
-            position: fixed;
-            width: 100%;
-            height: 100%;
-            overscroll-behavior: none;
+            min-height: 100vh;
         }
         
-        /* Auth Styles */
-        .auth-container {
-            min-height: 100vh;
+        /* Login Screen */
+        #loginScreen {
             display: flex;
             align-items: center;
             justify-content: center;
+            min-height: 100vh;
             padding: 20px;
         }
         
-        .auth-box {
-            background: rgba(20, 20, 30, 0.95);
-            backdrop-filter: blur(20px);
+        .login-box {
+            background: #1a1a1a;
+            padding: 40px;
             border-radius: 20px;
-            padding: 30px;
-            border: 2px solid rgba(155, 89, 182, 0.3);
-            width: 100%;
+            text-align: center;
             max-width: 400px;
+            width: 100%;
         }
         
         .logo {
-            font-size: 3rem;
-            text-align: center;
-            margin-bottom: 10px;
+            font-size: 4rem;
+            margin-bottom: 20px;
         }
         
         .title {
-            font-size: 2rem;
-            text-align: center;
-            margin-bottom: 30px;
+            font-size: 2.5rem;
+            margin-bottom: 10px;
             background: linear-gradient(45deg, #9b59b6, #e91e63);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
-            background-clip: text;
         }
         
-        .form-group {
-            margin-bottom: 20px;
+        .subtitle {
+            margin-bottom: 30px;
+            opacity: 0.8;
         }
         
-        .form-label {
-            display: block;
-            margin-bottom: 8px;
-            font-size: 0.9rem;
-            opacity: 0.9;
-        }
-        
-        .form-input, select {
+        .big-button {
             width: 100%;
-            padding: 12px;
-            border: 2px solid rgba(155, 89, 182, 0.3);
-            border-radius: 10px;
-            background: rgba(255, 255, 255, 0.05);
-            color: white;
-            font-size: 1rem;
-        }
-        
-        .btn {
-            width: 100%;
-            padding: 14px;
+            padding: 20px;
+            font-size: 1.2rem;
             border: none;
-            border-radius: 12px;
-            font-size: 1rem;
-            font-weight: 600;
+            border-radius: 15px;
             cursor: pointer;
-            transition: all 0.3s ease;
+            margin-bottom: 15px;
+            font-weight: bold;
+            transition: transform 0.2s;
+        }
+        
+        .big-button:hover {
+            transform: scale(1.05);
+        }
+        
+        .dev-button {
+            background: linear-gradient(135deg, #FF6B6B, #FFD93D);
+            color: black;
+        }
+        
+        .phone-button {
             background: linear-gradient(135deg, #9b59b6, #e91e63);
             color: white;
-            margin-bottom: 10px;
         }
         
-        .btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(155, 89, 182, 0.4);
-        }
-        
-        .dev-btn {
-            background: linear-gradient(135deg, #FF6B6B, #FFD93D);
-        }
-        
-        /* Main App Styles */
-        .app-container {
+        /* Main App */
+        #mainApp {
             display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
+            min-height: 100vh;
         }
         
-        /* Header */
-        .app-header {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            background: rgba(0, 0, 0, 0.8);
-            backdrop-filter: blur(10px);
-            padding: 15px;
-            z-index: 100;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
+        .header {
+            background: #1a1a1a;
+            padding: 20px;
+            text-align: center;
+            border-bottom: 2px solid #333;
         }
         
-        .header-logo {
-            font-size: 1.5rem;
-            font-weight: bold;
+        .header h1 {
             background: linear-gradient(45deg, #9b59b6, #e91e63);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
-            background-clip: text;
         }
         
-        .header-icons {
-            display: flex;
-            gap: 15px;
-        }
-        
-        .icon-btn {
-            width: 35px;
-            height: 35px;
-            border-radius: 50%;
-            background: rgba(255, 255, 255, 0.1);
-            border: none;
-            color: white;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            font-size: 1.2rem;
-        }
-        
-        /* Feed Container */
-        .feed-container {
-            position: absolute;
-            top: 60px;
-            bottom: 60px;
-            left: 0;
-            right: 0;
-            overflow-y: auto;
+        .content {
             padding: 20px;
+            max-width: 600px;
+            margin: 0 auto;
         }
         
-        .empty-state {
-            text-align: center;
-            padding: 50px 20px;
-            opacity: 0.6;
-        }
-        
-        .empty-icon {
-            font-size: 4rem;
+        .stats-box {
+            background: #1a1a1a;
+            padding: 20px;
+            border-radius: 15px;
             margin-bottom: 20px;
+            text-align: center;
         }
         
-        /* Bottom Navigation */
-        .bottom-nav {
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            background: rgba(0, 0, 0, 0.9);
-            backdrop-filter: blur(20px);
-            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        .stats {
             display: flex;
             justify-content: space-around;
-            padding: 10px 0;
-            padding-bottom: env(safe-area-inset-bottom);
-        }
-        
-        .nav-item {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 4px;
-            cursor: pointer;
-            padding: 5px;
-            background: none;
-            border: none;
-            color: white;
-        }
-        
-        .nav-icon {
-            font-size: 1.5rem;
-        }
-        
-        .nav-label {
-            font-size: 0.7rem;
-            opacity: 0.6;
-        }
-        
-        .nav-item.active .nav-icon,
-        .nav-item.active .nav-label {
-            color: #9b59b6;
-            opacity: 1;
-        }
-        
-        .create-btn {
-            background: linear-gradient(45deg, #9b59b6, #e91e63);
-            border-radius: 12px;
-            margin: 0 10px;
-        }
-        
-        /* Challenge Card */
-        .challenge-card {
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 15px;
-            padding: 20px;
-            margin-bottom: 15px;
-        }
-        
-        .challenge-title {
-            font-size: 1.2rem;
-            font-weight: 600;
-            margin-bottom: 10px;
-        }
-        
-        .challenge-desc {
-            opacity: 0.8;
-            margin-bottom: 15px;
-        }
-        
-        .challenge-meta {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        
-        .challenge-reward {
-            background: rgba(255, 215, 0, 0.2);
-            padding: 5px 10px;
-            border-radius: 20px;
-            font-size: 0.9rem;
-        }
-        
-        /* Modal */
-        .modal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.8);
-            z-index: 200;
-            align-items: center;
-            justify-content: center;
-        }
-        
-        .modal-content {
-            background: #1a1a1a;
-            border-radius: 20px;
-            padding: 20px;
-            width: 90%;
-            max-width: 400px;
-            max-height: 80vh;
-            overflow-y: auto;
-        }
-        
-        .modal-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
-        }
-        
-        .modal-title {
-            font-size: 1.3rem;
-            font-weight: 600;
-        }
-        
-        .close-btn {
-            background: none;
-            border: none;
-            color: white;
-            font-size: 1.5rem;
-            cursor: pointer;
-        }
-        
-        /* Profile Section */
-        .profile-section {
-            text-align: center;
-            padding: 20px;
-        }
-        
-        .profile-avatar {
-            font-size: 4rem;
-            margin-bottom: 10px;
-        }
-        
-        .profile-name {
-            font-size: 1.2rem;
-            font-weight: 600;
-            margin-bottom: 5px;
-        }
-        
-        .profile-stats {
-            display: flex;
-            justify-content: center;
-            gap: 30px;
             margin-top: 20px;
         }
         
@@ -340,584 +130,351 @@
         }
         
         .stat-value {
-            font-size: 1.5rem;
-            font-weight: bold;
+            font-size: 2rem;
             color: #9b59b6;
+            font-weight: bold;
         }
         
         .stat-label {
-            font-size: 0.8rem;
-            opacity: 0.6;
+            font-size: 0.9rem;
+            opacity: 0.7;
         }
         
-        /* Toast */
-        .toast {
+        .challenge-section {
+            background: #1a1a1a;
+            padding: 20px;
+            border-radius: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .challenge-card {
+            background: #2a2a2a;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 15px;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+        
+        .challenge-card:hover {
+            transform: translateX(10px);
+        }
+        
+        .action-button {
+            padding: 15px 30px;
+            font-size: 1.1rem;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            margin: 10px;
+            font-weight: bold;
+            background: linear-gradient(135deg, #9b59b6, #e91e63);
+            color: white;
+        }
+        
+        .bottom-nav {
             position: fixed;
-            bottom: 80px;
-            left: 50%;
-            transform: translateX(-50%);
-            background: rgba(0, 0, 0, 0.8);
-            backdrop-filter: blur(10px);
-            padding: 15px 25px;
-            border-radius: 25px;
-            z-index: 500;
-            animation: slideUp 0.3s ease;
-        }
-        
-        @keyframes slideUp {
-            from { transform: translate(-50%, 100%); opacity: 0; }
-            to { transform: translate(-50%, 0); opacity: 1; }
-        }
-        
-        /* Dev Banner */
-        .dev-banner {
-            position: fixed;
-            top: 0;
+            bottom: 0;
             left: 0;
             right: 0;
-            background: linear-gradient(90deg, #ff6b6b, #ffd93d);
-            color: black;
-            padding: 8px;
-            text-align: center;
-            font-weight: bold;
-            z-index: 9999;
-            font-size: 14px;
+            background: #1a1a1a;
+            padding: 15px;
+            display: flex;
+            justify-content: space-around;
+            border-top: 2px solid #333;
         }
         
-        .error-message, .success-message {
+        .nav-button {
+            background: none;
+            border: none;
+            color: white;
+            cursor: pointer;
+            font-size: 1.5rem;
             padding: 10px;
-            margin-bottom: 15px;
-            border-radius: 8px;
+        }
+        
+        .message {
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
             text-align: center;
-            display: none;
         }
         
-        .error-message {
-            background: rgba(244, 67, 54, 0.1);
-            border: 1px solid rgba(244, 67, 54, 0.3);
-            color: #ff6b6b;
+        .error {
+            background: rgba(255, 0, 0, 0.2);
+            border: 1px solid red;
         }
         
-        .success-message {
-            background: rgba(76, 175, 80, 0.1);
-            border: 1px solid rgba(76, 175, 80, 0.3);
-            color: #4CAF50;
-        }
-        
-        .divider {
-            text-align: center;
-            margin: 20px 0;
-            opacity: 0.5;
+        .success {
+            background: rgba(0, 255, 0, 0.2);
+            border: 1px solid green;
         }
     </style>
 </head>
 <body>
-    <!-- Dev Banner -->
-    <div id="devBanner" class="dev-banner" style="display: none;">
-        🚀 DEV MODE - <a href="#" onclick="exitDevMode()" style="color: black;">Exit</a>
-    </div>
-
-    <!-- Auth Container -->
-    <div id="authContainer" class="auth-container">
-        <div class="auth-box">
+    <!-- Login Screen -->
+    <div id="loginScreen">
+        <div class="login-box">
             <div class="logo">🎮</div>
             <h1 class="title">JomBro</h1>
-            <p style="text-align: center; margin-bottom: 30px; opacity: 0.8;">Let's Go! Let's Go!</p>
+            <p class="subtitle">Let's Go! Let's Go!</p>
             
-            <div id="errorMessage" class="error-message"></div>
-            <div id="successMessage" class="success-message"></div>
-            
-            <!-- Dev Mode Button -->
-            <button class="btn dev-btn" onclick="activateDevMode()">
-                🚀 Quick Play (Dev Mode)
+            <button class="big-button dev-button" onclick="quickStart()">
+                🚀 Quick Start (No Login)
             </button>
             
-            <div class="divider">——— OR ———</div>
+            <button class="big-button phone-button" onclick="alert('Phone login coming soon! Use Quick Start for now.')">
+                📱 Login with Phone
+            </button>
             
-            <!-- Phone Form -->
-            <form id="phoneForm">
-                <div class="form-group">
-                    <label class="form-label">Phone Number</label>
-                    <div style="display: flex; gap: 10px;">
-                        <select id="countryCode" class="form-input" style="width: 120px;">
-                            <option value="+60">🇲🇾 +60</option>
-                            <option value="+65">🇸🇬 +65</option>
-                            <option value="+1">🇺🇸 +1</option>
-                            <option value="+44">🇬🇧 +44</option>
-                        </select>
-                        <input type="tel" id="phoneNumber" class="form-input" placeholder="123456789" required>
-                    </div>
-                </div>
-                <button type="submit" class="btn">Continue with Phone</button>
-            </form>
+            <p style="margin-top: 20px; opacity: 0.6; font-size: 0.9rem;">
+                Click "Quick Start" to try the app instantly!
+            </p>
         </div>
     </div>
     
-    <!-- Main App Container -->
-    <div id="appContainer" class="app-container">
-        <!-- Header -->
-        <div class="app-header">
-            <div class="header-logo">JomBro</div>
-            <div class="header-icons">
-                <button class="icon-btn" onclick="showToast('Search coming soon!')">🔍</button>
-                <button class="icon-btn" onclick="showToast('Notifications coming soon!')">🔔</button>
-            </div>
+    <!-- Main App -->
+    <div id="mainApp">
+        <div class="header">
+            <h1>🎮 JomBro</h1>
+            <p id="userName">Welcome, Player!</p>
         </div>
         
-        <!-- Feed -->
-        <div class="feed-container" id="feedContainer">
-            <div class="empty-state" id="emptyState">
-                <div class="empty-icon">🎮</div>
-                <h3>Welcome to JomBro!</h3>
-                <p>Create your first challenge to get started</p>
-            </div>
-            <div id="challengesList"></div>
-        </div>
-        
-        <!-- Bottom Navigation -->
-        <div class="bottom-nav">
-            <button class="nav-item active" onclick="switchTab('home', this)">
-                <span class="nav-icon">🏠</span>
-                <span class="nav-label">Home</span>
-            </button>
-            <button class="nav-item" onclick="switchTab('discover', this)">
-                <span class="nav-icon">🔥</span>
-                <span class="nav-label">Discover</span>
-            </button>
-            <button class="nav-item create-btn" onclick="showCreateModal()">
-                <span class="nav-icon">➕</span>
-            </button>
-            <button class="nav-item" onclick="switchTab('challenges', this)">
-                <span class="nav-icon">🎯</span>
-                <span class="nav-label">Challenges</span>
-            </button>
-            <button class="nav-item" onclick="showProfileModal()">
-                <span class="nav-icon">👤</span>
-                <span class="nav-label">Profile</span>
-            </button>
-        </div>
-    </div>
-    
-    <!-- Create Challenge Modal -->
-    <div id="createModal" class="modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h3 class="modal-title">Create Challenge</h3>
-                <button class="close-btn" onclick="closeModal('createModal')">×</button>
-            </div>
-            <form onsubmit="createChallenge(event)">
-                <div class="form-group">
-                    <input type="text" id="challengeTitle" class="form-input" placeholder="Challenge title" required>
-                </div>
-                <div class="form-group">
-                    <textarea id="challengeDesc" class="form-input" placeholder="What do they need to do?" rows="3" required></textarea>
-                </div>
-                <div class="form-group">
-                    <select id="challengeCategory" class="form-input">
-                        <option value="fitness">💪 Fitness</option>
-                        <option value="creative">🎨 Creative</option>
-                        <option value="social">👥 Social</option>
-                        <option value="food">🍕 Food</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <input type="number" id="challengeReward" class="form-input" placeholder="Reward tokens" value="100" min="10" max="1000" required>
-                </div>
-                <button type="submit" class="btn">Create Challenge (50 tokens)</button>
-            </form>
-        </div>
-    </div>
-    
-    <!-- Profile Modal -->
-    <div id="profileModal" class="modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h3 class="modal-title">Profile</h3>
-                <button class="close-btn" onclick="closeModal('profileModal')">×</button>
-            </div>
-            <div class="profile-section">
-                <div class="profile-avatar" id="profileAvatar">🎮</div>
-                <div class="profile-name" id="profileName">Loading...</div>
-                <div class="profile-stats">
+        <div class="content">
+            <div id="messageArea"></div>
+            
+            <div class="stats-box">
+                <h2>Your Stats</h2>
+                <div class="stats">
                     <div class="stat">
-                        <div class="stat-value" id="tokenStat">0</div>
+                        <div class="stat-value" id="tokens">1000</div>
                         <div class="stat-label">Tokens</div>
                     </div>
                     <div class="stat">
-                        <div class="stat-value" id="levelStat">1</div>
+                        <div class="stat-value" id="level">1</div>
                         <div class="stat-label">Level</div>
                     </div>
                     <div class="stat">
-                        <div class="stat-value" id="challengeStat">0</div>
+                        <div class="stat-value" id="challenges">0</div>
                         <div class="stat-label">Challenges</div>
                     </div>
                 </div>
-                <button class="btn" onclick="signOut()" style="margin-top: 30px;">Sign Out</button>
             </div>
+            
+            <div class="challenge-section">
+                <h2>Active Challenges</h2>
+                <div id="challengeList">
+                    <p style="opacity: 0.6; text-align: center;">No challenges yet. Create one!</p>
+                </div>
+                
+                <center>
+                    <button class="action-button" onclick="createChallenge()">
+                        ➕ Create Challenge
+                    </button>
+                </center>
+            </div>
+            
+            <div style="height: 100px;"></div>
+        </div>
+        
+        <div class="bottom-nav">
+            <button class="nav-button" onclick="showMessage('Home clicked')">🏠</button>
+            <button class="nav-button" onclick="showMessage('Discover clicked')">🔥</button>
+            <button class="nav-button" onclick="createChallenge()">➕</button>
+            <button class="nav-button" onclick="showMessage('Challenges clicked')">🎯</button>
+            <button class="nav-button" onclick="showProfile()">👤</button>
         </div>
     </div>
     
-    <!-- reCAPTCHA container -->
-    <div id="recaptcha-container"></div>
-    
     <script>
-        // Firebase config
-        const firebaseConfig = {
-            apiKey: "AIzaSyC_orriRUuf1ynDiFaJAPrO6-Gu3GeURxQ",
-            authDomain: "jombro-9d129.firebaseapp.com",
-            projectId: "jombro-9d129",
-            storageBucket: "jombro-9d129.firebasestorage.app",
-            messagingSenderId: "390572076435",
-            appId: "1:390572076435:web:781f9f62b84542eb834c66",
-            measurementId: "G-J84HS0WPCP"
+        // Simple Firebase setup
+        let app, db;
+        let currentUser = null;
+        let userTokens = 1000;
+        let userLevel = 1;
+        let challengeCount = 0;
+        
+        // Initialize Firebase when page loads
+        window.onload = function() {
+            console.log('Page loaded, initializing...');
+            
+            try {
+                app = firebase.initializeApp({
+                    apiKey: "AIzaSyC_orriRUuf1ynDiFaJAPrO6-Gu3GeURxQ",
+                    authDomain: "jombro-9d129.firebaseapp.com",
+                    projectId: "jombro-9d129",
+                    storageBucket: "jombro-9d129.firebasestorage.app"
+                });
+                
+                db = firebase.firestore();
+                console.log('Firebase initialized successfully!');
+                
+            } catch (error) {
+                console.error('Firebase error:', error);
+                showMessage('Firebase connection error. App will work offline.', 'error');
+            }
         };
         
-        // Initialize Firebase
-        firebase.initializeApp(firebaseConfig);
-        const auth = firebase.auth();
-        const db = firebase.firestore();
-        const storage = firebase.storage();
-        
-        // Global variables
-        let currentUser = null;
-        let userData = null;
-        let devMode = false;
-        
-        // Initialize app
-        document.addEventListener('DOMContentLoaded', () => {
-            checkDevMode();
-            if (!devMode) {
-                setupAuth();
-            }
-        });
-        
-        // Check for dev mode
-        function checkDevMode() {
-            const urlParams = new URLSearchParams(window.location.search);
-            if (urlParams.get('dev') === 'true' || localStorage.getItem('jombro_dev_mode') === 'true') {
-                activateDevMode();
-            }
-        }
-        
-        // Activate dev mode
-        async function activateDevMode() {
-            devMode = true;
-            localStorage.setItem('jombro_dev_mode', 'true');
+        // Quick start function
+        function quickStart() {
+            console.log('Quick start clicked!');
             
-            // Create dev user
-            const devUserId = localStorage.getItem('jombro_dev_user') || 'dev_' + Date.now();
-            localStorage.setItem('jombro_dev_user', devUserId);
-            
+            // Generate random user
+            const randomId = Math.floor(Math.random() * 9999);
             currentUser = {
-                uid: devUserId,
-                phoneNumber: '+60123456789'
+                id: 'player_' + randomId,
+                name: 'Player' + randomId
             };
             
-            // Create/update user in Firestore
-            try {
-                const userDoc = await db.collection('users').doc(devUserId).get();
-                if (!userDoc.exists) {
-                    await db.collection('users').doc(devUserId).set({
-                        name: 'DevPlayer' + Math.floor(Math.random() * 999),
-                        phoneNumber: currentUser.phoneNumber,
-                        avatar: '🎮',
-                        tokens: 9999,
-                        level: 5,
-                        completedChallenges: 0,
-                        createdAt: firebase.firestore.FieldValue.serverTimestamp()
-                    });
-                }
-                
-                userData = (await db.collection('users').doc(devUserId).get()).data();
-                
-                // Show app
-                showApp();
-                
-                // Show dev banner
-                document.getElementById('devBanner').style.display = 'block';
-                
-                // Load initial data
-                updateProfile();
-                loadChallenges();
-                
-                showToast('🚀 Dev mode activated!');
-                
-            } catch (error) {
-                console.error('Dev mode error:', error);
-                showError('Failed to activate dev mode');
-            }
-        }
-        
-        // Exit dev mode
-        function exitDevMode() {
-            localStorage.removeItem('jombro_dev_mode');
-            localStorage.removeItem('jombro_dev_user');
-            location.href = location.pathname;
-        }
-        
-        // Setup authentication
-        function setupAuth() {
-            document.getElementById('phoneForm').addEventListener('submit', handlePhoneAuth);
-        }
-        
-        // Handle phone auth (simplified)
-        async function handlePhoneAuth(e) {
-            e.preventDefault();
-            showError('Phone auth bypassed. Use Dev Mode for now.');
-        }
-        
-        // Show app
-        function showApp() {
-            document.getElementById('authContainer').style.display = 'none';
-            document.getElementById('appContainer').style.display = 'block';
-        }
-        
-        // Hide app
-        function hideApp() {
-            document.getElementById('authContainer').style.display = 'flex';
-            document.getElementById('appContainer').style.display = 'none';
-        }
-        
-        // Update profile
-        function updateProfile() {
-            if (!userData) return;
+            // Update UI
+            document.getElementById('userName').textContent = 'Welcome, ' + currentUser.name + '!';
             
-            document.getElementById('profileAvatar').textContent = userData.avatar || '🎮';
-            document.getElementById('profileName').textContent = '@' + userData.name;
-            document.getElementById('tokenStat').textContent = userData.tokens || 0;
-            document.getElementById('levelStat').textContent = userData.level || 1;
-            document.getElementById('challengeStat').textContent = userData.completedChallenges || 0;
-        }
-        
-        // Load challenges
-        async function loadChallenges() {
-            try {
-                const snapshot = await db.collection('challenges')
-                    .orderBy('createdAt', 'desc')
-                    .limit(10)
-                    .get();
-                
-                const challengesList = document.getElementById('challengesList');
-                challengesList.innerHTML = '';
-                
-                if (snapshot.empty) {
-                    document.getElementById('emptyState').style.display = 'block';
-                    
-                    // Create sample challenges in dev mode
-                    if (devMode) {
-                        await createSampleChallenges();
-                    }
-                } else {
-                    document.getElementById('emptyState').style.display = 'none';
-                    
-                    snapshot.forEach(doc => {
-                        const challenge = doc.data();
-                        const card = createChallengeCard(doc.id, challenge);
-                        challengesList.appendChild(card);
-                    });
-                }
-                
-            } catch (error) {
-                console.error('Error loading challenges:', error);
-                
-                // If orderBy fails, try without it
-                try {
-                    const snapshot = await db.collection('challenges').limit(10).get();
-                    const challengesList = document.getElementById('challengesList');
-                    challengesList.innerHTML = '';
-                    
-                    if (!snapshot.empty) {
-                        document.getElementById('emptyState').style.display = 'none';
-                        snapshot.forEach(doc => {
-                            const challenge = doc.data();
-                            const card = createChallengeCard(doc.id, challenge);
-                            challengesList.appendChild(card);
-                        });
-                    }
-                } catch (retryError) {
-                    showToast('Failed to load challenges');
-                }
-            }
-        }
-        
-        // Create challenge card
-        function createChallengeCard(id, challenge) {
-            const card = document.createElement('div');
-            card.className = 'challenge-card';
-            card.innerHTML = `
-                <h3 class="challenge-title">${challenge.title || 'Untitled Challenge'}</h3>
-                <p class="challenge-desc">${challenge.description || 'No description'}</p>
-                <div class="challenge-meta">
-                    <span>${getCategoryEmoji(challenge.category)} ${challenge.category || 'general'}</span>
-                    <span class="challenge-reward">🪙 ${challenge.reward || 100} tokens</span>
-                </div>
-            `;
-            card.onclick = () => showToast('Challenge details coming soon!');
-            return card;
-        }
-        
-        // Get category emoji
-        function getCategoryEmoji(category) {
-            const emojis = {
-                fitness: '💪',
-                creative: '🎨',
-                social: '👥',
-                food: '🍕'
-            };
-            return emojis[category] || '🎯';
-        }
-        
-        // Create sample challenges
-        async function createSampleChallenges() {
-            const samples = [
-                { title: 'Do 20 Pushups', description: 'Complete 20 pushups in one go', category: 'fitness', reward: 100 },
-                { title: 'Dance Challenge', description: 'Dance to your favorite song for 30 seconds', category: 'creative', reward: 150 },
-                { title: 'Compliment Someone', description: 'Give someone a genuine compliment today', category: 'social', reward: 50 }
-            ];
+            // Switch screens
+            document.getElementById('loginScreen').style.display = 'none';
+            document.getElementById('mainApp').style.display = 'block';
             
-            for (const challenge of samples) {
-                await db.collection('challenges').add({
-                    ...challenge,
-                    creatorId: currentUser.uid,
-                    createdAt: firebase.firestore.FieldValue.serverTimestamp()
-                });
-            }
+            showMessage('Welcome to JomBro! You have 1000 tokens to start.', 'success');
             
-            loadChallenges();
-        }
-        
-        // Switch tab
-        function switchTab(tab, element) {
-            document.querySelectorAll('.nav-item').forEach(item => {
-                item.classList.remove('active');
-            });
-            element.classList.add('active');
-            
-            showToast(`${tab} tab coming soon!`);
-        }
-        
-        // Show create modal
-        function showCreateModal() {
-            document.getElementById('createModal').style.display = 'flex';
-        }
-        
-        // Show profile modal
-        function showProfileModal() {
-            updateProfile();
-            document.getElementById('profileModal').style.display = 'flex';
-        }
-        
-        // Close modal
-        function closeModal(modalId) {
-            document.getElementById(modalId).style.display = 'none';
+            // Load sample challenges
+            loadSampleChallenges();
         }
         
         // Create challenge
-        async function createChallenge(e) {
-            e.preventDefault();
+        function createChallenge() {
+            const title = prompt('Challenge title:');
+            if (!title) return;
             
-            const title = document.getElementById('challengeTitle').value;
-            const description = document.getElementById('challengeDesc').value;
-            const category = document.getElementById('challengeCategory').value;
-            const reward = parseInt(document.getElementById('challengeReward').value);
+            const description = prompt('Challenge description:');
+            if (!description) return;
             
-            // Check tokens
-            if (userData.tokens < 50) {
-                showToast('Not enough tokens!');
+            if (userTokens < 50) {
+                showMessage('Not enough tokens! You need 50 tokens.', 'error');
                 return;
             }
             
-            try {
-                // Create challenge
-                await db.collection('challenges').add({
-                    title,
-                    description,
-                    category,
-                    reward,
-                    creatorId: currentUser.uid,
-                    creatorName: userData.name,
-                    status: 'active',
-                    createdAt: firebase.firestore.FieldValue.serverTimestamp()
-                });
-                
-                // Deduct tokens
-                await db.collection('users').doc(currentUser.uid).update({
-                    tokens: firebase.firestore.FieldValue.increment(-50)
-                });
-                
-                userData.tokens -= 50;
-                updateProfile();
-                
-                showToast('Challenge created! -50 tokens');
-                closeModal('createModal');
-                loadChallenges();
-                
-                // Reset form
-                e.target.reset();
-                
-            } catch (error) {
-                console.error('Error creating challenge:', error);
-                showToast('Failed to create challenge');
+            // Deduct tokens
+            userTokens -= 50;
+            challengeCount++;
+            updateStats();
+            
+            // Add challenge to list
+            const challengeDiv = document.createElement('div');
+            challengeDiv.className = 'challenge-card';
+            challengeDiv.innerHTML = `
+                <h3>${title}</h3>
+                <p>${description}</p>
+                <small>🪙 100 token reward</small>
+            `;
+            challengeDiv.onclick = function() {
+                if (confirm('Complete this challenge?')) {
+                    userTokens += 100;
+                    updateStats();
+                    showMessage('Challenge completed! +100 tokens', 'success');
+                    challengeDiv.style.opacity = '0.5';
+                }
+            };
+            
+            const list = document.getElementById('challengeList');
+            if (list.children[0].tagName === 'P') {
+                list.innerHTML = '';
             }
-        }
-        
-        // Sign out
-        async function signOut() {
-            if (devMode) {
-                exitDevMode();
-            } else {
+            list.appendChild(challengeDiv);
+            
+            showMessage('Challenge created! -50 tokens', 'success');
+            
+            // Save to Firebase if connected
+            if (db) {
                 try {
-                    await auth.signOut();
-                    currentUser = null;
-                    userData = null;
-                    hideApp();
-                    showToast('Signed out successfully');
+                    db.collection('challenges').add({
+                        title: title,
+                        description: description,
+                        creator: currentUser.name,
+                        createdAt: new Date()
+                    });
                 } catch (error) {
-                    console.error('Sign out error:', error);
+                    console.error('Save error:', error);
                 }
             }
         }
         
-        // Show toast
-        function showToast(message) {
-            const existingToast = document.querySelector('.toast');
-            if (existingToast) {
-                existingToast.remove();
+        // Load sample challenges
+        function loadSampleChallenges() {
+            const samples = [
+                { title: 'Do 10 Pushups', desc: 'Complete 10 pushups in a row' },
+                { title: 'Dance for 30 seconds', desc: 'Dance to your favorite song' },
+                { title: 'Drink Water', desc: 'Drink a full glass of water' }
+            ];
+            
+            const list = document.getElementById('challengeList');
+            list.innerHTML = '';
+            
+            samples.forEach(challenge => {
+                const div = document.createElement('div');
+                div.className = 'challenge-card';
+                div.innerHTML = `
+                    <h3>${challenge.title}</h3>
+                    <p>${challenge.desc}</p>
+                    <small>🪙 100 token reward</small>
+                `;
+                div.onclick = function() {
+                    if (confirm('Complete this challenge?')) {
+                        userTokens += 100;
+                        challengeCount++;
+                        
+                        // Level up every 5 challenges
+                        if (challengeCount % 5 === 0) {
+                            userLevel++;
+                            showMessage('LEVEL UP! You are now level ' + userLevel, 'success');
+                        }
+                        
+                        updateStats();
+                        showMessage('Challenge completed! +100 tokens', 'success');
+                        div.style.opacity = '0.5';
+                        div.onclick = null;
+                    }
+                };
+                list.appendChild(div);
+            });
+        }
+        
+        // Update stats display
+        function updateStats() {
+            document.getElementById('tokens').textContent = userTokens;
+            document.getElementById('level').textContent = userLevel;
+            document.getElementById('challenges').textContent = challengeCount;
+        }
+        
+        // Show profile
+        function showProfile() {
+            alert(`
+Profile: ${currentUser.name}
+Tokens: ${userTokens}
+Level: ${userLevel}
+Completed Challenges: ${challengeCount}
+
+Keep playing to level up!
+            `);
+        }
+        
+        // Show message
+        function showMessage(text, type) {
+            const messageArea = document.getElementById('messageArea');
+            if (!messageArea) {
+                console.log(text);
+                return;
             }
             
-            const toast = document.createElement('div');
-            toast.className = 'toast';
-            toast.textContent = message;
-            document.body.appendChild(toast);
+            const div = document.createElement('div');
+            div.className = 'message ' + (type || '');
+            div.textContent = text;
             
-            setTimeout(() => toast.remove(), 3000);
-        }
-        
-        // Show error
-        function showError(message) {
-            const errorDiv = document.getElementById('errorMessage');
-            if (errorDiv) {
-                errorDiv.textContent = message;
-                errorDiv.style.display = 'block';
-                setTimeout(() => errorDiv.style.display = 'none', 5000);
-            }
-        }
-        
-        // Show success
-        function showSuccess(message) {
-            const successDiv = document.getElementById('successMessage');
-            if (successDiv) {
-                successDiv.textContent = message;
-                successDiv.style.display = 'block';
-                setTimeout(() => successDiv.style.display = 'none', 5000);
-            }
-        }
-        
-        // Click outside to close modals
-        window.onclick = function(event) {
-            if (event.target.classList.contains('modal')) {
-                event.target.style.display = 'none';
-            }
+            messageArea.innerHTML = '';
+            messageArea.appendChild(div);
+            
+            setTimeout(() => {
+                div.style.opacity = '0';
+                setTimeout(() => div.remove(), 300);
+            }, 3000);
         }
     </script>
 </body>
