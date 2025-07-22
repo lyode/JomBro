@@ -1734,9 +1734,6 @@
             }
         };
         
-        // Add follower stat to userData
-        let userData = null;
-        
         // Frame generation system
         const frameStyles = [
             'frame-gradient-border',
@@ -1931,50 +1928,75 @@
             return Math.min(baseScore + bonus, 100);
         }
         
-        // Quick start
-        async function quickStart() {
-            // Generate user
-            const userId = 'user_' + Date.now();
-            currentUser = {
-                uid: userId,
-                name: 'Player' + Math.floor(Math.random() * 9999)
-            };
-            
-            // Create user data
-            userData = {
-                name: currentUser.name,
-                avatar: '🎮',
-                tokens: 1000,
-                level: 1,
-                completedChallenges: 0,
-                followers: 0
-            };
-            
-            // Save to Firestore if available
-            if (db) {
-                try {
-                    await db.collection('users').doc(userId).set(userData);
-                } catch (error) {
-                    console.log('Offline mode');
-                }
+        // Show toast notification - Define early to ensure availability
+        function showToast(message) {
+            const existingToast = document.querySelector('.toast');
+            if (existingToast) {
+                existingToast.remove();
             }
             
-            // Show app
-            document.getElementById('loginScreen').style.display = 'none';
-            document.getElementById('feedContainer').style.display = 'block';
-            document.getElementById('bottomNav').style.display = 'flex';
+            const toast = document.createElement('div');
+            toast.className = 'toast';
+            toast.textContent = message;
+            document.body.appendChild(toast);
             
-            // Update profile
-            updateProfile();
-            
-            // Start AI challenge timer
-            startChallengeTimer();
-            
-            // Load feed
-            loadFeed();
-            
-            showToast('Welcome to JomBro! 🎮');
+            setTimeout(() => toast.remove(), 3000);
         }
+        
+        // Quick start
+        async function quickStart() {
+            try {
+                console.log('Quick start clicked!');
+                
+                // Generate user
+                const userId = 'user_' + Date.now();
+                currentUser = {
+                    uid: userId,
+                    name: 'Player' + Math.floor(Math.random() * 9999)
+                };
+                
+                // Create user data
+                userData = {
+                    name: currentUser.name,
+                    avatar: '🎮',
+                    tokens: 1000,
+                    level: 1,
+                    completedChallenges: 0,
+                    followers: 0
+                };
+                
+                // Save to Firestore if available
+                if (db) {
+                    try {
+                        await db.collection('users').doc(userId).set(userData);
+                    } catch (error) {
+                        console.log('Offline mode - Firestore save failed');
+                    }
+                }
+                
+                // Show app
+                document.getElementById('loginScreen').style.display = 'none';
+                document.getElementById('feedContainer').style.display = 'block';
+                document.getElementById('bottomNav').style.display = 'flex';
+                
+                // Update profile
+                updateProfile();
+                
+                // Start AI challenge timer
+                startChallengeTimer();
+                
+                // Load feed
+                loadFeed();
+                
+                showToast('Welcome to JomBro! 🎮');
+            } catch (error) {
+                console.error('Error in quickStart:', error);
+                showToast('Error starting app. Please refresh and try again.');
+            }
+        }
+        
+        // Make quickStart globally accessible
+        window.quickStart = quickStart;
         
         // Load feed
         async function loadFeed() {
@@ -2916,21 +2938,6 @@
             document.getElementById(modalId).style.display = 'none';
         }
         
-        // Show toast notification
-        function showToast(message) {
-            const existingToast = document.querySelector('.toast');
-            if (existingToast) {
-                existingToast.remove();
-            }
-            
-            const toast = document.createElement('div');
-            toast.className = 'toast';
-            toast.textContent = message;
-            document.body.appendChild(toast);
-            
-            setTimeout(() => toast.remove(), 3000);
-        }
-        
         // Handle swipe gestures (optional)
         let startY = 0;
         let endY = 0;
@@ -2974,6 +2981,35 @@
             }
         `;
         document.head.appendChild(style);
+        
+        // Make all necessary functions globally accessible
+        window.quickStart = quickStart;
+        window.switchFeed = switchFeed;
+        window.switchNav = switchNav;
+        window.openCamera = openCamera;
+        window.showProfile = showProfile;
+        window.closeCamera = closeCamera;
+        window.flipCamera = flipCamera;
+        window.toggleRecording = toggleRecording;
+        window.openGallery = openGallery;
+        window.acceptScore = acceptScore;
+        window.closeModal = closeModal;
+        window.showModal = showModal;
+        window.editProfile = editProfile;
+        window.createChallenge = createChallenge;
+        window.showComments = showComments;
+        window.sharePost = sharePost;
+        window.showSearch = showSearch;
+        window.toggleLike = toggleLike;
+        window.showToast = showToast;
+        window.selectDedication = selectDedication;
+        window.showAchievements = showAchievements;
+        window.filterCategory = filterCategory;
+        window.searchChallenges = searchChallenges;
+        window.selectTrendingChallenge = selectTrendingChallenge;
+        window.switchInboxTab = switchInboxTab;
+        window.acceptChallenge = acceptChallenge;
+        window.declineChallenge = declineChallenge;
         
         // Cleanup on page unload
         window.addEventListener('beforeunload', () => {
