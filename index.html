@@ -4,7 +4,257 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>JomBro - Auth Test</title>
+    // JOMBRO INSTANT FIX - DEVELOPMENT MODE
+// This bypasses Firebase Auth issues and lets you use the app immediately
+
+// Add this to the BEGINNING of your main script
+(function() {
+    console.log('🎮 JomBro Development Mode Activating...');
     
+    // Override the problematic auth check
+    const originalDOMContentLoaded = document.addEventListener;
+    document.addEventListener = function(event, handler, ...args) {
+        if (event === 'DOMContentLoaded') {
+            // Wrap the original handler
+            const wrappedHandler = async function() {
+                console.log('🔧 Intercepting app initialization...');
+                
+                try {
+                    // Initialize Firebase
+                    if (!firebase.apps.length) {
+                        firebase.initializeApp(window.firebaseConfig || {
+                            apiKey: "AIzaSyC_orriRUuf1ynDiFaJAPrO6-Gu3GeURxQ",
+                            authDomain: "jombro-9d129.firebaseapp.com",
+                            projectId: "jombro-9d129",
+                            storageBucket: "jombro-9d129.firebasestorage.app",
+                            messagingSenderId: "390572076435",
+                            appId: "1:390572076435:web:781f9f62b84542eb834c66"
+                        });
+                    }
+                    
+                    window.db = firebase.firestore();
+                    window.storage = firebase.storage();
+                    
+                    // Check for dev mode
+                    const urlParams = new URLSearchParams(window.location.search);
+                    const devMode = urlParams.get('dev') === 'true' || localStorage.getItem('jombro_dev_mode') === 'true';
+                    
+                    if (devMode || window.location.hostname === 'localhost' || window.location.protocol === 'file:') {
+                        console.log('🚀 Development mode detected - bypassing auth');
+                        await activateDevMode();
+                    } else {
+                        // Call original handler
+                        handler.apply(this, arguments);
+                    }
+                } catch (error) {
+                    console.error('Init error:', error);
+                    handler.apply(this, arguments);
+                }
+            };
+            
+            originalDOMContentLoaded.call(this, event, wrappedHandler, ...args);
+        } else {
+            originalDOMContentLoaded.call(this, event, handler, ...args);
+        }
+    };
+    
+    // Development mode activation
+    async function activateDevMode() {
+        console.log('👤 Creating development user...');
+        
+        // Create dev user
+        const devUserId = localStorage.getItem('jombro_dev_userId') || 'dev_' + Date.now();
+        const devPhone = '+60123456789';
+        
+        window.currentUser = {
+            uid: devUserId,
+            phoneNumber: devPhone
+        };
+        
+        try {
+            // Check if user exists
+            const userDoc = await window.db.collection('users').doc(devUserId).get();
+            
+            if (!userDoc.exists) {
+                // Create new dev user
+                await window.db.collection('users').doc(devUserId).set({
+                    name: 'DevPlayer' + Math.floor(Math.random() * 999),
+                    phoneNumber: devPhone,
+                    avatar: '🎮',
+                    tokens: 9999,
+                    level: 5,
+                    friendsCount: 0,
+                    completedChallenges: 0,
+                    achievements: [],
+                    createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+                    lastActive: firebase.firestore.FieldValue.serverTimestamp(),
+                    online: true,
+                    isDev: true
+                });
+                console.log('✅ New dev user created');
+            }
+            
+            // Load user data
+            const userData = (await window.db.collection('users').doc(devUserId).get()).data();
+            window.userData = userData;
+            
+            // Store session
+            localStorage.setItem('jombro_dev_mode', 'true');
+            localStorage.setItem('jombro_dev_userId', devUserId);
+            localStorage.setItem('jombro_userId', devUserId);
+            localStorage.setItem('jombro_phone', devPhone);
+            
+            // Hide auth modal
+            const authModal = document.getElementById('authModal');
+            if (authModal) {
+                authModal.style.display = 'none';
+                authModal.classList.remove('show');
+            }
+            
+            // Show app UI
+            showAppUI();
+            
+            // Initialize app features
+            if (window.updateProfileDisplay) window.updateProfileDisplay();
+            if (window.loadFeed) await window.loadFeed();
+            
+            // Show dev mode banner
+            showDevBanner();
+            
+            console.log('✅ Development mode active!');
+            console.log('👤 Logged in as:', userData.name);
+            
+        } catch (error) {
+            console.error('Dev mode error:', error);
+            alert('Dev mode failed: ' + error.message);
+        }
+    }
+    
+    function showAppUI() {
+        // Show all app elements
+        const elementsToShow = [
+            'feedContainer',
+            'appHeader', 
+            'bottomNav',
+            'fabContainer'
+        ];
+        
+        elementsToShow.forEach(id => {
+            const element = document.getElementById(id);
+            if (element) {
+                element.style.display = id === 'feedContainer' ? 'block' : 'flex';
+            }
+        });
+        
+        // Hide loading screen
+        const loadingScreen = document.getElementById('loadingScreen');
+        if (loadingScreen) loadingScreen.style.display = 'none';
+    }
+    
+    function showDevBanner() {
+        const banner = document.createElement('div');
+        banner.id = 'devModeBanner';
+        banner.style.cssText = `
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: linear-gradient(90deg, #ff6b6b, #ffd93d);
+            color: black;
+            padding: 8px;
+            text-align: center;
+            font-weight: bold;
+            z-index: 9999;
+            font-size: 14px;
+        `;
+        banner.innerHTML = `
+            🚀 DEVELOPMENT MODE - 
+            <a href="#" onclick="exitDevMode()" style="color: black; text-decoration: underline;">Exit</a>
+        `;
+        document.body.appendChild(banner);
+        
+        // Adjust header position
+        const header = document.getElementById('appHeader');
+        if (header) header.style.marginTop = '40px';
+    }
+    
+    // Global functions
+    window.exitDevMode = function() {
+        localStorage.removeItem('jombro_dev_mode');
+        localStorage.removeItem('jombro_dev_userId');
+        localStorage.removeItem('jombro_userId');
+        localStorage.removeItem('jombro_phone');
+        location.href = location.pathname; // Remove query params
+    };
+    
+    window.activateDevMode = activateDevMode;
+    
+    // Add keyboard shortcut
+    document.addEventListener('keydown', async (e) => {
+        // Ctrl+Shift+D to toggle dev mode
+        if (e.ctrlKey && e.shiftKey && e.key === 'D') {
+            e.preventDefault();
+            const devMode = localStorage.getItem('jombro_dev_mode') === 'true';
+            
+            if (devMode) {
+                exitDevMode();
+            } else {
+                localStorage.setItem('jombro_dev_mode', 'true');
+                location.reload();
+            }
+        }
+    });
+    
+})();
+
+// Additional helper to fix common issues
+window.fixAuth = function() {
+    console.log('🔧 Attempting to fix authentication...');
+    
+    // Check for common issues
+    const issues = [];
+    
+    // Check 1: reCAPTCHA container
+    if (!document.getElementById('recaptcha-container')) {
+        issues.push('Missing recaptcha-container div');
+        const div = document.createElement('div');
+        div.id = 'recaptcha-container';
+        document.body.appendChild(div);
+        console.log('✅ Added recaptcha-container');
+    }
+    
+    // Check 2: Protocol
+    if (window.location.protocol === 'file:') {
+        issues.push('Running from file:// protocol - Firebase Auth requires http(s)');
+        console.error('❌ Cannot use Firebase Auth with file:// protocol');
+        console.log('💡 Use a local server or activate dev mode');
+    }
+    
+    // Check 3: Firebase initialization
+    if (typeof firebase === 'undefined') {
+        issues.push('Firebase not loaded');
+    } else if (!firebase.auth) {
+        issues.push('Firebase Auth not initialized');
+    }
+    
+    if (issues.length === 0) {
+        console.log('✅ No obvious issues found');
+        console.log('Try: activateDevMode() to bypass auth');
+    } else {
+        console.log('❌ Issues found:', issues);
+    }
+};
+
+console.log(`
+🎮 JomBro Development Mode Loaded!
+
+Quick Commands:
+- activateDevMode() : Bypass auth and use app immediately  
+- fixAuth()         : Check for common auth issues
+- Ctrl+Shift+D      : Toggle dev mode
+
+Or simply add ?dev=true to your URL
+`);
     <!-- Firebase SDK -->
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
