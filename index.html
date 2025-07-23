@@ -15,6 +15,14 @@
             -webkit-tap-highlight-color: transparent;
         }
         
+        /* CSS Variables for consistent spacing */
+        :root {
+            --safe-top: env(safe-area-inset-top);
+            --safe-bottom: env(safe-area-inset-bottom);
+            --header-height: 60px;
+            --nav-height: 65px;
+        }
+        
         /* App container wrapper for iPhone 15 Pro Max */
         .app-container {
             position: relative;
@@ -38,6 +46,32 @@
             margin: 0;
             padding: 0;
             overscroll-behavior: none;
+        }
+        
+        /* Performance optimizations for animations */
+        .will-animate {
+            will-change: transform, opacity;
+            backface-visibility: hidden;
+            transform: translateZ(0);
+        }
+        
+        /* Optimize heavy animations */
+        @media (prefers-reduced-motion: reduce) {
+            * {
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.01ms !important;
+            }
+        }
+        
+        /* Hardware acceleration for transforms */
+        .frame-gradient-border,
+        .action-icon,
+        .music-icon,
+        .app-logo,
+        .app-slogan {
+            transform: translateZ(0);
+            backface-visibility: hidden;
         }
         
         /* iPhone 15 Pro Max container wrapper */
@@ -82,6 +116,7 @@
                         radial-gradient(circle at 80% 20%, rgba(233, 30, 99, 0.3) 0%, transparent 50%),
                         radial-gradient(circle at 40% 40%, rgba(74, 144, 226, 0.3) 0%, transparent 50%);
             animation: floatBackground 20s ease-in-out infinite;
+            will-change: transform;
         }
         
         @keyframes floatBackground {
@@ -104,6 +139,7 @@
             margin-bottom: 20px;
             animation: bounce 2s infinite;
             filter: drop-shadow(0 0 30px rgba(155, 89, 182, 0.5));
+            will-change: transform;
         }
         
         @keyframes bounce {
@@ -132,6 +168,7 @@
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             filter: drop-shadow(0 2px 4px rgba(0,0,0,0.8));
+            will-change: transform, opacity;
         }
         
         @keyframes pulse {
@@ -147,11 +184,12 @@
             border-radius: 50px;
             border: none;
             cursor: pointer;
-            transition: all 0.3s ease;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
             font-weight: bold;
             box-shadow: 0 10px 30px rgba(155, 89, 182, 0.5);
             position: relative;
             overflow: hidden;
+            will-change: transform;
         }
         
         .quick-start-btn:hover {
@@ -178,6 +216,8 @@
             -webkit-overflow-scrolling: touch;
             display: none;
             background: #000;
+            scroll-behavior: smooth;
+            overscroll-behavior-y: contain;
         }
         
         /* Individual Post - FULL SCREEN */
@@ -214,6 +254,16 @@
             object-fit: cover;
         }
         
+        /* Lazy loading optimization */
+        .post-image[data-src] {
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        
+        .post-image.loaded {
+            opacity: 1;
+        }
+        
         /* Frame wrapper */
         .frame-wrapper {
             position: absolute;
@@ -230,6 +280,7 @@
             background-size: 400% 400%;
             animation: gradientShift 10s ease infinite;
             padding: 3px;
+            will-change: background-position;
         }
         
         .frame-gradient-border::after {
@@ -248,14 +299,18 @@
             100% { background-position: 0% 50%; }
         }
         
-        /* Gradient Overlays - Floating */
+        /* Gradient Overlays - Floating with better spacing */
         .gradient-overlay-top {
             position: absolute;
             top: 0;
             left: 0;
             right: 0;
-            height: 100px;
-            background: linear-gradient(to bottom, rgba(0,0,0,0.8), rgba(0,0,0,0.5) 50%, transparent);
+            height: calc(120px + var(--safe-top));
+            background: linear-gradient(to bottom, 
+                rgba(0,0,0,0.9) 0%, 
+                rgba(0,0,0,0.7) 30%, 
+                rgba(0,0,0,0.4) 60%, 
+                transparent 100%);
             z-index: 10;
             pointer-events: none;
         }
@@ -265,8 +320,12 @@
             bottom: 0;
             left: 0;
             right: 0;
-            height: 180px;
-            background: linear-gradient(to top, rgba(0,0,0,0.95), rgba(0,0,0,0.6) 40%, transparent);
+            height: calc(220px + var(--safe-bottom));
+            background: linear-gradient(to top, 
+                rgba(0,0,0,0.98) 0%, 
+                rgba(0,0,0,0.85) 20%, 
+                rgba(0,0,0,0.6) 50%, 
+                transparent 100%);
             z-index: 10;
             pointer-events: none;
         }
@@ -281,11 +340,12 @@
             max-width: 430px;
             z-index: 100;
             padding: 15px 20px;
-            padding-top: max(15px, env(safe-area-inset-top));
+            padding-top: max(15px, var(--safe-top));
             display: flex;
             justify-content: space-between;
             align-items: center;
             background: transparent;
+            height: calc(var(--header-height) + var(--safe-top));
         }
         
         .header-left {
@@ -312,7 +372,7 @@
             font-weight: 600;
             opacity: 0.7;
             cursor: pointer;
-            transition: all 0.3s ease;
+            transition: opacity 0.3s ease;
             position: relative;
             background: none;
             border: none;
@@ -347,14 +407,14 @@
             justify-content: center;
             font-size: 1.2rem;
             cursor: pointer;
-            transition: all 0.3s ease;
+            transition: transform 0.3s ease;
         }
         
         /* Side Actions (TikTok Style) - FLOATING */
         .post-actions {
             position: absolute;
             right: 12px;
-            bottom: 90px;
+            bottom: calc(var(--nav-height) + var(--safe-bottom) + 20px);
             z-index: 20;
             display: flex;
             flex-direction: column;
@@ -368,7 +428,7 @@
             align-items: center;
             gap: 5px;
             cursor: pointer;
-            transition: all 0.3s ease;
+            transition: transform 0.3s ease;
         }
         
         .action-icon {
@@ -384,6 +444,7 @@
             font-size: 1.3rem;
             transition: all 0.3s ease;
             box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+            will-change: transform, background-color;
         }
         
         .action-icon.liked {
@@ -434,7 +495,7 @@
             left: 0;
             right: 80px;
             padding: 20px;
-            padding-bottom: max(80px, calc(70px + env(safe-area-inset-bottom)));
+            padding-bottom: calc(var(--nav-height) + var(--safe-bottom) + 20px);
             z-index: 20;
         }
         
@@ -474,6 +535,7 @@
         
         .music-icon {
             animation: spin 3s linear infinite;
+            will-change: transform;
         }
         
         @keyframes spin {
@@ -496,7 +558,8 @@
             display: flex;
             justify-content: space-around;
             padding: 10px 0;
-            padding-bottom: max(10px, env(safe-area-inset-bottom));
+            padding-bottom: max(10px, var(--safe-bottom));
+            height: calc(var(--nav-height) + var(--safe-bottom));
         }
         
         .nav-item {
@@ -506,7 +569,7 @@
             align-items: center;
             gap: 4px;
             cursor: pointer;
-            transition: all 0.3s ease;
+            transition: transform 0.3s ease;
             padding: 5px;
             background: none;
             border: none;
@@ -616,7 +679,7 @@
         /* Toast notification - adjusted for iPhone 15 Pro Max */
         .toast {
             position: fixed;
-            bottom: 100px;
+            bottom: calc(var(--nav-height) + var(--safe-bottom) + 30px);
             left: 50%;
             transform: translateX(-50%);
             background: rgba(0, 0, 0, 0.9);
@@ -632,6 +695,7 @@
             border: 1px solid rgba(255, 255, 255, 0.1);
             max-width: 350px;
             text-align: center;
+            will-change: transform, opacity;
         }
         
         @keyframes fadeInUp {
@@ -645,10 +709,10 @@
             }
         }
         
-        /* AI Score Display on Posts - FLOATING */
+        /* AI Score Display on Posts - FLOATING with better spacing */
         .ai-score-badge {
             position: absolute;
-            top: 70px;
+            top: calc(var(--header-height) + var(--safe-top) + 20px);
             left: 15px;
             background: linear-gradient(135deg, rgba(74, 144, 226, 0.9), rgba(138, 56, 236, 0.9));
             backdrop-filter: blur(10px);
@@ -662,6 +726,7 @@
             border: 2px solid rgba(255, 255, 255, 0.3);
             animation: slideInLeft 0.5s ease-out;
             box-shadow: 0 4px 20px rgba(74, 144, 226, 0.5);
+            will-change: transform, opacity;
         }
         
         .ai-score-badge .ai-icon {
@@ -721,14 +786,13 @@
         
         .camera-controls {
             position: absolute;
-            bottom: 30px;
+            bottom: calc(40px + var(--safe-bottom));
             left: 0;
             right: 0;
             display: flex;
             justify-content: center;
             align-items: center;
             gap: 30px;
-            padding-bottom: env(safe-area-inset-bottom);
         }
         
         .camera-btn {
@@ -737,7 +801,7 @@
             border-radius: 50%;
             border: none;
             cursor: pointer;
-            transition: all 0.3s ease;
+            transition: transform 0.3s ease;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -765,15 +829,17 @@
         
         .camera-close {
             position: absolute;
-            top: 20px;
+            top: calc(20px + var(--safe-top));
             left: 20px;
             background: rgba(0, 0, 0, 0.5);
+            width: 40px;
+            height: 40px;
         }
         
         /* AI Challenge Container */
         .ai-challenge-container {
             position: absolute;
-            bottom: 150px;
+            bottom: calc(160px + var(--safe-bottom));
             left: 0;
             right: 0;
             padding: 20px;
@@ -806,7 +872,7 @@
             border-radius: 15px;
             padding: 15px;
             cursor: pointer;
-            transition: all 0.3s ease;
+            transition: transform 0.3s ease, background 0.3s ease, border-color 0.3s ease;
             border: 2px solid transparent;
             position: relative;
         }
@@ -857,7 +923,7 @@
         /* Timer Display */
         .timer-display {
             position: absolute;
-            top: 80px;
+            top: calc(var(--safe-top) + 80px);
             right: 20px;
             background: rgba(0, 0, 0, 0.5);
             padding: 10px 20px;
@@ -868,30 +934,31 @@
             z-index: 50;
         }
         
-        /* AI Score Overlay */
+        /* AI Score Overlay - REDUCED TO 50% SIZE */
         .ai-score-overlay {
             position: absolute;
-            top: 50%;
+            top: 75%;
             left: 50%;
-            transform: translate(-50%, -50%);
+            transform: translate(-50%, -50%) scale(0.5);
             background: rgba(0, 0, 0, 0.9);
             backdrop-filter: blur(10px);
-            padding: 30px;
-            border-radius: 20px;
+            padding: 15px;
+            border-radius: 15px;
             text-align: center;
             z-index: 100;
             display: none;
+            max-width: 240px;
         }
         
         .ai-score-title {
-            font-size: 1.5rem;
-            margin-bottom: 20px;
+            font-size: 1rem;
+            margin-bottom: 10px;
             color: #4a90e2;
         }
         
         .ai-score-circle {
-            width: 150px;
-            height: 150px;
+            width: 80px;
+            height: 80px;
             border-radius: 50%;
             background: conic-gradient(
                 from 0deg,
@@ -902,21 +969,21 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            margin: 0 auto 20px;
+            margin: 0 auto 10px;
             position: relative;
         }
         
         .ai-score-circle::before {
             content: '';
             position: absolute;
-            width: 120px;
-            height: 120px;
+            width: 64px;
+            height: 64px;
             background: #000;
             border-radius: 50%;
         }
         
         .ai-score-value {
-            font-size: 3rem;
+            font-size: 1.5rem;
             font-weight: bold;
             color: white;
             position: relative;
@@ -924,14 +991,14 @@
         }
         
         .ai-score-feedback {
-            font-size: 1.1rem;
-            margin-bottom: 10px;
+            font-size: 0.85rem;
+            margin-bottom: 6px;
         }
         
         .ai-score-details {
-            font-size: 0.9rem;
+            font-size: 0.75rem;
             opacity: 0.8;
-            margin-bottom: 20px;
+            margin-bottom: 10px;
         }
         
         /* Modal - FULL SCREEN OPTIMIZED */
@@ -955,6 +1022,7 @@
             background: #1a1a1a;
             border-radius: 20px 20px 0 0;
             padding: 20px;
+            padding-bottom: max(20px, calc(20px + var(--safe-bottom)));
             width: 100%;
             max-height: 90vh;
             overflow-y: auto;
@@ -1064,7 +1132,7 @@
             border-radius: 15px;
             margin-bottom: 15px;
             cursor: pointer;
-            transition: all 0.3s ease;
+            transition: transform 0.3s ease;
         }
         
         .challenge-item:active {
@@ -1140,11 +1208,11 @@
         <!-- Login Screen -->
         <div id="loginScreen">
             <div class="login-content">
-                <div class="app-logo">🎮</div>
+                <div class="app-logo will-animate">🎮</div>
                 <h1 class="app-title">JomBro</h1>
-                <p class="app-slogan">Let's Go! Let's Go!</p>
+                <p class="app-slogan will-animate">Let's Go! Let's Go!</p>
                 
-                <button class="quick-start-btn" onclick="startApp()">
+                <button class="quick-start-btn will-animate" onclick="startApp()">
                     Enter JomBro →
                 </button>
             </div>
@@ -1215,7 +1283,7 @@
                 </div>
                 <div class="ai-score-feedback" id="scoreFeedback">Calculating...</div>
                 <div class="ai-score-details" id="scoreDetails">AI is analyzing your performance</div>
-                <button class="submit-btn" onclick="acceptScore()">Accept & Post</button>
+                <button class="submit-btn" onclick="acceptScore()" style="padding: 10px 20px; font-size: 0.9rem;">Accept & Post</button>
             </div>
             
             <div class="camera-controls">
@@ -1494,6 +1562,50 @@
         let recordingSeconds = 0;
         let videoStream = null;
         let challengeTimer = null;
+        let animationFrame = null;
+        let scrollTimeout = null;
+        
+        // Performance: Debounce function
+        function debounce(func, wait) {
+            let timeout;
+            return function executedFunction(...args) {
+                const later = () => {
+                    clearTimeout(timeout);
+                    func(...args);
+                };
+                clearTimeout(timeout);
+                timeout = setTimeout(later, wait);
+            };
+        }
+        
+        // Performance: Throttle function
+        function throttle(func, limit) {
+            let lastFunc;
+            let lastRan;
+            return function() {
+                const context = this;
+                const args = arguments;
+                if (!lastRan) {
+                    func.apply(context, args);
+                    lastRan = Date.now();
+                } else {
+                    clearTimeout(lastFunc);
+                    lastFunc = setTimeout(function() {
+                        if ((Date.now() - lastRan) >= limit) {
+                            func.apply(context, args);
+                            lastRan = Date.now();
+                        }
+                    }, limit - (Date.now() - lastRan));
+                }
+            }
+        }
+        
+        // Performance: Use event delegation
+        document.addEventListener('click', function(e) {
+            if (e.target.closest('.action-item')) {
+                e.preventDefault();
+            }
+        }, { passive: false });
         
         // Initialize app
         function startApp() {
@@ -1512,22 +1624,25 @@
                 followers: Math.floor(Math.random() * 100)
             };
             
-            // Hide login
-            document.getElementById('loginScreen').style.display = 'none';
-            
-            // Show app
-            document.getElementById('feedContainer').style.display = 'block';
-            document.querySelector('.feed-header').style.display = 'flex';
-            document.getElementById('bottomNav').style.display = 'flex';
-            
-            // Initialize features
-            updateProfile();
-            loadFeed();
-            generateAIChallenges();
-            startChallengeTimer();
-            
-            // Show welcome message
-            showToast('Welcome to JomBro! Let\'s Go! Let\'s Go! 🎮');
+            // Use requestAnimationFrame for smooth transitions
+            requestAnimationFrame(() => {
+                // Hide login
+                document.getElementById('loginScreen').style.display = 'none';
+                
+                // Show app
+                document.getElementById('feedContainer').style.display = 'block';
+                document.querySelector('.feed-header').style.display = 'flex';
+                document.getElementById('bottomNav').style.display = 'flex';
+                
+                // Initialize features
+                updateProfile();
+                loadFeed();
+                generateAIChallenges();
+                startChallengeTimer();
+                
+                // Show welcome message
+                showToast('Welcome to JomBro! Let\'s Go! Let\'s Go! 🎮');
+            });
         }
         
         // Toast notification
@@ -1538,13 +1653,37 @@
             }
             
             const toast = document.createElement('div');
-            toast.className = 'toast';
+            toast.className = 'toast will-animate';
             toast.textContent = message;
             document.body.appendChild(toast);
             
             setTimeout(() => {
                 toast.remove();
             }, 3000);
+        }
+        
+        // Optimized image loading with lazy loading
+        const imageObserver = new IntersectionObserver((entries, observer) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    const image = entry.target;
+                    // Preload image before showing
+                    const tempImg = new Image();
+                    tempImg.onload = () => {
+                        image.src = image.dataset.src;
+                        image.classList.add('loaded');
+                        observer.unobserve(image);
+                    };
+                    tempImg.src = image.dataset.src;
+                }
+            });
+        }, {
+            rootMargin: '50px 0px', // Start loading 50px before visible
+            threshold: 0.01
+        });
+        
+        function lazyLoadImage(img) {
+            imageObserver.observe(img);
         }
         
         // Load feed with posts
@@ -1584,32 +1723,51 @@
                 }
             ];
             
-            container.innerHTML = '';
+            // Performance: Use DocumentFragment for batch DOM updates
+            const fragment = document.createDocumentFragment();
             
-            posts.forEach(post => {
+            // Create posts off-screen
+            posts.forEach((post, index) => {
                 const postElement = createPostElement(post);
-                container.appendChild(postElement);
+                // Only load first image immediately, defer others
+                if (index === 0) {
+                    const img = postElement.querySelector('.post-image');
+                    img.src = img.dataset.src;
+                    img.classList.add('loaded');
+                }
+                fragment.appendChild(postElement);
             });
             
-            feedPosts = posts;
+            // Single DOM update
+            requestAnimationFrame(() => {
+                container.innerHTML = '';
+                container.appendChild(fragment);
+                
+                feedPosts = posts;
+                
+                // Set up lazy loading for remaining images
+                container.querySelectorAll('.post-image[data-src]:not(.loaded)').forEach(img => {
+                    lazyLoadImage(img);
+                });
+            });
         }
         
-        // Create post element
+        // Create post element (optimized)
         function createPostElement(post) {
             const postDiv = document.createElement('div');
             postDiv.className = 'feed-post';
             
             postDiv.innerHTML = `
                 <div class="post-media">
-                    <img class="post-image" src="${post.mediaUrl}" alt="Challenge">
-                    <div class="frame-wrapper frame-gradient-border"></div>
+                    <img class="post-image" data-src="${post.mediaUrl}" alt="Challenge">
+                    <div class="frame-wrapper frame-gradient-border will-animate"></div>
                 </div>
                 
                 <div class="gradient-overlay-top"></div>
                 <div class="gradient-overlay-bottom"></div>
                 
                 ${post.aiScore ? `
-                    <div class="ai-score-badge">
+                    <div class="ai-score-badge will-animate">
                         <span class="ai-icon">🤖</span>
                         <span class="score-value">${post.aiScore}%</span>
                         <div class="score-stars">
@@ -1628,7 +1786,7 @@
                         </div>
                     </div>
                     <div class="action-item" onclick="toggleLike('${post.id}')">
-                        <div class="action-icon" id="like-${post.id}">❤️</div>
+                        <div class="action-icon will-animate" id="like-${post.id}">❤️</div>
                         <div class="action-count" id="like-count-${post.id}">${post.likes}</div>
                     </div>
                     <div class="action-item" onclick="showComments('${post.id}')">
@@ -1648,7 +1806,7 @@
                     </div>
                     <div class="post-caption">${post.caption}</div>
                     <div class="post-music">
-                        <span class="music-icon">🎵</span>
+                        <span class="music-icon will-animate">🎵</span>
                         <span>Original sound - ${post.user.name}</span>
                     </div>
                 </div>
@@ -1657,7 +1815,7 @@
             return postDiv;
         }
         
-        // Toggle like with animation
+        // Toggle like with animation (optimized)
         function toggleLike(postId) {
             const likeBtn = document.getElementById(`like-${postId}`);
             const likeCount = document.getElementById(`like-count-${postId}`);
@@ -1675,7 +1833,7 @@
             likeCount.textContent = post.likes;
         }
         
-        // Create heart animation
+        // Create heart animation (optimized)
         function createHeartAnimation(element) {
             const heart = document.createElement('div');
             heart.textContent = '❤️';
@@ -1685,6 +1843,7 @@
                 animation: heartFloat 1s ease-out forwards;
                 pointer-events: none;
                 z-index: 100;
+                will-change: transform, opacity;
             `;
             
             const rect = element.getBoundingClientRect();
@@ -1693,7 +1852,8 @@
             
             document.body.appendChild(heart);
             
-            setTimeout(() => heart.remove(), 1000);
+            // Remove after animation
+            heart.addEventListener('animationend', () => heart.remove());
         }
         
         // Generate AI challenges
@@ -1795,12 +1955,14 @@
         
         // Update profile
         function updateProfile() {
-            document.getElementById('profileAvatar').textContent = userData.avatar;
-            document.getElementById('profileName').textContent = '@' + userData.name;
-            document.getElementById('tokenStat').textContent = userData.tokens;
-            document.getElementById('levelStat').textContent = userData.level;
-            document.getElementById('challengeStat').textContent = userData.completedChallenges;
-            document.getElementById('followerStat').textContent = userData.followers;
+            requestAnimationFrame(() => {
+                document.getElementById('profileAvatar').textContent = userData.avatar;
+                document.getElementById('profileName').textContent = '@' + userData.name;
+                document.getElementById('tokenStat').textContent = userData.tokens;
+                document.getElementById('levelStat').textContent = userData.level;
+                document.getElementById('challengeStat').textContent = userData.completedChallenges;
+                document.getElementById('followerStat').textContent = userData.followers;
+            });
         }
         
         // Edit profile
@@ -1850,6 +2012,8 @@
             const grid = document.getElementById('aiChallengesGrid');
             grid.innerHTML = '';
             
+            const fragment = document.createDocumentFragment();
+            
             aiChallenges.forEach(challenge => {
                 const card = document.createElement('div');
                 card.className = 'ai-challenge-card';
@@ -1866,8 +2030,10 @@
                 `;
                 
                 card.onclick = () => selectAIChallenge(card, challenge);
-                grid.appendChild(card);
+                fragment.appendChild(card);
             });
+            
+            grid.appendChild(fragment);
         }
         
         // Select AI challenge
@@ -1976,7 +2142,7 @@
             }, 1000);
         }
         
-        // Show AI scoring
+        // Show AI scoring (optimized with RAF)
         function showAIScoring() {
             const overlay = document.getElementById('aiScoreOverlay');
             overlay.style.display = 'block';
@@ -1989,12 +2155,25 @@
             const scoreFeedback = document.getElementById('scoreFeedback');
             const scoreDetails = document.getElementById('scoreDetails');
             
-            // Animate score
-            const scoreAnimation = setInterval(() => {
-                currentScore += 2;
-                if (currentScore >= targetScore) {
+            // Performance: Use RAF for smooth 60fps animation
+            let startTime = null;
+            const duration = 1500; // 1.5 seconds
+            
+            function animateScore(timestamp) {
+                if (!startTime) startTime = timestamp;
+                const progress = Math.min((timestamp - startTime) / duration, 1);
+                
+                currentScore = Math.floor(progress * targetScore);
+                scoreValue.textContent = currentScore + '%';
+                scoreCircle.style.setProperty('--score', `${currentScore * 3.6}deg`);
+                
+                if (progress < 1) {
+                    animationFrame = requestAnimationFrame(animateScore);
+                } else {
+                    // Animation complete
                     currentScore = targetScore;
-                    clearInterval(scoreAnimation);
+                    scoreValue.textContent = targetScore + '%';
+                    scoreCircle.style.setProperty('--score', `${targetScore * 3.6}deg`);
                     
                     // Show feedback
                     if (targetScore >= 90) {
@@ -2008,10 +2187,9 @@
                         scoreDetails.textContent = 'You met the basic requirements!';
                     }
                 }
-                
-                scoreValue.textContent = currentScore + '%';
-                scoreCircle.style.setProperty('--score', `${currentScore * 3.6}deg`);
-            }, 20);
+            }
+            
+            animationFrame = requestAnimationFrame(animateScore);
         }
         
         // Accept score
@@ -2189,17 +2367,103 @@
             document.getElementById(modalId).style.display = 'flex';
         }
         
-        // Close modal
+        // Close modal with cleanup
         function closeModal(modalId) {
-            document.getElementById(modalId).style.display = 'none';
+            const modal = document.getElementById(modalId);
+            modal.style.display = 'none';
+            
+            // Performance: Clean up any animations or observers
+            if (modalId === 'feedContainer') {
+                // Disconnect observers for images that are no longer visible
+                document.querySelectorAll('.post-image').forEach(img => {
+                    imageObserver.unobserve(img);
+                });
+            }
         }
         
-        // Show create modal from camera
-        document.addEventListener('DOMContentLoaded', function() {
-            // Additional initialization if needed
+        // Performance: Memory cleanup on app hide
+        document.addEventListener('pagehide', () => {
+            // Cancel any pending animations
+            if (animationFrame) {
+                cancelAnimationFrame(animationFrame);
+            }
+            // Clear timers
+            if (recordingTimer) {
+                clearInterval(recordingTimer);
+            }
+            if (challengeTimer) {
+                clearInterval(challengeTimer);
+            }
+            // Stop video streams
+            if (videoStream) {
+                videoStream.getTracks().forEach(track => track.stop());
+            }
         });
         
-        console.log('JomBro app ready with ALL features activated! 🎮');
+        // Performance: Clean up animations on page hide
+        document.addEventListener('visibilitychange', function() {
+            if (document.hidden) {
+                if (animationFrame) {
+                    cancelAnimationFrame(animationFrame);
+                }
+                // Pause all animations
+                document.querySelectorAll('.will-animate').forEach(el => {
+                    el.style.animationPlayState = 'paused';
+                });
+            } else {
+                // Resume animations
+                document.querySelectorAll('.will-animate').forEach(el => {
+                    el.style.animationPlayState = 'running';
+                });
+            }
+        });
+        
+        // Performance: Optimized scroll handler
+        const handleScroll = throttle(() => {
+            // Handle scroll events with minimal DOM reads
+            const scrollTop = document.getElementById('feedContainer').scrollTop;
+            // Add any scroll-based logic here
+        }, 16); // 60fps
+        
+        // Passive event listeners for scroll performance
+        document.getElementById('feedContainer').addEventListener('scroll', handleScroll, { passive: true });
+        
+        // Performance: Optimize touch events
+        let touchStartY = 0;
+        document.addEventListener('touchstart', (e) => {
+            touchStartY = e.touches[0].clientY;
+        }, { passive: true });
+        
+        document.addEventListener('touchmove', (e) => {
+            const touchY = e.touches[0].clientY;
+            const diff = touchStartY - touchY;
+            // Handle swipe gestures if needed
+        }, { passive: true });
+        
+        document.addEventListener('DOMContentLoaded', function() {
+            // Performance: Preload critical images
+            const preloadImages = [
+                'https://picsum.photos/1080/1920?random=1',
+                'https://picsum.photos/1080/1920?random=2',
+                'https://picsum.photos/1080/1920?random=3'
+            ];
+            
+            preloadImages.forEach(src => {
+                const link = document.createElement('link');
+                link.rel = 'preload';
+                link.as = 'image';
+                link.href = src;
+                document.head.appendChild(link);
+            });
+            
+            // Enable hardware acceleration for the app container
+            const appContainer = document.querySelector('.app-container');
+            if (appContainer) {
+                appContainer.style.transform = 'translateZ(0)';
+            }
+        });
+        
+        console.log('JomBro app ready with MAXIMUM performance optimizations! 🚀🎮');
     </script>
     </div> <!-- End of app-container -->
 </body>
