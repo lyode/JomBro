@@ -37,18 +37,37 @@
             display: none;
         }
         
-        /* Login Screen */
+        /* Login Screen - All Black with Floating Elements */
         #loginScreen {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: #000;
             display: flex;
             align-items: center;
             justify-content: center;
             z-index: 9999;
+            overflow: hidden;
+        }
+        
+        /* Floating background elements */
+        #loginScreen::before {
+            content: '';
+            position: absolute;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle at 20% 80%, rgba(155, 89, 182, 0.2) 0%, transparent 50%),
+                        radial-gradient(circle at 80% 20%, rgba(233, 30, 99, 0.2) 0%, transparent 50%),
+                        radial-gradient(circle at 40% 40%, rgba(74, 144, 226, 0.2) 0%, transparent 50%);
+            animation: floatBackground 20s ease-in-out infinite;
+        }
+        
+        @keyframes floatBackground {
+            0%, 100% { transform: translate(0, 0) rotate(0deg); }
+            33% { transform: translate(-30px, -30px) rotate(120deg); }
+            66% { transform: translate(30px, -30px) rotate(240deg); }
         }
         
         .login-content {
@@ -56,12 +75,15 @@
             padding: 20px;
             width: 100%;
             max-width: 400px;
+            position: relative;
+            z-index: 1;
         }
         
         .app-logo {
             font-size: 5rem;
             margin-bottom: 20px;
             animation: bounce 2s infinite;
+            filter: drop-shadow(0 0 30px rgba(155, 89, 182, 0.5));
         }
         
         @keyframes bounce {
@@ -71,23 +93,29 @@
         
         .app-title {
             font-size: 3rem;
-            font-weight: 400;
+            font-weight: 700;
             margin-bottom: 5px;
             color: white;
+            text-shadow: 0 0 30px rgba(255, 255, 255, 0.5);
+            letter-spacing: -1px;
         }
         
         .app-slogan {
             font-size: 1.5rem;
             font-weight: 600;
-            opacity: 0.95;
             margin-bottom: 40px;
             text-transform: uppercase;
-            letter-spacing: 2px;
+            letter-spacing: 3px;
             animation: pulse 2s infinite;
+            background: linear-gradient(45deg, #ff006e, #8338ec, #3a86ff);
+            background-clip: text;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            filter: drop-shadow(0 2px 4px rgba(0,0,0,0.8));
         }
         
         @keyframes pulse {
-            0%, 100% { transform: scale(1); opacity: 0.95; }
+            0%, 100% { transform: scale(1); opacity: 0.9; }
             50% { transform: scale(1.05); opacity: 1; }
         }
         
@@ -96,6 +124,7 @@
             flex-direction: column;
             gap: 15px;
             margin-bottom: 20px;
+            animation: fadeInUp 0.8s ease-out 0.5s backwards;
         }
         
         .phone-input-container {
@@ -105,48 +134,66 @@
         }
         
         .country-code {
-            background: rgba(255, 255, 255, 0.2);
-            backdrop-filter: blur(10px);
-            border: 2px solid white;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
             color: white;
             padding: 15px;
             border-radius: 15px;
             font-size: 1.1rem;
             width: 100px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            transition: all 0.3s ease;
+        }
+        
+        .country-code:hover,
+        .country-code:focus {
+            background: rgba(255, 255, 255, 0.15);
+            border-color: rgba(255, 255, 255, 0.4);
+            transform: translateY(-2px);
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.4);
         }
         
         .phone-input {
             flex: 1;
-            background: rgba(255, 255, 255, 0.2);
-            backdrop-filter: blur(10px);
-            border: 2px solid white;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
             color: white;
             padding: 15px 20px;
             border-radius: 15px;
             font-size: 1.1rem;
             outline: none;
             transition: all 0.3s ease;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
         }
         
         .phone-input::placeholder {
-            color: rgba(255, 255, 255, 0.7);
+            color: rgba(255, 255, 255, 0.5);
         }
         
+        .phone-input:hover,
         .phone-input:focus {
-            background: rgba(255, 255, 255, 0.3);
-            transform: scale(1.02);
+            background: rgba(255, 255, 255, 0.15);
+            border-color: rgba(255, 255, 255, 0.4);
+            transform: translateY(-2px);
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.4);
         }
         
         .verification-container {
             display: none;
             flex-direction: column;
             gap: 15px;
+            animation: fadeInUp 0.5s ease-out;
         }
         
         .otp-input {
-            background: rgba(255, 255, 255, 0.2);
-            backdrop-filter: blur(10px);
-            border: 2px solid white;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
             color: white;
             padding: 15px 20px;
             border-radius: 15px;
@@ -154,11 +201,21 @@
             text-align: center;
             letter-spacing: 10px;
             outline: none;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            transition: all 0.3s ease;
+        }
+        
+        .otp-input:hover,
+        .otp-input:focus {
+            background: rgba(255, 255, 255, 0.15);
+            border-color: rgba(255, 255, 255, 0.4);
+            transform: translateY(-2px);
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.4);
         }
         
         .auth-btn {
-            background: rgba(255, 255, 255, 0.9);
-            color: #764ba2;
+            background: linear-gradient(45deg, #9b59b6, #e91e63);
+            color: white;
             padding: 18px 40px;
             font-size: 1.2rem;
             border-radius: 30px;
@@ -167,41 +224,96 @@
             transition: all 0.3s ease;
             font-weight: bold;
             width: 100%;
+            box-shadow: 0 10px 30px rgba(155, 89, 182, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .auth-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            transition: left 0.5s;
         }
         
         .auth-btn:hover {
-            background: white;
-            transform: scale(1.05);
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            transform: translateY(-3px);
+            box-shadow: 0 15px 40px rgba(155, 89, 182, 0.4);
+        }
+        
+        .auth-btn:hover::before {
+            left: 100%;
+        }
+        
+        .auth-btn:active {
+            transform: translateY(-1px);
         }
         
         .auth-btn:disabled {
             opacity: 0.5;
             cursor: not-allowed;
+            transform: none;
         }
         
         .quick-start-btn {
-            background: rgba(255, 255, 255, 0.1);
+            background: transparent;
             backdrop-filter: blur(10px);
-            border: 2px solid rgba(255, 255, 255, 0.5);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
             color: white;
-            padding: 12px 30px;
+            padding: 14px 35px;
             font-size: 1rem;
             border-radius: 25px;
             cursor: pointer;
             transition: all 0.3s ease;
             margin-top: 20px;
+            position: relative;
+            overflow: hidden;
+            animation: fadeIn 1s ease-out 1s backwards;
+        }
+        
+        .quick-start-btn::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.1);
+            transform: translate(-50%, -50%);
+            transition: width 0.6s, height 0.6s;
         }
         
         .quick-start-btn:hover {
-            background: rgba(255, 255, 255, 0.2);
-            border-color: white;
+            background: rgba(255, 255, 255, 0.1);
+            border-color: rgba(255, 255, 255, 0.5);
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(255, 255, 255, 0.1);
+        }
+        
+        .quick-start-btn:hover::before {
+            width: 300px;
+            height: 300px;
+        }
+        
+        .quick-start-btn:active {
+            transform: translateY(0);
         }
         
         #recaptcha-container {
             margin-top: 10px;
             display: flex;
             justify-content: center;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
         }
         
         /* Main Feed Container - FULL SCREEN */
@@ -1419,7 +1531,7 @@
             z-index: 50;
         }
         
-        /* Loading Spinner */
+        /* Loading Spinner - Used in login buttons */
         .loading-spinner {
             display: inline-block;
             width: 20px;
@@ -1923,14 +2035,69 @@
         let confirmationResult = null;
         let recaptchaVerifier = null;
         
+        // Show toast notification - Define first since it's used everywhere
+        function showToast(message) {
+            const existingToast = document.querySelector('.toast');
+            if (existingToast) {
+                existingToast.remove();
+            }
+            
+            const toast = document.createElement('div');
+            toast.className = 'toast';
+            toast.textContent = message;
+            document.body.appendChild(toast);
+            
+            setTimeout(() => toast.remove(), 3000);
+        }
+        
+        // Quick start (Demo mode) - Define early
+        function quickStart() {
+            try {
+                console.log('Quick start demo mode initiated');
+                
+                // Generate demo user
+                const userId = 'demo_' + Date.now();
+                currentUser = {
+                    uid: userId,
+                    name: 'Player' + Math.floor(Math.random() * 9999),
+                    isDemo: true
+                };
+                
+                // Create user data
+                userData = {
+                    name: currentUser.name,
+                    avatar: '🎮',
+                    tokens: 1000,
+                    level: 1,
+                    completedChallenges: 0,
+                    followers: 0,
+                    isDemo: true
+                };
+                
+                // Start app directly without Firebase
+                startApp();
+                showToast('Demo mode activated! 🎮');
+                
+            } catch (error) {
+                console.error('Error in quickStart:', error);
+                alert('Error starting demo mode. Please refresh the page.');
+            }
+        }
+        
         // Initialize app
         window.onload = function() {
+            console.log('App loading...');
+            
+            // Make quickStart available immediately
+            window.quickStart = quickStart;
+            
             try {
+                // Initialize Firebase
                 app = firebase.initializeApp(firebaseConfig);
                 auth = firebase.auth();
                 db = firebase.firestore();
                 storage = firebase.storage();
-                console.log('Firebase initialized!');
+                console.log('Firebase initialized successfully!');
                 
                 // Setup phone auth
                 setupPhoneAuth();
@@ -1947,22 +2114,61 @@
                         handleAuthSuccess(user);
                     }
                 });
+                
             } catch (error) {
-                console.error('Firebase error:', error);
+                console.error('Firebase initialization error:', error);
+                console.log('Firebase not available - Demo mode only');
             }
+            
+            // Setup event listeners
+            setupEventListeners();
+            
+            // Make all functions globally available
+            setupGlobalFunctions();
         };
+        
+        // Setup event listeners
+        function setupEventListeners() {
+            // Phone input formatting
+            const phoneInput = document.getElementById('phoneNumber');
+            if (phoneInput) {
+                phoneInput.addEventListener('input', (e) => {
+                    // Remove non-numeric characters
+                    e.target.value = e.target.value.replace(/\D/g, '');
+                });
+            }
+            
+            // OTP input
+            const otpInput = document.getElementById('otpCode');
+            if (otpInput) {
+                otpInput.addEventListener('input', (e) => {
+                    // Remove non-numeric characters
+                    e.target.value = e.target.value.replace(/\D/g, '');
+                    
+                    // Auto-submit when 6 digits entered
+                    if (e.target.value.length === 6) {
+                        verifyOTP();
+                    }
+                });
+            }
+        }
         
         // Setup phone authentication
         function setupPhoneAuth() {
             try {
-                recaptchaVerifier = new firebase.auth.RecaptchaVerifier('recaptcha-container', {
-                    'size': 'invisible',
-                    'callback': (response) => {
-                        console.log('reCAPTCHA solved');
-                    }
-                });
+                if (firebase.auth && firebase.auth.RecaptchaVerifier) {
+                    recaptchaVerifier = new firebase.auth.RecaptchaVerifier('recaptcha-container', {
+                        'size': 'invisible',
+                        'callback': (response) => {
+                            console.log('reCAPTCHA solved');
+                        }
+                    });
+                } else {
+                    console.log('Firebase Auth not available - Demo mode only');
+                }
             } catch (error) {
                 console.error('reCAPTCHA setup error:', error);
+                console.log('Phone auth not available - use Demo Mode');
             }
         }
         
@@ -1973,6 +2179,12 @@
             
             if (!phoneNumber || phoneNumber.length < 6) {
                 showToast('Please enter a valid phone number');
+                return;
+            }
+            
+            // Check if Firebase Auth is available
+            if (!auth) {
+                showToast('Phone authentication not available. Please use Demo Mode.');
                 return;
             }
             
@@ -1999,7 +2211,7 @@
                 }, 100);
             } catch (error) {
                 console.error('OTP send error:', error);
-                showToast('Error sending OTP. Please try again.');
+                showToast('Error sending OTP. Please try demo mode instead.');
                 btn.disabled = false;
                 btn.innerHTML = 'Get Started →';
             }
@@ -2082,6 +2294,8 @@
         
         // Start app after auth
         function startApp() {
+            console.log('Starting JomBro app...');
+            
             // Hide login screen
             document.getElementById('loginScreen').style.display = 'none';
             
@@ -2099,7 +2313,7 @@
             // Load feed
             loadFeed();
             
-            showToast('Welcome to JomBro! 🎮');
+            showToast('Welcome to JomBro! Let\'s Go! Let\'s Go! 🎮');
         }
         
         // Frame generation system
@@ -2320,12 +2534,12 @@
             setTimeout(() => toast.remove(), 3000);
         }
         
-        // Quick start (Demo mode)
-        async function quickStart() {
+        // Quick start (Demo mode) - Fix functionality
+        function quickStart() {
             try {
                 console.log('Quick start clicked!');
                 
-                // Generate user
+                // Generate demo user
                 const userId = 'demo_' + Date.now();
                 currentUser = {
                     uid: userId,
@@ -2344,22 +2558,12 @@
                     isDemo: true
                 };
                 
-                // Save to Firestore if available
-                if (db) {
-                    try {
-                        await db.collection('users').doc(userId).set(userData);
-                    } catch (error) {
-                        console.log('Offline mode - Firestore save failed');
-                    }
-                }
-                
-                // Start app
+                // Start app directly
                 startApp();
                 
-                showToast('Demo mode activated! Sign in with phone for full features.');
             } catch (error) {
                 console.error('Error in quickStart:', error);
-                showToast('Error starting app. Please refresh and try again.');
+                showToast('Error starting demo mode. Please refresh and try again.');
             }
         }
         
@@ -2676,7 +2880,7 @@
             }
         }
         
-        // Add CSS animation for heart float
+        /* Add CSS animation for heart float and other animations */
         const style = document.createElement('style');
         style.textContent = `
             @keyframes heartFloat {
@@ -2695,40 +2899,56 @@
                 50% { transform: scale(1.1); }
                 100% { transform: scale(1); }
             }
+            
+            .loading-spinner {
+                display: inline-block;
+                width: 16px;
+                height: 16px;
+                border: 2px solid rgba(255, 255, 255, 0.3);
+                border-radius: 50%;
+                border-top-color: white;
+                animation: spin 1s ease-in-out infinite;
+            }
+            
+            @keyframes spin {
+                to { transform: rotate(360deg); }
+            }
         `;
         document.head.appendChild(style);
         
         // Make all necessary functions globally accessible
-        window.sendOTP = sendOTP;
-        window.verifyOTP = verifyOTP;
-        window.resendOTP = resendOTP;
-        window.quickStart = quickStart;
-        window.switchFeed = switchFeed;
-        window.switchNav = switchNav;
-        window.openCamera = openCamera;
-        window.showProfile = showProfile;
-        window.closeCamera = closeCamera;
-        window.flipCamera = flipCamera;
-        window.toggleRecording = toggleRecording;
-        window.openGallery = openGallery;
-        window.acceptScore = acceptScore;
-        window.closeModal = closeModal;
-        window.showModal = showModal;
-        window.editProfile = editProfile;
-        window.createChallenge = createChallenge;
-        window.showComments = showComments;
-        window.sharePost = sharePost;
-        window.showSearch = showSearch;
-        window.toggleLike = toggleLike;
-        window.showToast = showToast;
-        window.selectDedication = selectDedication;
-        window.showAchievements = showAchievements;
-        window.filterCategory = filterCategory;
-        window.searchChallenges = searchChallenges;
-        window.selectTrendingChallenge = selectTrendingChallenge;
-        window.switchInboxTab = switchInboxTab;
-        window.acceptChallenge = acceptChallenge;
-        window.declineChallenge = declineChallenge;
+        function setupGlobalFunctions() {
+            window.sendOTP = sendOTP;
+            window.verifyOTP = verifyOTP;
+            window.resendOTP = resendOTP;
+            window.quickStart = quickStart;
+            window.switchFeed = switchFeed;
+            window.switchNav = switchNav;
+            window.openCamera = openCamera;
+            window.showProfile = showProfile;
+            window.closeCamera = closeCamera;
+            window.flipCamera = flipCamera;
+            window.toggleRecording = toggleRecording;
+            window.openGallery = openGallery;
+            window.acceptScore = acceptScore;
+            window.closeModal = closeModal;
+            window.showModal = showModal;
+            window.editProfile = editProfile;
+            window.createChallenge = createChallenge;
+            window.showComments = showComments;
+            window.sharePost = sharePost;
+            window.showSearch = showSearch;
+            window.toggleLike = toggleLike;
+            window.showToast = showToast;
+            window.selectDedication = selectDedication;
+            window.showAchievements = showAchievements;
+            window.filterCategory = filterCategory;
+            window.searchChallenges = searchChallenges;
+            window.selectTrendingChallenge = selectTrendingChallenge;
+            window.switchInboxTab = switchInboxTab;
+            window.acceptChallenge = acceptChallenge;
+            window.declineChallenge = declineChallenge;
+        }
         
         // Cleanup on page unload
         window.addEventListener('beforeunload', () => {
