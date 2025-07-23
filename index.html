@@ -475,8 +475,8 @@
             top: 0;
             left: 0;
             right: 0;
-            height: 120px;
-            background: linear-gradient(to bottom, rgba(0,0,0,0.8), transparent);
+            height: 150px;
+            background: linear-gradient(to bottom, rgba(0,0,0,0.6), transparent);
             z-index: 15;
             pointer-events: none;
         }
@@ -496,40 +496,51 @@
         .feed-header {
             position: fixed;
             top: 0;
-            left: 0;
-            right: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100%;
+            max-width: 480px;
             z-index: 300;
             padding: 20px;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            background: linear-gradient(to bottom, rgba(0,0,0,0.9), rgba(0,0,0,0.4), transparent);
-            backdrop-filter: blur(15px);
-            -webkit-backdrop-filter: blur(15px);
+            background: transparent;
         }
         
         .header-left {
             font-size: 1.44rem;
-            font-weight: 400;
+            font-weight: 600;
             color: white;
             flex-shrink: 0;
+            text-shadow: 0 2px 8px rgba(0,0,0,0.8);
+            animation: fadeInDown 0.5s ease-out;
+            letter-spacing: -0.5px;
         }
         
         .header-center {
             display: flex;
             gap: 20px;
+            background: rgba(0,0,0,0.3);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            padding: 8px 20px;
+            border-radius: 30px;
+            animation: fadeInDown 0.5s ease-out 0.1s backwards;
+            transition: all 0.3s ease;
         }
         
         .header-tab {
             font-size: 1.1rem;
             font-weight: 600;
-            opacity: 0.6;
+            opacity: 0.7;
             cursor: pointer;
             transition: all 0.3s ease;
             position: relative;
             background: none;
             border: none;
             color: white;
+            text-shadow: 0 1px 4px rgba(0,0,0,0.8);
         }
         
         .header-tab.active {
@@ -547,9 +558,13 @@
             background: white;
         }
         
-        .header-right {
-            font-size: 1.5rem;
-            cursor: pointer;
+        .header-center:hover {
+            background: rgba(0,0,0,0.5);
+        }
+        
+        .header-right:hover {
+            background: rgba(0,0,0,0.5);
+            transform: scale(1.05);
         }
         
         /* Side Actions (TikTok Style) */
@@ -957,6 +972,17 @@
             to { 
                 opacity: 1;
                 transform: translate(-50%, 0);
+            }
+        }
+        
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
             }
         }
         
@@ -1374,6 +1400,10 @@
             .bottom-nav {
                 padding-bottom: max(10px, env(safe-area-inset-bottom));
             }
+            
+            .gradient-overlay-top {
+                padding-top: env(safe-area-inset-top);
+            }
         }
         
         /* Header Tab Adjustments for Mobile */
@@ -1384,6 +1414,17 @@
             
             .header-left {
                 font-size: 1.2rem;
+            }
+            
+            .header-center {
+                gap: 15px;
+                padding: 6px 15px;
+            }
+            
+            .header-right {
+                width: 36px;
+                height: 36px;
+                font-size: 1.3rem;
             }
         }
         .empty-state {
@@ -1421,17 +1462,18 @@
         </div>
     </div>
     
+    <!-- Feed Header (Floating) -->
+    <div class="feed-header" style="display: none;">
+        <div class="header-left">JomBro</div>
+        <div class="header-center">
+            <button class="header-tab" onclick="switchFeed('stalking')">Stalking</button>
+            <button class="header-tab active" onclick="switchFeed('trustmebro')">Trust Me Bro!</button>
+        </div>
+        <div class="header-right" onclick="showSearch()">🔍</div>
+    </div>
+    
     <!-- Main Feed (TikTok Style) -->
     <div class="feed-container" id="feedContainer" style="display: none;">
-        <!-- Feed Header -->
-        <div class="feed-header">
-            <div class="header-left">JomBro</div>
-            <div class="header-center">
-                <button class="header-tab" onclick="switchFeed('stalking')">Stalking</button>
-                <button class="header-tab active" onclick="switchFeed('trustmebro')">Trust Me Bro!</button>
-            </div>
-            <div class="header-right" onclick="showSearch()">🔍</div>
-        </div>
         
         <!-- Default Static Post -->
         <div class="feed-post">
@@ -2054,6 +2096,7 @@
                 // Show app
                 document.getElementById('loginScreen').style.display = 'none';
                 document.getElementById('feedContainer').style.display = 'block';
+                document.querySelector('.feed-header').style.display = 'flex';
                 document.getElementById('bottomNav').style.display = 'flex';
                 
                 // Update profile
@@ -2164,10 +2207,8 @@
                     }
                 ];
                 
-                // Clear existing posts (except header)
-                const header = container.querySelector('.feed-header');
+                // Clear existing posts
                 container.innerHTML = '';
-                container.appendChild(header);
                 
                 // Add posts
                 samplePosts.forEach((post, index) => {
