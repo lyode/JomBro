@@ -2,10 +2,10 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <title>JomBro - TikTok Style</title>
+    <title>JomBro - Let's Go! Let's Go!</title>
     
     <!-- Firebase SDK -->
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
@@ -30,16 +30,6 @@
             width: 100%;
             height: 100%;
             overscroll-behavior: none;
-            max-width: 480px;
-            margin: 0 auto;
-            position: relative;
-        }
-        
-        @media (min-width: 481px) {
-            body {
-                border-left: 1px solid #333;
-                border-right: 1px solid #333;
-            }
         }
         
         /* Hide scrollbar */
@@ -64,6 +54,8 @@
         .login-content {
             text-align: center;
             padding: 20px;
+            width: 100%;
+            max-width: 400px;
         }
         
         .app-logo {
@@ -80,42 +72,146 @@
         .app-title {
             font-size: 3rem;
             font-weight: 400;
-            margin-bottom: 10px;
+            margin-bottom: 5px;
             color: white;
         }
         
-        .app-subtitle {
-            font-size: 1.2rem;
-            opacity: 0.9;
+        .app-slogan {
+            font-size: 1.5rem;
+            font-weight: 600;
+            opacity: 0.95;
             margin-bottom: 40px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            animation: pulse 2s infinite;
         }
         
-        .quick-start-btn {
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); opacity: 0.95; }
+            50% { transform: scale(1.05); opacity: 1; }
+        }
+        
+        .login-form {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .phone-input-container {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+        
+        .country-code {
             background: rgba(255, 255, 255, 0.2);
             backdrop-filter: blur(10px);
             border: 2px solid white;
             color: white;
-            padding: 20px 60px;
-            font-size: 1.3rem;
-            border-radius: 50px;
+            padding: 15px;
+            border-radius: 15px;
+            font-size: 1.1rem;
+            width: 100px;
+        }
+        
+        .phone-input {
+            flex: 1;
+            background: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(10px);
+            border: 2px solid white;
+            color: white;
+            padding: 15px 20px;
+            border-radius: 15px;
+            font-size: 1.1rem;
+            outline: none;
+            transition: all 0.3s ease;
+        }
+        
+        .phone-input::placeholder {
+            color: rgba(255, 255, 255, 0.7);
+        }
+        
+        .phone-input:focus {
+            background: rgba(255, 255, 255, 0.3);
+            transform: scale(1.02);
+        }
+        
+        .verification-container {
+            display: none;
+            flex-direction: column;
+            gap: 15px;
+        }
+        
+        .otp-input {
+            background: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(10px);
+            border: 2px solid white;
+            color: white;
+            padding: 15px 20px;
+            border-radius: 15px;
+            font-size: 1.5rem;
+            text-align: center;
+            letter-spacing: 10px;
+            outline: none;
+        }
+        
+        .auth-btn {
+            background: rgba(255, 255, 255, 0.9);
+            color: #764ba2;
+            padding: 18px 40px;
+            font-size: 1.2rem;
+            border-radius: 30px;
+            border: none;
             cursor: pointer;
             transition: all 0.3s ease;
             font-weight: bold;
+            width: 100%;
+        }
+        
+        .auth-btn:hover {
+            background: white;
+            transform: scale(1.05);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        }
+        
+        .auth-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        
+        .quick-start-btn {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border: 2px solid rgba(255, 255, 255, 0.5);
+            color: white;
+            padding: 12px 30px;
+            font-size: 1rem;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 20px;
         }
         
         .quick-start-btn:hover {
-            background: white;
-            color: #764ba2;
-            transform: scale(1.05);
+            background: rgba(255, 255, 255, 0.2);
+            border-color: white;
         }
         
-        /* Main Feed Container */
+        #recaptcha-container {
+            margin-top: 10px;
+            display: flex;
+            justify-content: center;
+        }
+        
+        /* Main Feed Container - FULL SCREEN */
         .feed-container {
             position: fixed;
             top: 0;
             left: 0;
-            width: 100%;
-            height: 100%;
+            width: 100vw;
+            height: 100vh;
+            height: 100dvh;
             overflow-y: scroll;
             scroll-snap-type: y mandatory;
             -webkit-overflow-scrolling: touch;
@@ -123,21 +219,24 @@
             background: #000;
         }
         
-        /* Individual Post */
+        /* Individual Post - FULL SCREEN */
         .feed-post {
             position: relative;
-            width: 100%;
+            width: 100vw;
             height: 100vh;
+            height: 100dvh;
             scroll-snap-align: start;
             background: #000;
             overflow: hidden;
         }
         
-        /* Post Media with Frames */
+        /* Post Media - FULL SCREEN */
         .post-media {
             width: 100%;
             height: 100%;
-            position: relative;
+            position: absolute;
+            top: 0;
+            left: 0;
             background: #000;
             display: flex;
             align-items: center;
@@ -475,9 +574,9 @@
             top: 0;
             left: 0;
             right: 0;
-            height: 180px;
-            background: linear-gradient(to bottom, rgba(0,0,0,0.7), rgba(0,0,0,0.3) 50%, transparent);
-            z-index: 15;
+            height: 120px;
+            background: linear-gradient(to bottom, rgba(0,0,0,0.7), transparent);
+            z-index: 10;
             pointer-events: none;
         }
         
@@ -486,22 +585,21 @@
             bottom: 0;
             left: 0;
             right: 0;
-            height: 150px;
-            background: linear-gradient(to top, rgba(0,0,0,0.9), transparent);
-            z-index: 15;
+            height: 200px;
+            background: linear-gradient(to top, rgba(0,0,0,0.9), rgba(0,0,0,0.5) 50%, transparent);
+            z-index: 10;
             pointer-events: none;
         }
         
-        /* TikTok Style Header */
+        /* TikTok Style Header - FLOATING */
         .feed-header {
             position: fixed;
             top: 0;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 100%;
-            max-width: 480px;
-            z-index: 300;
+            left: 0;
+            right: 0;
+            z-index: 100;
             padding: 15px 20px;
+            padding-top: max(15px, env(safe-area-inset-top));
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -509,12 +607,10 @@
         }
         
         .header-left {
-            font-size: 1.44rem;
-            font-weight: 600;
+            font-size: 1.3rem;
+            font-weight: 700;
             color: white;
-            flex-shrink: 0;
             text-shadow: 0 2px 8px rgba(0,0,0,0.8);
-            animation: fadeInDown 0.5s ease-out;
             letter-spacing: -0.5px;
         }
         
@@ -526,12 +622,11 @@
             -webkit-backdrop-filter: blur(20px);
             padding: 10px 24px;
             border-radius: 35px;
-            animation: fadeInDown 0.5s ease-out 0.1s backwards;
             transition: all 0.3s ease;
         }
         
         .header-tab {
-            font-size: 1.1rem;
+            font-size: 1rem;
             font-weight: 600;
             opacity: 0.7;
             cursor: pointer;
@@ -558,40 +653,36 @@
             background: white;
         }
         
-        .header-center:hover {
-            background: rgba(0,0,0,0.5);
+        .header-right {
+            width: 36px;
+            height: 36px;
+            background: rgba(0,0,0,0.3);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
         }
         
         .header-right:hover {
             background: rgba(0,0,0,0.5);
-            transform: scale(1.03);
-            box-shadow: 0 6px 25px rgba(0,0,0,0.5), 0 0 30px rgba(255,255,255,0.1);
-            border-color: rgba(255,255,255,0.2);
+            transform: scale(1.05);
         }
         
-        .header-right:active {
-            transform: scale(0.98);
-            box-shadow: 0 2px 10px rgba(0,0,0,0.4);
-        }
-        
-        /* Side Actions (TikTok Style) */
+        /* Side Actions (TikTok Style) - FLOATING */
         .post-actions {
             position: absolute;
             right: 15px;
-            top: calc(50% - 170px);
-            z-index: 25;
+            bottom: 100px;
+            z-index: 20;
             display: flex;
             flex-direction: column;
             gap: 20px;
             align-items: center;
-        }
-        
-        /* Adjust for mobile */
-        @media (max-height: 700px) {
-            .post-actions {
-                gap: 15px;
-                top: calc(50% - 150px);
-            }
         }
         
         .action-item {
@@ -630,6 +721,7 @@
         .action-count {
             font-size: 0.75rem;
             font-weight: 600;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.8);
         }
         
         /* User Avatar */
@@ -662,20 +754,22 @@
             box-shadow: 0 1px 4px rgba(0, 0, 0, 0.3);
         }
         
-        /* Post Info (Bottom Left) */
+        /* Post Info (Bottom Left) - FLOATING */
         .post-info {
             position: absolute;
-            bottom: 20px;
+            bottom: 0;
             left: 0;
             right: 80px;
             padding: 20px;
-            z-index: 25;
+            padding-bottom: max(80px, calc(70px + env(safe-area-inset-bottom)));
+            z-index: 20;
         }
         
         .post-user {
             font-weight: 600;
             font-size: 1.1rem;
             margin-bottom: 10px;
+            text-shadow: 0 1px 3px rgba(0,0,0,0.8);
         }
         
         .challenge-badge {
@@ -695,6 +789,7 @@
             font-size: 0.95rem;
             margin-bottom: 10px;
             line-height: 1.3;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.8);
         }
         
         .post-music {
@@ -713,7 +808,7 @@
             to { transform: rotate(360deg); }
         }
         
-        /* Bottom Navigation (TikTok Style) */
+        /* Bottom Navigation (TikTok Style) - FLOATING */
         .bottom-nav {
             position: fixed;
             bottom: 0;
@@ -722,11 +817,11 @@
             background: rgba(0, 0, 0, 0.95);
             backdrop-filter: blur(20px);
             -webkit-backdrop-filter: blur(20px);
-            z-index: 300;
+            z-index: 100;
             display: flex;
             justify-content: space-around;
             padding: 10px 0;
-            padding-bottom: env(safe-area-inset-bottom);
+            padding-bottom: max(10px, env(safe-area-inset-bottom));
         }
         
         .nav-item {
@@ -796,13 +891,14 @@
             z-index: 1;
         }
         
-        /* Camera/Upload Interface */
+        /* Camera/Upload Interface - FULL SCREEN */
         .camera-interface {
             position: fixed;
             top: 0;
             left: 0;
-            width: 100%;
-            height: 100%;
+            width: 100vw;
+            height: 100vh;
+            height: 100dvh;
             background: #000;
             z-index: 500;
             display: none;
@@ -855,10 +951,10 @@
         }
         
         .record-btn.recording {
-            animation: pulse 1s infinite;
+            animation: recordPulse 1s infinite;
         }
         
-        @keyframes pulse {
+        @keyframes recordPulse {
             0% { transform: scale(1); }
             50% { transform: scale(1.1); }
             100% { transform: scale(1); }
@@ -908,13 +1004,14 @@
             border-color: #9b59b6;
         }
         
-        /* Modal */
+        /* Modal - FULL SCREEN OPTIMIZED */
         .modal {
             position: fixed;
             top: 0;
             left: 0;
-            width: 100%;
-            height: 100%;
+            width: 100vw;
+            height: 100vh;
+            height: 100dvh;
             background: rgba(0, 0, 0, 0.9);
             z-index: 400;
             display: none;
@@ -927,7 +1024,7 @@
             border-radius: 20px 20px 0 0;
             padding: 20px;
             width: 100%;
-            max-height: 80vh;
+            max-height: 90vh;
             overflow-y: auto;
             animation: slideUp 0.3s ease;
         }
@@ -1196,10 +1293,10 @@
             font-size: 0.8rem;
         }
         
-        /* AI Score Display on Posts */
+        /* AI Score Display on Posts - FLOATING */
         .ai-score-badge {
             position: absolute;
-            top: 110px;
+            top: 80px;
             left: 20px;
             background: linear-gradient(135deg, rgba(74, 144, 226, 0.9), rgba(138, 56, 236, 0.9));
             backdrop-filter: blur(10px);
@@ -1209,7 +1306,7 @@
             display: flex;
             align-items: center;
             gap: 10px;
-            z-index: 25;
+            z-index: 20;
             border: 2px solid rgba(255, 255, 255, 0.3);
             animation: slideInLeft 0.5s ease-out;
             box-shadow: 0 4px 20px rgba(74, 144, 226, 0.5);
@@ -1322,21 +1419,38 @@
             z-index: 50;
         }
         
+        /* Loading Spinner */
+        .loading-spinner {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 1s ease-in-out infinite;
+        }
+        
+        /* Empty state */
+        .empty-state {
+            text-align: center;
+            padding: 50px 20px;
+            opacity: 0.6;
+        }
+        
+        .empty-icon {
+            font-size: 4rem;
+            margin-bottom: 20px;
+        }
+        
         /* Mobile Optimization */
         @media (max-width: 480px) {
             .header-center {
                 gap: 15px;
+                padding: 8px 18px;
             }
             
             .header-tab {
-                font-size: 1rem;
-            }
-            
-            .header-right {
-                width: 64px;
-                height: 64px;
-                font-size: 2.1rem;
-                border: 1px solid rgba(255,255,255,0.1);
+                font-size: 0.95rem;
             }
             
             .post-actions {
@@ -1348,7 +1462,6 @@
                 width: 42px;
                 height: 42px;
                 font-size: 1.2rem;
-                background: rgba(0, 0, 0, 0.4);
             }
             
             .user-avatar {
@@ -1370,7 +1483,6 @@
             .post-info {
                 padding: 15px;
                 right: 70px;
-                bottom: 10px;
             }
             
             .post-user {
@@ -1387,7 +1499,7 @@
             }
             
             .ai-score-badge {
-                top: 95px;
+                top: 70px;
                 left: 15px;
                 padding: 8px 15px;
             }
@@ -1427,15 +1539,15 @@
                 padding-bottom: max(10px, env(safe-area-inset-bottom));
             }
             
-            .gradient-overlay-top {
-                padding-top: env(safe-area-inset-top);
+            .post-info {
+                padding-bottom: max(80px, calc(70px + env(safe-area-inset-bottom)));
             }
         }
         
         /* Header Tab Adjustments for Mobile */
         @media (max-width: 360px) {
             .header-tab {
-                font-size: 0.95rem;
+                font-size: 0.9rem;
             }
             
             .header-left {
@@ -1443,48 +1555,53 @@
             }
             
             .header-center {
-                gap: 15px;
-                padding: 8px 18px;
+                gap: 12px;
+                padding: 7px 15px;
             }
             
             .header-right {
-                width: 60px;
-                height: 60px;
-                font-size: 2rem;
-                border: 1px solid rgba(255,255,255,0.1);
+                width: 32px;
+                height: 32px;
+                font-size: 1.1rem;
             }
-        }
-        .empty-state {
-            text-align: center;
-            padding: 50px 20px;
-            opacity: 0.6;
-        }
-        
-        .empty-icon {
-            font-size: 4rem;
-            margin-bottom: 20px;
-        }
-        .empty-state {
-            text-align: center;
-            padding: 50px 20px;
-            opacity: 0.6;
-        }
-        
-        .empty-icon {
-            font-size: 4rem;
-            margin-bottom: 20px;
         }
     </style>
 </head>
 <body>
-    <!-- Login Screen -->
+    <!-- Login Screen with Phone Auth -->
     <div id="loginScreen">
         <div class="login-content">
             <div class="app-logo">🎮</div>
             <h1 class="app-title">JomBro</h1>
-            <p class="app-subtitle">Let's Go! Let's Go!</p>
+            <p class="app-slogan">Let's Go! Let's Go!</p>
+            
+            <div class="login-form" id="phoneForm">
+                <div class="phone-input-container">
+                    <select class="country-code" id="countryCode">
+                        <option value="+60">🇲🇾 +60</option>
+                        <option value="+65">🇸🇬 +65</option>
+                        <option value="+1">🇺🇸 +1</option>
+                        <option value="+44">🇬🇧 +44</option>
+                        <option value="+91">🇮🇳 +91</option>
+                        <option value="+86">🇨🇳 +86</option>
+                        <option value="+81">🇯🇵 +81</option>
+                        <option value="+82">🇰🇷 +82</option>
+                    </select>
+                    <input type="tel" class="phone-input" id="phoneNumber" placeholder="Phone number" maxlength="15">
+                </div>
+                <button class="auth-btn" onclick="sendOTP()">Get Started →</button>
+                <div id="recaptcha-container"></div>
+            </div>
+            
+            <div class="verification-container" id="otpForm">
+                <p style="margin-bottom: 15px; opacity: 0.9;">Enter the code sent to <span id="phoneDisplay"></span></p>
+                <input type="text" class="otp-input" id="otpCode" placeholder="123456" maxlength="6">
+                <button class="auth-btn" onclick="verifyOTP()">Verify & Continue →</button>
+                <button class="quick-start-btn" onclick="resendOTP()">Resend Code</button>
+            </div>
+            
             <button class="quick-start-btn" onclick="quickStart()">
-                Start Playing →
+                Quick Start (Demo Mode)
             </button>
         </div>
     </div>
@@ -1499,61 +1616,12 @@
         <div class="header-right" onclick="showSearch()">🔍</div>
     </div>
     
-    <!-- Main Feed (TikTok Style) -->
+    <!-- Main Feed (Full Screen) -->
     <div class="feed-container" id="feedContainer" style="display: none;">
-        
-        <!-- Default Static Post -->
-        <div class="feed-post">
-            <div class="post-media">
-                <img class="post-image" src="https://picsum.photos/400/800?random=1" alt="Challenge">
-                <div class="frame-wrapper frame-gradient-border"></div>
-            </div>
-            
-            <div class="gradient-overlay-top"></div>
-            <div class="gradient-overlay-bottom"></div>
-            
-            <div class="ai-score-badge">
-                <span class="ai-icon">🤖</span>
-                <span class="score-value">92%</span>
-                <div class="score-stars">⭐⭐⭐⭐⭐</div>
-            </div>
-            
-            <div class="post-actions">
-                <div class="action-item">
-                    <div class="user-avatar">😎<div class="follow-btn">+</div></div>
-                </div>
-                <div class="action-item">
-                    <div class="action-icon">❤️</div>
-                    <div class="action-count">234</div>
-                </div>
-                <div class="action-item">
-                    <div class="action-icon">💬</div>
-                    <div class="action-count">45</div>
-                </div>
-                <div class="action-item">
-                    <div class="action-icon">↗️</div>
-                    <div class="action-count">Share</div>
-                </div>
-                <div class="action-item">
-                    <div class="action-icon">⋮</div>
-                </div>
-            </div>
-            
-            <div class="post-info">
-                <div class="post-user">@alex_gamer</div>
-                <div class="challenge-badge">
-                    🎯 20 Pushup Challenge • 🪙 100 • 👥 People I Know
-                </div>
-                <div class="post-caption">Just crushed the pushup challenge! 💪 Challenge dedicated to my gym buddies!</div>
-                <div class="post-music">
-                    <span class="music-icon">🎵</span>
-                    <span>Original sound - alex_gamer</span>
-                </div>
-            </div>
-        </div>
+        <!-- Posts will be dynamically loaded here -->
     </div>
     
-    <!-- Bottom Navigation -->
+    <!-- Bottom Navigation (Floating) -->
     <div class="bottom-nav" id="bottomNav" style="display: none;">
         <button class="nav-item active" onclick="switchNav('home', this)">
             <span class="nav-icon">🏠</span>
@@ -1576,7 +1644,7 @@
         </button>
     </div>
     
-    <!-- Camera/Upload Interface -->
+    <!-- Camera/Upload Interface (Full Screen) -->
     <div class="camera-interface" id="cameraInterface">
         <div class="camera-view">
             <video class="camera-video" id="cameraVideo" autoplay muted playsinline></video>
@@ -1841,7 +1909,7 @@
         };
         
         // Initialize Firebase
-        let app, db, storage;
+        let app, auth, db, storage;
         let currentUser = null;
         let userData = null;
         let feedPosts = [];
@@ -1852,24 +1920,187 @@
         let aiChallenges = [];
         let usedChallenges = new Set();
         let challengeTimer = null;
+        let confirmationResult = null;
+        let recaptchaVerifier = null;
         
         // Initialize app
         window.onload = function() {
             try {
                 app = firebase.initializeApp(firebaseConfig);
+                auth = firebase.auth();
                 db = firebase.firestore();
                 storage = firebase.storage();
                 console.log('Firebase initialized!');
+                
+                // Setup phone auth
+                setupPhoneAuth();
                 
                 // Load saved challenges from localStorage
                 const saved = localStorage.getItem('usedChallenges');
                 if (saved) {
                     usedChallenges = new Set(JSON.parse(saved));
                 }
+                
+                // Check if user is already logged in
+                auth.onAuthStateChanged(user => {
+                    if (user) {
+                        handleAuthSuccess(user);
+                    }
+                });
             } catch (error) {
                 console.error('Firebase error:', error);
             }
         };
+        
+        // Setup phone authentication
+        function setupPhoneAuth() {
+            try {
+                recaptchaVerifier = new firebase.auth.RecaptchaVerifier('recaptcha-container', {
+                    'size': 'invisible',
+                    'callback': (response) => {
+                        console.log('reCAPTCHA solved');
+                    }
+                });
+            } catch (error) {
+                console.error('reCAPTCHA setup error:', error);
+            }
+        }
+        
+        // Send OTP
+        async function sendOTP() {
+            const countryCode = document.getElementById('countryCode').value;
+            const phoneNumber = document.getElementById('phoneNumber').value;
+            
+            if (!phoneNumber || phoneNumber.length < 6) {
+                showToast('Please enter a valid phone number');
+                return;
+            }
+            
+            const fullNumber = countryCode + phoneNumber;
+            document.getElementById('phoneDisplay').textContent = fullNumber;
+            
+            // Show loading
+            const btn = event.target;
+            btn.disabled = true;
+            btn.innerHTML = '<span class="loading-spinner"></span> Sending...';
+            
+            try {
+                confirmationResult = await auth.signInWithPhoneNumber(fullNumber, recaptchaVerifier);
+                
+                // Show OTP form
+                document.getElementById('phoneForm').style.display = 'none';
+                document.getElementById('otpForm').style.display = 'flex';
+                
+                showToast('OTP sent successfully! Check your messages.');
+                
+                // Auto focus OTP input
+                setTimeout(() => {
+                    document.getElementById('otpCode').focus();
+                }, 100);
+            } catch (error) {
+                console.error('OTP send error:', error);
+                showToast('Error sending OTP. Please try again.');
+                btn.disabled = false;
+                btn.innerHTML = 'Get Started →';
+            }
+        }
+        
+        // Verify OTP
+        async function verifyOTP() {
+            const otpCode = document.getElementById('otpCode').value;
+            
+            if (!otpCode || otpCode.length !== 6) {
+                showToast('Please enter the 6-digit code');
+                return;
+            }
+            
+            // Show loading
+            const btn = event.target;
+            btn.disabled = true;
+            btn.innerHTML = '<span class="loading-spinner"></span> Verifying...';
+            
+            try {
+                const result = await confirmationResult.confirm(otpCode);
+                handleAuthSuccess(result.user);
+            } catch (error) {
+                console.error('OTP verification error:', error);
+                showToast('Invalid code. Please try again.');
+                btn.disabled = false;
+                btn.innerHTML = 'Verify & Continue →';
+            }
+        }
+        
+        // Resend OTP
+        function resendOTP() {
+            document.getElementById('phoneForm').style.display = 'flex';
+            document.getElementById('otpForm').style.display = 'none';
+            showToast('Enter your phone number again');
+        }
+        
+        // Handle successful authentication
+        async function handleAuthSuccess(user) {
+            currentUser = user;
+            
+            // Check if user exists in Firestore
+            try {
+                const userDoc = await db.collection('users').doc(user.uid).get();
+                
+                if (userDoc.exists) {
+                    userData = userDoc.data();
+                } else {
+                    // Create new user
+                    userData = {
+                        name: 'Player' + Math.floor(Math.random() * 9999),
+                        avatar: '🎮',
+                        tokens: 1000,
+                        level: 1,
+                        completedChallenges: 0,
+                        followers: 0,
+                        phoneNumber: user.phoneNumber,
+                        createdAt: new Date()
+                    };
+                    
+                    await db.collection('users').doc(user.uid).set(userData);
+                }
+                
+                // Start app
+                startApp();
+            } catch (error) {
+                console.error('User setup error:', error);
+                // Continue in offline mode
+                userData = {
+                    name: 'Player' + Math.floor(Math.random() * 9999),
+                    avatar: '🎮',
+                    tokens: 1000,
+                    level: 1,
+                    completedChallenges: 0,
+                    followers: 0
+                };
+                startApp();
+            }
+        }
+        
+        // Start app after auth
+        function startApp() {
+            // Hide login screen
+            document.getElementById('loginScreen').style.display = 'none';
+            
+            // Show main app
+            document.getElementById('feedContainer').style.display = 'block';
+            document.querySelector('.feed-header').style.display = 'flex';
+            document.getElementById('bottomNav').style.display = 'flex';
+            
+            // Update profile
+            updateProfile();
+            
+            // Start AI challenge timer
+            startChallengeTimer();
+            
+            // Load feed
+            loadFeed();
+            
+            showToast('Welcome to JomBro! 🎮');
+        }
         
         // Frame generation system
         const frameStyles = [
@@ -2089,16 +2320,17 @@
             setTimeout(() => toast.remove(), 3000);
         }
         
-        // Quick start
+        // Quick start (Demo mode)
         async function quickStart() {
             try {
                 console.log('Quick start clicked!');
                 
                 // Generate user
-                const userId = 'user_' + Date.now();
+                const userId = 'demo_' + Date.now();
                 currentUser = {
                     uid: userId,
-                    name: 'Player' + Math.floor(Math.random() * 9999)
+                    name: 'Player' + Math.floor(Math.random() * 9999),
+                    isDemo: true
                 };
                 
                 // Create user data
@@ -2108,7 +2340,8 @@
                     tokens: 1000,
                     level: 1,
                     completedChallenges: 0,
-                    followers: 0
+                    followers: 0,
+                    isDemo: true
                 };
                 
                 // Save to Firestore if available
@@ -2120,22 +2353,10 @@
                     }
                 }
                 
-                // Show app
-                document.getElementById('loginScreen').style.display = 'none';
-                document.getElementById('feedContainer').style.display = 'block';
-                document.querySelector('.feed-header').style.display = 'flex';
-                document.getElementById('bottomNav').style.display = 'flex';
+                // Start app
+                startApp();
                 
-                // Update profile
-                updateProfile();
-                
-                // Start AI challenge timer
-                startChallengeTimer();
-                
-                // Load feed
-                loadFeed();
-                
-                showToast('Welcome to JomBro! 🎮');
+                showToast('Demo mode activated! Sign in with phone for full features.');
             } catch (error) {
                 console.error('Error in quickStart:', error);
                 showToast('Error starting app. Please refresh and try again.');
@@ -2150,7 +2371,7 @@
                 // Reset used frame combinations when loading feed
                 usedFrameCombinations.clear();
                 
-                // Create sample posts
+                // Create sample posts with real random images
                 const samplePosts = [
                     {
                         id: 'post1',
@@ -2165,7 +2386,393 @@
                         likes: 234,
                         comments: 45,
                         mediaType: 'image',
-                        mediaUrl: 'https://picsum.photos/400/800?random=1',
+                        mediaUrl: `https://picsum.photos/seed/${Date.now()}/1080/1920`,
+                aiScore: score,
+                createdAt: new Date()
+            };
+            
+            // Save to Firestore if not demo
+            if (db && !currentUser.isDemo) {
+                try {
+                    await db.collection('posts').add(newPost);
+                } catch (error) {
+                    console.log('Offline post save');
+                }
+            }
+            
+            feedPosts.unshift(newPost);
+            loadFeed();
+        }
+        
+        // Select dedication option
+        function selectDedication(button, value) {
+            // Remove active class from all buttons
+            document.querySelectorAll('.dedication-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            
+            // Add active class to clicked button
+            button.classList.add('active');
+            
+            // Update hidden input
+            document.getElementById('challengeDedication').value = value;
+        }
+        
+        // Flip camera
+        async function flipCamera() {
+            try {
+                const video = document.getElementById('cameraVideo');
+                const currentFacingMode = video.srcObject?.getVideoTracks()[0]?.getSettings().facingMode || 'user';
+                const newFacingMode = currentFacingMode === 'user' ? 'environment' : 'user';
+                
+                // Stop current stream
+                if (videoStream) {
+                    videoStream.getTracks().forEach(track => track.stop());
+                }
+                
+                // Start new stream
+                videoStream = await navigator.mediaDevices.getUserMedia({ 
+                    video: { facingMode: newFacingMode }, 
+                    audio: true 
+                });
+                
+                video.srcObject = videoStream;
+                showToast('Camera switched');
+            } catch (error) {
+                console.error('Camera flip error:', error);
+                showToast('Error switching camera');
+            }
+        }
+        
+        // Open gallery
+        function openGallery() {
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.accept = 'video/*,image/*';
+            input.onchange = (e) => {
+                const file = e.target.files[0];
+                if (file) {
+                    showToast('File selected: ' + file.name);
+                    // In a real app, this would process the file
+                }
+            };
+            input.click();
+        }
+        
+        // Show profile
+        function showProfile() {
+            updateProfile();
+            showModal('profileModal');
+        }
+        
+        // Update profile display
+        function updateProfile() {
+            try {
+                if (!userData) {
+                    console.error('No user data available');
+                    return;
+                }
+                
+                document.getElementById('profileAvatar').textContent = userData.avatar || '🎮';
+                document.getElementById('profileName').textContent = '@' + (userData.name || 'player');
+                document.getElementById('tokenStat').textContent = userData.tokens || 0;
+                document.getElementById('levelStat').textContent = userData.level || 1;
+                document.getElementById('challengeStat').textContent = userData.completedChallenges || 0;
+                document.getElementById('followerStat').textContent = userData.followers || Math.floor(Math.random() * 1000);
+                
+                // Load recent challenges
+                const recentChallenges = [
+                    { title: 'Dance Challenge', score: 92, reward: 150 },
+                    { title: 'Pushup Challenge', score: 88, reward: 100 },
+                    { title: 'Cooking Challenge', score: 76, reward: 200 }
+                ];
+                
+                const recentChallengesEl = document.getElementById('recentChallenges');
+                if (recentChallengesEl) {
+                    recentChallengesEl.innerHTML = recentChallenges.map(ch => `
+                        <div class="challenge-item">
+                            <div style="display: flex; justify-content: space-between; align-items: center;">
+                                <div>
+                                    <h5>${ch.title}</h5>
+                                    <small style="opacity: 0.7;">AI Score: ${ch.score}%</small>
+                                </div>
+                                <div class="challenge-reward">+${ch.reward} 🪙</div>
+                            </div>
+                        </div>
+                    `).join('');
+                }
+                
+                // Load top performances
+                const topPerformances = [
+                    { title: 'Best Dance', score: 98, likes: 1234 },
+                    { title: 'Epic Food Challenge', score: 95, likes: 890 }
+                ];
+                
+                const topPerformancesEl = document.getElementById('topPerformances');
+                if (topPerformancesEl) {
+                    topPerformancesEl.innerHTML = topPerformances.map(perf => `
+                        <div class="challenge-item">
+                            <div style="display: flex; justify-content: space-between; align-items: center;">
+                                <div>
+                                    <h5>${perf.title}</h5>
+                                    <small style="opacity: 0.7;">❤️ ${perf.likes} likes</small>
+                                </div>
+                                <div style="color: #4a90e2; font-weight: 600;">${perf.score}%</div>
+                            </div>
+                        </div>
+                    `).join('');
+                }
+            } catch (error) {
+                console.error('Error updating profile:', error);
+            }
+        }
+        
+        // Edit profile
+        function editProfile() {
+            const newName = prompt('Enter new username:', userData.name);
+            if (newName && newName.trim()) {
+                userData.name = newName.trim();
+                
+                // Save to Firestore
+                if (db && !currentUser.isDemo) {
+                    try {
+                        db.collection('users').doc(currentUser.uid).update({
+                            name: userData.name
+                        });
+                    } catch (error) {
+                        console.log('Offline profile update');
+                    }
+                }
+                
+                updateProfile();
+                showToast('Profile updated!');
+            }
+        }
+        
+        // Create challenge
+        async function createChallenge(e) {
+            e.preventDefault();
+            
+            const title = document.getElementById('challengeTitle').value;
+            const description = document.getElementById('challengeDesc').value;
+            const category = document.getElementById('challengeCategory').value;
+            const reward = parseInt(document.getElementById('challengeReward').value);
+            const dedication = document.getElementById('challengeDedication').value;
+            
+            if (userData.tokens < 50) {
+                showToast('Not enough tokens! Need 50 tokens.');
+                return;
+            }
+            
+            // Deduct tokens
+            userData.tokens -= 50;
+            
+            // Save challenge
+            const challenge = {
+                title,
+                description,
+                category,
+                reward,
+                dedication,
+                creator: userData.name,
+                creatorId: currentUser.uid,
+                createdAt: new Date()
+            };
+            
+            if (db && !currentUser.isDemo) {
+                try {
+                    await db.collection('challenges').add(challenge);
+                    await db.collection('users').doc(currentUser.uid).update({
+                        tokens: userData.tokens
+                    });
+                } catch (error) {
+                    console.log('Saved locally');
+                }
+            }
+            
+            updateProfile();
+            
+            // Show dedication in toast
+            const dedicationText = dedication === 'people-i-know' ? 'People I Know' : 
+                                 dedication === 'people-i-dont-know' ? "People I Don't Know" : 
+                                 'Open to Public';
+            
+            showToast(`Challenge created for ${dedicationText}! -50 tokens`);
+            closeModal('createModal');
+            
+            // Reset form
+            e.target.reset();
+            document.getElementById('challengeDedication').value = 'open-public';
+        }
+        
+        // Show comments
+        function showComments(postId) {
+            const post = feedPosts.find(p => p.id === postId);
+            if (post) {
+                showToast(`${post.comments} comments on this post`);
+                // In a real app, this would open a comments modal
+            }
+        }
+        
+        // Share post
+        function sharePost(postId) {
+            if (navigator.share) {
+                navigator.share({
+                    title: 'JomBro Challenge',
+                    text: 'Check out this awesome challenge!',
+                    url: window.location.href
+                });
+            } else {
+                // Fallback - copy to clipboard
+                navigator.clipboard.writeText(window.location.href).then(() => {
+                    showToast('Link copied!');
+                });
+            }
+        }
+        
+        // Show search
+        function showSearch() {
+            showModal('searchModal');
+            // Auto-focus the search input
+            setTimeout(() => {
+                document.querySelector('#searchModal input').focus();
+            }, 100);
+        }
+        
+        // Show/hide modal
+        function showModal(modalId) {
+            document.getElementById(modalId).style.display = 'flex';
+        }
+        
+        function closeModal(modalId) {
+            document.getElementById(modalId).style.display = 'none';
+        }
+        
+        // Handle swipe gestures for feed navigation
+        let touchStartY = 0;
+        let touchEndY = 0;
+        
+        document.addEventListener('touchstart', (e) => {
+            touchStartY = e.touches[0].clientY;
+        }, { passive: true });
+        
+        document.addEventListener('touchend', (e) => {
+            touchEndY = e.changedTouches[0].clientY;
+            handleSwipe();
+        }, { passive: true });
+        
+        function handleSwipe() {
+            const diff = touchStartY - touchEndY;
+            
+            if (Math.abs(diff) > 50) {
+                // Swipe threshold
+                if (diff > 0) {
+                    // Swipe up - next video
+                    console.log('Next video');
+                } else {
+                    // Swipe down - previous video
+                    console.log('Previous video');
+                }
+            }
+        }
+        
+        // Add CSS animation for heart float
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes heartFloat {
+                0% {
+                    opacity: 1;
+                    transform: translateY(0) scale(1);
+                }
+                100% {
+                    opacity: 0;
+                    transform: translateY(-100px) scale(1.5);
+                }
+            }
+            
+            @keyframes recordPulse {
+                0% { transform: scale(1); }
+                50% { transform: scale(1.1); }
+                100% { transform: scale(1); }
+            }
+        `;
+        document.head.appendChild(style);
+        
+        // Make all necessary functions globally accessible
+        window.sendOTP = sendOTP;
+        window.verifyOTP = verifyOTP;
+        window.resendOTP = resendOTP;
+        window.quickStart = quickStart;
+        window.switchFeed = switchFeed;
+        window.switchNav = switchNav;
+        window.openCamera = openCamera;
+        window.showProfile = showProfile;
+        window.closeCamera = closeCamera;
+        window.flipCamera = flipCamera;
+        window.toggleRecording = toggleRecording;
+        window.openGallery = openGallery;
+        window.acceptScore = acceptScore;
+        window.closeModal = closeModal;
+        window.showModal = showModal;
+        window.editProfile = editProfile;
+        window.createChallenge = createChallenge;
+        window.showComments = showComments;
+        window.sharePost = sharePost;
+        window.showSearch = showSearch;
+        window.toggleLike = toggleLike;
+        window.showToast = showToast;
+        window.selectDedication = selectDedication;
+        window.showAchievements = showAchievements;
+        window.filterCategory = filterCategory;
+        window.searchChallenges = searchChallenges;
+        window.selectTrendingChallenge = selectTrendingChallenge;
+        window.switchInboxTab = switchInboxTab;
+        window.acceptChallenge = acceptChallenge;
+        window.declineChallenge = declineChallenge;
+        
+        // Cleanup on page unload
+        window.addEventListener('beforeunload', () => {
+            if (challengeTimer) {
+                clearInterval(challengeTimer);
+            }
+            if (window.challengeCountdownTimer) {
+                clearInterval(window.challengeCountdownTimer);
+            }
+            if (videoStream) {
+                videoStream.getTracks().forEach(track => track.stop());
+            }
+        });
+        
+        // Handle phone input formatting
+        document.getElementById('phoneNumber').addEventListener('input', (e) => {
+            // Remove non-numeric characters
+            e.target.value = e.target.value.replace(/\D/g, '');
+        });
+        
+        // Handle OTP input
+        document.getElementById('otpCode').addEventListener('input', (e) => {
+            // Remove non-numeric characters
+            e.target.value = e.target.value.replace(/\D/g, '');
+            
+            // Auto-submit when 6 digits entered
+            if (e.target.value.length === 6) {
+                verifyOTP();
+            }
+        });
+        
+        // Logout function (for profile menu)
+        window.logout = function() {
+            if (confirm('Are you sure you want to logout?')) {
+                auth.signOut().then(() => {
+                    location.reload();
+                });
+            }
+        }
+        
+        console.log('JomBro app initialized! Let\'s Go! Let\'s Go!');
+    </script>
+</body>
+</html>.now() + 1}/1080/1920`,
                         aiScore: 92
                     },
                     {
@@ -2181,7 +2788,7 @@
                         likes: 567,
                         comments: 89,
                         mediaType: 'image',
-                        mediaUrl: 'https://picsum.photos/400/800?random=2',
+                        mediaUrl: `https://picsum.photos/seed/${Date.now() + 2}/1080/1920`,
                         aiScore: 88
                     },
                     {
@@ -2197,7 +2804,7 @@
                         likes: 890,
                         comments: 156,
                         mediaType: 'image',
-                        mediaUrl: 'https://picsum.photos/400/800?random=3',
+                        mediaUrl: `https://picsum.photos/seed/${Date.now() + 3}/1080/1920`,
                         aiScore: 95
                     },
                     {
@@ -2213,7 +2820,7 @@
                         likes: 423,
                         comments: 67,
                         mediaType: 'image',
-                        mediaUrl: 'https://picsum.photos/400/800?random=4',
+                        mediaUrl: `https://picsum.photos/seed/${Date.now() + 4}/1080/1920`,
                         aiScore: 78
                     },
                     {
@@ -2229,10 +2836,26 @@
                         likes: 789,
                         comments: 123,
                         mediaType: 'image',
-                        mediaUrl: 'https://picsum.photos/400/800?random=5',
+                        mediaUrl: `https://picsum.photos/seed/${Date.now() + 5}/1080/1920`,
                         aiScore: 84
                     }
                 ];
+                
+                // Load posts from Firestore if available
+                if (db && !currentUser.isDemo) {
+                    try {
+                        const snapshot = await db.collection('posts')
+                            .orderBy('createdAt', 'desc')
+                            .limit(10)
+                            .get();
+                        
+                        snapshot.forEach(doc => {
+                            samplePosts.unshift(doc.data());
+                        });
+                    } catch (error) {
+                        console.log('Using default posts');
+                    }
+                }
                 
                 // Clear existing posts
                 container.innerHTML = '';
@@ -2253,7 +2876,7 @@
             }
         }
         
-        // Create post element (TikTok style)
+        // Create post element (Full Screen TikTok style)
         function createPostElement(post, index) {
             try {
                 const postDiv = document.createElement('div');
@@ -2275,7 +2898,7 @@
                 
                 postDiv.innerHTML = `
                     <div class="post-media">
-                        <img class="post-image" src="${post.mediaUrl}" alt="Challenge" onerror="this.src='https://via.placeholder.com/400x800/222/fff?text=JomBro'">
+                        <img class="post-image" src="${post.mediaUrl}" alt="Challenge" loading="lazy" onerror="this.src='https://via.placeholder.com/1080x1920/222/fff?text=JomBro'">
                         <div class="frame-wrapper ${frameClass}" ${frameStyle}></div>
                     </div>
                     
@@ -2403,6 +3026,17 @@
             }
             
             likeBtn.nextElementSibling.textContent = formatCount(post.likes);
+            
+            // Save to Firestore if not demo
+            if (db && !currentUser.isDemo) {
+                try {
+                    db.collection('posts').doc(postId).update({
+                        likes: post.likes
+                    });
+                } catch (error) {
+                    console.log('Offline like');
+                }
+            }
         }
         
         // Create heart animation
@@ -2704,7 +3338,10 @@
             };
             
             updateTimer();
-            setInterval(updateTimer, 1000);
+            const timer = setInterval(updateTimer, 1000);
+            
+            // Store timer reference for cleanup
+            window.challengeCountdownTimer = timer;
         }
         
         // Close camera
@@ -2718,6 +3355,11 @@
             
             if (isRecording) {
                 stopRecording();
+            }
+            
+            // Clear countdown timer
+            if (window.challengeCountdownTimer) {
+                clearInterval(window.challengeCountdownTimer);
             }
         }
         
@@ -2869,7 +3511,7 @@
         }
         
         // Accept score and post
-        window.acceptScore = function() {
+        window.acceptScore = async function() {
             const score = parseInt(document.getElementById('scoreValue').textContent);
             
             // Calculate reward based on score
@@ -2886,6 +3528,19 @@
                 showToast(`🎉 LEVEL UP! You're now level ${userData.level}!`);
             }
             
+            // Save to Firestore
+            if (db && !currentUser.isDemo) {
+                try {
+                    await db.collection('users').doc(currentUser.uid).update({
+                        tokens: userData.tokens,
+                        completedChallenges: userData.completedChallenges,
+                        level: userData.level
+                    });
+                } catch (error) {
+                    console.log('Offline score save');
+                }
+            }
+            
             updateProfile();
             
             // Close everything
@@ -2899,7 +3554,7 @@
         }
         
         // Add completed challenge to feed
-        function addToFeed(challenge, score) {
+        async function addToFeed(challenge, score) {
             const newPost = {
                 id: 'post_' + Date.now(),
                 user: { name: userData.name, avatar: userData.avatar },
@@ -2912,286 +3567,4 @@
                 likes: 0,
                 comments: 0,
                 mediaType: 'image',
-                mediaUrl: 'https://picsum.photos/400/800?random=' + Date.now(),
-                aiScore: score
-            };
-            
-            feedPosts.unshift(newPost);
-            loadFeed();
-        }
-        
-        // Select dedication option
-        function selectDedication(button, value) {
-            // Remove active class from all buttons
-            document.querySelectorAll('.dedication-btn').forEach(btn => {
-                btn.classList.remove('active');
-            });
-            
-            // Add active class to clicked button
-            button.classList.add('active');
-            
-            // Update hidden input
-            document.getElementById('challengeDedication').value = value;
-        }
-        
-        // Flip camera
-        function flipCamera() {
-            showToast('Switching camera...');
-        }
-        
-        // Open gallery
-        function openGallery() {
-            showToast('Gallery upload coming soon!');
-        }
-        
-        // Show profile
-        function showProfile() {
-            updateProfile();
-            showModal('profileModal');
-        }
-        
-        // Update profile display
-        function updateProfile() {
-            try {
-                if (!userData) {
-                    console.error('No user data available');
-                    return;
-                }
-                
-                document.getElementById('profileAvatar').textContent = userData.avatar || '🎮';
-                document.getElementById('profileName').textContent = '@' + (userData.name || 'player');
-                document.getElementById('tokenStat').textContent = userData.tokens || 0;
-                document.getElementById('levelStat').textContent = userData.level || 1;
-                document.getElementById('challengeStat').textContent = userData.completedChallenges || 0;
-                document.getElementById('followerStat').textContent = userData.followers || Math.floor(Math.random() * 1000);
-                
-                // Load recent challenges
-                const recentChallenges = [
-                    { title: 'Dance Challenge', score: 92, reward: 150 },
-                    { title: 'Pushup Challenge', score: 88, reward: 100 },
-                    { title: 'Cooking Challenge', score: 76, reward: 200 }
-                ];
-                
-                const recentChallengesEl = document.getElementById('recentChallenges');
-                if (recentChallengesEl) {
-                    recentChallengesEl.innerHTML = recentChallenges.map(ch => `
-                        <div class="challenge-item">
-                            <div style="display: flex; justify-content: space-between; align-items: center;">
-                                <div>
-                                    <h5>${ch.title}</h5>
-                                    <small style="opacity: 0.7;">AI Score: ${ch.score}%</small>
-                                </div>
-                                <div class="challenge-reward">+${ch.reward} 🪙</div>
-                            </div>
-                        </div>
-                    `).join('');
-                }
-                
-                // Load top performances
-                const topPerformances = [
-                    { title: 'Best Dance', score: 98, likes: 1234 },
-                    { title: 'Epic Food Challenge', score: 95, likes: 890 }
-                ];
-                
-                const topPerformancesEl = document.getElementById('topPerformances');
-                if (topPerformancesEl) {
-                    topPerformancesEl.innerHTML = topPerformances.map(perf => `
-                        <div class="challenge-item">
-                            <div style="display: flex; justify-content: space-between; align-items: center;">
-                                <div>
-                                    <h5>${perf.title}</h5>
-                                    <small style="opacity: 0.7;">❤️ ${perf.likes} likes</small>
-                                </div>
-                                <div style="color: #4a90e2; font-weight: 600;">${perf.score}%</div>
-                            </div>
-                        </div>
-                    `).join('');
-                }
-            } catch (error) {
-                console.error('Error updating profile:', error);
-            }
-        }
-        
-        // Edit profile
-        function editProfile() {
-            const newName = prompt('Enter new username:', userData.name);
-            if (newName) {
-                userData.name = newName;
-                updateProfile();
-                showToast('Profile updated!');
-            }
-        }
-        
-        // Create challenge
-        async function createChallenge(e) {
-            e.preventDefault();
-            
-            const title = document.getElementById('challengeTitle').value;
-            const description = document.getElementById('challengeDesc').value;
-            const category = document.getElementById('challengeCategory').value;
-            const reward = parseInt(document.getElementById('challengeReward').value);
-            const dedication = document.getElementById('challengeDedication').value;
-            
-            if (userData.tokens < 50) {
-                showToast('Not enough tokens! Need 50 tokens.');
-                return;
-            }
-            
-            // Deduct tokens
-            userData.tokens -= 50;
-            updateProfile();
-            
-            // Save challenge
-            const challenge = {
-                title,
-                description,
-                category,
-                reward,
-                dedication,
-                creator: currentUser.name,
-                createdAt: new Date()
-            };
-            
-            if (db) {
-                try {
-                    await db.collection('challenges').add(challenge);
-                } catch (error) {
-                    console.log('Saved locally');
-                }
-            }
-            
-            // Show dedication in toast
-            const dedicationText = dedication === 'people-i-know' ? 'People I Know' : 
-                                 dedication === 'people-i-dont-know' ? "People I Don't Know" : 
-                                 'Open to Public';
-            
-            showToast(`Challenge created for ${dedicationText}! -50 tokens`);
-            closeModal('createModal');
-            
-            // Reset form
-            e.target.reset();
-            document.getElementById('challengeDedication').value = 'open-public';
-        }
-        
-        // Show comments
-        function showComments(postId) {
-            const post = feedPosts.find(p => p.id === postId);
-            if (post) {
-                showToast(`${post.comments} comments on this post`);
-                // In a real app, this would open a comments modal
-            }
-        }
-        
-        // Share post
-        function sharePost(postId) {
-            if (navigator.share) {
-                navigator.share({
-                    title: 'JomBro Challenge',
-                    text: 'Check out this awesome challenge!',
-                    url: window.location.href
-                });
-            } else {
-                showToast('Link copied!');
-            }
-        }
-        
-        // Show search
-        function showSearch() {
-            showModal('searchModal');
-            // Auto-focus the search input
-            setTimeout(() => {
-                document.querySelector('#searchModal input').focus();
-            }, 100);
-        }
-        
-        // Show/hide modal
-        function showModal(modalId) {
-            document.getElementById(modalId).style.display = 'flex';
-        }
-        
-        function closeModal(modalId) {
-            document.getElementById(modalId).style.display = 'none';
-        }
-        
-        // Handle swipe gestures (optional)
-        let startY = 0;
-        let endY = 0;
-        
-        document.addEventListener('touchstart', (e) => {
-            startY = e.touches[0].clientY;
-        });
-        
-        document.addEventListener('touchend', (e) => {
-            endY = e.changedTouches[0].clientY;
-            handleSwipe();
-        });
-        
-        function handleSwipe() {
-            const diff = startY - endY;
-            
-            if (Math.abs(diff) > 50) {
-                // Swipe threshold
-                if (diff > 0) {
-                    // Swipe up - next video
-                    console.log('Next video');
-                } else {
-                    // Swipe down - previous video
-                    console.log('Previous video');
-                }
-            }
-        }
-        
-        // Add CSS animation for heart float
-        const style = document.createElement('style');
-        style.textContent = `
-            @keyframes heartFloat {
-                0% {
-                    opacity: 1;
-                    transform: translateY(0) scale(1);
-                }
-                100% {
-                    opacity: 0;
-                    transform: translateY(-100px) scale(1.5);
-                }
-            }
-        `;
-        document.head.appendChild(style);
-        
-        // Make all necessary functions globally accessible
-        window.quickStart = quickStart;
-        window.switchFeed = switchFeed;
-        window.switchNav = switchNav;
-        window.openCamera = openCamera;
-        window.showProfile = showProfile;
-        window.closeCamera = closeCamera;
-        window.flipCamera = flipCamera;
-        window.toggleRecording = toggleRecording;
-        window.openGallery = openGallery;
-        window.acceptScore = acceptScore;
-        window.closeModal = closeModal;
-        window.showModal = showModal;
-        window.editProfile = editProfile;
-        window.createChallenge = createChallenge;
-        window.showComments = showComments;
-        window.sharePost = sharePost;
-        window.showSearch = showSearch;
-        window.toggleLike = toggleLike;
-        window.showToast = showToast;
-        window.selectDedication = selectDedication;
-        window.showAchievements = showAchievements;
-        window.filterCategory = filterCategory;
-        window.searchChallenges = searchChallenges;
-        window.selectTrendingChallenge = selectTrendingChallenge;
-        window.switchInboxTab = switchInboxTab;
-        window.acceptChallenge = acceptChallenge;
-        window.declineChallenge = declineChallenge;
-        
-        // Cleanup on page unload
-        window.addEventListener('beforeunload', () => {
-            if (challengeTimer) {
-                clearInterval(challengeTimer);
-            }
-        });
-    </script>
-</body>
-</html>
+                mediaUrl: `https://picsum.photos/seed/${Date
