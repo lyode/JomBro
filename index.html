@@ -1922,35 +1922,27 @@
             </div>
             
             <div style="margin-bottom: 20px;">
-                <input type="text" class="form-input" placeholder="Search users, challenges, or hashtags..." style="font-size: 1.1rem;">
+                <input type="text" class="form-input" placeholder="Search users, challenges, or hashtags..." style="font-size: 1.1rem;" onkeyup="searchUsers(this.value)">
             </div>
             
             <div style="margin-bottom: 20px;">
                 <h4 style="margin-bottom: 10px;">Trending Hashtags</h4>
                 <div style="display: flex; flex-wrap: wrap; gap: 10px;">
-                    <span class="challenge-badge" style="cursor: pointer;">#SpicyChallenge</span>
-                    <span class="challenge-badge" style="cursor: pointer;">#DanceOff</span>
-                    <span class="challenge-badge" style="cursor: pointer;">#FitnessGoals</span>
-                    <span class="challenge-badge" style="cursor: pointer;">#CreativeMinds</span>
-                    <span class="challenge-badge" style="cursor: pointer;">#JomBroChallenge</span>
+                    <span class="challenge-badge" style="cursor: pointer;" onclick="searchHashtag('SpicyChallenge')">#SpicyChallenge</span>
+                    <span class="challenge-badge" style="cursor: pointer;" onclick="searchHashtag('DanceOff')">#DanceOff</span>
+                    <span class="challenge-badge" style="cursor: pointer;" onclick="searchHashtag('FitnessGoals')">#FitnessGoals</span>
+                    <span class="challenge-badge" style="cursor: pointer;" onclick="searchHashtag('CreativeMinds')">#CreativeMinds</span>
+                    <span class="challenge-badge" style="cursor: pointer;" onclick="searchHashtag('JomBroChallenge')">#JomBroChallenge</span>
+                    <span class="challenge-badge" style="cursor: pointer;" onclick="searchHashtag('100BurpeeChallenge')">#100BurpeeChallenge</span>
+                    <span class="challenge-badge" style="cursor: pointer;" onclick="searchHashtag('ParkourLife')">#ParkourLife</span>
+                    <span class="challenge-badge" style="cursor: pointer;" onclick="searchHashtag('FoodChallenge')">#FoodChallenge</span>
                 </div>
             </div>
             
-            <div>
+            <div id="searchResults">
                 <h4 style="margin-bottom: 10px;">Popular Users</h4>
-                <div class="challenge-item" style="display: flex; align-items: center; gap: 15px;">
-                    <div class="user-avatar">🎮</div>
-                    <div>
-                        <h5>@pro_gamer</h5>
-                        <small style="opacity: 0.7;">Level 25 • 10K followers</small>
-                    </div>
-                </div>
-                <div class="challenge-item" style="display: flex; align-items: center; gap: 15px;">
-                    <div class="user-avatar">💃</div>
-                    <div>
-                        <h5>@dance_master</h5>
-                        <small style="opacity: 0.7;">Level 18 • 5K followers</small>
-                    </div>
+                <div id="popularUsersList">
+                    <!-- Popular users will be loaded here -->
                 </div>
             </div>
         </div>
@@ -1987,6 +1979,237 @@
             social: false,
             dedicated: false
         };
+        
+        // AI Reference Players Database (168 users)
+        const aiPlayers = [
+            // Top Performers with Videos (1-100)
+            { id: 1, name: 'ninja_master', avatar: '🥷', level: 45, status: 'Elite Challenger', followers: 125000, online: true, hasVideo: true, category: 'fitness', aiScore: 98 },
+            { id: 2, name: 'dance_queen_88', avatar: '💃', level: 38, status: 'Dance Legend', followers: 89000, online: true, hasVideo: true, category: 'creative', aiScore: 95 },
+            { id: 3, name: 'fitness_beast', avatar: '💪', level: 42, status: 'Beast Mode 24/7', followers: 67000, online: false, hasVideo: true, category: 'fitness', aiScore: 92 },
+            { id: 4, name: 'spicy_challenger', avatar: '🌶️', level: 33, status: 'Spice King', followers: 45000, online: true, hasVideo: true, category: 'food', aiScore: 88 },
+            { id: 5, name: 'parkour_pro', avatar: '🏃', level: 40, status: 'Urban Ninja', followers: 78000, online: true, hasVideo: true, category: 'adventure', aiScore: 94 },
+            { id: 6, name: 'viral_vibes', avatar: '🌟', level: 50, status: 'Trending Now', followers: 234000, online: true, hasVideo: true, category: 'creative', aiScore: 97 },
+            { id: 7, name: 'comedy_king', avatar: '😂', level: 35, status: 'Making You Laugh', followers: 156000, online: false, hasVideo: true, category: 'creative', aiScore: 90 },
+            { id: 8, name: 'yoga_guru', avatar: '🧘', level: 37, status: 'Zen Master', followers: 43000, online: true, hasVideo: true, category: 'fitness', aiScore: 89 },
+            { id: 9, name: 'gaming_legend', avatar: '🎮', level: 48, status: 'Pro Gamer', followers: 198000, online: true, hasVideo: true, category: 'creative', aiScore: 96 },
+            { id: 10, name: 'chef_extraordinaire', avatar: '👨‍🍳', level: 36, status: 'Culinary Artist', followers: 52000, online: false, hasVideo: true, category: 'food', aiScore: 91 },
+            
+            // More video users (11-100)
+            { id: 11, name: 'street_artist', avatar: '🎨', level: 32, status: 'Creating Magic', followers: 28000, online: true, hasVideo: true, category: 'creative', aiScore: 87 },
+            { id: 12, name: 'mountain_climber', avatar: '🏔️', level: 39, status: 'Peak Seeker', followers: 34000, online: false, hasVideo: true, category: 'adventure', aiScore: 93 },
+            { id: 13, name: 'music_maven', avatar: '🎵', level: 34, status: 'Beat Maker', followers: 61000, online: true, hasVideo: true, category: 'creative', aiScore: 88 },
+            { id: 14, name: 'skateboard_king', avatar: '🛹', level: 31, status: 'Shredding It', followers: 41000, online: true, hasVideo: true, category: 'adventure', aiScore: 85 },
+            { id: 15, name: 'makeup_magician', avatar: '💄', level: 29, status: 'Glam Expert', followers: 73000, online: false, hasVideo: true, category: 'creative', aiScore: 86 },
+            { id: 16, name: 'crossfit_champion', avatar: '🏋️', level: 44, status: 'WOD Crusher', followers: 38000, online: true, hasVideo: true, category: 'fitness', aiScore: 94 },
+            { id: 17, name: 'foodie_explorer', avatar: '🍔', level: 28, status: 'Food Hunter', followers: 55000, online: true, hasVideo: true, category: 'food', aiScore: 84 },
+            { id: 18, name: 'tech_wizard', avatar: '🧙', level: 41, status: 'Code Master', followers: 42000, online: false, hasVideo: true, category: 'creative', aiScore: 91 },
+            { id: 19, name: 'fashion_forward', avatar: '👗', level: 30, status: 'Style Icon', followers: 87000, online: true, hasVideo: true, category: 'creative', aiScore: 88 },
+            { id: 20, name: 'extreme_sports', avatar: '🪂', level: 38, status: 'Adrenaline Junkie', followers: 46000, online: true, hasVideo: true, category: 'adventure', aiScore: 92 },
+            
+            // Continuing with more diverse users (21-100)
+            { id: 21, name: 'mindful_moments', avatar: '🌸', level: 27, status: 'Living Peacefully', followers: 19000, online: true, hasVideo: true, category: 'social', aiScore: 82 },
+            { id: 22, name: 'urban_explorer', avatar: '🏙️', level: 33, status: 'City Wanderer', followers: 31000, online: false, hasVideo: true, category: 'adventure', aiScore: 86 },
+            { id: 23, name: 'pet_whisperer', avatar: '🐕', level: 26, status: 'Animal Lover', followers: 64000, online: true, hasVideo: true, category: 'social', aiScore: 83 },
+            { id: 24, name: 'diy_master', avatar: '🔨', level: 35, status: 'Building Dreams', followers: 27000, online: true, hasVideo: true, category: 'creative', aiScore: 87 },
+            { id: 25, name: 'travel_junkie', avatar: '✈️', level: 37, status: 'Globe Trotter', followers: 92000, online: false, hasVideo: true, category: 'adventure', aiScore: 89 },
+            { id: 26, name: 'plant_parent', avatar: '🌱', level: 24, status: 'Green Thumb', followers: 18000, online: true, hasVideo: true, category: 'social', aiScore: 80 },
+            { id: 27, name: 'coffee_addict', avatar: '☕', level: 25, status: 'Caffeinated', followers: 23000, online: true, hasVideo: true, category: 'food', aiScore: 81 },
+            { id: 28, name: 'bookworm_life', avatar: '📚', level: 29, status: 'Reading Always', followers: 16000, online: false, hasVideo: true, category: 'social', aiScore: 82 },
+            { id: 29, name: 'night_owl', avatar: '🦉', level: 31, status: 'Nocturnal', followers: 21000, online: true, hasVideo: true, category: 'creative', aiScore: 84 },
+            { id: 30, name: 'beach_bum', avatar: '🏖️', level: 28, status: 'Salt Life', followers: 35000, online: true, hasVideo: true, category: 'adventure', aiScore: 83 },
+            
+            // Mid-tier performers (31-60)
+            { id: 31, name: 'puzzle_solver', avatar: '🧩', level: 26, status: 'Brain Teaser', followers: 14000, online: false, hasVideo: true, category: 'creative', aiScore: 79 },
+            { id: 32, name: 'karaoke_star', avatar: '🎤', level: 23, status: 'Singing Always', followers: 17000, online: true, hasVideo: true, category: 'creative', aiScore: 78 },
+            { id: 33, name: 'vintage_vibes', avatar: '📻', level: 27, status: 'Retro Soul', followers: 22000, online: true, hasVideo: true, category: 'creative', aiScore: 81 },
+            { id: 34, name: 'soccer_skills', avatar: '⚽', level: 32, status: 'Goal Scorer', followers: 48000, online: false, hasVideo: true, category: 'fitness', aiScore: 85 },
+            { id: 35, name: 'meditation_master', avatar: '🕉️', level: 34, status: 'Inner Peace', followers: 26000, online: true, hasVideo: true, category: 'fitness', aiScore: 84 },
+            { id: 36, name: 'graffiti_artist', avatar: '🎭', level: 30, status: 'Street Art', followers: 33000, online: true, hasVideo: true, category: 'creative', aiScore: 83 },
+            { id: 37, name: 'baking_boss', avatar: '🧁', level: 28, status: 'Sweet Creator', followers: 41000, online: false, hasVideo: true, category: 'food', aiScore: 82 },
+            { id: 38, name: 'hiit_hero', avatar: '🏃‍♀️', level: 36, status: 'HIIT It Hard', followers: 29000, online: true, hasVideo: true, category: 'fitness', aiScore: 86 },
+            { id: 39, name: 'photo_fanatic', avatar: '📸', level: 31, status: 'Capturing Life', followers: 58000, online: true, hasVideo: true, category: 'creative', aiScore: 84 },
+            { id: 40, name: 'board_game_buff', avatar: '🎲', level: 25, status: 'Game Night Host', followers: 13000, online: false, hasVideo: true, category: 'social', aiScore: 77 },
+            
+            // Continuing variety (41-70)
+            { id: 41, name: 'marathon_runner', avatar: '🏃‍♂️', level: 40, status: '26.2 Miles', followers: 37000, online: true, hasVideo: true, category: 'fitness', aiScore: 90 },
+            { id: 42, name: 'sushi_sensei', avatar: '🍣', level: 33, status: 'Roll Master', followers: 44000, online: true, hasVideo: true, category: 'food', aiScore: 85 },
+            { id: 43, name: 'origami_oracle', avatar: '🗾', level: 27, status: 'Paper Artist', followers: 19000, online: false, hasVideo: true, category: 'creative', aiScore: 80 },
+            { id: 44, name: 'basketball_baller', avatar: '🏀', level: 35, status: 'Court King', followers: 62000, online: true, hasVideo: true, category: 'fitness', aiScore: 87 },
+            { id: 45, name: 'nature_navigator', avatar: '🌲', level: 32, status: 'Trail Blazer', followers: 28000, online: true, hasVideo: true, category: 'adventure', aiScore: 84 },
+            { id: 46, name: 'beatbox_boss', avatar: '🎧', level: 29, status: 'Human Beatbox', followers: 51000, online: false, hasVideo: true, category: 'creative', aiScore: 83 },
+            { id: 47, name: 'pottery_pro', avatar: '🏺', level: 26, status: 'Clay Creator', followers: 16000, online: true, hasVideo: true, category: 'creative', aiScore: 79 },
+            { id: 48, name: 'tennis_ace', avatar: '🎾', level: 34, status: 'Game Set Match', followers: 39000, online: true, hasVideo: true, category: 'fitness', aiScore: 85 },
+            { id: 49, name: 'cosplay_creator', avatar: '🦸', level: 31, status: 'Character Life', followers: 76000, online: false, hasVideo: true, category: 'creative', aiScore: 84 },
+            { id: 50, name: 'smoothie_specialist', avatar: '🥤', level: 24, status: 'Blend Master', followers: 21000, online: true, hasVideo: true, category: 'food', aiScore: 78 },
+            
+            // Active community members (51-80)
+            { id: 51, name: 'roller_blader', avatar: '⛸️', level: 28, status: 'Rolling Through', followers: 24000, online: true, hasVideo: true, category: 'adventure', aiScore: 81 },
+            { id: 52, name: 'magic_mike', avatar: '🎩', level: 30, status: 'Illusionist', followers: 47000, online: false, hasVideo: true, category: 'creative', aiScore: 83 },
+            { id: 53, name: 'vegan_victor', avatar: '🥗', level: 27, status: 'Plant Powered', followers: 32000, online: true, hasVideo: true, category: 'food', aiScore: 80 },
+            { id: 54, name: 'swimming_shark', avatar: '🏊', level: 36, status: 'Water Beast', followers: 35000, online: true, hasVideo: true, category: 'fitness', aiScore: 86 },
+            { id: 55, name: 'language_learner', avatar: '🗣️', level: 25, status: 'Polyglot', followers: 18000, online: false, hasVideo: true, category: 'social', aiScore: 78 },
+            { id: 56, name: 'retro_gamer', avatar: '👾', level: 29, status: '8-Bit Life', followers: 43000, online: true, hasVideo: true, category: 'creative', aiScore: 82 },
+            { id: 57, name: 'salsa_sensation', avatar: '💃🏽', level: 32, status: 'Salsa King', followers: 38000, online: true, hasVideo: true, category: 'creative', aiScore: 84 },
+            { id: 58, name: 'minimalist_life', avatar: '⚪', level: 26, status: 'Less is More', followers: 22000, online: false, hasVideo: true, category: 'social', aiScore: 79 },
+            { id: 59, name: 'rock_climber', avatar: '🧗', level: 37, status: 'Vertical Limit', followers: 41000, online: true, hasVideo: true, category: 'adventure', aiScore: 87 },
+            { id: 60, name: 'anime_artist', avatar: '🎌', level: 28, status: 'Manga Master', followers: 69000, online: true, hasVideo: true, category: 'creative', aiScore: 82 },
+            
+            // Rising stars (61-90)
+            { id: 61, name: 'boxing_beast', avatar: '🥊', level: 38, status: 'Ring Fighter', followers: 46000, online: false, hasVideo: true, category: 'fitness', aiScore: 88 },
+            { id: 62, name: 'pizza_perfectionist', avatar: '🍕', level: 30, status: 'Pizza Time', followers: 53000, online: true, hasVideo: true, category: 'food', aiScore: 83 },
+            { id: 63, name: 'guitar_god', avatar: '🎸', level: 35, status: 'Shredding', followers: 81000, online: true, hasVideo: true, category: 'creative', aiScore: 86 },
+            { id: 64, name: 'cycling_champion', avatar: '🚴', level: 39, status: 'Pedal Power', followers: 34000, online: false, hasVideo: true, category: 'fitness', aiScore: 87 },
+            { id: 65, name: 'astro_enthusiast', avatar: '🔭', level: 27, status: 'Star Gazer', followers: 25000, online: true, hasVideo: true, category: 'social', aiScore: 80 },
+            { id: 66, name: 'calligraphy_king', avatar: '✒️', level: 29, status: 'Ink Master', followers: 20000, online: true, hasVideo: true, category: 'creative', aiScore: 81 },
+            { id: 67, name: 'wildlife_warrior', avatar: '🦁', level: 33, status: 'Nature Guard', followers: 49000, online: false, hasVideo: true, category: 'adventure', aiScore: 84 },
+            { id: 68, name: 'ice_cream_innovator', avatar: '🍦', level: 25, status: 'Flavor Creator', followers: 36000, online: true, hasVideo: true, category: 'food', aiScore: 79 },
+            { id: 69, name: 'martial_arts_master', avatar: '🥋', level: 42, status: 'Sensei', followers: 57000, online: true, hasVideo: true, category: 'fitness', aiScore: 91 },
+            { id: 70, name: 'drone_pilot', avatar: '🚁', level: 31, status: 'Sky Captain', followers: 42000, online: false, hasVideo: true, category: 'adventure', aiScore: 83 },
+            
+            // Community favorites (71-100)
+            { id: 71, name: 'juggling_genius', avatar: '🤹', level: 28, status: 'Juggle Life', followers: 29000, online: true, hasVideo: true, category: 'creative', aiScore: 81 },
+            { id: 72, name: 'ramen_master', avatar: '🍜', level: 34, status: 'Noodle Boss', followers: 48000, online: true, hasVideo: true, category: 'food', aiScore: 84 },
+            { id: 73, name: 'street_dancer', avatar: '🕺', level: 36, status: 'B-Boy Life', followers: 71000, online: false, hasVideo: true, category: 'creative', aiScore: 86 },
+            { id: 74, name: 'golf_guru', avatar: '⛳', level: 32, status: 'On the Green', followers: 26000, online: true, hasVideo: true, category: 'fitness', aiScore: 82 },
+            { id: 75, name: 'astronomy_ace', avatar: '🌠', level: 29, status: 'Space Explorer', followers: 31000, online: true, hasVideo: true, category: 'social', aiScore: 81 },
+            { id: 76, name: 'candle_creator', avatar: '🕯️', level: 24, status: 'Wax Artist', followers: 17000, online: false, hasVideo: true, category: 'creative', aiScore: 77 },
+            { id: 77, name: 'surf_rider', avatar: '🏄', level: 35, status: 'Wave Chaser', followers: 54000, online: true, hasVideo: true, category: 'adventure', aiScore: 85 },
+            { id: 78, name: 'taco_tuesday', avatar: '🌮', level: 26, status: 'Taco Life', followers: 39000, online: true, hasVideo: true, category: 'food', aiScore: 80 },
+            { id: 79, name: 'pilates_pro', avatar: '🤸', level: 33, status: 'Core Strong', followers: 45000, online: false, hasVideo: true, category: 'fitness', aiScore: 84 },
+            { id: 80, name: 'film_fanatic', avatar: '🎬', level: 30, status: 'Movie Buff', followers: 62000, online: true, hasVideo: true, category: 'creative', aiScore: 82 },
+            
+            // Final video users (81-100)
+            { id: 81, name: 'archery_ace', avatar: '🏹', level: 34, status: 'Bullseye', followers: 33000, online: true, hasVideo: true, category: 'fitness', aiScore: 83 },
+            { id: 82, name: 'bubble_tea_boss', avatar: '🧋', level: 23, status: 'Boba Life', followers: 44000, online: false, hasVideo: true, category: 'food', aiScore: 78 },
+            { id: 83, name: 'parkour_princess', avatar: '🦸‍♀️', level: 37, status: 'Urban Flow', followers: 68000, online: true, hasVideo: true, category: 'adventure', aiScore: 87 },
+            { id: 84, name: 'chess_champion', avatar: '♟️', level: 40, status: 'Checkmate', followers: 28000, online: true, hasVideo: true, category: 'social', aiScore: 88 },
+            { id: 85, name: 'knitting_ninja', avatar: '🧶', level: 25, status: 'Yarn Life', followers: 15000, online: false, hasVideo: true, category: 'creative', aiScore: 76 },
+            { id: 86, name: 'kickboxing_king', avatar: '🦵', level: 39, status: 'Kick Master', followers: 51000, online: true, hasVideo: true, category: 'fitness', aiScore: 89 },
+            { id: 87, name: 'dessert_designer', avatar: '🍰', level: 31, status: 'Sweet Artist', followers: 58000, online: true, hasVideo: true, category: 'food', aiScore: 83 },
+            { id: 88, name: 'volleyball_vixen', avatar: '🏐', level: 33, status: 'Spike Queen', followers: 40000, online: false, hasVideo: true, category: 'fitness', aiScore: 84 },
+            { id: 89, name: 'podcast_pro', avatar: '🎙️', level: 29, status: 'On Air', followers: 73000, online: true, hasVideo: true, category: 'creative', aiScore: 82 },
+            { id: 90, name: 'scuba_diver', avatar: '🤿', level: 36, status: 'Deep Diver', followers: 37000, online: true, hasVideo: true, category: 'adventure', aiScore: 85 },
+            
+            { id: 91, name: 'nail_artist', avatar: '💅', level: 27, status: 'Nail Goals', followers: 65000, online: false, hasVideo: true, category: 'creative', aiScore: 80 },
+            { id: 92, name: 'bbq_master', avatar: '🍖', level: 35, status: 'Grill King', followers: 42000, online: true, hasVideo: true, category: 'food', aiScore: 84 },
+            { id: 93, name: 'hip_hop_head', avatar: '🎤', level: 32, status: 'Rap God', followers: 89000, online: true, hasVideo: true, category: 'creative', aiScore: 85 },
+            { id: 94, name: 'rugby_warrior', avatar: '🏉', level: 38, status: 'Scrum Master', followers: 34000, online: false, hasVideo: true, category: 'fitness', aiScore: 86 },
+            { id: 95, name: 'jewelry_maker', avatar: '💎', level: 26, status: 'Bling Creator', followers: 23000, online: true, hasVideo: true, category: 'creative', aiScore: 78 },
+            { id: 96, name: 'snowboard_shredder', avatar: '🏂', level: 34, status: 'Snow Life', followers: 56000, online: true, hasVideo: true, category: 'adventure', aiScore: 85 },
+            { id: 97, name: 'pasta_princess', avatar: '🍝', level: 30, status: 'Pasta Perfect', followers: 47000, online: false, hasVideo: true, category: 'food', aiScore: 82 },
+            { id: 98, name: 'zumba_zealot', avatar: '💃🏻', level: 31, status: 'Dance Fit', followers: 52000, online: true, hasVideo: true, category: 'fitness', aiScore: 83 },
+            { id: 99, name: 'vr_visionary', avatar: '🥽', level: 33, status: 'Virtual World', followers: 61000, online: true, hasVideo: true, category: 'creative', aiScore: 84 },
+            { id: 100, name: 'kayak_king', avatar: '🛶', level: 35, status: 'River Runner', followers: 38000, online: false, hasVideo: true, category: 'adventure', aiScore: 85 },
+            
+            // Non-video users (101-168)
+            { id: 101, name: 'rookie_runner', avatar: '👟', level: 15, status: 'Just Started', followers: 500, online: true, hasVideo: false, category: 'fitness', aiScore: 65 },
+            { id: 102, name: 'casual_gamer', avatar: '🕹️', level: 18, status: 'Gaming Chill', followers: 1200, online: false, hasVideo: false, category: 'creative', aiScore: 68 },
+            { id: 103, name: 'weekend_warrior', avatar: '⚔️', level: 20, status: 'Weekend Only', followers: 800, online: true, hasVideo: false, category: 'fitness', aiScore: 70 },
+            { id: 104, name: 'snack_lover', avatar: '🍿', level: 16, status: 'Always Hungry', followers: 950, online: true, hasVideo: false, category: 'food', aiScore: 66 },
+            { id: 105, name: 'beginner_blogger', avatar: '📝', level: 14, status: 'New Here', followers: 300, online: false, hasVideo: false, category: 'social', aiScore: 62 },
+            { id: 106, name: 'shy_singer', avatar: '🎵', level: 17, status: 'Finding Voice', followers: 650, online: true, hasVideo: false, category: 'creative', aiScore: 67 },
+            { id: 107, name: 'morning_person', avatar: '🌅', level: 19, status: 'Early Bird', followers: 1100, online: true, hasVideo: false, category: 'social', aiScore: 69 },
+            { id: 108, name: 'tea_time', avatar: '🫖', level: 21, status: 'Tea Lover', followers: 1400, online: false, hasVideo: false, category: 'food', aiScore: 71 },
+            { id: 109, name: 'doodle_artist', avatar: '✏️', level: 16, status: 'Sketching', followers: 750, online: true, hasVideo: false, category: 'creative', aiScore: 66 },
+            { id: 110, name: 'plant_newbie', avatar: '🌿', level: 13, status: 'Learning', followers: 420, online: true, hasVideo: false, category: 'social', aiScore: 61 },
+            
+            // More beginners and intermediates (111-140)
+            { id: 111, name: 'puzzle_player', avatar: '🧩', level: 22, status: 'Brain Games', followers: 1600, online: false, hasVideo: false, category: 'social', aiScore: 72 },
+            { id: 112, name: 'cookie_monster', avatar: '🍪', level: 19, status: 'Cookie Life', followers: 1300, online: true, hasVideo: false, category: 'food', aiScore: 69 },
+            { id: 113, name: 'sunset_chaser', avatar: '🌇', level: 24, status: 'Golden Hour', followers: 2100, online: true, hasVideo: false, category: 'adventure', aiScore: 74 },
+            { id: 114, name: 'book_club', avatar: '📖', level: 20, status: 'Reading Now', followers: 980, online: false, hasVideo: false, category: 'social', aiScore: 70 },
+            { id: 115, name: 'home_chef', avatar: '👩‍🍳', level: 23, status: 'Cooking Daily', followers: 1800, online: true, hasVideo: false, category: 'food', aiScore: 73 },
+            { id: 116, name: 'dog_walker', avatar: '🐕‍🦺', level: 18, status: 'Dog Person', followers: 1500, online: true, hasVideo: false, category: 'social', aiScore: 68 },
+            { id: 117, name: 'movie_nights', avatar: '🍿', level: 21, status: 'Film Lover', followers: 1700, online: false, hasVideo: false, category: 'creative', aiScore: 71 },
+            { id: 118, name: 'garden_grower', avatar: '🥕', level: 17, status: 'Growing Food', followers: 890, online: true, hasVideo: false, category: 'social', aiScore: 67 },
+            { id: 119, name: 'happy_hiker', avatar: '🥾', level: 25, status: 'Trail Walker', followers: 2300, online: true, hasVideo: false, category: 'adventure', aiScore: 75 },
+            { id: 120, name: 'music_mood', avatar: '🎶', level: 19, status: 'Vibing', followers: 1450, online: false, hasVideo: false, category: 'creative', aiScore: 69 },
+            
+            { id: 121, name: 'cat_person', avatar: '🐱', level: 16, status: 'Cat Mom', followers: 2800, online: true, hasVideo: false, category: 'social', aiScore: 66 },
+            { id: 122, name: 'brunch_buddy', avatar: '🥞', level: 22, status: 'Brunch Time', followers: 1900, online: true, hasVideo: false, category: 'food', aiScore: 72 },
+            { id: 123, name: 'board_gamer', avatar: '🎯', level: 20, status: 'Game Night', followers: 1250, online: false, hasVideo: false, category: 'social', aiScore: 70 },
+            { id: 124, name: 'beach_walker', avatar: '🏝️', level: 24, status: 'Beach Life', followers: 2500, online: true, hasVideo: false, category: 'adventure', aiScore: 74 },
+            { id: 125, name: 'craft_corner', avatar: '🎨', level: 18, status: 'DIY Time', followers: 1100, online: true, hasVideo: false, category: 'creative', aiScore: 68 },
+            { id: 126, name: 'smoothie_sipper', avatar: '🥤', level: 17, status: 'Healthy Life', followers: 950, online: false, hasVideo: false, category: 'food', aiScore: 67 },
+            { id: 127, name: 'word_player', avatar: '📝', level: 21, status: 'Word Games', followers: 1350, online: true, hasVideo: false, category: 'social', aiScore: 71 },
+            { id: 128, name: 'cloud_watcher', avatar: '☁️', level: 15, status: 'Day Dreamer', followers: 780, online: true, hasVideo: false, category: 'social', aiScore: 65 },
+            { id: 129, name: 'dance_beginner', avatar: '💃🏾', level: 19, status: 'Learning Moves', followers: 1600, online: false, hasVideo: false, category: 'creative', aiScore: 69 },
+            { id: 130, name: 'coffee_break', avatar: '☕', level: 23, status: 'Coffee First', followers: 2200, online: true, hasVideo: false, category: 'food', aiScore: 73 },
+            
+            // Final users (131-168)
+            { id: 131, name: 'sketch_pad', avatar: '🖍️', level: 16, status: 'Drawing Daily', followers: 820, online: true, hasVideo: false, category: 'creative', aiScore: 66 },
+            { id: 132, name: 'picnic_planner', avatar: '🧺', level: 20, status: 'Outdoor Fun', followers: 1400, online: false, hasVideo: false, category: 'social', aiScore: 70 },
+            { id: 133, name: 'midnight_snacker', avatar: '🌙', level: 18, status: 'Night Owl', followers: 1150, online: true, hasVideo: false, category: 'food', aiScore: 68 },
+            { id: 134, name: 'bike_rider', avatar: '🚲', level: 22, status: 'Pedaling', followers: 1750, online: true, hasVideo: false, category: 'fitness', aiScore: 72 },
+            { id: 135, name: 'emoji_expert', avatar: '😊', level: 17, status: 'Emoji Life', followers: 990, online: false, hasVideo: false, category: 'social', aiScore: 67 },
+            { id: 136, name: 'podcast_listener', avatar: '🎧', level: 19, status: 'Listening', followers: 1280, online: true, hasVideo: false, category: 'creative', aiScore: 69 },
+            { id: 137, name: 'star_gazer', avatar: '⭐', level: 21, status: 'Night Sky', followers: 1520, online: true, hasVideo: false, category: 'social', aiScore: 71 },
+            { id: 138, name: 'soup_season', avatar: '🍲', level: 20, status: 'Soup Lover', followers: 1380, online: false, hasVideo: false, category: 'food', aiScore: 70 },
+            { id: 139, name: 'photo_taker', avatar: '📷', level: 24, status: 'Capturing', followers: 2600, online: true, hasVideo: false, category: 'creative', aiScore: 74 },
+            { id: 140, name: 'rain_dancer', avatar: '🌧️', level: 16, status: 'Rain Lover', followers: 870, online: true, hasVideo: false, category: 'social', aiScore: 66 },
+            
+            { id: 141, name: 'game_streamer', avatar: '🎮', level: 26, status: 'Live Now', followers: 3200, online: false, hasVideo: false, category: 'creative', aiScore: 76 },
+            { id: 142, name: 'salad_maker', avatar: '🥗', level: 18, status: 'Eating Clean', followers: 1050, online: true, hasVideo: false, category: 'food', aiScore: 68 },
+            { id: 143, name: 'morning_yoga', avatar: '🧘‍♀️', level: 23, status: 'Namaste', followers: 1950, online: true, hasVideo: false, category: 'fitness', aiScore: 73 },
+            { id: 144, name: 'story_teller', avatar: '📚', level: 21, status: 'Story Time', followers: 1480, online: false, hasVideo: false, category: 'creative', aiScore: 71 },
+            { id: 145, name: 'ice_skater', avatar: '⛸️', level: 25, status: 'On Ice', followers: 2400, online: true, hasVideo: false, category: 'fitness', aiScore: 75 },
+            { id: 146, name: 'fruit_fanatic', avatar: '🍎', level: 17, status: 'Fruit Bowl', followers: 920, online: true, hasVideo: false, category: 'food', aiScore: 67 },
+            { id: 147, name: 'bird_watcher', avatar: '🦜', level: 19, status: 'Bird Spotter', followers: 1180, online: false, hasVideo: false, category: 'social', aiScore: 69 },
+            { id: 148, name: 'moon_child', avatar: '🌜', level: 20, status: 'Lunar Love', followers: 1320, online: true, hasVideo: false, category: 'social', aiScore: 70 },
+            { id: 149, name: 'pottery_starter', avatar: '🏺', level: 15, status: 'Clay Hands', followers: 680, online: true, hasVideo: false, category: 'creative', aiScore: 65 },
+            { id: 150, name: 'trail_runner', avatar: '🏃‍♀️', level: 27, status: 'Trail Bound', followers: 2900, online: false, hasVideo: false, category: 'fitness', aiScore: 77 },
+            
+            { id: 151, name: 'meme_maker', avatar: '😄', level: 22, status: 'Meme Lord', followers: 4500, online: true, hasVideo: false, category: 'creative', aiScore: 72 },
+            { id: 152, name: 'spice_lover', avatar: '🌶️', level: 19, status: 'Spicy Life', followers: 1420, online: true, hasVideo: false, category: 'food', aiScore: 69 },
+            { id: 153, name: 'jump_rope', avatar: '🪢', level: 24, status: 'Jumping', followers: 1850, online: false, hasVideo: false, category: 'fitness', aiScore: 74 },
+            { id: 154, name: 'nature_lover', avatar: '🦋', level: 21, status: 'Nature Walk', followers: 1650, online: true, hasVideo: false, category: 'adventure', aiScore: 71 },
+            { id: 155, name: 'piano_player', avatar: '🎹', level: 28, status: 'Keys Life', followers: 3100, online: true, hasVideo: false, category: 'creative', aiScore: 78 },
+            { id: 156, name: 'juice_bar', avatar: '🧃', level: 17, status: 'Fresh Juice', followers: 1020, online: false, hasVideo: false, category: 'food', aiScore: 67 },
+            { id: 157, name: 'sunset_yoga', avatar: '🧘', level: 26, status: 'Zen Mode', followers: 2750, online: true, hasVideo: false, category: 'fitness', aiScore: 76 },
+            { id: 158, name: 'comic_reader', avatar: '📰', level: 20, status: 'Comic Life', followers: 1580, online: true, hasVideo: false, category: 'creative', aiScore: 70 },
+            { id: 159, name: 'flower_power', avatar: '🌻', level: 18, status: 'Blooming', followers: 1220, online: false, hasVideo: false, category: 'social', aiScore: 68 },
+            { id: 160, name: 'cardio_queen', avatar: '💓', level: 29, status: 'Heart Rate Up', followers: 3400, online: true, hasVideo: false, category: 'fitness', aiScore: 79 },
+            
+            { id: 161, name: 'origami_beginner', avatar: '📄', level: 16, status: 'Paper Folding', followers: 760, online: true, hasVideo: false, category: 'creative', aiScore: 66 },
+            { id: 162, name: 'waffle_wednesday', avatar: '🧇', level: 21, status: 'Waffle Love', followers: 1680, online: false, hasVideo: false, category: 'food', aiScore: 71 },
+            { id: 163, name: 'stretch_daily', avatar: '🤸‍♀️', level: 25, status: 'Flexibility', followers: 2250, online: true, hasVideo: false, category: 'fitness', aiScore: 75 },
+            { id: 164, name: 'cloud_nine', avatar: '☁️', level: 19, status: 'Dreaming', followers: 1340, online: true, hasVideo: false, category: 'social', aiScore: 69 },
+            { id: 165, name: 'ukulele_user', avatar: '🪕', level: 23, status: 'Strumming', followers: 1920, online: false, hasVideo: false, category: 'creative', aiScore: 73 },
+            { id: 166, name: 'donut_day', avatar: '🍩', level: 18, status: 'Donut Worry', followers: 1480, online: true, hasVideo: false, category: 'food', aiScore: 68 },
+            { id: 167, name: 'balance_beam', avatar: '🤸‍♂️', level: 27, status: 'Balanced', followers: 2580, online: true, hasVideo: false, category: 'fitness', aiScore: 77 },
+            { id: 168, name: 'creative_soul', avatar: '✨', level: 30, status: 'Creating Magic', followers: 4200, online: false, hasVideo: false, category: 'creative', aiScore: 80 }
+        ];
+        
+        // Helper function to get random AI players
+        function getRandomAIPlayers(count, filter = {}) {
+            let filtered = aiPlayers;
+            
+            if (filter.hasVideo !== undefined) {
+                filtered = filtered.filter(p => p.hasVideo === filter.hasVideo);
+            }
+            if (filter.category) {
+                filtered = filtered.filter(p => p.category === filter.category);
+            }
+            if (filter.minLevel) {
+                filtered = filtered.filter(p => p.level >= filter.minLevel);
+            }
+            if (filter.online !== undefined) {
+                filtered = filtered.filter(p => p.online === filter.online);
+            }
+            
+            const shuffled = [...filtered].sort(() => Math.random() - 0.5);
+            return shuffled.slice(0, count);
+        }
+        
+        // Generate video URL for AI players with videos
+        function getAIPlayerVideo(playerId) {
+            const player = aiPlayers.find(p => p.id === playerId);
+            if (player && player.hasVideo) {
+                // Return a placeholder video URL - in real app, these would be actual video files
+                return `https://picsum.photos/1080/1920?random=${playerId}`;
+            }
+            return null;
+        }
         
         // Performance: Debounce function
         function debounce(func, wait) {
@@ -2089,46 +2312,81 @@
         
         // Initialize sample data
         function initializeSampleData() {
-            // Sample followers
-            followers = [
-                { id: 1, name: 'alex_gamer', avatar: '😎', status: 'Level 15', online: true },
-                { id: 2, name: 'dance_queen', avatar: '💃', status: 'Dance Master', online: true },
-                { id: 3, name: 'foodie_bro', avatar: '🍔', status: 'Spicy Champion', online: false },
-                { id: 4, name: 'fitness_guru', avatar: '💪', status: 'Beast Mode', online: true },
-                { id: 5, name: 'creative_mind', avatar: '🎨', status: 'Artist', online: false }
-            ];
+            // Get random AI players for followers (mix of levels)
+            const followerPlayers = getRandomAIPlayers(15, { minLevel: 15 });
+            followers = followerPlayers.map(player => ({
+                id: player.id,
+                name: player.name,
+                avatar: player.avatar,
+                status: player.status,
+                online: player.online,
+                level: player.level,
+                isAI: true
+            }));
             
-            // Sample following
-            following = [
-                { id: 6, name: 'pro_player', avatar: '🎯', status: 'Level 30', online: true },
-                { id: 7, name: 'tech_wizard', avatar: '🧙', status: 'Coding Ninja', online: false },
-                { id: 8, name: 'music_lover', avatar: '🎵', status: 'Vibing', online: true }
-            ];
+            // Get different AI players for following
+            const followingPlayers = getRandomAIPlayers(20, { minLevel: 20 });
+            following = followingPlayers.map(player => ({
+                id: player.id,
+                name: player.name,
+                avatar: player.avatar,
+                status: player.status,
+                online: player.online,
+                level: player.level,
+                isAI: true
+            }));
             
-            // Sample messages
+            // Sample messages from AI players
+            const messageAuthors = getRandomAIPlayers(5, { online: true });
             messages = [
                 { 
                     id: 1, 
-                    from: 'alex_gamer', 
-                    avatar: '😎',
-                    message: 'Great job on the challenge! 🔥', 
+                    from: messageAuthors[0].name, 
+                    avatar: messageAuthors[0].avatar,
+                    message: 'Great job on the challenge! Your score was insane! 🔥', 
                     time: '2 hours ago',
                     unread: true
                 },
                 { 
                     id: 2, 
+                    from: messageAuthors[1].name, 
+                    avatar: messageAuthors[1].avatar,
+                    message: 'Want to collab on the next challenge? 🤝', 
+                    time: '3 hours ago',
+                    unread: true
+                },
+                { 
+                    id: 3, 
+                    from: messageAuthors[2].name, 
+                    avatar: messageAuthors[2].avatar,
+                    message: 'Thanks for the follow! Check out my latest video 🎥', 
+                    time: '5 hours ago',
+                    unread: false
+                },
+                { 
+                    id: 4, 
                     from: 'system', 
                     avatar: '🤖',
-                    message: 'New AI challenges available!', 
+                    message: 'New AI challenges available! Beat the high scores! 🏆', 
                     time: '1 hour ago',
                     unread: true
+                },
+                { 
+                    id: 5, 
+                    from: messageAuthors[3].name, 
+                    avatar: messageAuthors[3].avatar,
+                    message: 'Your parkour skills are next level! Teach me? 🙏', 
+                    time: '6 hours ago',
+                    unread: false
                 }
             ];
             
             // Sample notifications
             notifications = [
                 { id: 1, text: '🔔 New Achievement Unlocked!', time: new Date() },
-                { id: 2, text: '💬 Alex commented on your post', time: new Date() }
+                { id: 2, text: `💬 ${messageAuthors[4].name} commented on your post`, time: new Date(Date.now() - 30 * 60 * 1000) },
+                { id: 3, text: '🎯 You\'ve been challenged by 3 players!', time: new Date(Date.now() - 60 * 60 * 1000) },
+                { id: 4, text: '🔥 Your post is trending! +500 views', time: new Date(Date.now() - 2 * 60 * 60 * 1000) }
             ];
         }
         
@@ -2140,15 +2398,63 @@
             // Set up periodic notifications
             setInterval(() => {
                 if (Math.random() > 0.7) {
+                    // Get random AI players for notifications
+                    const notifPlayer = getRandomAIPlayers(1)[0];
                     const notifs = [
-                        '🔥 Your post is trending!',
-                        '👥 New follower!',
-                        '🎯 Challenge completed nearby!',
-                        '💎 Daily bonus available!'
+                        `🔥 Your post is trending!`,
+                        `👥 ${notifPlayer.name} started following you!`,
+                        `🎯 ${notifPlayer.name} completed your challenge!`,
+                        `💎 Daily bonus available!`,
+                        `🏆 ${notifPlayer.name} beat your high score!`,
+                        `💬 ${notifPlayer.name} commented: "${['Amazing! 🔥', 'Let\'s gooo! 🚀', 'Challenge accepted! 💪'][Math.floor(Math.random() * 3)]}"`,
+                        `🌟 You're now in the top 100!`,
+                        `📹 ${notifPlayer.name} posted a new ${notifPlayer.aiScore}% challenge!`,
+                        `🎮 New achievement unlocked!`,
+                        `👀 ${formatNumber(Math.floor(Math.random() * 1000 + 100))} people viewed your profile!`
                     ];
                     addNotification(notifs[Math.floor(Math.random() * notifs.length)]);
                 }
             }, 30000); // Every 30 seconds
+            
+            // Simulate AI player activities
+            setInterval(() => {
+                // Random AI player interactions
+                if (Math.random() > 0.8) {
+                    const activityPlayer = getRandomAIPlayers(1, { online: true })[0];
+                    if (Math.random() > 0.5) {
+                        // New follower
+                        followers.push({
+                            id: activityPlayer.id,
+                            name: activityPlayer.name,
+                            avatar: activityPlayer.avatar,
+                            status: activityPlayer.status,
+                            online: activityPlayer.online,
+                            level: activityPlayer.level,
+                            isAI: true
+                        });
+                        userData.followers++;
+                        updateProfile();
+                        addNotification(`👥 ${activityPlayer.name} started following you!`);
+                    } else {
+                        // New message
+                        messages.unshift({
+                            id: Date.now(),
+                            from: activityPlayer.name,
+                            avatar: activityPlayer.avatar,
+                            message: [
+                                'Your last challenge was fire! 🔥',
+                                'Want to collab? 🤝',
+                                'Just saw your video, amazing! 👏',
+                                'Challenge accepted! See my response 💪',
+                                'You inspire me to push harder! 🚀'
+                            ][Math.floor(Math.random() * 5)],
+                            time: 'Just now',
+                            unread: true
+                        });
+                        updateInboxBadge();
+                    }
+                }
+            }, 45000); // Every 45 seconds
         }
         
         // Add notification
@@ -2316,38 +2622,59 @@
         function loadFeed() {
             const container = document.getElementById('feedContainer');
             
-            const posts = [
-                {
-                    id: 'post1',
-                    user: { name: 'alex_gamer', avatar: '😎' },
-                    challenge: { title: '20 Pushup Challenge', reward: 100, category: 'fitness' },
-                    caption: 'Just crushed the pushup challenge! 💪 Let\'s Go!',
-                    likes: 234,
-                    comments: 45,
-                    mediaUrl: 'https://picsum.photos/1080/1920?random=1',
-                    aiScore: 92
-                },
-                {
-                    id: 'post2',
-                    user: { name: 'dance_queen', avatar: '💃' },
-                    challenge: { title: 'TikTok Dance', reward: 150, category: 'creative' },
-                    caption: 'New dance moves! Who wants to try? 🕺',
-                    likes: 567,
-                    comments: 89,
-                    mediaUrl: 'https://picsum.photos/1080/1920?random=2',
-                    aiScore: 88
-                },
-                {
-                    id: 'post3',
-                    user: { name: 'foodie_bro', avatar: '🍔' },
-                    challenge: { title: 'Spicy Noodle Challenge', reward: 200, category: 'food' },
-                    caption: 'This was INSANE! 🔥🍜 #SpicyChallenge',
-                    likes: 890,
-                    comments: 156,
-                    mediaUrl: 'https://picsum.photos/1080/1920?random=3',
-                    aiScore: 95
-                }
-            ];
+            // Get random AI players with videos for the feed
+            const videoPlayers = getRandomAIPlayers(10, { hasVideo: true });
+            
+            const posts = videoPlayers.map((player, index) => {
+                const challenges = [
+                    { title: '100 Pushup Challenge', reward: 150, category: 'fitness' },
+                    { title: 'Viral Dance Remix', reward: 200, category: 'creative' },
+                    { title: 'Spicy Noodle Challenge', reward: 180, category: 'food' },
+                    { title: 'Parkour Flow', reward: 250, category: 'adventure' },
+                    { title: 'Comedy Roast', reward: 220, category: 'creative' },
+                    { title: 'HIIT Workout', reward: 170, category: 'fitness' },
+                    { title: 'Art in 60 Seconds', reward: 190, category: 'creative' },
+                    { title: 'Extreme Sports', reward: 300, category: 'adventure' },
+                    { title: 'Cooking Speed Run', reward: 160, category: 'food' },
+                    { title: 'Flexibility Challenge', reward: 140, category: 'fitness' }
+                ];
+                
+                const captions = [
+                    'Just crushed this challenge! 💪 Who\'s next?',
+                    'Let\'s Go! Let\'s Go! This was insane! 🔥',
+                    'New personal best! Can you beat my score? 🎯',
+                    'This challenge is trending for a reason! 🚀',
+                    'Absolutely killed it! Join the movement! 💯',
+                    'Who said this was hard? Easy mode! 😎',
+                    'Challenge accepted and dominated! 👑',
+                    'Breaking limits every day! 💥',
+                    'This is why I love JomBro! 🎮',
+                    'Next level achieved! Level up with me! ⬆️'
+                ];
+                
+                const challenge = challenges[index % challenges.length];
+                const caption = captions[index % captions.length];
+                
+                return {
+                    id: `post_${player.id}_${Date.now()}`,
+                    user: { 
+                        name: player.name, 
+                        avatar: player.avatar,
+                        level: player.level,
+                        isAI: true
+                    },
+                    challenge: challenge,
+                    caption: `${caption} #${challenge.title.replace(/\s+/g, '')}`,
+                    likes: Math.floor(player.followers * (0.1 + Math.random() * 0.3)),
+                    comments: Math.floor(player.followers * (0.02 + Math.random() * 0.08)),
+                    mediaUrl: getAIPlayerVideo(player.id),
+                    aiScore: player.aiScore,
+                    timestamp: new Date(Date.now() - Math.random() * 24 * 60 * 60 * 1000) // Random time in last 24h
+                };
+            });
+            
+            // Sort by timestamp (newest first)
+            posts.sort((a, b) => b.timestamp - a.timestamp);
             
             // Performance: Use DocumentFragment for batch DOM updates
             const fragment = document.createDocumentFragment();
@@ -2375,6 +2702,44 @@
                 container.querySelectorAll('.post-image[data-src]:not(.loaded)').forEach(img => {
                     lazyLoadImage(img);
                 });
+                
+                // Add some AI-generated comments to posts
+                addAIComments();
+            });
+        }
+        
+        // Add AI-generated comments to posts
+        function addAIComments() {
+            const commentTemplates = [
+                '🔥🔥🔥',
+                'This is amazing! 😍',
+                'I need to try this!',
+                'You killed it! 💪',
+                'Tutorial please! 🙏',
+                'Goals! 💯',
+                'How did you do that?! 😱',
+                'Inspiring! ✨',
+                'Let\'s gooo! 🚀',
+                'Challenge accepted! 💪',
+                'You\'re on another level! 👑',
+                'This is why I love JomBro! ❤️',
+                'Teach me your ways! 🙌',
+                'Absolutely insane! 🤯',
+                'Making it look easy! 😎'
+            ];
+            
+            feedPosts.forEach(post => {
+                // Generate 3-8 AI comments per post
+                const numComments = 3 + Math.floor(Math.random() * 6);
+                const commenters = getRandomAIPlayers(numComments);
+                
+                post.aiComments = commenters.map((commenter, i) => ({
+                    user: commenter.name,
+                    avatar: commenter.avatar,
+                    text: commentTemplates[Math.floor(Math.random() * commentTemplates.length)],
+                    time: `${Math.floor(Math.random() * 59) + 1}m ago`,
+                    likes: Math.floor(Math.random() * 100)
+                }));
             });
         }
         
@@ -2672,33 +3037,64 @@
         
         // Generate AI challenges
         function generateAIChallenges() {
+            // Get top players from different categories for challenge inspiration
+            const fitnessPlayer = getRandomAIPlayers(1, { category: 'fitness', minLevel: 30 })[0];
+            const creativePlayer = getRandomAIPlayers(1, { category: 'creative', minLevel: 30 })[0];
+            const socialPlayer = getRandomAIPlayers(1, { category: 'social', minLevel: 25 })[0];
+            
             aiChallenges = [
                 {
                     id: 'ai1',
-                    title: 'Plank Challenge',
-                    description: 'Hold a plank for 45 seconds',
+                    title: `${fitnessPlayer.name}'s Plank Challenge`,
+                    description: `Beat ${fitnessPlayer.name}'s record: Hold a plank for 60 seconds`,
                     category: 'fitness',
-                    reward: 100,
+                    reward: 100 + Math.floor(fitnessPlayer.level * 2),
                     difficulty: 3,
-                    aiGenerated: true
+                    aiGenerated: true,
+                    inspiredBy: fitnessPlayer.name,
+                    targetScore: fitnessPlayer.aiScore
                 },
                 {
                     id: 'ai2',
-                    title: 'Dance Battle',
-                    description: 'Create a 30-second dance to trending music',
+                    title: 'Viral Dance Battle',
+                    description: `Challenge ${creativePlayer.name}'s moves with a 30-second dance`,
                     category: 'creative',
-                    reward: 150,
+                    reward: 150 + Math.floor(creativePlayer.level * 2),
                     difficulty: 3,
-                    aiGenerated: true
+                    aiGenerated: true,
+                    inspiredBy: creativePlayer.name,
+                    targetScore: creativePlayer.aiScore
                 },
                 {
                     id: 'ai3',
-                    title: 'Compliment Challenge',
-                    description: 'Give 5 genuine compliments to strangers',
+                    title: 'Community Challenge',
+                    description: `Like ${socialPlayer.name}, spread positivity with 5 compliments`,
                     category: 'social',
-                    reward: 120,
+                    reward: 120 + Math.floor(socialPlayer.level * 1.5),
                     difficulty: 2,
-                    aiGenerated: true
+                    aiGenerated: true,
+                    inspiredBy: socialPlayer.name,
+                    targetScore: socialPlayer.aiScore
+                },
+                {
+                    id: 'ai4',
+                    title: 'Speed Run Challenge',
+                    description: 'Complete 50 jumping jacks in 30 seconds',
+                    category: 'fitness',
+                    reward: 180,
+                    difficulty: 4,
+                    aiGenerated: true,
+                    targetScore: 85
+                },
+                {
+                    id: 'ai5',
+                    title: 'Creative Expression',
+                    description: 'Create art using only items in your room',
+                    category: 'creative',
+                    reward: 200,
+                    difficulty: 3,
+                    aiGenerated: true,
+                    targetScore: 80
                 }
             ];
         }
@@ -2892,14 +3288,27 @@
             } else if (tab === 'following') {
                 renderFriendsList(following, friendsList, 'following');
             } else if (tab === 'suggested') {
-                // Generate suggested friends
-                const suggested = [
-                    { id: 10, name: 'viral_king', avatar: '👑', status: 'Level 40', online: true },
-                    { id: 11, name: 'challenge_master', avatar: '🏆', status: 'Elite Player', online: true },
-                    { id: 12, name: 'adventure_seeker', avatar: '🗺️', status: 'Explorer', online: false },
-                    { id: 13, name: 'comedy_central', avatar: '😂', status: 'Comedian', online: true }
-                ];
-                renderFriendsList(suggested, friendsList, 'suggested');
+                // Get suggested friends based on level and category preferences
+                const userLevel = userData.level;
+                const suggestedPlayers = getRandomAIPlayers(12, { 
+                    minLevel: Math.max(1, userLevel - 10),
+                    online: true 
+                }).filter(player => {
+                    // Don't suggest players already in followers or following
+                    return !followers.some(f => f.name === player.name) && 
+                           !following.some(f => f.name === player.name);
+                }).map(player => ({
+                    id: player.id,
+                    name: player.name,
+                    avatar: player.avatar,
+                    status: player.status,
+                    online: player.online,
+                    level: player.level,
+                    followers: player.followers,
+                    isAI: true
+                }));
+                
+                renderFriendsList(suggestedPlayers, friendsList, 'suggested');
             }
         }
         
@@ -2916,30 +3325,121 @@
                 return;
             }
             
-            container.innerHTML = list.map(friend => `
-                <div class="friend-item" onclick="viewFriendProfile('${friend.name}', '${friend.avatar}')">
-                    <div class="friend-avatar">
-                        ${friend.avatar}
-                        ${friend.online ? '<div class="friend-online"></div>' : ''}
+            container.innerHTML = list.map(friend => {
+                const levelInfo = friend.level ? `Level ${friend.level} • ` : '';
+                const followersInfo = friend.followers ? `${formatNumber(friend.followers)} followers` : friend.status || 'Active player';
+                
+                return `
+                    <div class="friend-item" onclick="viewFriendProfile('${friend.name}', '${friend.avatar}', ${friend.level || 1})">
+                        <div class="friend-avatar">
+                            ${friend.avatar}
+                            ${friend.online ? '<div class="friend-online"></div>' : ''}
+                        </div>
+                        <div class="friend-info">
+                            <div class="friend-name">@${friend.name}${friend.isAI ? ' 🤖' : ''}</div>
+                            <div class="friend-status">${levelInfo}${followersInfo}</div>
+                        </div>
+                        ${type === 'suggested' ? 
+                            `<button class="friend-action" onclick="event.stopPropagation(); followUser('${friend.name}')">Follow</button>` :
+                            type === 'followers' && !following.some(f => f.name === friend.name) ?
+                            `<button class="friend-action" onclick="event.stopPropagation(); followBack('${friend.name}')">Follow Back</button>` :
+                            `<button class="dedication-btn" onclick="event.stopPropagation(); challengeUser('${friend.name}')">Challenge</button>`
+                        }
                     </div>
-                    <div class="friend-info">
-                        <div class="friend-name">@${friend.name}</div>
-                        <div class="friend-status">${friend.status || 'Active player'}</div>
-                    </div>
-                    ${type === 'suggested' ? 
-                        `<button class="friend-action" onclick="event.stopPropagation(); followUser('${friend.name}')">Follow</button>` :
-                        type === 'followers' && !following.some(f => f.name === friend.name) ?
-                        `<button class="friend-action" onclick="event.stopPropagation(); followBack('${friend.name}')">Follow Back</button>` :
-                        `<button class="dedication-btn" onclick="event.stopPropagation(); challengeUser('${friend.name}')">Challenge</button>`
-                    }
-                </div>
-            `).join('');
+                `;
+            }).join('');
         }
         
-        // View friend profile
-        function viewFriendProfile(username, avatar) {
+        // View friend profile (updated for AI players)
+        function viewFriendProfile(username, avatar, level = 1) {
             closeModal('profileModal');
-            showUserProfile(username, avatar);
+            
+            // Find the AI player data if available
+            const aiPlayer = aiPlayers.find(p => p.name === username);
+            if (aiPlayer) {
+                showAIPlayerProfile(aiPlayer);
+            } else {
+                showUserProfile(username, avatar);
+            }
+        }
+        
+        // Show AI player profile
+        function showAIPlayerProfile(player) {
+            const profileModal = document.createElement('div');
+            profileModal.className = 'modal';
+            profileModal.style.display = 'flex';
+            profileModal.innerHTML = `
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h3 class="modal-title">@${player.name} 🤖</h3>
+                        <button class="close-btn" onclick="this.closest('.modal').remove()">×</button>
+                    </div>
+                    
+                    <div class="profile-header">
+                        <div class="profile-avatar-large">${player.avatar}</div>
+                        <h2>@${player.name}</h2>
+                        <p style="opacity: 0.7; margin-top: 5px;">Level ${player.level} • ${player.status}</p>
+                        <p style="opacity: 0.6; margin-top: 5px; font-size: 0.9rem;">
+                            ${player.category.charAt(0).toUpperCase() + player.category.slice(1)} Specialist • AI Score: ${player.aiScore}%
+                        </p>
+                        
+                        <div class="profile-stats">
+                            <div class="stat">
+                                <div class="stat-value">${formatNumber(player.followers)}</div>
+                                <div class="stat-label">Followers</div>
+                            </div>
+                            <div class="stat">
+                                <div class="stat-value">${formatNumber(Math.floor(player.followers * 0.3))}</div>
+                                <div class="stat-label">Following</div>
+                            </div>
+                            <div class="stat">
+                                <div class="stat-value">${Math.floor(player.level * 5.5)}</div>
+                                <div class="stat-label">Challenges</div>
+                            </div>
+                            <div class="stat">
+                                <div class="stat-value">${player.hasVideo ? '📹' : '📷'}</div>
+                                <div class="stat-label">Content</div>
+                            </div>
+                        </div>
+                        
+                        <div style="display: flex; gap: 10px; margin-top: 20px;">
+                            <button class="submit-btn" onclick="followUser('${player.name}')" style="flex: 1;">
+                                Follow
+                            </button>
+                            <button class="dedication-btn" onclick="challengeUser('${player.name}')" style="flex: 1;">
+                                Challenge
+                            </button>
+                        </div>
+                        
+                        <div style="margin-top: 30px;">
+                            <h3 style="margin-bottom: 15px;">Recent Activity</h3>
+                            ${player.hasVideo ? `
+                                <div class="challenge-item">
+                                    <div style="display: flex; justify-content: space-between;">
+                                        <div>
+                                            <h5>📹 Latest Video</h5>
+                                            <p style="opacity: 0.7; font-size: 0.9rem;">AI Score: ${player.aiScore}%</p>
+                                            <small style="opacity: 0.5;">2 hours ago</small>
+                                        </div>
+                                        <div class="challenge-reward">🔥 Trending</div>
+                                    </div>
+                                </div>
+                            ` : ''}
+                            <div class="challenge-item">
+                                <div style="display: flex; justify-content: space-between;">
+                                    <div>
+                                        <h5>🏆 Top Challenge</h5>
+                                        <p style="opacity: 0.7; font-size: 0.9rem;">${player.category} Master</p>
+                                        <small style="opacity: 0.5;">Best Score: ${player.aiScore}%</small>
+                                    </div>
+                                    <div class="challenge-reward">+${Math.floor(player.aiScore * 3)} 🪙</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            document.body.appendChild(profileModal);
         }
         
         // Follow back
@@ -3084,7 +3584,78 @@
         
         // Show search
         function showSearch() {
+            loadPopularUsers();
             showModal('searchModal');
+        }
+        
+        // Load popular users
+        function loadPopularUsers() {
+            const popularList = document.getElementById('popularUsersList');
+            const popularPlayers = getRandomAIPlayers(8, { minLevel: 35, hasVideo: true })
+                .sort((a, b) => b.followers - a.followers);
+            
+            popularList.innerHTML = popularPlayers.map(player => `
+                <div class="challenge-item" style="display: flex; align-items: center; gap: 15px; cursor: pointer;" 
+                     onclick="showAIPlayerProfile(${JSON.stringify(player).replace(/"/g, '&quot;')})">
+                    <div class="user-avatar">${player.avatar}</div>
+                    <div style="flex: 1;">
+                        <h5>@${player.name} ${player.hasVideo ? '📹' : ''}</h5>
+                        <small style="opacity: 0.7;">Level ${player.level} • ${formatNumber(player.followers)} followers</small>
+                        <small style="display: block; opacity: 0.6; margin-top: 2px;">${player.status}</small>
+                    </div>
+                    <button class="dedication-btn" onclick="event.stopPropagation(); followUser('${player.name}')">Follow</button>
+                </div>
+            `).join('');
+        }
+        
+        // Search users
+        function searchUsers(query) {
+            if (query.length < 2) {
+                loadPopularUsers();
+                return;
+            }
+            
+            const searchResults = document.getElementById('searchResults');
+            const matchingPlayers = aiPlayers.filter(player => 
+                player.name.toLowerCase().includes(query.toLowerCase()) ||
+                player.status.toLowerCase().includes(query.toLowerCase()) ||
+                player.category.toLowerCase().includes(query.toLowerCase())
+            ).slice(0, 10);
+            
+            if (matchingPlayers.length > 0) {
+                searchResults.innerHTML = `
+                    <h4 style="margin-bottom: 10px;">Search Results</h4>
+                    <div id="popularUsersList">
+                        ${matchingPlayers.map(player => `
+                            <div class="challenge-item" style="display: flex; align-items: center; gap: 15px; cursor: pointer;" 
+                                 onclick="showAIPlayerProfile(${JSON.stringify(player).replace(/"/g, '&quot;')})">
+                                <div class="user-avatar">${player.avatar}</div>
+                                <div style="flex: 1;">
+                                    <h5>@${player.name} ${player.hasVideo ? '📹' : ''}</h5>
+                                    <small style="opacity: 0.7;">Level ${player.level} • ${formatNumber(player.followers)} followers</small>
+                                    <small style="display: block; opacity: 0.6; margin-top: 2px;">${player.status}</small>
+                                </div>
+                                <button class="dedication-btn" onclick="event.stopPropagation(); followUser('${player.name}')">Follow</button>
+                            </div>
+                        `).join('')}
+                    </div>
+                `;
+            } else {
+                searchResults.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-icon">🔍</div>
+                        <p>No results for "${query}"</p>
+                        <button class="dedication-btn" onclick="document.querySelector('#searchModal input').value=''; loadPopularUsers();">Clear Search</button>
+                    </div>
+                `;
+            }
+        }
+        
+        // Search hashtag
+        function searchHashtag(hashtag) {
+            closeModal('searchModal');
+            showToast(`Showing posts with #${hashtag}`);
+            // In a real app, this would filter the feed
         }
         
         // Open camera
@@ -3123,6 +3694,11 @@
                     <div class="ai-badge">🤖 AI Challenge</div>
                     <h4 class="challenge-title">${challenge.title}</h4>
                     <p style="font-size: 0.9rem; opacity: 0.9; margin: 5px 0;">${challenge.description}</p>
+                    ${challenge.inspiredBy ? `
+                        <p style="font-size: 0.8rem; opacity: 0.7; margin: 5px 0;">
+                            Inspired by @${challenge.inspiredBy} • Beat ${challenge.targetScore}%
+                        </p>
+                    ` : ''}
                     <div class="challenge-meta">
                         <div class="challenge-difficulty">
                             ${'⭐'.repeat(challenge.difficulty)}
@@ -3349,12 +3925,26 @@
             commentsDiv.className = 'comments-overlay';
             commentsDiv.style.display = 'flex';
             
-            const sampleComments = [
-                { user: 'alex_gamer', avatar: '😎', text: 'This is amazing! 🔥', time: '2m ago' },
-                { user: 'dance_queen', avatar: '💃', text: 'I need to try this!', time: '5m ago' },
-                { user: 'foodie_bro', avatar: '🍔', text: 'Let\'s gooo! 🚀', time: '10m ago' },
-                { user: 'pro_player', avatar: '🎯', text: 'Easy challenge for me 😎', time: '15m ago' }
-            ];
+            // Use AI comments if available, otherwise generate new ones
+            const comments = post.aiComments || (() => {
+                const commenters = getRandomAIPlayers(8);
+                return commenters.map(commenter => ({
+                    user: commenter.name,
+                    avatar: commenter.avatar,
+                    text: [
+                        'This is amazing! 🔥',
+                        'I need to try this challenge!',
+                        'You\'re killing it! 💪',
+                        'Tutorial please! 🙏',
+                        'Next level performance! 🚀',
+                        'How did you get that score?! 😱',
+                        'Let\'s gooo! This is what JomBro is about! 🎮',
+                        'Challenge accepted! See you on the leaderboard! 💯'
+                    ][Math.floor(Math.random() * 8)],
+                    time: `${Math.floor(Math.random() * 59) + 1}m ago`,
+                    likes: Math.floor(Math.random() * 200)
+                }));
+            })();
             
             commentsDiv.innerHTML = `
                 <div class="comments-header">
@@ -3363,13 +3953,13 @@
                 </div>
                 
                 <div class="comments-list" id="commentsList">
-                    ${sampleComments.map(comment => `
+                    ${comments.map(comment => `
                         <div class="comment-item">
                             <div class="comment-avatar">${comment.avatar}</div>
                             <div class="comment-content">
                                 <div class="comment-user">@${comment.user}</div>
                                 <div class="comment-text">${comment.text}</div>
-                                <div class="comment-time">${comment.time} • ❤️ ${Math.floor(Math.random() * 100)}</div>
+                                <div class="comment-time">${comment.time} • ❤️ ${comment.likes}</div>
                             </div>
                         </div>
                     `).join('')}
@@ -3566,12 +4156,55 @@
         function loadTrendingChallenges() {
             const trendingDiv = document.getElementById('trendingChallenges');
             
+            // Get top AI players to show as participants
+            const topPlayers = getRandomAIPlayers(5, { minLevel: 30, hasVideo: true });
+            
             const trending = [
-                { title: '100 Burpee Challenge', participants: 1234, difficulty: 5, reward: 300, category: 'fitness' },
-                { title: 'Viral Dance Remix', participants: 5678, difficulty: 3, reward: 200, category: 'creative' },
-                { title: 'Cooking Speedrun', participants: 890, difficulty: 2, reward: 150, category: 'food' },
-                { title: 'Comedy Roast', participants: 3456, difficulty: 4, reward: 250, category: 'creative' },
-                { title: 'Extreme Parkour', participants: 2345, difficulty: 5, reward: 400, category: 'adventure' }
+                { 
+                    title: '100 Burpee Challenge', 
+                    participants: 12340 + topPlayers[0].followers, 
+                    difficulty: 5, 
+                    reward: 300, 
+                    category: 'fitness',
+                    topPlayer: topPlayers[0].name,
+                    topScore: topPlayers[0].aiScore
+                },
+                { 
+                    title: 'Viral Dance Remix', 
+                    participants: 56780 + topPlayers[1].followers, 
+                    difficulty: 3, 
+                    reward: 200, 
+                    category: 'creative',
+                    topPlayer: topPlayers[1].name,
+                    topScore: topPlayers[1].aiScore
+                },
+                { 
+                    title: 'Cooking Speedrun', 
+                    participants: 8900 + topPlayers[2].followers, 
+                    difficulty: 2, 
+                    reward: 150, 
+                    category: 'food',
+                    topPlayer: topPlayers[2].name,
+                    topScore: topPlayers[2].aiScore
+                },
+                { 
+                    title: 'Comedy Roast', 
+                    participants: 34560 + topPlayers[3].followers, 
+                    difficulty: 4, 
+                    reward: 250, 
+                    category: 'creative',
+                    topPlayer: topPlayers[3].name,
+                    topScore: topPlayers[3].aiScore
+                },
+                { 
+                    title: 'Extreme Parkour', 
+                    participants: 23450 + topPlayers[4].followers, 
+                    difficulty: 5, 
+                    reward: 400, 
+                    category: 'adventure',
+                    topPlayer: topPlayers[4].name,
+                    topScore: topPlayers[4].aiScore
+                }
             ];
             
             trendingDiv.innerHTML = `
@@ -3582,6 +4215,7 @@
                             <div>
                                 <h4 class="challenge-title">${challenge.title}</h4>
                                 <p style="opacity: 0.7; font-size: 0.9rem;">👥 ${formatNumber(challenge.participants)} participants</p>
+                                <p style="opacity: 0.6; font-size: 0.85rem;">🏆 Top: @${challenge.topPlayer} (${challenge.topScore}%)</p>
                                 <div class="challenge-difficulty">${'⭐'.repeat(challenge.difficulty)}</div>
                             </div>
                             <div class="challenge-reward">🪙 ${challenge.reward}</div>
@@ -3701,34 +4335,35 @@
                     </div>
                 `).join('');
             } else {
-                // Challenge invites
-                const challengeInvites = [
-                    {
-                        from: 'Mike',
-                        challenge: '50 Pushups Speed Run',
-                        description: 'Complete 50 pushups in 2 minutes',
-                        reward: 150,
-                        time: '5 min ago'
-                    },
-                    {
-                        from: 'Sarah',
-                        challenge: 'Dance Off',
-                        description: 'Best dance wins!',
-                        reward: 200,
-                        time: '1 hour ago'
-                    },
-                    {
-                        from: 'TeamJomBro',
-                        challenge: 'Weekly Community Challenge',
-                        description: 'This week: Show your morning routine',
-                        reward: 500,
-                        time: '2 hours ago'
-                    }
+                // Challenge invites from AI players
+                const challengingPlayers = getRandomAIPlayers(5, { minLevel: 20 });
+                const challenges = [
+                    { title: '100 Burpee Speed Run', description: 'Complete 100 burpees in under 5 minutes', reward: 200 },
+                    { title: 'Dance Battle Royale', description: 'Best dance wins! 30 second freestyle', reward: 250 },
+                    { title: 'Plank Marathon', description: 'Hold plank position for as long as possible', reward: 180 },
+                    { title: 'Creative Art Sprint', description: 'Create amazing art in 60 seconds', reward: 220 },
+                    { title: 'Ultimate Food Challenge', description: 'Finish the spiciest dish in town!', reward: 300 }
                 ];
+                
+                const challengeInvites = challengingPlayers.map((player, index) => ({
+                    from: player.name,
+                    avatar: player.avatar,
+                    level: player.level,
+                    challenge: challenges[index].title,
+                    description: challenges[index].description,
+                    reward: challenges[index].reward,
+                    time: `${Math.floor(Math.random() * 12) + 1} hours ago`
+                }));
                 
                 content.innerHTML = challengeInvites.map((invite, index) => `
                     <div class="challenge-item">
-                        <h4>🎯 ${invite.from} challenged you!</h4>
+                        <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 10px;">
+                            <div class="comment-avatar">${invite.avatar}</div>
+                            <div>
+                                <h4 style="margin: 0;">🎯 ${invite.from} challenged you!</h4>
+                                <small style="opacity: 0.6;">Level ${invite.level} Player</small>
+                            </div>
+                        </div>
                         <p style="font-weight: 600; margin: 5px 0;">${invite.challenge}</p>
                         <p style="opacity: 0.7; margin: 5px 0;">${invite.description}</p>
                         <p style="color: #ffd700; margin: 5px 0;">🪙 ${invite.reward} tokens</p>
