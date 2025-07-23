@@ -920,6 +920,23 @@
             to { transform: rotate(360deg); }
         }
         
+        @keyframes recordPulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+        
+        @keyframes heartFloat {
+            0% {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+            100% {
+                opacity: 0;
+                transform: translateY(-100px) scale(1.5);
+            }
+        }
+        
         /* Bottom Navigation (TikTok Style) - FLOATING */
         .bottom-nav {
             position: fixed;
@@ -1166,18 +1183,23 @@
             cursor: pointer;
         }
         
-        /* Toast */
+        /* Toast notification */
         .toast {
             position: fixed;
             bottom: 100px;
             left: 50%;
             transform: translateX(-50%);
-            background: rgba(0, 0, 0, 0.8);
+            background: rgba(0, 0, 0, 0.9);
             backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
             padding: 15px 25px;
             border-radius: 25px;
             z-index: 600;
             animation: fadeInUp 0.3s ease;
+            color: white;
+            font-size: 1rem;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+            border: 1px solid rgba(255, 255, 255, 0.1);
         }
         
         @keyframes fadeInUp {
@@ -1701,18 +1723,18 @@
                     </select>
                     <input type="tel" class="phone-input" id="phoneNumber" placeholder="Phone number" maxlength="15">
                 </div>
-                <button class="auth-btn" onclick="sendOTP()">Get Started →</button>
+                <button class="auth-btn" id="sendOTPBtn" type="button" onclick="sendOTP()">Get Started →</button>
                 <div id="recaptcha-container"></div>
             </div>
             
             <div class="verification-container" id="otpForm">
                 <p style="margin-bottom: 15px; opacity: 0.9;">Enter the code sent to <span id="phoneDisplay"></span></p>
                 <input type="text" class="otp-input" id="otpCode" placeholder="123456" maxlength="6">
-                <button class="auth-btn" onclick="verifyOTP()">Verify & Continue →</button>
-                <button class="quick-start-btn" onclick="resendOTP()">Resend Code</button>
+                <button class="auth-btn" id="verifyOTPBtn" type="button" onclick="verifyOTP()">Verify & Continue →</button>
+                <button class="quick-start-btn" id="resendOTPBtn" type="button" onclick="resendOTP()">Resend Code</button>
             </div>
             
-            <button class="quick-start-btn" onclick="quickStart()">
+            <button class="quick-start-btn" id="quickStartBtn" type="button" onclick="window.quickStart()">
                 Quick Start (Demo Mode)
             </button>
         </div>
@@ -2050,8 +2072,245 @@
             setTimeout(() => toast.remove(), 3000);
         }
         
-        // Quick start (Demo mode) - Define early
-        function quickStart() {
+        // Calculate AI Score - Simple version
+        function calculateAIScore() {
+            const baseScore = 60 + Math.floor(Math.random() * 30);
+            const bonus = Math.floor(Math.random() * 10);
+            return Math.min(baseScore + bonus, 100);
+        }
+        
+        // Generate unique AI challenges
+        function generateAIChallenges() {
+            const challengeTemplates = {
+                fitness: [
+                    { title: "Push-up Challenge", desc: "Do 20 push-ups", difficulty: 3, reward: 100 },
+                    { title: "Plank Challenge", desc: "Hold plank for 30 seconds", difficulty: 2, reward: 80 }
+                ],
+                creative: [
+                    { title: "Dance Challenge", desc: "Create a 30-second dance", difficulty: 3, reward: 150 },
+                    { title: "Drawing Challenge", desc: "Draw something in 60 seconds", difficulty: 2, reward: 100 }
+                ],
+                social: [
+                    { title: "Compliment Challenge", desc: "Give 5 genuine compliments", difficulty: 2, reward: 120 },
+                    { title: "Phone a Friend", desc: "Call and tell them you appreciate them", difficulty: 1, reward: 80 }
+                ]
+            };
+            
+            const challenges = [];
+            const categories = Object.keys(challengeTemplates);
+            
+            // Generate 3 challenges
+            for (let i = 0; i < 3; i++) {
+                const category = categories[Math.floor(Math.random() * categories.length)];
+                const templates = challengeTemplates[category];
+                const template = templates[Math.floor(Math.random() * templates.length)];
+                
+                challenges.push({
+                    id: `${category}_${Date.now()}_${i}`,
+                    title: template.title,
+                    description: template.desc,
+                    category: category,
+                    reward: template.reward,
+                    difficulty: template.difficulty,
+                    dedication: 'open-public',
+                    aiGenerated: true,
+                    expiresAt: new Date(Date.now() + 10 * 60 * 1000)
+                });
+            }
+            
+            return challenges;
+        }
+        
+        // Start AI challenge timer
+        function startChallengeTimer() {
+            try {
+                aiChallenges = generateAIChallenges();
+                console.log('AI challenges generated');
+                
+                // Update every 10 minutes
+                challengeTimer = setInterval(() => {
+                    try {
+                        aiChallenges = generateAIChallenges();
+                        showToast('🤖 New AI challenges available!');
+                    } catch (error) {
+                        console.error('Challenge timer error:', error);
+                    }
+                }, 10 * 60 * 1000);
+            } catch (error) {
+                console.error('Error starting challenge timer:', error);
+            }
+        }
+        
+        // Format count helper
+        function formatCount(count) {
+            if (count >= 1000000) {
+                return (count / 1000000).toFixed(1) + 'M';
+            } else if (count >= 1000) {
+                return (count / 1000).toFixed(1) + 'K';
+            }
+            return count.toString();
+        }
+        
+        // Create post element
+        function createPostElement(post, index) {
+            try {
+                const postDiv = document.createElement('div');
+                postDiv.className = 'feed-post';
+                postDiv.setAttribute('data-index', index);
+                
+                postDiv.innerHTML = `
+                    <div class="post-media">
+                        <img class="post-image" src="${post.mediaUrl}" alt="Challenge" loading="lazy" onerror="this.src='https://via.placeholder.com/1080x1920/222/fff?text=JomBro'">
+                        <div class="frame-wrapper frame-gradient-border"></div>
+                    </div>
+                    
+                    <div class="gradient-overlay-top"></div>
+                    <div class="gradient-overlay-bottom"></div>
+                    
+                    ${post.aiScore ? `
+                        <div class="ai-score-badge">
+                            <span class="ai-icon">🤖</span>
+                            <span class="score-value">${post.aiScore}%</span>
+                            <div class="score-stars">
+                                ${post.aiScore >= 90 ? '⭐⭐⭐⭐⭐' : 
+                                  post.aiScore >= 75 ? '⭐⭐⭐⭐' : 
+                                  post.aiScore >= 60 ? '⭐⭐⭐' : '⭐⭐'}
+                            </div>
+                        </div>
+                    ` : ''}
+                    
+                    <div class="post-actions">
+                        <div class="action-item">
+                            <div class="user-avatar">
+                                ${post.user.avatar}
+                                <div class="follow-btn">+</div>
+                            </div>
+                        </div>
+                        
+                        <div class="action-item" onclick="toggleLike('${post.id}')">
+                            <div class="action-icon" id="like-${post.id}">❤️</div>
+                            <div class="action-count">${formatCount(post.likes)}</div>
+                        </div>
+                        
+                        <div class="action-item" onclick="showComments('${post.id}')">
+                            <div class="action-icon">💬</div>
+                            <div class="action-count">${formatCount(post.comments)}</div>
+                        </div>
+                        
+                        <div class="action-item" onclick="sharePost('${post.id}')">
+                            <div class="action-icon">↗️</div>
+                            <div class="action-count">Share</div>
+                        </div>
+                    </div>
+                    
+                    <div class="post-info">
+                        <div class="post-user">@${post.user.name}</div>
+                        <div class="challenge-badge">
+                            🎯 ${post.challenge.title} • 🪙 ${post.challenge.reward}
+                        </div>
+                        <div class="post-caption">${post.caption}</div>
+                        <div class="post-music">
+                            <span class="music-icon">🎵</span>
+                            <span>Original sound - ${post.user.name}</span>
+                        </div>
+                    </div>
+                `;
+                
+                return postDiv;
+            } catch (error) {
+                console.error('Error creating post element:', error);
+                const postDiv = document.createElement('div');
+                postDiv.className = 'feed-post';
+                postDiv.innerHTML = '<div class="post-media">Error loading post</div>';
+                return postDiv;
+            }
+        }
+        
+        // Load feed
+        function loadFeed() {
+            try {
+                console.log('Loading feed...');
+                const container = document.getElementById('feedContainer');
+                
+                // Create sample posts
+                const samplePosts = [
+                    {
+                        id: 'post1',
+                        user: { name: 'alex_gamer', avatar: '😎' },
+                        challenge: { 
+                            title: '20 Pushup Challenge', 
+                            category: 'fitness', 
+                            reward: 100
+                        },
+                        caption: 'Just crushed the pushup challenge! 💪',
+                        likes: 234,
+                        comments: 45,
+                        mediaUrl: `https://picsum.photos/seed/${Date.now() + 1}/1080/1920`,
+                        aiScore: 92
+                    },
+                    {
+                        id: 'post2',
+                        user: { name: 'dance_queen', avatar: '💃' },
+                        challenge: { 
+                            title: 'TikTok Dance', 
+                            category: 'creative', 
+                            reward: 150
+                        },
+                        caption: 'New dance moves! Who wants to try? 🕺',
+                        likes: 567,
+                        comments: 89,
+                        mediaUrl: `https://picsum.photos/seed/${Date.now() + 2}/1080/1920`,
+                        aiScore: 88
+                    }
+                ];
+                
+                // Clear existing posts
+                container.innerHTML = '';
+                
+                // Add posts
+                samplePosts.forEach((post, index) => {
+                    const postElement = createPostElement(post, index);
+                    container.appendChild(postElement);
+                });
+                
+                feedPosts = samplePosts;
+                console.log('Feed loaded successfully');
+                
+            } catch (error) {
+                console.error('Error loading feed:', error);
+                showToast('Error loading feed');
+            }
+        }
+            try {
+                if (!userData) {
+                    console.error('No user data available');
+                    return;
+                }
+                
+                // Update profile elements if they exist
+                const profileAvatar = document.getElementById('profileAvatar');
+                if (profileAvatar) profileAvatar.textContent = userData.avatar || '🎮';
+                
+                const profileName = document.getElementById('profileName');
+                if (profileName) profileName.textContent = '@' + (userData.name || 'player');
+                
+                const tokenStat = document.getElementById('tokenStat');
+                if (tokenStat) tokenStat.textContent = userData.tokens || 0;
+                
+                const levelStat = document.getElementById('levelStat');
+                if (levelStat) levelStat.textContent = userData.level || 1;
+                
+                const challengeStat = document.getElementById('challengeStat');
+                if (challengeStat) challengeStat.textContent = userData.completedChallenges || 0;
+                
+                const followerStat = document.getElementById('followerStat');
+                if (followerStat) followerStat.textContent = userData.followers || Math.floor(Math.random() * 1000);
+                
+                console.log('Profile updated');
+            } catch (error) {
+                console.error('Error updating profile:', error);
+            }
+        }
             try {
                 console.log('Quick start demo mode initiated');
                 
@@ -2074,61 +2333,124 @@
                     isDemo: true
                 };
                 
-                // Start app directly without Firebase
-                startApp();
-                showToast('Demo mode activated! 🎮');
+                console.log('Demo user created:', userData);
+                
+                // Hide login screen immediately
+                document.getElementById('loginScreen').style.display = 'none';
+                
+                // Show main app immediately
+                document.getElementById('feedContainer').style.display = 'block';
+                document.querySelector('.feed-header').style.display = 'flex';
+                document.getElementById('bottomNav').style.display = 'flex';
+                
+                // Initialize app features
+                setTimeout(() => {
+                    updateProfile();
+                    startChallengeTimer();
+                    loadFeed();
+                    showToast('Welcome to JomBro! Let\'s Go! Let\'s Go! 🎮');
+                }, 100);
                 
             } catch (error) {
                 console.error('Error in quickStart:', error);
-                alert('Error starting demo mode. Please refresh the page.');
+                alert('Error starting demo mode. Please refresh the page and try again.');
             }
         }
         
-        // Initialize app
-        window.onload = function() {
-            console.log('App loading...');
+        // Initialize app - Use multiple initialization methods to ensure it works
+        function initializeApp() {
+            console.log('Initializing JomBro app...');
             
-            // Make quickStart available immediately
-            window.quickStart = quickStart;
+            // Setup event listeners immediately
+            setupEventListeners();
+            
+            // Make functions globally available immediately
+            setupGlobalFunctions();
             
             try {
-                // Initialize Firebase
-                app = firebase.initializeApp(firebaseConfig);
-                auth = firebase.auth();
-                db = firebase.firestore();
-                storage = firebase.storage();
-                console.log('Firebase initialized successfully!');
-                
-                // Setup phone auth
-                setupPhoneAuth();
-                
-                // Load saved challenges from localStorage
-                const saved = localStorage.getItem('usedChallenges');
-                if (saved) {
-                    usedChallenges = new Set(JSON.parse(saved));
+                // Try to initialize Firebase
+                if (typeof firebase !== 'undefined') {
+                    app = firebase.initializeApp(firebaseConfig);
+                    auth = firebase.auth();
+                    db = firebase.firestore();
+                    storage = firebase.storage();
+                    console.log('Firebase initialized successfully!');
+                    
+                    // Setup phone auth
+                    setupPhoneAuth();
+                    
+                    // Check if user is already logged in
+                    auth.onAuthStateChanged(user => {
+                        if (user) {
+                            handleAuthSuccess(user);
+                        }
+                    });
+                } else {
+                    console.log('Firebase not loaded - Demo mode only available');
                 }
-                
-                // Check if user is already logged in
-                auth.onAuthStateChanged(user => {
-                    if (user) {
-                        handleAuthSuccess(user);
-                    }
-                });
-                
             } catch (error) {
                 console.error('Firebase initialization error:', error);
                 console.log('Firebase not available - Demo mode only');
             }
             
-            // Setup event listeners
-            setupEventListeners();
+            // Load saved challenges from localStorage
+            const saved = localStorage.getItem('usedChallenges');
+            if (saved) {
+                try {
+                    usedChallenges = new Set(JSON.parse(saved));
+                } catch (e) {
+                    console.error('Error loading saved challenges:', e);
+                }
+            }
             
-            // Make all functions globally available
-            setupGlobalFunctions();
-        };
+            console.log('App initialization complete. Quick Start button should work now.');
+        }
+        
+        // Try multiple initialization methods
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', initializeApp);
+        } else {
+            // DOM is already loaded
+            initializeApp();
+        }
+        
+        // Backup initialization
+        window.addEventListener('load', function() {
+            if (!window.quickStart) {
+                console.log('Backup initialization triggered');
+                initializeApp();
+            }
+        });
         
         // Setup event listeners
         function setupEventListeners() {
+            console.log('Setting up event listeners...');
+            
+            // Quick Start Button
+            const quickStartBtn = document.getElementById('quickStartBtn');
+            if (quickStartBtn) {
+                quickStartBtn.addEventListener('click', quickStart);
+                console.log('Quick start button connected');
+            }
+            
+            // Send OTP Button
+            const sendOTPBtn = document.getElementById('sendOTPBtn');
+            if (sendOTPBtn) {
+                sendOTPBtn.addEventListener('click', sendOTP);
+            }
+            
+            // Verify OTP Button
+            const verifyOTPBtn = document.getElementById('verifyOTPBtn');
+            if (verifyOTPBtn) {
+                verifyOTPBtn.addEventListener('click', verifyOTP);
+            }
+            
+            // Resend OTP Button
+            const resendOTPBtn = document.getElementById('resendOTPBtn');
+            if (resendOTPBtn) {
+                resendOTPBtn.addEventListener('click', resendOTP);
+            }
+            
             // Phone input formatting
             const phoneInput = document.getElementById('phoneNumber');
             if (phoneInput) {
@@ -2172,8 +2494,8 @@
             }
         }
         
-        // Send OTP
-        async function sendOTP() {
+        // Send OTP - Make it globally available
+        window.sendOTP = async function() {
             const countryCode = document.getElementById('countryCode').value;
             const phoneNumber = document.getElementById('phoneNumber').value;
             
@@ -2192,7 +2514,7 @@
             document.getElementById('phoneDisplay').textContent = fullNumber;
             
             // Show loading
-            const btn = event.target;
+            const btn = document.getElementById('sendOTPBtn');
             btn.disabled = true;
             btn.innerHTML = '<span class="loading-spinner"></span> Sending...';
             
@@ -2215,10 +2537,10 @@
                 btn.disabled = false;
                 btn.innerHTML = 'Get Started →';
             }
-        }
+        };
         
-        // Verify OTP
-        async function verifyOTP() {
+        // Verify OTP - Make it globally available
+        window.verifyOTP = async function() {
             const otpCode = document.getElementById('otpCode').value;
             
             if (!otpCode || otpCode.length !== 6) {
@@ -2227,7 +2549,7 @@
             }
             
             // Show loading
-            const btn = event.target;
+            const btn = document.getElementById('verifyOTPBtn');
             btn.disabled = true;
             btn.innerHTML = '<span class="loading-spinner"></span> Verifying...';
             
@@ -2240,14 +2562,14 @@
                 btn.disabled = false;
                 btn.innerHTML = 'Verify & Continue →';
             }
-        }
+        };
         
-        // Resend OTP
-        function resendOTP() {
+        // Resend OTP - Make it globally available
+        window.resendOTP = function() {
             document.getElementById('phoneForm').style.display = 'flex';
             document.getElementById('otpForm').style.display = 'none';
             showToast('Enter your phone number again');
-        }
+        };
         
         // Handle successful authentication
         async function handleAuthSuccess(user) {
@@ -2990,6 +3312,23 @@
         }
         
         console.log('JomBro app initialized! Let\'s Go! Let\'s Go!');
+    </script>
+    <!-- Test script at end of body -->
+    <script>
+        // Final check when everything is loaded
+        setTimeout(function() {
+            const btn = document.getElementById('quickStartBtn');
+            if (btn) {
+                console.log('✅ Quick Start button found and ready!');
+                if (typeof window.quickStart === 'function') {
+                    console.log('✅ quickStart function is available!');
+                } else {
+                    console.error('❌ quickStart function not found!');
+                }
+            } else {
+                console.error('❌ Quick Start button not found!');
+            }
+        }, 100);
     </script>
 </body>
 </html>.now() + 1}/1080/1920`,
