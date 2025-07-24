@@ -3090,26 +3090,17 @@
         }
         
         // Open camera
-        async function openCamera() {
-            document.getElementById('cameraInterface').style.display = 'block';
-            
-            try {
-                videoStream = await navigator.mediaDevices.getUserMedia({ 
-                    video: { facingMode: 'user' }, 
-                    audio: false 
-                });
-                
-                document.getElementById('cameraVideo').srcObject = videoStream;
-                showAIChallenges();
-                
-            } catch (error) {
-                console.error('Camera error:', error);
-                showToast('Camera access denied');
-                
-                // Show challenges anyway
-                showAIChallenges();
-            }
+       // Add retry logic for failed operations
+async function retryOperation(operation, maxRetries = 3) {
+    for (let i = 0; i < maxRetries; i++) {
+        try {
+            return await operation();
+        } catch (error) {
+            if (i === maxRetries - 1) throw error;
+            await new Promise(resolve => setTimeout(resolve, 1000 * Math.pow(2, i)));
         }
+    }
+}
         
         // Show AI challenges
         function showAIChallenges() {
