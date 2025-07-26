@@ -2478,6 +2478,20 @@
             display: flex;
             gap: 15px;
             justify-content: center;
+            flex-wrap: wrap;
+        }
+        
+        @media (max-width: 480px) {
+            .ecommerce-links {
+                display: grid;
+                grid-template-columns: 1fr 1fr;
+                gap: 10px;
+            }
+            
+            .ecommerce-link {
+                margin: 0;
+                text-align: center;
+            }
         }
         
         .ecommerce-link {
@@ -2488,6 +2502,8 @@
             text-decoration: none;
             font-weight: 500;
             transition: all 0.3s ease;
+            display: inline-block;
+            margin: 5px;
         }
         
         .ecommerce-link:hover {
@@ -3103,17 +3119,17 @@
                                 <div class="contact-icon">💬</div>
                                 <div>WhatsApp</div>
                             </a>
-                            <a href="#" class="contact-btn" onclick="contactVia('call')">
-                                <div class="contact-icon">📞</div>
-                                <div>Call</div>
+                            <a href="#" class="contact-btn" onclick="contactVia('line')">
+                                <div class="contact-icon">📱</div>
+                                <div>LINE</div>
                             </a>
                             <a href="#" class="contact-btn" onclick="contactVia('email')">
                                 <div class="contact-icon">📧</div>
                                 <div>Email</div>
                             </a>
-                            <a href="#" class="contact-btn" onclick="contactVia('message')">
-                                <div class="contact-icon">💌</div>
-                                <div>Message</div>
+                            <a href="#" class="contact-btn" onclick="contactVia('wechat')">
+                                <div class="contact-icon">💚</div>
+                                <div>WeChat</div>
                             </a>
                         </div>
                         
@@ -3126,6 +3142,12 @@
                                 </a>
                                 <a href="#" class="ecommerce-link" onclick="openEcommerce('lazada')">
                                     Lazada
+                                </a>
+                                <a href="#" class="ecommerce-link" onclick="openEcommerce('temu')">
+                                    Temu
+                                </a>
+                                <a href="#" class="ecommerce-link" onclick="openEcommerce('taobao')">
+                                    Taobao
                                 </a>
                             </div>
                         </div>
@@ -3250,13 +3272,18 @@
                 </div>
                 
                 <div class="form-group">
-                    <label class="form-label">Phone</label>
-                    <input type="tel" id="editPhone" class="form-input" placeholder="+60...">
+                    <label class="form-label">LINE</label>
+                    <input type="text" id="editLine" class="form-input" placeholder="LINE ID">
                 </div>
                 
                 <div class="form-group">
                     <label class="form-label">Email</label>
                     <input type="email" id="editEmail" class="form-input" placeholder="email@example.com">
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">WeChat</label>
+                    <input type="text" id="editWechat" class="form-input" placeholder="WeChat ID">
                 </div>
                 
                 <!-- E-commerce -->
@@ -3269,6 +3296,16 @@
                 <div class="form-group">
                     <label class="form-label">Lazada Store</label>
                     <input type="url" id="editLazada" class="form-input" placeholder="Lazada store link">
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Temu Store</label>
+                    <input type="url" id="editTemu" class="form-input" placeholder="Temu store link">
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Taobao Store</label>
+                    <input type="url" id="editTaobao" class="form-input" placeholder="Taobao store link">
                 </div>
                 
                 <button class="submit-btn" onclick="saveProfile()">Save Changes</button>
@@ -4187,11 +4224,14 @@
                     website: '',
                     // Contact
                     whatsapp: '',
-                    phone: '',
+                    line: '',
                     email: '',
+                    wechat: '',
                     // E-commerce
                     shopee: '',
-                    lazada: ''
+                    lazada: '',
+                    temu: '',
+                    taobao: ''
                 };
                 
                 // Save to Firestore if available
@@ -5126,12 +5166,15 @@
             
             // Contact
             document.getElementById('editWhatsapp').value = userData.whatsapp || '';
-            document.getElementById('editPhone').value = userData.phone || '';
+            document.getElementById('editLine').value = userData.line || '';
             document.getElementById('editEmail').value = userData.email || '';
+            document.getElementById('editWechat').value = userData.wechat || '';
             
             // E-commerce
             document.getElementById('editShopee').value = userData.shopee || '';
             document.getElementById('editLazada').value = userData.lazada || '';
+            document.getElementById('editTemu').value = userData.temu || '';
+            document.getElementById('editTaobao').value = userData.taobao || '';
             
             closeModal('profileModal');
             showModal('editProfileModal');
@@ -5164,12 +5207,15 @@
             
             // Contact
             userData.whatsapp = document.getElementById('editWhatsapp').value.trim();
-            userData.phone = document.getElementById('editPhone').value.trim();
+            userData.line = document.getElementById('editLine').value.trim();
             userData.email = document.getElementById('editEmail').value.trim();
+            userData.wechat = document.getElementById('editWechat').value.trim();
             
             // E-commerce
             userData.shopee = document.getElementById('editShopee').value.trim();
             userData.lazada = document.getElementById('editLazada').value.trim();
+            userData.temu = document.getElementById('editTemu').value.trim();
+            userData.taobao = document.getElementById('editTaobao').value.trim();
             
             updateProfile();
             saveProfileData();
@@ -5441,11 +5487,11 @@
                         showToast('No WhatsApp number set');
                     }
                     break;
-                case 'call':
-                    if (userData.phone) {
-                        window.location.href = `tel:${userData.phone}`;
+                case 'line':
+                    if (userData.line) {
+                        window.open(`https://line.me/ti/p/${userData.line}`, '_blank');
                     } else {
-                        showToast('No phone number set');
+                        showToast('No LINE ID set');
                     }
                     break;
                 case 'email':
@@ -5455,8 +5501,16 @@
                         showToast('No email set');
                     }
                     break;
-                case 'message':
-                    showToast('Opening messenger...');
+                case 'wechat':
+                    if (userData.wechat) {
+                        showToast(`WeChat ID: ${userData.wechat} (copied to clipboard!)`);
+                        // In a real app, copy to clipboard
+                        if (navigator.clipboard) {
+                            navigator.clipboard.writeText(userData.wechat);
+                        }
+                    } else {
+                        showToast('No WeChat ID set');
+                    }
                     break;
             }
         }
@@ -5464,7 +5518,9 @@
         function openEcommerce(platform) {
             const links = {
                 shopee: userData.shopee || '#',
-                lazada: userData.lazada || '#'
+                lazada: userData.lazada || '#',
+                temu: userData.temu || '#',
+                taobao: userData.taobao || '#'
             };
             
             if (links[platform] && links[platform] !== '#') {
