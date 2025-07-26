@@ -27,6 +27,103 @@
             -webkit-tap-highlight-color: transparent;
         }
         
+        /* ADD NEW STYLES FOR COMPANY MEDIA UPLOAD */
+        .company-media-section {
+            margin-top: 30px;
+            padding: 25px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            text-align: center;
+        }
+        
+        .company-media-upload {
+            width: 100%;
+            aspect-ratio: 16/9;
+            background: rgba(255, 255, 255, 0.08);
+            border: 2px dashed rgba(255, 255, 255, 0.3);
+            border-radius: 15px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            overflow: hidden;
+            position: relative;
+        }
+        
+        .company-media-upload:hover {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: rgba(255, 255, 255, 0.5);
+            transform: scale(1.02);
+        }
+        
+        .company-media-preview {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: none;
+        }
+        
+        .company-media-placeholder {
+            text-align: center;
+            color: rgba(255, 255, 255, 0.7);
+        }
+        
+        .company-media-icon {
+            font-size: 3rem;
+            margin-bottom: 15px;
+        }
+        
+        .company-media-text {
+            font-size: 1.1rem;
+            margin-bottom: 10px;
+        }
+        
+        .company-media-hint {
+            font-size: 0.85rem;
+            opacity: 0.6;
+        }
+        
+        .company-media-remove {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: rgba(255, 0, 0, 0.8);
+            color: white;
+            border: none;
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            font-size: 1.2rem;
+            cursor: pointer;
+            display: none;
+            z-index: 10;
+            transition: all 0.3s ease;
+        }
+        
+        .company-media-remove:hover {
+            background: rgba(255, 0, 0, 1);
+            transform: scale(1.1);
+        }
+        
+        /* Company Media Display in Profile */
+        .profile-company-media {
+            margin: 20px 0;
+            border-radius: 15px;
+            overflow: hidden;
+            aspect-ratio: 16/9;
+            background: rgba(255, 255, 255, 0.05);
+        }
+        
+        .profile-company-media img,
+        .profile-company-media video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
         /* ADD NEW STYLES FOR LEADERBOARD */
         .leaderboard-btn {
             position: fixed;
@@ -3542,6 +3639,30 @@
                             </a>
                         </div>
                         
+                        <!-- Address Information -->
+                        <div class="info-card">
+                            <div class="info-card-title">Address</div>
+                            <div class="info-card-content" id="profileAddress">123 Tech Street, Silicon Valley</div>
+                        </div>
+                        
+                        <!-- Area and City -->
+                        <div class="business-section">
+                            <div class="info-card">
+                                <div class="info-card-title">Area</div>
+                                <div class="info-card-content" id="profileArea">Petaling Jaya</div>
+                            </div>
+                            <div class="info-card">
+                                <div class="info-card-title">City</div>
+                                <div class="info-card-content" id="profileCity">Selangor</div>
+                            </div>
+                        </div>
+                        
+                        <!-- Company Media Section -->
+                        <div class="profile-company-media" id="profileCompanyMedia" style="display: none;">
+                            <img id="profileCompanyMediaImg" src="" alt="" style="display: none;">
+                            <video id="profileCompanyMediaVideo" controls style="display: none;"></video>
+                        </div>
+                        
                         <!-- Happy Moment -->
                         <div class="happy-moment-card">
                             <div class="info-card-title">One Thing I'm Happy With</div>
@@ -3700,6 +3821,40 @@
                 <div class="form-group">
                     <label class="form-label">Company Profile Link</label>
                     <input type="url" id="editCompanyLink" class="form-input" placeholder="https://...">
+                </div>
+                
+                <!-- Address Fields -->
+                <div class="form-group">
+                    <label class="form-label">Address</label>
+                    <input type="text" id="editAddress" class="form-input" placeholder="Street address">
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Area</label>
+                    <input type="text" id="editArea" class="form-input" placeholder="e.g., Petaling Jaya">
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">City</label>
+                    <input type="text" id="editCity" class="form-input" placeholder="e.g., Selangor">
+                </div>
+                
+                <!-- Company Media Upload -->
+                <div class="form-group">
+                    <label class="form-label">Company Media (Image/Video)</label>
+                    <div class="company-media-section">
+                        <div class="company-media-upload" onclick="uploadCompanyMedia()">
+                            <img class="company-media-preview" id="companyMediaPreviewImg" src="" alt="" style="display: none;">
+                            <video class="company-media-preview" id="companyMediaPreviewVideo" controls style="display: none;"></video>
+                            <div class="company-media-placeholder" id="companyMediaPlaceholder">
+                                <div class="company-media-icon">🎬</div>
+                                <div class="company-media-text">Upload Image or Video</div>
+                                <div class="company-media-hint">Landscape orientation • Max 1 minute for videos</div>
+                            </div>
+                            <button class="company-media-remove" id="companyMediaRemove" onclick="removeCompanyMedia(event)">×</button>
+                        </div>
+                        <input type="file" id="companyMediaInput" class="file-input" accept="image/*,video/*" onchange="handleCompanyMediaUpload(event)">
+                    </div>
                 </div>
                 
                 <!-- Personal Touch -->
@@ -4163,9 +4318,7 @@
             updateProfile();
             saveProfileData();
             
-            closeModal('editProfileModal');
-            showModal('profileModal');
-            showToast('Profile updated! ✨');
+            closeFriendRequest();
         }
         
         // Upload profile image
@@ -4206,6 +4359,85 @@
                 };
                 reader.readAsDataURL(file);
             }
+        }
+        
+        // Upload company media
+        function uploadCompanyMedia() {
+            document.getElementById('companyMediaInput').click();
+        }
+        
+        // Handle company media upload
+        function handleCompanyMediaUpload(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            
+            const isVideo = file.type.startsWith('video/');
+            
+            // Check video duration for 1 minute limit
+            if (isVideo) {
+                const video = document.createElement('video');
+                video.preload = 'metadata';
+                
+                video.onloadedmetadata = function() {
+                    window.URL.revokeObjectURL(video.src);
+                    
+                    if (video.duration > 60) {
+                        showToast('Video must be less than 1 minute long');
+                        return;
+                    }
+                    
+                    // Video is valid, proceed with upload
+                    processCompanyMedia(file, isVideo);
+                };
+                
+                video.src = URL.createObjectURL(file);
+            } else {
+                // Image upload
+                processCompanyMedia(file, isVideo);
+            }
+        }
+        
+        // Process company media
+        function processCompanyMedia(file, isVideo) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                userData.companyMedia = {
+                    type: isVideo ? 'video' : 'image',
+                    url: e.target.result
+                };
+                
+                // Update preview
+                if (isVideo) {
+                    document.getElementById('companyMediaPreviewVideo').src = e.target.result;
+                    document.getElementById('companyMediaPreviewVideo').style.display = 'block';
+                    document.getElementById('companyMediaPreviewImg').style.display = 'none';
+                } else {
+                    document.getElementById('companyMediaPreviewImg').src = e.target.result;
+                    document.getElementById('companyMediaPreviewImg').style.display = 'block';
+                    document.getElementById('companyMediaPreviewVideo').style.display = 'none';
+                }
+                
+                document.getElementById('companyMediaPlaceholder').style.display = 'none';
+                document.getElementById('companyMediaRemove').style.display = 'block';
+                
+                showToast('Company media uploaded! 🎬');
+            };
+            reader.readAsDataURL(file);
+        }
+        
+        // Remove company media
+        function removeCompanyMedia(event) {
+            event.stopPropagation();
+            
+            userData.companyMedia = null;
+            
+            // Reset preview
+            document.getElementById('companyMediaPreviewImg').style.display = 'none';
+            document.getElementById('companyMediaPreviewVideo').style.display = 'none';
+            document.getElementById('companyMediaPlaceholder').style.display = 'block';
+            document.getElementById('companyMediaRemove').style.display = 'none';
+            
+            showToast('Company media removed');
         }
         
         // Create challenge
@@ -4360,7 +4592,7 @@
                     name: 'Player' + Math.floor(Math.random() * 9999)
                 };
                 
-                // Create user data
+                // Create user data with new fields
                 userData = {
                     name: currentUser.name,
                     avatar: '🎮',
@@ -4380,6 +4612,12 @@
                     nature: 'B2C SaaS',
                     companyName: 'JomBro Technologies',
                     companyLink: '',
+                    // NEW ADDRESS FIELDS
+                    address: '123 Tech Street, Silicon Valley',
+                    area: 'Petaling Jaya',
+                    city: 'Selangor',
+                    // Company media
+                    companyMedia: null,
                     // Personal touch
                     happyMoment: 'Creating experiences that bring joy to millions of users worldwide! 🌟',
                     slogan: 'Dream big, code bigger, impact biggest!',
@@ -4464,7 +4702,11 @@
                         tokens: 1000,
                         level: 1,
                         completedChallenges: 0,
-                        followers: 0
+                        followers: 0,
+                        address: '',
+                        area: '',
+                        city: '',
+                        companyMedia: null
                     };
                 }
                 
@@ -4502,6 +4744,9 @@
         window.handleProfileImageUpload = handleProfileImageUpload;
         window.uploadCoverImage = uploadCoverImage;
         window.handleCoverImageUpload = handleCoverImageUpload;
+        window.uploadCompanyMedia = uploadCompanyMedia;
+        window.handleCompanyMediaUpload = handleCompanyMediaUpload;
+        window.removeCompanyMedia = removeCompanyMedia;
         window.stalkProfile = stalkProfile;
         window.openSocialLink = openSocialLink;
         window.contactVia = contactVia;
@@ -4626,12 +4871,6 @@
                 clearInterval(challengeTimer);
             }
         });
-    </script>
-</body>
-</html>
-            closeFriendRequest();
-        }
-        
         // Decline friend request
         function declineFriendRequest() {
             closeFriendRequest();
@@ -6503,6 +6742,11 @@
                 document.getElementById('businessNature').textContent = userData.nature || 'B2C SaaS';
                 document.getElementById('companyName').textContent = userData.companyName || 'JomBro Technologies';
                 
+                // Update address fields
+                document.getElementById('profileAddress').textContent = userData.address || '123 Tech Street, Silicon Valley';
+                document.getElementById('profileArea').textContent = userData.area || 'Petaling Jaya';
+                document.getElementById('profileCity').textContent = userData.city || 'Selangor';
+                
                 // Update personal touch
                 document.getElementById('happyMoment').textContent = userData.happyMoment || 'Creating experiences that bring joy!';
                 document.getElementById('successSlogan').textContent = userData.slogan || 'Dream big, achieve bigger!';
@@ -6527,6 +6771,24 @@
                     document.querySelector('.profile-cover').style.background = 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)';
                 }
                 
+                // Update company media
+                if (userData.companyMedia) {
+                    const mediaContainer = document.getElementById('profileCompanyMedia');
+                    mediaContainer.style.display = 'block';
+                    
+                    if (userData.companyMedia.type === 'video') {
+                        document.getElementById('profileCompanyMediaVideo').src = userData.companyMedia.url;
+                        document.getElementById('profileCompanyMediaVideo').style.display = 'block';
+                        document.getElementById('profileCompanyMediaImg').style.display = 'none';
+                    } else {
+                        document.getElementById('profileCompanyMediaImg').src = userData.companyMedia.url;
+                        document.getElementById('profileCompanyMediaImg').style.display = 'block';
+                        document.getElementById('profileCompanyMediaVideo').style.display = 'none';
+                    }
+                } else {
+                    document.getElementById('profileCompanyMedia').style.display = 'none';
+                }
+                
             } catch (error) {
                 console.error('Error updating profile:', error);
             }
@@ -6546,6 +6808,27 @@
             document.getElementById('editNature').value = userData.nature || '';
             document.getElementById('editCompanyName').value = userData.companyName || '';
             document.getElementById('editCompanyLink').value = userData.companyLink || '';
+            
+            // Address fields
+            document.getElementById('editAddress').value = userData.address || '';
+            document.getElementById('editArea').value = userData.area || '';
+            document.getElementById('editCity').value = userData.city || '';
+            
+            // Company media preview
+            if (userData.companyMedia) {
+                document.getElementById('companyMediaPlaceholder').style.display = 'none';
+                document.getElementById('companyMediaRemove').style.display = 'block';
+                
+                if (userData.companyMedia.type === 'video') {
+                    document.getElementById('companyMediaPreviewVideo').src = userData.companyMedia.url;
+                    document.getElementById('companyMediaPreviewVideo').style.display = 'block';
+                    document.getElementById('companyMediaPreviewImg').style.display = 'none';
+                } else {
+                    document.getElementById('companyMediaPreviewImg').src = userData.companyMedia.url;
+                    document.getElementById('companyMediaPreviewImg').style.display = 'block';
+                    document.getElementById('companyMediaPreviewVideo').style.display = 'none';
+                }
+            }
             
             // Personal touch
             document.getElementById('editHappyMoment').value = userData.happyMoment || '';
@@ -6588,6 +6871,11 @@
             userData.companyName = document.getElementById('editCompanyName').value.trim();
             userData.companyLink = document.getElementById('editCompanyLink').value.trim();
             
+            // Address fields
+            userData.address = document.getElementById('editAddress').value.trim();
+            userData.area = document.getElementById('editArea').value.trim();
+            userData.city = document.getElementById('editCity').value.trim();
+            
             // Personal touch
             userData.happyMoment = document.getElementById('editHappyMoment').value.trim();
             userData.slogan = document.getElementById('editSlogan').value.trim();
@@ -6612,3 +6900,11 @@
             
             updateProfile();
             saveProfileData();
+            
+            closeModal('editProfileModal');
+            showModal('profileModal');
+            showToast('Profile updated! ✨');
+        }
+    </script>
+</body>
+</html>
