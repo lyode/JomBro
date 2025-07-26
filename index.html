@@ -1,4 +1,40 @@
-<!DOCTYPE html>
+#editProfileModal .modal-content::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            border-radius: 25px;
+            padding: 1px;
+            background: linear-gradient(135deg, rgba(155, 89, 182, 0.3), rgba(233, 30, 99, 0.3));
+            -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+            -webkit-mask-composite: destination-out;
+            mask-composite: exclude;
+            pointer-events: none;
+        }        #editProfileModal .form-input:focus,
+        #editProfileModal .form-textarea:focus {
+            background: rgba(255, 255, 255, 0.15);
+            border-color: rgba(155, 89, 182, 0.6);
+            box-shadow: 0 0 20px rgba(155, 89, 182, 0.3),
+                        inset 0 1px 3px rgba(255, 255, 255, 0.1);
+        }        #editProfileModal .close-btn {
+            font-size: 1.8rem;
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+        }
+        
+        #editProfileModal .close-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: rotate(90deg);
+        }<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -965,6 +1001,15 @@
             align-items: center;
             justify-content: center;
             display: none;
+            background: rgba(0, 0, 0, 0.95);
+            backdrop-filter: blur(5px);
+            -webkit-backdrop-filter: blur(5px);
+            animation: fadeIn 0.3s ease;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
         }
         
         #editProfileModal.show {
@@ -972,11 +1017,11 @@
         }
         
         #editProfileModal .modal-content {
-            border-radius: 20px;
-            max-width: 600px;
-            width: 90%;
+            border-radius: 25px;
+            max-width: 500px;
+            width: 80%;
             box-shadow: 0 20px 60px rgba(0, 0, 0, 0.8);
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.15);
             margin: auto;
         }
         
@@ -987,14 +1032,30 @@
         }
         
         #editProfileModal h4 {
-            font-size: 1.1rem;
+            font-size: 1.2rem;
             letter-spacing: 0.5px;
+            font-weight: 300;
+            color: rgba(255, 255, 255, 0.9);
+            margin: 35px 0 25px;
         }
         
         #editProfileModal .submit-btn {
-            margin-top: 30px;
-            padding: 18px;
-            font-size: 1.2rem;
+            margin-top: 35px;
+            padding: 20px;
+            font-size: 1.25rem;
+            border-radius: 12px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            letter-spacing: 0.5px;
+        }
+        
+        #editProfileModal .submit-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 30px rgba(155, 89, 182, 0.5);
+        }
+        
+        #editProfileModal .submit-btn:active {
+            transform: translateY(0);
         }
         
         @keyframes slideUp {
@@ -1004,17 +1065,47 @@
         
         @keyframes slideUpScale {
             from { 
-                transform: translateY(100%) scale(1.35); 
+                transform: translateY(50%) scale(1.4); 
                 opacity: 0;
             }
             to { 
-                transform: translateY(0) scale(1.35); 
+                transform: translateY(0) scale(1.4); 
                 opacity: 1;
             }
         }
         
+        #editProfileModal * {
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            text-rendering: optimizeLegibility;
+        }
+        
         #editProfileModal .modal-content {
             animation: slideUpScale 0.3s ease;
+            box-shadow: 0 30px 80px rgba(0, 0, 0, 0.9),
+                        0 0 120px rgba(155, 89, 182, 0.2);
+            overflow-y: auto;
+            scrollbar-width: thin;
+            scrollbar-color: rgba(255, 255, 255, 0.3) transparent;
+        }
+        
+        #editProfileModal .modal-content::-webkit-scrollbar {
+            width: 8px;
+            display: block;
+        }
+        
+        #editProfileModal .modal-content::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 4px;
+        }
+        
+        #editProfileModal .modal-content::-webkit-scrollbar-thumb {
+            background: rgba(155, 89, 182, 0.5);
+            border-radius: 4px;
+        }
+        
+        #editProfileModal .modal-content::-webkit-scrollbar-thumb:hover {
+            background: rgba(155, 89, 182, 0.7);
         }
         
         .modal-header {
@@ -1203,6 +1294,12 @@
         
         /* Mobile Optimization */
         /* Media Queries for different devices */
+        @media (max-width: 1024px) and (min-width: 769px) {
+            #editProfileModal .modal-content {
+                transform: scale(1.3) !important;
+            }
+        }
+        
         @media (max-width: 768px) and (min-width: 481px) {
             #editProfileModal .modal-content {
                 transform: scale(1.2) !important;
@@ -1212,7 +1309,9 @@
         @media (max-width: 480px) {
             #editProfileModal .modal-content {
                 transform: scale(1) !important;
+                max-height: 85vh !important;
             }
+        }
             
             .header-center {
                 gap: 15px;
@@ -2117,6 +2216,13 @@
             margin-bottom: 8px;
             display: block;
         }
+        
+        #editProfileModal .form-label {
+            font-size: 0.95rem;
+            margin-bottom: 10px;
+            font-weight: 300;
+            letter-spacing: 0.3px;
+        }
     </style>
 </head>
 <body>
@@ -2444,7 +2550,7 @@
     
     <!-- Edit Profile Modal -->
     <div class="modal" id="editProfileModal">
-        <div class="modal-content" style="background: #111; max-height: calc(90vh / 1.35); overflow-y: auto; transform: scale(1.35); transform-origin: center center; position: relative;">
+        <div class="modal-content" style="background: linear-gradient(135deg, #111 0%, #1a1a1a 100%); max-height: calc(85vh / 1.4); overflow-y: auto; overflow-x: hidden; transform: scale(1.4); transform-origin: center center; position: relative; padding: 35px;">
             <div class="modal-header">
                 <h3 class="modal-title">Edit Profile</h3>
                 <button class="close-btn" onclick="closeModal('editProfileModal')">×</button>
