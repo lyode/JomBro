@@ -1848,6 +1848,10 @@
                 padding: 22px;
                 font-size: 1.3rem;
             }
+            
+            .media-upload-slot {
+                min-height: 200px;
+            }
         }
         
         @media (max-width: 768px) and (min-width: 481px) {
@@ -1858,6 +1862,10 @@
             #editProfileModal .form-textarea {
                 padding: 20px;
                 font-size: 1.2rem;
+            }
+            
+            .media-upload-slot {
+                min-height: 180px;
             }
         }
         
@@ -1892,6 +1900,18 @@
                 width: 45px;
                 height: 45px;
                 font-size: 1.8rem;
+            }
+            
+            .media-upload-slot {
+                min-height: 150px;
+            }
+            
+            .media-upload-icon {
+                font-size: 2rem;
+            }
+            
+            .media-upload-text {
+                font-size: 0.8rem;
             }
             
             .header-center {
@@ -2778,6 +2798,83 @@
             margin-bottom: 20px;
         }
         
+        /* Media Upload Slots */
+        .media-upload-slot {
+            width: 100%;
+            aspect-ratio: 16/9;
+            background: rgba(255, 255, 255, 0.05);
+            border: 2px dashed rgba(255, 255, 255, 0.3);
+            border-radius: 15px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            margin-top: 15px;
+        }
+        
+        .media-upload-slot:hover {
+            background: rgba(255, 255, 255, 0.08);
+            border-color: rgba(155, 89, 182, 0.5);
+            transform: scale(1.02);
+        }
+        
+        .media-upload-slot.has-media {
+            border-style: solid;
+            border-color: rgba(155, 89, 182, 0.5);
+        }
+        
+        .media-upload-icon {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            opacity: 0.7;
+        }
+        
+        .media-upload-text {
+            font-size: 0.9rem;
+            color: rgba(255, 255, 255, 0.7);
+            text-align: center;
+        }
+        
+        .media-upload-preview {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: none;
+        }
+        
+        .media-upload-remove {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: rgba(233, 30, 99, 0.9);
+            color: white;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            z-index: 10;
+            transition: all 0.3s ease;
+        }
+        
+        .media-upload-remove:hover {
+            background: rgba(233, 30, 99, 1);
+            transform: scale(1.1);
+        }
+        
+        .media-upload-slot.has-media .media-upload-remove {
+            display: flex;
+        }
+        
         /* Recent challenges in profile */
         .profile-challenges {
             padding: 20px;
@@ -3246,9 +3343,25 @@
                         <div class="info-card">
                             <div class="info-card-title">Company</div>
                             <div class="info-card-content" id="companyName">JomBro Technologies</div>
+                            <div style="margin-top: 10px; font-size: 0.9rem; opacity: 0.8;">
+                                <div id="companyAddress" style="margin-bottom: 5px;"></div>
+                                <div><span id="companyArea"></span><span id="companyCitySeparator" style="display: none;">, </span><span id="companyCity"></span></div>
+                            </div>
                             <a href="#" class="social-link" style="display: inline-block; margin-top: 10px; padding: 8px 20px; background: rgba(255,255,255,0.1); border-radius: 20px;">
                                 🔗 View Company Profile
                             </a>
+                        </div>
+                        
+                        <!-- Company Media Display -->
+                        <div id="companyMediaDisplay" class="info-card" style="display: none; padding: 0; overflow: hidden;">
+                            <img id="profileCompanyImage" src="" alt="Company" style="width: 100%; height: auto; display: none;">
+                            <video id="profileCompanyVideo" controls style="width: 100%; height: auto; display: none;"></video>
+                        </div>
+                        
+                        <!-- Business Nature Media Display -->
+                        <div id="businessMediaDisplay" class="info-card" style="display: none; padding: 0; overflow: hidden;">
+                            <img id="profileBusinessImage" src="" alt="Business Nature" style="width: 100%; height: auto; display: none;">
+                            <video id="profileBusinessVideo" controls style="width: 100%; height: auto; display: none;"></video>
                         </div>
                         
                         <!-- Happy Moment -->
@@ -4571,6 +4684,13 @@
                     nature: 'B2C SaaS',
                     companyName: 'JomBro Technologies',
                     companyLink: '',
+                    address: '',
+                    area: '',
+                    city: '',
+                    companyMedia: '',
+                    companyMediaType: '',
+                    businessMedia: '',
+                    businessMediaType: '',
                     // Personal touch
                     happyMoment: 'Creating experiences that bring joy to millions of users worldwide! 🌟',
                     slogan: 'Dream big, code bigger, impact biggest!',
@@ -5532,6 +5652,56 @@
                 document.getElementById('businessNature').textContent = userData.nature || 'B2C SaaS';
                 document.getElementById('companyName').textContent = userData.companyName || 'JomBro Technologies';
                 
+                // Update company address
+                if (userData.address) {
+                    document.getElementById('companyAddress').textContent = userData.address;
+                    document.getElementById('companyAddress').style.display = 'block';
+                } else {
+                    document.getElementById('companyAddress').style.display = 'none';
+                }
+                
+                if (userData.area || userData.city) {
+                    document.getElementById('companyArea').textContent = userData.area || '';
+                    document.getElementById('companyCity').textContent = userData.city || '';
+                    document.getElementById('companyCitySeparator').style.display = userData.area && userData.city ? 'inline' : 'none';
+                } else {
+                    document.getElementById('companyArea').textContent = '';
+                    document.getElementById('companyCity').textContent = '';
+                    document.getElementById('companyCitySeparator').style.display = 'none';
+                }
+                
+                // Update company media display
+                if (userData.companyMedia) {
+                    document.getElementById('companyMediaDisplay').style.display = 'block';
+                    if (userData.companyMediaType === 'image') {
+                        document.getElementById('profileCompanyImage').src = userData.companyMedia;
+                        document.getElementById('profileCompanyImage').style.display = 'block';
+                        document.getElementById('profileCompanyVideo').style.display = 'none';
+                    } else {
+                        document.getElementById('profileCompanyVideo').src = userData.companyMedia;
+                        document.getElementById('profileCompanyVideo').style.display = 'block';
+                        document.getElementById('profileCompanyImage').style.display = 'none';
+                    }
+                } else {
+                    document.getElementById('companyMediaDisplay').style.display = 'none';
+                }
+                
+                // Update business nature media display
+                if (userData.businessMedia) {
+                    document.getElementById('businessMediaDisplay').style.display = 'block';
+                    if (userData.businessMediaType === 'image') {
+                        document.getElementById('profileBusinessImage').src = userData.businessMedia;
+                        document.getElementById('profileBusinessImage').style.display = 'block';
+                        document.getElementById('profileBusinessVideo').style.display = 'none';
+                    } else {
+                        document.getElementById('profileBusinessVideo').src = userData.businessMedia;
+                        document.getElementById('profileBusinessVideo').style.display = 'block';
+                        document.getElementById('profileBusinessImage').style.display = 'none';
+                    }
+                } else {
+                    document.getElementById('businessMediaDisplay').style.display = 'none';
+                }
+                
                 // Update personal touch
                 document.getElementById('happyMoment').textContent = userData.happyMoment || 'Creating experiences that bring joy!';
                 document.getElementById('successSlogan').textContent = userData.slogan || 'Dream big, achieve bigger!';
@@ -5575,6 +5745,36 @@
             document.getElementById('editNature').value = userData.nature || '';
             document.getElementById('editCompanyName').value = userData.companyName || '';
             document.getElementById('editCompanyLink').value = userData.companyLink || '';
+            document.getElementById('editAddress').value = userData.address || '';
+            document.getElementById('editArea').value = userData.area || '';
+            document.getElementById('editCity').value = userData.city || '';
+            
+            // Update media upload slots
+            if (userData.companyMedia) {
+                document.getElementById('companyMediaSlot').classList.add('has-media');
+                if (userData.companyMediaType === 'image') {
+                    document.getElementById('companyMediaPreview').src = userData.companyMedia;
+                    document.getElementById('companyMediaPreview').style.display = 'block';
+                    document.getElementById('companyVideoPreview').style.display = 'none';
+                } else {
+                    document.getElementById('companyVideoPreview').src = userData.companyMedia;
+                    document.getElementById('companyVideoPreview').style.display = 'block';
+                    document.getElementById('companyMediaPreview').style.display = 'none';
+                }
+            }
+            
+            if (userData.businessMedia) {
+                document.getElementById('businessMediaSlot').classList.add('has-media');
+                if (userData.businessMediaType === 'image') {
+                    document.getElementById('businessMediaPreview').src = userData.businessMedia;
+                    document.getElementById('businessMediaPreview').style.display = 'block';
+                    document.getElementById('businessVideoPreview').style.display = 'none';
+                } else {
+                    document.getElementById('businessVideoPreview').src = userData.businessMedia;
+                    document.getElementById('businessVideoPreview').style.display = 'block';
+                    document.getElementById('businessMediaPreview').style.display = 'none';
+                }
+            }
             
             // Personal touch
             document.getElementById('editHappyMoment').value = userData.happyMoment || '';
@@ -5616,6 +5816,9 @@
             userData.nature = document.getElementById('editNature').value.trim();
             userData.companyName = document.getElementById('editCompanyName').value.trim();
             userData.companyLink = document.getElementById('editCompanyLink').value.trim();
+            userData.address = document.getElementById('editAddress').value.trim();
+            userData.area = document.getElementById('editArea').value.trim();
+            userData.city = document.getElementById('editCity').value.trim();
             
             // Personal touch
             userData.happyMoment = document.getElementById('editHappyMoment').value.trim();
@@ -5881,6 +6084,155 @@
         window.viewChallengeDetails = viewChallengeDetails;
         window.acceptDetailedChallenge = acceptDetailedChallenge;
         window.declineDetailedChallenge = declineDetailedChallenge;
+        window.uploadCompanyMedia = uploadCompanyMedia;
+        window.handleCompanyMediaUpload = handleCompanyMediaUpload;
+        window.removeCompanyMedia = removeCompanyMedia;
+        window.uploadBusinessMedia = uploadBusinessMedia;
+        window.handleBusinessMediaUpload = handleBusinessMediaUpload;
+        window.removeBusinessMedia = removeBusinessMedia;
+        
+        // Media upload functions
+        function uploadCompanyMedia() {
+            document.getElementById('companyMediaInput').click();
+        }
+        
+        function handleCompanyMediaUpload(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            
+            // Check if it's a video and validate duration
+            if (file.type.startsWith('video/')) {
+                const video = document.createElement('video');
+                video.preload = 'metadata';
+                
+                video.onloadedmetadata = function() {
+                    window.URL.revokeObjectURL(video.src);
+                    
+                    if (video.duration > 60) {
+                        showToast('Video must be less than 1 minute!');
+                        event.target.value = '';
+                        return;
+                    }
+                    
+                    // Process video
+                    processCompanyMedia(file, 'video');
+                };
+                
+                video.src = URL.createObjectURL(file);
+            } else if (file.type.startsWith('image/')) {
+                processCompanyMedia(file, 'image');
+            } else {
+                showToast('Please upload an image or video file');
+                event.target.value = '';
+            }
+        }
+        
+        function processCompanyMedia(file, type) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                userData.companyMedia = e.target.result;
+                userData.companyMediaType = type;
+                
+                // Update preview
+                document.getElementById('companyMediaSlot').classList.add('has-media');
+                if (type === 'image') {
+                    document.getElementById('companyMediaPreview').src = e.target.result;
+                    document.getElementById('companyMediaPreview').style.display = 'block';
+                    document.getElementById('companyVideoPreview').style.display = 'none';
+                } else {
+                    document.getElementById('companyVideoPreview').src = e.target.result;
+                    document.getElementById('companyVideoPreview').style.display = 'block';
+                    document.getElementById('companyMediaPreview').style.display = 'none';
+                }
+                
+                showToast('Company media uploaded! 📸');
+            };
+            reader.readAsDataURL(file);
+        }
+        
+        function removeCompanyMedia(event) {
+            event.stopPropagation();
+            userData.companyMedia = '';
+            userData.companyMediaType = '';
+            
+            document.getElementById('companyMediaSlot').classList.remove('has-media');
+            document.getElementById('companyMediaPreview').style.display = 'none';
+            document.getElementById('companyVideoPreview').style.display = 'none';
+            document.getElementById('companyMediaInput').value = '';
+            
+            showToast('Company media removed');
+        }
+        
+        function uploadBusinessMedia() {
+            document.getElementById('businessMediaInput').click();
+        }
+        
+        function handleBusinessMediaUpload(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            
+            // Check if it's a video and validate duration
+            if (file.type.startsWith('video/')) {
+                const video = document.createElement('video');
+                video.preload = 'metadata';
+                
+                video.onloadedmetadata = function() {
+                    window.URL.revokeObjectURL(video.src);
+                    
+                    if (video.duration > 60) {
+                        showToast('Video must be less than 1 minute!');
+                        event.target.value = '';
+                        return;
+                    }
+                    
+                    // Process video
+                    processBusinessMedia(file, 'video');
+                };
+                
+                video.src = URL.createObjectURL(file);
+            } else if (file.type.startsWith('image/')) {
+                processBusinessMedia(file, 'image');
+            } else {
+                showToast('Please upload an image or video file');
+                event.target.value = '';
+            }
+        }
+        
+        function processBusinessMedia(file, type) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                userData.businessMedia = e.target.result;
+                userData.businessMediaType = type;
+                
+                // Update preview
+                document.getElementById('businessMediaSlot').classList.add('has-media');
+                if (type === 'image') {
+                    document.getElementById('businessMediaPreview').src = e.target.result;
+                    document.getElementById('businessMediaPreview').style.display = 'block';
+                    document.getElementById('businessVideoPreview').style.display = 'none';
+                } else {
+                    document.getElementById('businessVideoPreview').src = e.target.result;
+                    document.getElementById('businessVideoPreview').style.display = 'block';
+                    document.getElementById('businessMediaPreview').style.display = 'none';
+                }
+                
+                showToast('Business nature media uploaded! 🎥');
+            };
+            reader.readAsDataURL(file);
+        }
+        
+        function removeBusinessMedia(event) {
+            event.stopPropagation();
+            userData.businessMedia = '';
+            userData.businessMediaType = '';
+            
+            document.getElementById('businessMediaSlot').classList.remove('has-media');
+            document.getElementById('businessMediaPreview').style.display = 'none';
+            document.getElementById('businessVideoPreview').style.display = 'none';
+            document.getElementById('businessMediaInput').value = '';
+            
+            showToast('Business nature media removed');
+        }
         
         // New profile functions
         function stalkProfile() {
