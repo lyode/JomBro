@@ -1848,10 +1848,6 @@
                 padding: 22px;
                 font-size: 1.3rem;
             }
-            
-            .media-upload-slot {
-                min-height: 200px;
-            }
         }
         
         @media (max-width: 768px) and (min-width: 481px) {
@@ -1862,10 +1858,6 @@
             #editProfileModal .form-textarea {
                 padding: 20px;
                 font-size: 1.2rem;
-            }
-            
-            .media-upload-slot {
-                min-height: 180px;
             }
         }
         
@@ -1900,18 +1892,6 @@
                 width: 45px;
                 height: 45px;
                 font-size: 1.8rem;
-            }
-            
-            .media-upload-slot {
-                min-height: 150px;
-            }
-            
-            .media-upload-icon {
-                font-size: 2rem;
-            }
-            
-            .media-upload-text {
-                font-size: 0.8rem;
             }
             
             .header-center {
@@ -2798,83 +2778,6 @@
             margin-bottom: 20px;
         }
         
-        /* Media Upload Slots */
-        .media-upload-slot {
-            width: 100%;
-            aspect-ratio: 16/9;
-            background: rgba(255, 255, 255, 0.05);
-            border: 2px dashed rgba(255, 255, 255, 0.3);
-            border-radius: 15px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            position: relative;
-            overflow: hidden;
-            margin-top: 15px;
-        }
-        
-        .media-upload-slot:hover {
-            background: rgba(255, 255, 255, 0.08);
-            border-color: rgba(155, 89, 182, 0.5);
-            transform: scale(1.02);
-        }
-        
-        .media-upload-slot.has-media {
-            border-style: solid;
-            border-color: rgba(155, 89, 182, 0.5);
-        }
-        
-        .media-upload-icon {
-            font-size: 2.5rem;
-            margin-bottom: 10px;
-            opacity: 0.7;
-        }
-        
-        .media-upload-text {
-            font-size: 0.9rem;
-            color: rgba(255, 255, 255, 0.7);
-            text-align: center;
-        }
-        
-        .media-upload-preview {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            display: none;
-        }
-        
-        .media-upload-remove {
-            position: absolute;
-            top: 10px;
-            right: 10px;
-            background: rgba(233, 30, 99, 0.9);
-            color: white;
-            width: 30px;
-            height: 30px;
-            border-radius: 50%;
-            display: none;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            z-index: 10;
-            transition: all 0.3s ease;
-        }
-        
-        .media-upload-remove:hover {
-            background: rgba(233, 30, 99, 1);
-            transform: scale(1.1);
-        }
-        
-        .media-upload-slot.has-media .media-upload-remove {
-            display: flex;
-        }
-        
         /* Recent challenges in profile */
         .profile-challenges {
             padding: 20px;
@@ -3343,25 +3246,9 @@
                         <div class="info-card">
                             <div class="info-card-title">Company</div>
                             <div class="info-card-content" id="companyName">JomBro Technologies</div>
-                            <div style="margin-top: 10px; font-size: 0.9rem; opacity: 0.8;">
-                                <div id="companyAddress" style="margin-bottom: 5px;"></div>
-                                <div><span id="companyArea"></span><span id="companyCitySeparator" style="display: none;">, </span><span id="companyCity"></span></div>
-                            </div>
                             <a href="#" class="social-link" style="display: inline-block; margin-top: 10px; padding: 8px 20px; background: rgba(255,255,255,0.1); border-radius: 20px;">
                                 🔗 View Company Profile
                             </a>
-                        </div>
-                        
-                        <!-- Company Media Display -->
-                        <div id="companyMediaDisplay" class="info-card" style="display: none; padding: 0; overflow: hidden;">
-                            <img id="profileCompanyImage" src="" alt="Company" style="width: 100%; height: auto; display: none;">
-                            <video id="profileCompanyVideo" controls style="width: 100%; height: auto; display: none;"></video>
-                        </div>
-                        
-                        <!-- Business Nature Media Display -->
-                        <div id="businessMediaDisplay" class="info-card" style="display: none; padding: 0; overflow: hidden;">
-                            <img id="profileBusinessImage" src="" alt="Business Nature" style="width: 100%; height: auto; display: none;">
-                            <video id="profileBusinessVideo" controls style="width: 100%; height: auto; display: none;"></video>
                         </div>
                         
                         <!-- Happy Moment -->
@@ -3877,119 +3764,6 @@
         </div>
     </div>
     
-    <!-- Challenge User Modal -->
-    <div class="modal challenge-user-modal" id="challengeUserModal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h3 class="modal-title">🎯 Challenge User</h3>
-                <button class="close-btn" onclick="closeModal('challengeUserModal')">×</button>
-            </div>
-            
-            <div class="challenge-user-header">
-                <div class="challenge-user-avatar" id="challengeTargetAvatar">👤</div>
-                <div class="challenge-user-info">
-                    <h3 id="challengeTargetName">@username</h3>
-                    <p id="challengeTargetInfo">Select a user to challenge</p>
-                </div>
-            </div>
-            
-            <form onsubmit="sendChallenge(event)">
-                <div class="form-group">
-                    <select id="existingChallengeSelect" class="form-input" onchange="selectExistingChallenge(this.value)">
-                        <option value="">Choose existing challenge or create new...</option>
-                        <option value="new">➕ Create New Challenge</option>
-                        <optgroup label="Fitness">
-                            <option value="pushup">💪 Push-up Challenge</option>
-                            <option value="plank">🏋️ Plank Challenge</option>
-                            <option value="squat">🦵 Squat Challenge</option>
-                        </optgroup>
-                        <optgroup label="Creative">
-                            <option value="dance">💃 Dance Challenge</option>
-                            <option value="art">🎨 Art Challenge</option>
-                        </optgroup>
-                        <optgroup label="Food">
-                            <option value="spicy">🌶️ Spicy Food Challenge</option>
-                            <option value="cooking">🍳 Cooking Challenge</option>
-                        </optgroup>
-                    </select>
-                </div>
-                
-                <div id="newChallengeFields" style="display: none;">
-                    <div class="form-group">
-                        <input type="text" id="newChallengeTitle" class="form-input" placeholder="Challenge title">
-                    </div>
-                    <div class="form-group">
-                        <textarea id="newChallengeDesc" class="form-input" placeholder="What do they need to do?" rows="3"></textarea>
-                    </div>
-                    <div class="form-group">
-                        <select id="newChallengeCategory" class="form-input">
-                            <option value="fitness">💪 Fitness</option>
-                            <option value="creative">🎨 Creative</option>
-                            <option value="social">👥 Social</option>
-                            <option value="food">🍕 Food</option>
-                            <option value="adventure">🗺️ Adventure</option>
-                        </select>
-                    </div>
-                </div>
-                
-                <div class="form-group">
-                    <label style="color: #e7e9ea; margin-bottom: 10px; display: block;">Challenge Type:</label>
-                    <div style="display: flex; gap: 10px; flex-wrap: wrap;">
-                        <button type="button" class="dedication-btn active" onclick="selectChallengeType(this, 'direct')">Direct Challenge</button>
-                        <button type="button" class="dedication-btn" onclick="selectChallengeType(this, 'group')">Group Challenge</button>
-                    </div>
-                    <input type="hidden" id="challengeType" value="direct">
-                </div>
-                
-                <div class="form-group">
-                    <input type="number" id="challengeUserReward" class="form-input" placeholder="Reward tokens" value="100" min="10" max="1000" required>
-                </div>
-                
-                <div class="form-group">
-                    <label style="color: #e7e9ea; margin-bottom: 10px; display: block;">Challenge Duration:</label>
-                    <select id="challengeDuration" class="form-input">
-                        <option value="24">24 hours</option>
-                        <option value="48">48 hours</option>
-                        <option value="72">72 hours</option>
-                        <option value="168">1 week</option>
-                    </select>
-                </div>
-                
-                <button type="submit" class="submit-btn">Send Challenge (25 tokens)</button>
-            </form>
-        </div>
-    </div>
-    
-    <!-- Decline Challenge Confirmation Modal -->
-    <div class="modal" id="declineConfirmModal">
-        <div class="modal-content" style="max-width: 400px; margin: auto;">
-            <div class="modal-header">
-                <h3 class="modal-title">⚠️ Decline Challenge?</h3>
-                <button class="close-btn" onclick="closeModal('declineConfirmModal')">×</button>
-            </div>
-            
-            <div class="decline-warning">
-                <div class="decline-warning-icon">🪙</div>
-                <div class="decline-warning-text">
-                    Declining this challenge will cost you <span class="decline-penalty">20 tokens</span>
-                </div>
-            </div>
-            
-            <p style="text-align: center; opacity: 0.8; margin-bottom: 20px;">
-                Are you sure you want to decline this challenge?
-            </p>
-            
-            <div style="display: flex; gap: 15px;">
-                <button class="submit-btn" style="background: rgba(255, 255, 255, 0.1); flex: 1;" onclick="closeModal('declineConfirmModal')">
-                    Cancel
-                </button>
-                <button class="submit-btn" style="background: linear-gradient(135deg, #e91e63, #f06292); flex: 1;" onclick="confirmDeclineChallenge()">
-                    Decline (-20 🪙)
-                </button>
-            </div>
-        </div>
-    </div>
-    
     <!-- Hidden file input for gallery -->
     <input type="file" id="galleryInput" accept="image/*,video/*" style="display: none;" onchange="handleGallerySelection(event)">
     
@@ -4023,28 +3797,6 @@
         let pendingChallenges = [];
         let mediaRecorder = null;
         let recordedChunks = [];
-        let currentChallengeTarget = null;
-        let pendingDeclineChallenge = null;
-        let imageObserver = null;
-        
-        // Performance optimization - Image lazy loading
-        function initializeLazyLoading() {
-            if ('IntersectionObserver' in window) {
-                imageObserver = new IntersectionObserver((entries, observer) => {
-                    entries.forEach(entry => {
-                        if (entry.isIntersecting) {
-                            const img = entry.target;
-                            img.src = img.dataset.src;
-                            img.classList.add('loaded');
-                            observer.unobserve(img);
-                        }
-                    });
-                }, {
-                    rootMargin: '50px 0px',
-                    threshold: 0.01
-                });
-            }
-        }
         
         // Initialize alert sound
         function initAlertSound() {
@@ -4282,414 +4034,13 @@
             }
         }
         
-        // Challenge a user
-        function challengeUser(username, avatar) {
-            currentChallengeTarget = { username, avatar };
-            document.getElementById('challengeTargetName').textContent = '@' + username;
-            document.getElementById('challengeTargetAvatar').textContent = avatar;
-            document.getElementById('challengeTargetInfo').textContent = 'Challenge this user to prove their skills!';
-            
-            // Reset form
-            document.getElementById('existingChallengeSelect').value = '';
-            document.getElementById('newChallengeFields').style.display = 'none';
-            document.getElementById('challengeUserReward').value = '100';
-            document.getElementById('challengeDuration').value = '24';
-            
-            showModal('challengeUserModal');
-        }
-        
-        // Select existing challenge
-        function selectExistingChallenge(value) {
-            if (value === 'new') {
-                document.getElementById('newChallengeFields').style.display = 'block';
-            } else {
-                document.getElementById('newChallengeFields').style.display = 'none';
-            }
-        }
-        
-        // Select challenge type
-        function selectChallengeType(button, type) {
-            document.querySelectorAll('#challengeUserModal .dedication-btn').forEach(btn => {
-                btn.classList.remove('active');
-            });
-            button.classList.add('active');
-            document.getElementById('challengeType').value = type;
-        }
-        
-        // Send challenge to user
-        async function sendChallenge(e) {
-            e.preventDefault();
-            
-            if (userData.tokens < 25) {
-                showToast('Not enough tokens! Need 25 tokens to send a challenge.');
-                return;
-            }
-            
-            const challengeSelect = document.getElementById('existingChallengeSelect').value;
-            let challenge;
-            
-            if (challengeSelect === 'new') {
-                // Create new challenge
-                const title = document.getElementById('newChallengeTitle').value;
-                const desc = document.getElementById('newChallengeDesc').value;
-                const category = document.getElementById('newChallengeCategory').value;
-                
-                if (!title || !desc) {
-                    showToast('Please fill in all challenge details');
-                    return;
-                }
-                
-                challenge = {
-                    title,
-                    description: desc,
-                    category
-                };
-            } else if (challengeSelect) {
-                // Use existing challenge
-                const challengeTemplates = {
-                    pushup: { title: 'Push-up Challenge', description: 'Complete 20 push-ups with proper form', category: 'fitness' },
-                    plank: { title: 'Plank Challenge', description: 'Hold a plank for 60 seconds', category: 'fitness' },
-                    squat: { title: 'Squat Challenge', description: 'Do 30 squats without stopping', category: 'fitness' },
-                    dance: { title: 'Dance Challenge', description: 'Create a 30-second dance video', category: 'creative' },
-                    art: { title: 'Art Challenge', description: 'Draw something in 60 seconds', category: 'creative' },
-                    spicy: { title: 'Spicy Food Challenge', description: 'Eat something spicy without water', category: 'food' },
-                    cooking: { title: 'Cooking Challenge', description: 'Cook a meal in 10 minutes', category: 'food' }
-                };
-                
-                challenge = challengeTemplates[challengeSelect];
-            } else {
-                showToast('Please select or create a challenge');
-                return;
-            }
-            
-            // Add challenge details
-            challenge.reward = parseInt(document.getElementById('challengeUserReward').value);
-            challenge.duration = parseInt(document.getElementById('challengeDuration').value);
-            challenge.type = document.getElementById('challengeType').value;
-            challenge.to = currentChallengeTarget;
-            challenge.from = {
-                name: userData.name,
-                avatar: userData.avatar || '🎮'
-            };
-            challenge.createdAt = Date.now();
-            challenge.expiresAt = Date.now() + (challenge.duration * 60 * 60 * 1000);
-            challenge.id = 'challenge_' + Date.now();
-            
-            // Deduct tokens
-            userData.tokens -= 25;
-            updateProfile();
-            saveProfileData();
-            
-            // In a real app, this would send the challenge to the server
-            showToast(`Challenge sent to @${currentChallengeTarget.username}! -25 tokens 🪙`);
-            
-            // Simulate the other user receiving the challenge
-            setTimeout(() => {
-                if (Math.random() < 0.3) { // 30% chance they see it immediately
-                    showChallengeAlert(currentChallengeTarget.username, challenge.title, challenge);
-                }
-            }, 5000);
-            
-            closeModal('challengeUserModal');
-        }
-        
-        // Show decline confirmation
+        // Decline detailed challenge
         function declineDetailedChallenge(challengeId) {
-            pendingDeclineChallenge = challengeId;
-            showModal('declineConfirmModal');
-        }
-        
-        // Confirm decline with token penalty
-        function confirmDeclineChallenge() {
-            if (userData.tokens < 20) {
-                showToast('Not enough tokens to decline! You need 20 tokens.');
-                closeModal('declineConfirmModal');
-                return;
-            }
-            
-            // Deduct tokens for declining
-            userData.tokens -= 20;
-            updateProfile();
-            saveProfileData();
-            
-            // Remove the challenge
-            if (pendingDeclineChallenge) {
-                pendingChallenges = pendingChallenges.filter(c => c.id !== pendingDeclineChallenge);
-                savePendingChallenges();
-            }
-            
-            showToast('Challenge declined. -20 tokens 🪙');
-            
-            closeModal('declineConfirmModal');
+            pendingChallenges = pendingChallenges.filter(c => c.id !== challengeId);
+            savePendingChallenges();
             closeModal('challengeDetailsModal');
-            
-            // Reload inbox if open
-            if (document.getElementById('inboxModal').style.display === 'flex') {
-                loadInboxContent('challenges');
-            }
-        }
-        
-        // Performance optimization - Throttle function
-        function throttle(func, limit) {
-            let inThrottle;
-            return function() {
-                const args = arguments;
-                const context = this;
-                if (!inThrottle) {
-                    func.apply(context, args);
-                    inThrottle = true;
-                    setTimeout(() => inThrottle = false, limit);
-                }
-            }
-        }
-        
-        // Performance optimization - Debounce function
-        function debounce(func, wait) {
-            let timeout;
-            return function executedFunction(...args) {
-                const later = () => {
-                    clearTimeout(timeout);
-                    func(...args);
-                };
-                clearTimeout(timeout);
-                timeout = setTimeout(later, wait);
-            };
-        }
-        
-        // Optimized feed loading with lazy loading
-        async function loadFeedOptimized() {
-            try {
-                const container = document.getElementById('feedContainer');
-                
-                // Reset used frame combinations when loading feed
-                usedFrameCombinations.clear();
-                
-                // Create sample posts
-                const samplePosts = [
-                    {
-                        id: 'post1',
-                        user: { name: 'alex_gamer', avatar: '😎' },
-                        challenge: { 
-                            title: '20 Pushup Challenge', 
-                            category: 'fitness', 
-                            reward: 100,
-                            dedication: 'people-i-know'
-                        },
-                        caption: 'Just crushed the pushup challenge! 💪 Challenge dedicated to my gym buddies!',
-                        likes: 234,
-                        comments: 45,
-                        mediaType: 'image',
-                        mediaUrl: 'https://picsum.photos/400/800?random=1',
-                        aiScore: 92
-                    },
-                    {
-                        id: 'post2',
-                        user: { name: 'dance_queen', avatar: '💃' },
-                        challenge: { 
-                            title: 'TikTok Dance', 
-                            category: 'creative', 
-                            reward: 150,
-                            dedication: 'open-public'
-                        },
-                        caption: 'New dance moves! Who wants to try? 🕺 Open challenge for everyone!',
-                        likes: 567,
-                        comments: 89,
-                        mediaType: 'image',
-                        mediaUrl: 'https://picsum.photos/400/800?random=2',
-                        aiScore: 88
-                    },
-                    {
-                        id: 'post3',
-                        user: { name: 'foodie_bro', avatar: '🍔' },
-                        challenge: { 
-                            title: 'Spicy Noodle Challenge', 
-                            category: 'food', 
-                            reward: 200,
-                            dedication: 'people-i-dont-know'
-                        },
-                        caption: 'This was INSANE! 🔥🍜 #SpicyChallenge Challenging strangers to beat this!',
-                        likes: 890,
-                        comments: 156,
-                        mediaType: 'image',
-                        mediaUrl: 'https://picsum.photos/400/800?random=3',
-                        aiScore: 95
-                    },
-                    {
-                        id: 'post4',
-                        user: { name: 'adventure_seeker', avatar: '🏃' },
-                        challenge: { 
-                            title: 'Sunrise Photo Hunt', 
-                            category: 'adventure', 
-                            reward: 180,
-                            dedication: 'open-public'
-                        },
-                        caption: 'Caught the perfect sunrise! 🌅 Who else is up for the challenge?',
-                        likes: 423,
-                        comments: 67,
-                        mediaType: 'image',
-                        mediaUrl: 'https://picsum.photos/400/800?random=4',
-                        aiScore: 78
-                    },
-                    {
-                        id: 'post5',
-                        user: { name: 'artist_soul', avatar: '🎨' },
-                        challenge: { 
-                            title: 'Speed Art Challenge', 
-                            category: 'creative', 
-                            reward: 250,
-                            dedication: 'people-i-know'
-                        },
-                        caption: 'Created this in 60 seconds! Can you do better? 🎨✨',
-                        likes: 789,
-                        comments: 123,
-                        mediaType: 'image',
-                        mediaUrl: 'https://picsum.photos/400/800?random=5',
-                        aiScore: 84
-                    }
-                ];
-                
-                // Add user's posts to the feed
-                const allPosts = [...myPosts, ...samplePosts];
-                
-                // Clear existing posts
-                container.innerHTML = '';
-                
-                // Add posts with lazy loading
-                allPosts.forEach((post, index) => {
-                    const postElement = createPostElementOptimized(post, index);
-                    container.appendChild(postElement);
-                });
-                
-                feedPosts = allPosts;
-                
-                // Setup scroll observer
-                setupScrollObserver();
-                
-                // Initialize lazy loading for images
-                if (imageObserver) {
-                    document.querySelectorAll('.lazy-load').forEach(img => {
-                        imageObserver.observe(img);
-                    });
-                }
-            } catch (error) {
-                console.error('Error loading feed:', error);
-                showToast('Error loading feed');
-            }
-        }
-        
-        // Optimized post element creation
-        function createPostElementOptimized(post, index) {
-            try {
-                const postDiv = document.createElement('div');
-                postDiv.className = 'feed-post';
-                postDiv.setAttribute('data-index', index);
-                postDiv.setAttribute('data-post-id', post.id);
-                
-                // Generate unique frame for this post
-                const { frameClass, colorScheme } = generateUniqueFrame(index);
-                
-                // Apply custom colors to certain frame styles
-                let frameStyle = '';
-                if (frameClass === 'frame-gradient-border') {
-                    frameStyle = `style="background: linear-gradient(45deg, ${colorScheme.primary}, ${colorScheme.secondary}, ${colorScheme.primary});"`;
-                } else if (frameClass === 'frame-neon-glow') {
-                    frameStyle = `style="box-shadow: inset 0 0 50px ${colorScheme.primary}, inset 20px 0 80px ${colorScheme.primary}, inset -20px 0 80px ${colorScheme.secondary}, 0 0 50px ${colorScheme.secondary};"`;
-                } else if (frameClass === 'frame-geometric') {
-                    frameStyle = `style="--frame-color: ${colorScheme.primary};"`;
-                }
-                
-                // Use lazy loading for images
-                const imgTag = imageObserver ? 
-                    `<img class="post-image lazy-load" data-src="${post.mediaUrl}" alt="Challenge" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 800'%3E%3Crect fill='%23222' width='400' height='800'/%3E%3C/svg%3E">` :
-                    `<img class="post-image" src="${post.mediaUrl}" alt="Challenge" onerror="this.src='https://via.placeholder.com/400x800/222/fff?text=JomBro'">`;
-                
-                postDiv.innerHTML = `
-                    <div class="post-media">
-                        ${imgTag}
-                        <div class="frame-wrapper ${frameClass}" ${frameStyle}></div>
-                    </div>
-                    
-                    <div class="gradient-overlay-top"></div>
-                    <div class="gradient-overlay-bottom"></div>
-                    
-                    ${post.aiScore ? `
-                        <div class="ai-score-badge">
-                            <span class="ai-icon">🤖</span>
-                            <span class="score-value">${post.aiScore}%</span>
-                            <div class="score-stars">
-                                ${post.aiScore >= 90 ? '⭐⭐⭐⭐⭐' : 
-                                  post.aiScore >= 75 ? '⭐⭐⭐⭐' : 
-                                  post.aiScore >= 60 ? '⭐⭐⭐' : 
-                                  post.aiScore >= 40 ? '⭐⭐' : '⭐'}
-                            </div>
-                        </div>
-                    ` : ''}
-                    
-                    <!-- Side Actions -->
-                    <div class="post-actions">
-                        <div class="action-item">
-                            <div class="user-avatar">
-                                ${post.user.avatar}
-                                <div class="follow-btn">+</div>
-                            </div>
-                        </div>
-                        
-                        <div class="action-item" onclick="toggleLike('${post.id}')">
-                            <div class="action-icon" id="like-${post.id}">❤️</div>
-                            <div class="action-count">${formatCount(post.likes)}</div>
-                        </div>
-                        
-                        <div class="action-item" onclick="showComments('${post.id}')">
-                            <div class="action-icon">💬</div>
-                            <div class="action-count">${formatCount(post.comments)}</div>
-                        </div>
-                        
-                        <div class="action-item" onclick="sharePost('${post.id}')">
-                            <div class="action-icon">↗️</div>
-                            <div class="action-count">Share</div>
-                        </div>
-                        
-                        <div class="action-item" onclick="challengeUser('${post.user.name}', '${post.user.avatar}')">
-                            <div class="action-icon">🎯</div>
-                            <div class="action-count">Challenge</div>
-                        </div>
-                        
-                        <div class="action-item" onclick="showToast('More options coming soon!')">
-                            <div class="action-icon">⋮</div>
-                        </div>
-                    </div>
-                    
-                    <!-- Bottom Info -->
-                    <div class="post-info">
-                        <div class="post-user">@${post.user.name}</div>
-                        
-                        <div class="challenge-badge">
-                            🎯 ${post.challenge.title} • 🪙 ${post.challenge.reward}
-                            ${post.challenge.dedication ? ` • 👥 ${
-                                post.challenge.dedication === 'people-i-know' ? 'People I Know' : 
-                                post.challenge.dedication === 'people-i-dont-know' ? "People I Don't Know" : 
-                                'Open to Public'
-                            }` : ''}
-                        </div>
-                        
-                        <div class="post-caption">${post.caption}</div>
-                        
-                        <div class="post-music">
-                            <span class="music-icon">🎵</span>
-                            <span>Original sound - ${post.user.name}</span>
-                        </div>
-                    </div>
-                `;
-                
-                return postDiv;
-            } catch (error) {
-                console.error('Error creating post element:', error);
-                // Return a simple post element if there's an error
-                const postDiv = document.createElement('div');
-                postDiv.className = 'feed-post';
-                postDiv.innerHTML = '<div class="post-media" style="display: flex; align-items: center; justify-content: center; color: #666;">Error loading post</div>';
-                return postDiv;
-            }
+            showToast('Challenge declined');
+            loadInboxContent('challenges');
         }
         
         // Save pending challenges
@@ -4908,9 +4259,6 @@
                 
                 // Initialize alert sound
                 initAlertSound();
-                
-                // Initialize lazy loading
-                initializeLazyLoading();
                 
                 // Request persistent permissions
                 requestPersistentPermissions();
@@ -5223,13 +4571,6 @@
                     nature: 'B2C SaaS',
                     companyName: 'JomBro Technologies',
                     companyLink: '',
-                    address: '',
-                    area: '',
-                    city: '',
-                    companyMedia: '',
-                    companyMediaType: '',
-                    businessMedia: '',
-                    businessMediaType: '',
                     // Personal touch
                     happyMoment: 'Creating experiences that bring joy to millions of users worldwide! 🌟',
                     slogan: 'Dream big, code bigger, impact biggest!',
@@ -5276,7 +4617,7 @@
                 simulateChallenges();
                 
                 // Load feed
-                loadFeedOptimized();
+                loadFeed();
                 
                 showToast('Welcome to JomBro! 🎮');
             } catch (error) {
@@ -5466,11 +4807,6 @@
                             <div class="action-count">Share</div>
                         </div>
                         
-                        <div class="action-item" onclick="challengeUser('${post.user.name}', '${post.user.avatar}')">
-                            <div class="action-icon">🎯</div>
-                            <div class="action-count">Challenge</div>
-                        </div>
-                        
                         <div class="action-item" onclick="showToast('More options coming soon!')">
                             <div class="action-icon">⋮</div>
                         </div>
@@ -5512,18 +4848,13 @@
         // Setup scroll observer for current post
         function setupScrollObserver() {
             try {
-                const handleIntersection = throttle((entries) => {
+                const observer = new IntersectionObserver((entries) => {
                     entries.forEach(entry => {
                         if (entry.isIntersecting) {
                             currentPostIndex = parseInt(entry.target.getAttribute('data-index'));
                         }
                     });
-                }, 100);
-                
-                const observer = new IntersectionObserver(handleIntersection, { 
-                    threshold: 0.5,
-                    rootMargin: '0px'
-                });
+                }, { threshold: 0.5 });
                 
                 document.querySelectorAll('.feed-post').forEach(post => {
                     observer.observe(post);
@@ -5592,7 +4923,7 @@
             
             const displayName = type === 'stalking' ? 'Stalking' : 'Trust Me Bro!';
             showToast(`Switched to ${displayName} feed`);
-            loadFeedOptimized(); // Reload with different content
+            loadFeed(); // Reload with different content
         }
         
         // Switch navigation
@@ -6108,7 +5439,7 @@
             
             // Add to feed
             feedPosts.unshift(newPost);
-            loadFeedOptimized();
+            loadFeed();
             
             // Close camera
             closeCamera();
@@ -6201,56 +5532,6 @@
                 document.getElementById('businessNature').textContent = userData.nature || 'B2C SaaS';
                 document.getElementById('companyName').textContent = userData.companyName || 'JomBro Technologies';
                 
-                // Update company address
-                if (userData.address) {
-                    document.getElementById('companyAddress').textContent = userData.address;
-                    document.getElementById('companyAddress').style.display = 'block';
-                } else {
-                    document.getElementById('companyAddress').style.display = 'none';
-                }
-                
-                if (userData.area || userData.city) {
-                    document.getElementById('companyArea').textContent = userData.area || '';
-                    document.getElementById('companyCity').textContent = userData.city || '';
-                    document.getElementById('companyCitySeparator').style.display = userData.area && userData.city ? 'inline' : 'none';
-                } else {
-                    document.getElementById('companyArea').textContent = '';
-                    document.getElementById('companyCity').textContent = '';
-                    document.getElementById('companyCitySeparator').style.display = 'none';
-                }
-                
-                // Update company media display
-                if (userData.companyMedia) {
-                    document.getElementById('companyMediaDisplay').style.display = 'block';
-                    if (userData.companyMediaType === 'image') {
-                        document.getElementById('profileCompanyImage').src = userData.companyMedia;
-                        document.getElementById('profileCompanyImage').style.display = 'block';
-                        document.getElementById('profileCompanyVideo').style.display = 'none';
-                    } else {
-                        document.getElementById('profileCompanyVideo').src = userData.companyMedia;
-                        document.getElementById('profileCompanyVideo').style.display = 'block';
-                        document.getElementById('profileCompanyImage').style.display = 'none';
-                    }
-                } else {
-                    document.getElementById('companyMediaDisplay').style.display = 'none';
-                }
-                
-                // Update business nature media display
-                if (userData.businessMedia) {
-                    document.getElementById('businessMediaDisplay').style.display = 'block';
-                    if (userData.businessMediaType === 'image') {
-                        document.getElementById('profileBusinessImage').src = userData.businessMedia;
-                        document.getElementById('profileBusinessImage').style.display = 'block';
-                        document.getElementById('profileBusinessVideo').style.display = 'none';
-                    } else {
-                        document.getElementById('profileBusinessVideo').src = userData.businessMedia;
-                        document.getElementById('profileBusinessVideo').style.display = 'block';
-                        document.getElementById('profileBusinessImage').style.display = 'none';
-                    }
-                } else {
-                    document.getElementById('businessMediaDisplay').style.display = 'none';
-                }
-                
                 // Update personal touch
                 document.getElementById('happyMoment').textContent = userData.happyMoment || 'Creating experiences that bring joy!';
                 document.getElementById('successSlogan').textContent = userData.slogan || 'Dream big, achieve bigger!';
@@ -6294,36 +5575,6 @@
             document.getElementById('editNature').value = userData.nature || '';
             document.getElementById('editCompanyName').value = userData.companyName || '';
             document.getElementById('editCompanyLink').value = userData.companyLink || '';
-            document.getElementById('editAddress').value = userData.address || '';
-            document.getElementById('editArea').value = userData.area || '';
-            document.getElementById('editCity').value = userData.city || '';
-            
-            // Update media upload slots
-            if (userData.companyMedia) {
-                document.getElementById('companyMediaSlot').classList.add('has-media');
-                if (userData.companyMediaType === 'image') {
-                    document.getElementById('companyMediaPreview').src = userData.companyMedia;
-                    document.getElementById('companyMediaPreview').style.display = 'block';
-                    document.getElementById('companyVideoPreview').style.display = 'none';
-                } else {
-                    document.getElementById('companyVideoPreview').src = userData.companyMedia;
-                    document.getElementById('companyVideoPreview').style.display = 'block';
-                    document.getElementById('companyMediaPreview').style.display = 'none';
-                }
-            }
-            
-            if (userData.businessMedia) {
-                document.getElementById('businessMediaSlot').classList.add('has-media');
-                if (userData.businessMediaType === 'image') {
-                    document.getElementById('businessMediaPreview').src = userData.businessMedia;
-                    document.getElementById('businessMediaPreview').style.display = 'block';
-                    document.getElementById('businessVideoPreview').style.display = 'none';
-                } else {
-                    document.getElementById('businessVideoPreview').src = userData.businessMedia;
-                    document.getElementById('businessVideoPreview').style.display = 'block';
-                    document.getElementById('businessMediaPreview').style.display = 'none';
-                }
-            }
             
             // Personal touch
             document.getElementById('editHappyMoment').value = userData.happyMoment || '';
@@ -6365,9 +5616,6 @@
             userData.nature = document.getElementById('editNature').value.trim();
             userData.companyName = document.getElementById('editCompanyName').value.trim();
             userData.companyLink = document.getElementById('editCompanyLink').value.trim();
-            userData.address = document.getElementById('editAddress').value.trim();
-            userData.area = document.getElementById('editArea').value.trim();
-            userData.city = document.getElementById('editCity').value.trim();
             
             // Personal touch
             userData.happyMoment = document.getElementById('editHappyMoment').value.trim();
@@ -6633,160 +5881,6 @@
         window.viewChallengeDetails = viewChallengeDetails;
         window.acceptDetailedChallenge = acceptDetailedChallenge;
         window.declineDetailedChallenge = declineDetailedChallenge;
-        window.uploadCompanyMedia = uploadCompanyMedia;
-        window.handleCompanyMediaUpload = handleCompanyMediaUpload;
-        window.removeCompanyMedia = removeCompanyMedia;
-        window.uploadBusinessMedia = uploadBusinessMedia;
-        window.handleBusinessMediaUpload = handleBusinessMediaUpload;
-        window.removeBusinessMedia = removeBusinessMedia;
-        window.challengeUser = challengeUser;
-        window.selectExistingChallenge = selectExistingChallenge;
-        window.selectChallengeType = selectChallengeType;
-        window.sendChallenge = sendChallenge;
-        window.confirmDeclineChallenge = confirmDeclineChallenge;
-        
-        // Media upload functions
-        function uploadCompanyMedia() {
-            document.getElementById('companyMediaInput').click();
-        }
-        
-        function handleCompanyMediaUpload(event) {
-            const file = event.target.files[0];
-            if (!file) return;
-            
-            // Check if it's a video and validate duration
-            if (file.type.startsWith('video/')) {
-                const video = document.createElement('video');
-                video.preload = 'metadata';
-                
-                video.onloadedmetadata = function() {
-                    window.URL.revokeObjectURL(video.src);
-                    
-                    if (video.duration > 60) {
-                        showToast('Video must be less than 1 minute!');
-                        event.target.value = '';
-                        return;
-                    }
-                    
-                    // Process video
-                    processCompanyMedia(file, 'video');
-                };
-                
-                video.src = URL.createObjectURL(file);
-            } else if (file.type.startsWith('image/')) {
-                processCompanyMedia(file, 'image');
-            } else {
-                showToast('Please upload an image or video file');
-                event.target.value = '';
-            }
-        }
-        
-        function processCompanyMedia(file, type) {
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                userData.companyMedia = e.target.result;
-                userData.companyMediaType = type;
-                
-                // Update preview
-                document.getElementById('companyMediaSlot').classList.add('has-media');
-                if (type === 'image') {
-                    document.getElementById('companyMediaPreview').src = e.target.result;
-                    document.getElementById('companyMediaPreview').style.display = 'block';
-                    document.getElementById('companyVideoPreview').style.display = 'none';
-                } else {
-                    document.getElementById('companyVideoPreview').src = e.target.result;
-                    document.getElementById('companyVideoPreview').style.display = 'block';
-                    document.getElementById('companyMediaPreview').style.display = 'none';
-                }
-                
-                showToast('Company media uploaded! 📸');
-            };
-            reader.readAsDataURL(file);
-        }
-        
-        function removeCompanyMedia(event) {
-            event.stopPropagation();
-            userData.companyMedia = '';
-            userData.companyMediaType = '';
-            
-            document.getElementById('companyMediaSlot').classList.remove('has-media');
-            document.getElementById('companyMediaPreview').style.display = 'none';
-            document.getElementById('companyVideoPreview').style.display = 'none';
-            document.getElementById('companyMediaInput').value = '';
-            
-            showToast('Company media removed');
-        }
-        
-        function uploadBusinessMedia() {
-            document.getElementById('businessMediaInput').click();
-        }
-        
-        function handleBusinessMediaUpload(event) {
-            const file = event.target.files[0];
-            if (!file) return;
-            
-            // Check if it's a video and validate duration
-            if (file.type.startsWith('video/')) {
-                const video = document.createElement('video');
-                video.preload = 'metadata';
-                
-                video.onloadedmetadata = function() {
-                    window.URL.revokeObjectURL(video.src);
-                    
-                    if (video.duration > 60) {
-                        showToast('Video must be less than 1 minute!');
-                        event.target.value = '';
-                        return;
-                    }
-                    
-                    // Process video
-                    processBusinessMedia(file, 'video');
-                };
-                
-                video.src = URL.createObjectURL(file);
-            } else if (file.type.startsWith('image/')) {
-                processBusinessMedia(file, 'image');
-            } else {
-                showToast('Please upload an image or video file');
-                event.target.value = '';
-            }
-        }
-        
-        function processBusinessMedia(file, type) {
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                userData.businessMedia = e.target.result;
-                userData.businessMediaType = type;
-                
-                // Update preview
-                document.getElementById('businessMediaSlot').classList.add('has-media');
-                if (type === 'image') {
-                    document.getElementById('businessMediaPreview').src = e.target.result;
-                    document.getElementById('businessMediaPreview').style.display = 'block';
-                    document.getElementById('businessVideoPreview').style.display = 'none';
-                } else {
-                    document.getElementById('businessVideoPreview').src = e.target.result;
-                    document.getElementById('businessVideoPreview').style.display = 'block';
-                    document.getElementById('businessMediaPreview').style.display = 'none';
-                }
-                
-                showToast('Business nature media uploaded! 🎥');
-            };
-            reader.readAsDataURL(file);
-        }
-        
-        function removeBusinessMedia(event) {
-            event.stopPropagation();
-            userData.businessMedia = '';
-            userData.businessMediaType = '';
-            
-            document.getElementById('businessMediaSlot').classList.remove('has-media');
-            document.getElementById('businessMediaPreview').style.display = 'none';
-            document.getElementById('businessVideoPreview').style.display = 'none';
-            document.getElementById('businessMediaInput').value = '';
-            
-            showToast('Business nature media removed');
-        }
         
         // New profile functions
         function stalkProfile() {
