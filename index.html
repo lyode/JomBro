@@ -115,6 +115,7 @@
             overflow: hidden;
             aspect-ratio: 16/9;
             background: rgba(255, 255, 255, 0.05);
+            position: relative;
         }
         
         .profile-company-media img,
@@ -122,6 +123,20 @@
             width: 100%;
             height: 100%;
             object-fit: cover;
+        }
+        
+        .profile-company-media video {
+            background: #000;
+        }
+        
+        /* Video loading animation */
+        .profile-company-media video:not([src=""]) {
+            animation: fadeIn 0.5s ease-in;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
         }
         
         /* ADD NEW STYLES FOR LEADERBOARD */
@@ -3660,7 +3675,7 @@
                         <!-- Company Media Section -->
                         <div class="profile-company-media" id="profileCompanyMedia" style="display: none;">
                             <img id="profileCompanyMediaImg" src="" alt="" style="display: none;">
-                            <video id="profileCompanyMediaVideo" controls style="display: none;"></video>
+                            <video id="profileCompanyMediaVideo" autoplay loop muted playsinline style="display: none;"></video>
                         </div>
                         
                         <!-- Happy Moment -->
@@ -3845,11 +3860,11 @@
                     <div class="company-media-section">
                         <div class="company-media-upload" onclick="uploadCompanyMedia()">
                             <img class="company-media-preview" id="companyMediaPreviewImg" src="" alt="" style="display: none;">
-                            <video class="company-media-preview" id="companyMediaPreviewVideo" controls style="display: none;"></video>
+                            <video class="company-media-preview" id="companyMediaPreviewVideo" controls loop muted style="display: none;"></video>
                             <div class="company-media-placeholder" id="companyMediaPlaceholder">
                                 <div class="company-media-icon">🎬</div>
                                 <div class="company-media-text">Upload Image or Video</div>
-                                <div class="company-media-hint">Landscape orientation • Max 1 minute for videos</div>
+                                <div class="company-media-hint">Landscape orientation • Max 1 minute for videos • Auto-play enabled</div>
                             </div>
                             <button class="company-media-remove" id="companyMediaRemove" onclick="removeCompanyMedia(event)">×</button>
                         </div>
@@ -6777,9 +6792,16 @@
                     mediaContainer.style.display = 'block';
                     
                     if (userData.companyMedia.type === 'video') {
-                        document.getElementById('profileCompanyMediaVideo').src = userData.companyMedia.url;
-                        document.getElementById('profileCompanyMediaVideo').style.display = 'block';
+                        const videoElement = document.getElementById('profileCompanyMediaVideo');
+                        videoElement.src = userData.companyMedia.url;
+                        videoElement.style.display = 'block';
                         document.getElementById('profileCompanyMediaImg').style.display = 'none';
+                        
+                        // Ensure video plays when modal opens
+                        videoElement.load();
+                        videoElement.play().catch(e => {
+                            console.log('Video autoplay was prevented:', e);
+                        });
                     } else {
                         document.getElementById('profileCompanyMediaImg').src = userData.companyMedia.url;
                         document.getElementById('profileCompanyMediaImg').style.display = 'block';
