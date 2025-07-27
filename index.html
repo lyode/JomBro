@@ -2383,6 +2383,55 @@
             display: none;
         }
         
+        /* Company Media Upload */
+        .company-media-upload {
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .company-media-preview {
+            width: 100%;
+            height: 200px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 2px dashed rgba(255, 255, 255, 0.3);
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .company-media-upload:hover .company-media-preview {
+            border-color: rgba(155, 89, 182, 0.6);
+            background: rgba(155, 89, 182, 0.1);
+        }
+        
+        .upload-placeholder {
+            color: rgba(255, 255, 255, 0.6);
+        }
+        
+        .company-media-preview img,
+        .company-media-preview video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 13px;
+        }
+        
+        .media-overlay {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: rgba(0, 0, 0, 0.7);
+            color: white;
+            padding: 5px 10px;
+            border-radius: 15px;
+            font-size: 0.8rem;
+        }
+        
         /* Form Labels */
         .form-label {
             font-size: 0.9rem;
@@ -2641,6 +2690,21 @@
                             </a>
                         </div>
                         
+                        <!-- Company Media Upload -->
+                        <div class="info-card">
+                            <div class="info-card-title">Company Showcase</div>
+                            <div class="company-media-upload" onclick="uploadCompanyMedia()">
+                                <div class="company-media-preview" id="companyMediaPreview">
+                                    <div class="upload-placeholder">
+                                        <div style="font-size: 2rem; margin-bottom: 10px;">📸</div>
+                                        <div>Upload Image or Video</div>
+                                        <div style="font-size: 0.8rem; opacity: 0.7; margin-top: 5px;">Landscape • Max 1min video</div>
+                                    </div>
+                                </div>
+                                <input type="file" id="companyMediaInput" class="file-input" accept="image/*,video/*" onchange="handleCompanyMediaUpload(event)">
+                            </div>
+                        </div>
+                        
                         <!-- Happy Moment -->
                         <div class="happy-moment-card">
                             <div class="info-card-title">One Thing I'm Happy With</div>
@@ -2700,8 +2764,11 @@
                         <div class="ecommerce-section">
                             <div class="ecommerce-title">🛍️ Shop With Me</div>
                             <div class="ecommerce-links">
-                                <a href="#" class="ecommerce-link" onclick="openEcommerce('myecommerce')">
-                                    My E-commerce
+                                <a href="#" class="ecommerce-link" onclick="openEcommerce('myecommerce1')" id="ecommerceLink1" style="display: none;">
+                                    My E-commerce 1
+                                </a>
+                                <a href="#" class="ecommerce-link" onclick="openEcommerce('myecommerce2')" id="ecommerceLink2" style="display: none;">
+                                    My E-commerce 2
                                 </a>
                             </div>
                         </div>
@@ -2784,6 +2851,20 @@
                     <input type="url" id="editCompanyLink" class="form-input" placeholder="https://...">
                 </div>
                 
+                <div class="form-group">
+                    <label class="form-label">Company Showcase Media</label>
+                    <div class="company-media-upload" onclick="document.getElementById('editCompanyMediaInput').click()">
+                        <div class="company-media-preview" id="editCompanyMediaPreview">
+                            <div class="upload-placeholder">
+                                <div style="font-size: 2rem; margin-bottom: 10px;">📸</div>
+                                <div>Upload Image or Video</div>
+                                <div style="font-size: 0.8rem; opacity: 0.7; margin-top: 5px;">Landscape • Max 1min video</div>
+                            </div>
+                        </div>
+                        <input type="file" id="editCompanyMediaInput" class="file-input" accept="image/*,video/*" onchange="handleEditCompanyMediaUpload(event)">
+                    </div>
+                </div>
+                
                 <!-- Personal Touch -->
                 <h4 style="color: rgba(255,255,255,0.8); margin: 50px 0 35px;">Personal Touch</h4>
                 <div class="form-group">
@@ -2843,8 +2924,13 @@
                 <!-- E-commerce -->
                 <h4 style="color: rgba(255,255,255,0.8); margin: 50px 0 35px;">E-commerce</h4>
                 <div class="form-group">
-                    <label class="form-label">My E-commerce Store</label>
-                    <input type="url" id="editMyEcommerce" class="form-input" placeholder="Your e-commerce store link">
+                    <label class="form-label">My E-commerce Store 1</label>
+                    <input type="url" id="editMyEcommerce1" class="form-input" placeholder="Your first e-commerce store link">
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">My E-commerce Store 2</label>
+                    <input type="url" id="editMyEcommerce2" class="form-input" placeholder="Your second e-commerce store link">
                 </div>
                 
                 <button class="submit-btn" onclick="saveProfile()">Save Changes</button>
@@ -3329,6 +3415,8 @@
                     nature: 'B2C SaaS',
                     companyName: 'JomBro Technologies',
                     companyLink: '',
+                    companyMedia: '',
+                    companyMediaType: '', // 'image' or 'video'
                     // Personal touch
                     happyMoment: 'Creating experiences that bring joy to millions of users worldwide! 🌟',
                     slogan: 'Dream big, code bigger, impact biggest!',
@@ -3343,7 +3431,8 @@
                     line: '',
                     email: '',
                     // E-commerce
-                    myecommerce: ''
+                    myecommerce1: '',
+                    myecommerce2: ''
                 };
                 
                 // Save to Firestore if available
@@ -4234,6 +4323,25 @@
                     document.querySelector('.profile-cover').style.background = 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)';
                 }
                 
+                // Update company media
+                updateCompanyMediaDisplay();
+                
+                // Update e-commerce links visibility
+                const ecomLink1 = document.getElementById('ecommerceLink1');
+                const ecomLink2 = document.getElementById('ecommerceLink2');
+                
+                if (userData.myecommerce1 && userData.myecommerce1.trim() !== '') {
+                    ecomLink1.style.display = 'block';
+                } else {
+                    ecomLink1.style.display = 'none';
+                }
+                
+                if (userData.myecommerce2 && userData.myecommerce2.trim() !== '') {
+                    ecomLink2.style.display = 'block';
+                } else {
+                    ecomLink2.style.display = 'none';
+                }
+                
             } catch (error) {
                 console.error('Error updating profile:', error);
             }
@@ -4254,6 +4362,22 @@
             document.getElementById('editCompanyName').value = userData.companyName || '';
             document.getElementById('editCompanyLink').value = userData.companyLink || '';
             
+            // Load company media if exists
+            if (userData.companyMedia) {
+                const preview = document.getElementById('editCompanyMediaPreview');
+                if (userData.companyMediaType === 'video') {
+                    preview.innerHTML = `
+                        <video src="${userData.companyMedia}" style="width: 100%; height: 100%; object-fit: cover; border-radius: 13px;" controls></video>
+                        <div class="media-overlay">Video</div>
+                    `;
+                } else {
+                    preview.innerHTML = `
+                        <img src="${userData.companyMedia}" style="width: 100%; height: 100%; object-fit: cover; border-radius: 13px;" alt="Company Media">
+                        <div class="media-overlay">Image</div>
+                    `;
+                }
+            }
+            
             // Personal touch
             document.getElementById('editHappyMoment').value = userData.happyMoment || '';
             document.getElementById('editSlogan').value = userData.slogan || '';
@@ -4271,7 +4395,8 @@
             document.getElementById('editEmail').value = userData.email || '';
             
             // E-commerce
-            document.getElementById('editMyEcommerce').value = userData.myecommerce || '';
+            document.getElementById('editMyEcommerce1').value = userData.myecommerce1 || '';
+            document.getElementById('editMyEcommerce2').value = userData.myecommerce2 || '';
             
             closeModal('profileModal');
             showModal('editProfileModal');
@@ -4291,6 +4416,7 @@
             userData.nature = document.getElementById('editNature').value.trim();
             userData.companyName = document.getElementById('editCompanyName').value.trim();
             userData.companyLink = document.getElementById('editCompanyLink').value.trim();
+            // Company media is saved via separate upload handler
             
             // Personal touch
             userData.happyMoment = document.getElementById('editHappyMoment').value.trim();
@@ -4309,7 +4435,8 @@
             userData.email = document.getElementById('editEmail').value.trim();
             
             // E-commerce
-            userData.myecommerce = document.getElementById('editMyEcommerce').value.trim();
+            userData.myecommerce1 = document.getElementById('editMyEcommerce1').value.trim();
+            userData.myecommerce2 = document.getElementById('editMyEcommerce2').value.trim();
             
             updateProfile();
             saveProfileData();
@@ -4342,6 +4469,130 @@
         // Upload cover image
         function uploadCoverImage() {
             document.getElementById('coverImageInput').click();
+        }
+        
+        // Upload company media
+        function uploadCompanyMedia() {
+            document.getElementById('companyMediaInput').click();
+        }
+        
+        // Handle company media upload in profile view
+        function handleCompanyMediaUpload(event) {
+            const file = event.target.files[0];
+            if (file) {
+                // Check file type
+                const isVideo = file.type.startsWith('video/');
+                const isImage = file.type.startsWith('image/');
+                
+                if (!isVideo && !isImage) {
+                    showToast('Please select an image or video file');
+                    return;
+                }
+                
+                // Check video duration (max 1 minute)
+                if (isVideo) {
+                    const video = document.createElement('video');
+                    video.preload = 'metadata';
+                    video.onloadedmetadata = function() {
+                        window.URL.revokeObjectURL(video.src);
+                        if (video.duration > 60) {
+                            showToast('Video must be 1 minute or less');
+                            return;
+                        }
+                        processCompanyMedia(file, isVideo);
+                    };
+                    video.src = URL.createObjectURL(file);
+                } else {
+                    processCompanyMedia(file, isVideo);
+                }
+            }
+        }
+        
+        // Handle company media upload in edit view
+        function handleEditCompanyMediaUpload(event) {
+            const file = event.target.files[0];
+            if (file) {
+                // Check file type
+                const isVideo = file.type.startsWith('video/');
+                const isImage = file.type.startsWith('image/');
+                
+                if (!isVideo && !isImage) {
+                    showToast('Please select an image or video file');
+                    return;
+                }
+                
+                // Check video duration (max 1 minute)
+                if (isVideo) {
+                    const video = document.createElement('video');
+                    video.preload = 'metadata';
+                    video.onloadedmetadata = function() {
+                        window.URL.revokeObjectURL(video.src);
+                        if (video.duration > 60) {
+                            showToast('Video must be 1 minute or less');
+                            return;
+                        }
+                        processEditCompanyMedia(file, isVideo);
+                    };
+                    video.src = URL.createObjectURL(file);
+                } else {
+                    processEditCompanyMedia(file, isVideo);
+                }
+            }
+        }
+        
+        // Process company media for profile view
+        function processCompanyMedia(file, isVideo) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                userData.companyMedia = e.target.result;
+                userData.companyMediaType = isVideo ? 'video' : 'image';
+                updateCompanyMediaDisplay();
+                saveProfileData();
+                showToast(`Company ${isVideo ? 'video' : 'image'} updated! 🎬`);
+            };
+            reader.readAsDataURL(file);
+        }
+        
+        // Process company media for edit view
+        function processEditCompanyMedia(file, isVideo) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const preview = document.getElementById('editCompanyMediaPreview');
+                if (isVideo) {
+                    preview.innerHTML = `
+                        <video src="${e.target.result}" style="width: 100%; height: 100%; object-fit: cover; border-radius: 13px;" controls></video>
+                        <div class="media-overlay">Video</div>
+                    `;
+                } else {
+                    preview.innerHTML = `
+                        <img src="${e.target.result}" style="width: 100%; height: 100%; object-fit: cover; border-radius: 13px;" alt="Company Media">
+                        <div class="media-overlay">Image</div>
+                    `;
+                }
+                // Store in temporary data to be saved when profile is saved
+                userData.companyMedia = e.target.result;
+                userData.companyMediaType = isVideo ? 'video' : 'image';
+                showToast(`Company ${isVideo ? 'video' : 'image'} ready to save! 📁`);
+            };
+            reader.readAsDataURL(file);
+        }
+        
+        // Update company media display in profile view
+        function updateCompanyMediaDisplay() {
+            const preview = document.getElementById('companyMediaPreview');
+            if (userData.companyMedia) {
+                if (userData.companyMediaType === 'video') {
+                    preview.innerHTML = `
+                        <video src="${userData.companyMedia}" style="width: 100%; height: 100%; object-fit: cover; border-radius: 13px;" controls></video>
+                        <div class="media-overlay">Video</div>
+                    `;
+                } else {
+                    preview.innerHTML = `
+                        <img src="${userData.companyMedia}" style="width: 100%; height: 100%; object-fit: cover; border-radius: 13px;" alt="Company Media">
+                        <div class="media-overlay">Image</div>
+                    `;
+                }
+            }
         }
         
         // Handle cover image upload
@@ -4544,12 +4795,21 @@
         }
         
         function openEcommerce(platform) {
-            if (platform === 'myecommerce') {
-                if (userData.myecommerce && userData.myecommerce !== '#') {
-                    window.open(userData.myecommerce, '_blank');
-                } else {
-                    showToast('No e-commerce store link set yet');
-                }
+            let ecommerceUrl = '';
+            let storeName = '';
+            
+            if (platform === 'myecommerce1') {
+                ecommerceUrl = userData.myecommerce1;
+                storeName = 'E-commerce Store 1';
+            } else if (platform === 'myecommerce2') {
+                ecommerceUrl = userData.myecommerce2;
+                storeName = 'E-commerce Store 2';
+            }
+            
+            if (ecommerceUrl && ecommerceUrl !== '#' && ecommerceUrl.trim() !== '') {
+                window.open(ecommerceUrl, '_blank');
+            } else {
+                showToast(`No ${storeName} link set yet`);
             }
         }
         
@@ -4619,6 +4879,9 @@
         window.handleProfileImageUpload = handleProfileImageUpload;
         window.uploadCoverImage = uploadCoverImage;
         window.handleCoverImageUpload = handleCoverImageUpload;
+        window.uploadCompanyMedia = uploadCompanyMedia;
+        window.handleCompanyMediaUpload = handleCompanyMediaUpload;
+        window.handleEditCompanyMediaUpload = handleEditCompanyMediaUpload;
         window.stalkProfile = stalkProfile;
         window.openSocialLink = openSocialLink;
         window.contactVia = contactVia;
