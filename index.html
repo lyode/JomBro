@@ -2700,11 +2700,8 @@
                         <div class="ecommerce-section">
                             <div class="ecommerce-title">🛍️ Shop With Me</div>
                             <div class="ecommerce-links">
-                                <a href="#" class="ecommerce-link" onclick="openEcommerce('shopee')">
-                                    Shopee
-                                </a>
-                                <a href="#" class="ecommerce-link" onclick="openEcommerce('lazada')">
-                                    Lazada
+                                <a href="#" class="ecommerce-link" onclick="openEcommerce('myecommerce')">
+                                    My E-commerce
                                 </a>
                             </div>
                         </div>
@@ -2844,15 +2841,10 @@
                 </div>
                 
                 <!-- E-commerce -->
-                <h4 style="color: rgba(255,255,255,0.8); margin: 50px 0 35px;">E-commerce Links</h4>
+                <h4 style="color: rgba(255,255,255,0.8); margin: 50px 0 35px;">E-commerce</h4>
                 <div class="form-group">
-                    <label class="form-label">Shopee Store</label>
-                    <input type="url" id="editShopee" class="form-input" placeholder="Shopee store link">
-                </div>
-                
-                <div class="form-group">
-                    <label class="form-label">Lazada Store</label>
-                    <input type="url" id="editLazada" class="form-input" placeholder="Lazada store link">
+                    <label class="form-label">My E-commerce Store</label>
+                    <input type="url" id="editMyEcommerce" class="form-input" placeholder="Your e-commerce store link">
                 </div>
                 
                 <button class="submit-btn" onclick="saveProfile()">Save Changes</button>
@@ -3351,8 +3343,7 @@
                     line: '',
                     email: '',
                     // E-commerce
-                    shopee: '',
-                    lazada: ''
+                    myecommerce: ''
                 };
                 
                 // Save to Firestore if available
@@ -4280,8 +4271,7 @@
             document.getElementById('editEmail').value = userData.email || '';
             
             // E-commerce
-            document.getElementById('editShopee').value = userData.shopee || '';
-            document.getElementById('editLazada').value = userData.lazada || '';
+            document.getElementById('editMyEcommerce').value = userData.myecommerce || '';
             
             closeModal('profileModal');
             showModal('editProfileModal');
@@ -4319,8 +4309,7 @@
             userData.email = document.getElementById('editEmail').value.trim();
             
             // E-commerce
-            userData.shopee = document.getElementById('editShopee').value.trim();
-            userData.lazada = document.getElementById('editLazada').value.trim();
+            userData.myecommerce = document.getElementById('editMyEcommerce').value.trim();
             
             updateProfile();
             saveProfileData();
@@ -4555,15 +4544,12 @@
         }
         
         function openEcommerce(platform) {
-            const links = {
-                shopee: userData.shopee || '#',
-                lazada: userData.lazada || '#'
-            };
-            
-            if (links[platform] && links[platform] !== '#') {
-                window.open(links[platform], '_blank');
-            } else {
-                showToast(`No ${platform} store link set yet`);
+            if (platform === 'myecommerce') {
+                if (userData.myecommerce && userData.myecommerce !== '#') {
+                    window.open(userData.myecommerce, '_blank');
+                } else {
+                    showToast('No e-commerce store link set yet');
+                }
             }
         }
         
