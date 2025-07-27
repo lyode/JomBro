@@ -26,6 +26,15 @@
             -webkit-tap-highlight-color: transparent;
         }
         
+        // Show search
+        function showSearch() {
+            showModal('searchModal');
+            // Auto-focus the search input
+            setTimeout(() => {
+                document.querySelector('#searchModal input').focus();
+            }, 100);
+        }
+        
         body {
             font-family: 'Montserrat', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica Neue', Arial, sans-serif;
             font-weight: 400;
@@ -2378,9 +2387,106 @@
             font-size: 0.75rem;
         }
         
-        /* File input styles */
-        .file-input {
-            display: none;
+        /* Ranking Board Styles */
+        .my-rank-card {
+            background: linear-gradient(135deg, rgba(155, 89, 182, 0.2), rgba(233, 30, 99, 0.2));
+            border: 1px solid rgba(155, 89, 182, 0.4);
+            border-radius: 15px;
+            padding: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .rank-header {
+            font-size: 0.9rem;
+            color: rgba(255, 255, 255, 0.7);
+            margin-bottom: 10px;
+            text-align: center;
+        }
+        
+        .rank-item {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            margin-bottom: 10px;
+            transition: all 0.3s ease;
+        }
+        
+        .rank-item:hover {
+            background: rgba(255, 255, 255, 0.1);
+            transform: translateX(5px);
+        }
+        
+        .my-rank {
+            background: rgba(155, 89, 182, 0.2);
+        }
+        
+        .rank-position {
+            font-size: 1.2rem;
+            font-weight: bold;
+            min-width: 40px;
+            text-align: center;
+        }
+        
+        .rank-position.top {
+            font-size: 1.5rem;
+            background: linear-gradient(45deg, #ffd700, #ffed4e);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .rank-avatar {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: linear-gradient(45deg, #f093fb, #f5576c);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+        }
+        
+        .rank-info {
+            flex: 1;
+        }
+        
+        .rank-name {
+            font-weight: 600;
+            font-size: 1rem;
+            margin-bottom: 3px;
+        }
+        
+        .rank-stats {
+            font-size: 0.9rem;
+            color: rgba(255, 255, 255, 0.7);
+        }
+        
+        .rank-badge {
+            padding: 5px 12px;
+            background: rgba(155, 89, 182, 0.6);
+            border-radius: 20px;
+            font-size: 0.7rem;
+            font-weight: bold;
+            color: white;
+        }
+        
+        .crown-icon {
+            margin-left: 10px;
+            font-size: 1.2rem;
+            animation: bounce 2s infinite;
+        }
+        
+        .ranking-list {
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        
+        .ranking-tabs {
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
         }
         
         /* Company Media Upload */
@@ -2783,6 +2889,7 @@
             
             <!-- Floating Action Buttons -->
             <div class="floating-actions">
+                <div class="floating-btn" onclick="showRanking()">🏆</div>
                 <div class="floating-btn" onclick="shareProfile()">📤</div>
                 <div class="floating-btn" onclick="showAchievements()">🏆</div>
                 <div class="floating-btn" onclick="showQRCode()">📱</div>
@@ -3037,6 +3144,44 @@
                 </div>
                 <button type="submit" class="submit-btn">Create Challenge (50 tokens)</button>
             </form>
+        </div>
+    </div>
+    
+    <!-- Ranking Modal -->
+    <div class="modal" id="rankingModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">🏆 Ranking Board</h3>
+                <button class="close-btn" onclick="closeModal('rankingModal')">×</button>
+            </div>
+            
+            <!-- Ranking Tabs -->
+            <div class="ranking-tabs" style="display: flex; gap: 10px; margin-bottom: 20px; padding: 10px 0;">
+                <button class="dedication-btn active" onclick="switchRankingTab('tokens', this)">💰 Tokens</button>
+                <button class="dedication-btn" onclick="switchRankingTab('level', this)">⭐ Level</button>
+                <button class="dedication-btn" onclick="switchRankingTab('challenges', this)">🎯 Challenges</button>
+            </div>
+            
+            <!-- Current User Rank -->
+            <div class="my-rank-card">
+                <div class="rank-header">Your Rank</div>
+                <div class="rank-item my-rank">
+                    <div class="rank-position">#42</div>
+                    <div class="rank-avatar">🎮</div>
+                    <div class="rank-info">
+                        <div class="rank-name" id="myRankName">@player</div>
+                        <div class="rank-stats">
+                            <span id="myRankValue">1000</span> <span id="myRankLabel">tokens</span>
+                        </div>
+                    </div>
+                    <div class="rank-badge">YOU</div>
+                </div>
+            </div>
+            
+            <!-- Top Rankings -->
+            <div class="ranking-list" id="rankingList">
+                <!-- Rankings will be loaded here -->
+            </div>
         </div>
     </div>
     
@@ -4683,13 +4828,121 @@
             }
         }
         
-        // Show search
-        function showSearch() {
-            showModal('searchModal');
-            // Auto-focus the search input
-            setTimeout(() => {
-                document.querySelector('#searchModal input').focus();
-            }, 100);
+        // Ranking data
+        const rankingData = {
+            tokens: [
+                { name: 'ChallengeMaster', avatar: '👑', value: 15420, level: 28 },
+                { name: 'TokenKing', avatar: '💎', value: 12890, level: 25 },
+                { name: 'GoldRush', avatar: '🏆', value: 11650, level: 23 },
+                { name: 'CoinCollector', avatar: '💰', value: 10200, level: 22 },
+                { name: 'RichPlayer', avatar: '🎯', value: 9800, level: 20 },
+                { name: 'MoneyMaker', avatar: '💸', value: 9200, level: 19 },
+                { name: 'TokenHunter', avatar: '🔥', value: 8900, level: 18 },
+                { name: 'WealthBuilder', avatar: '⭐', value: 8500, level: 17 },
+                { name: 'CashKing', avatar: '💫', value: 8200, level: 16 },
+                { name: 'FortuneMaker', avatar: '🌟', value: 7800, level: 15 }
+            ],
+            level: [
+                { name: 'LevelMaster', avatar: '👑', value: 30, tokens: 18500 },
+                { name: 'StarPlayer', avatar: '⭐', value: 28, tokens: 15420 },
+                { name: 'EliteGamer', avatar: '🏆', value: 26, tokens: 13200 },
+                { name: 'ProChallenger', avatar: '💎', value: 25, tokens: 12890 },
+                { name: 'SkillMaster', avatar: '🎯', value: 24, tokens: 11800 },
+                { name: 'LevelKing', avatar: '👑', value: 23, tokens: 11650 },
+                { name: 'RankMaster', avatar: '🔥', value: 22, tokens: 10200 },
+                { name: 'TopPlayer', avatar: '💫', value: 21, tokens: 9900 },
+                { name: 'GameMaster', avatar: '🌟', value: 20, tokens: 9800 },
+                { name: 'ChampionPro', avatar: '⚡', value: 19, tokens: 9200 }
+            ],
+            challenges: [
+                { name: 'ChallengeKing', avatar: '🎯', value: 156, level: 24 },
+                { name: 'TaskMaster', avatar: '🏆', value: 142, level: 23 },
+                { name: 'QuestHero', avatar: '⚔️', value: 138, level: 22 },
+                { name: 'MissionPro', avatar: '🎮', value: 129, level: 21 },
+                { name: 'ChallengeGod', avatar: '👑', value: 124, level: 25 },
+                { name: 'TaskHunter', avatar: '🔥', value: 118, level: 20 },
+                { name: 'QuestMaster', avatar: '⭐', value: 112, level: 19 },
+                { name: 'ChallengePro', avatar: '💪', value: 108, level: 18 },
+                { name: 'MissionKing', avatar: '🌟', value: 104, level: 17 },
+                { name: 'TaskChamp', avatar: '💎', value: 98, level: 16 }
+            ]
+        };
+        
+        let currentRankingType = 'tokens';
+        
+        // Show ranking modal
+        function showRanking() {
+            loadRankings(currentRankingType);
+            showModal('rankingModal');
+        }
+        
+        // Switch ranking tab
+        function switchRankingTab(type, element) {
+            // Update active tab
+            document.querySelectorAll('.ranking-tabs button').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            element.classList.add('active');
+            
+            currentRankingType = type;
+            loadRankings(type);
+        }
+        
+        // Load rankings
+        function loadRankings(type) {
+            const container = document.getElementById('rankingList');
+            const data = rankingData[type];
+            
+            // Update my rank info
+            updateMyRank(type);
+            
+            // Generate ranking list
+            container.innerHTML = data.map((player, index) => {
+                const position = index + 1;
+                const isTop3 = position <= 3;
+                const crown = position === 1 ? '<span class="crown-icon">👑</span>' : '';
+                
+                let valueText = '';
+                if (type === 'tokens') {
+                    valueText = `${player.value.toLocaleString()} tokens • Lv.${player.level}`;
+                } else if (type === 'level') {
+                    valueText = `Level ${player.value} • ${player.tokens.toLocaleString()} tokens`;
+                } else {
+                    valueText = `${player.value} challenges • Lv.${player.level}`;
+                }
+                
+                return `
+                    <div class="rank-item">
+                        <div class="rank-position ${isTop3 ? 'top' : ''}">#${position}</div>
+                        <div class="rank-avatar">${player.avatar}</div>
+                        <div class="rank-info">
+                            <div class="rank-name">@${player.name}${crown}</div>
+                            <div class="rank-stats">${valueText}</div>
+                        </div>
+                        ${isTop3 ? `<div class="rank-badge">${position === 1 ? 'CHAMPION' : position === 2 ? 'RUNNER-UP' : 'TOP 3'}</div>` : ''}
+                    </div>
+                `;
+            }).join('');
+        }
+        
+        // Update my rank display
+        function updateMyRank(type) {
+            const myRankName = document.getElementById('myRankName');
+            const myRankValue = document.getElementById('myRankValue');
+            const myRankLabel = document.getElementById('myRankLabel');
+            
+            myRankName.textContent = '@' + (userData.name || 'player');
+            
+            if (type === 'tokens') {
+                myRankValue.textContent = (userData.tokens || 1000).toLocaleString();
+                myRankLabel.textContent = 'tokens';
+            } else if (type === 'level') {
+                myRankValue.textContent = userData.level || 1;
+                myRankLabel.textContent = `level • ${(userData.tokens || 1000).toLocaleString()} tokens`;
+            } else {
+                myRankValue.textContent = userData.completedChallenges || 0;
+                myRankLabel.textContent = 'challenges completed';
+            }
         }
         
         // Show/hide modal
@@ -4865,6 +5118,8 @@
         window.showComments = showComments;
         window.sharePost = sharePost;
         window.showSearch = showSearch;
+        window.showRanking = showRanking;
+        window.switchRankingTab = switchRankingTab;
         window.toggleLike = toggleLike;
         window.showToast = showToast;
         window.selectDedication = selectDedication;
