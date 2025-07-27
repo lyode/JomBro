@@ -126,18 +126,19 @@
             transform: scale(1.05);
         }
         
-        /* Main Feed Container */
+        /* Main Feed Container - Full Screen */
         .feed-container {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
-            height: 100%;
+            height: 100vh;
             overflow-y: scroll;
             scroll-snap-type: y mandatory;
             -webkit-overflow-scrolling: touch;
             display: none;
             background: #000;
+            z-index: 1;
         }
         
         /* Individual Post */
@@ -611,7 +612,7 @@
             box-shadow: 0 2px 10px rgba(0,0,0,0.4);
         }
         
-        /* Side Actions (TikTok Style) */
+        /* Full Screen Post Actions - Always Visible */
         .post-actions {
             position: absolute;
             right: 15px;
@@ -621,6 +622,107 @@
             flex-direction: column;
             gap: 20px;
             align-items: center;
+        }
+        
+        /* Floating Menu for Full Screen */
+        .floating-menu {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            z-index: 100;
+            display: none;
+            animation: fadeIn 0.3s ease;
+        }
+        
+        .floating-menu.show {
+            display: block;
+        }
+        
+        .menu-trigger {
+            width: 50px;
+            height: 50px;
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(10px);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .menu-trigger:hover {
+            background: rgba(0, 0, 0, 0.9);
+            transform: scale(1.1);
+        }
+        
+        .menu-items {
+            position: absolute;
+            top: 60px;
+            left: 0;
+            background: rgba(0, 0, 0, 0.9);
+            backdrop-filter: blur(20px);
+            border-radius: 15px;
+            padding: 10px;
+            display: none;
+            min-width: 150px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .menu-items.show {
+            display: block;
+            animation: slideDown 0.3s ease;
+        }
+        
+        .menu-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px;
+            color: white;
+            text-decoration: none;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            font-size: 0.9rem;
+        }
+        
+        .menu-item:hover {
+            background: rgba(155, 89, 182, 0.3);
+        }
+        
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        /* Full Screen Gesture Instructions */
+        .gesture-hint {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0, 0, 0, 0.7);
+            color: white;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            z-index: 50;
+            opacity: 0.7;
+            animation: fadeInOut 4s ease;
+        }
+        
+        @keyframes fadeInOut {
+            0%, 100% { opacity: 0; }
+            20%, 80% { opacity: 0.7; }
         }
         
         /* Adjust for mobile */
@@ -1457,7 +1559,9 @@
             }
         }
         
+        /* Mobile Optimization for Full Screen */
         @media (max-width: 480px) {
+            /* Edit Profile Modal Responsive */
             #editProfileModal .modal-content {
                 transform: scale(1) !important;
                 max-height: 85vh !important;
@@ -1490,26 +1594,27 @@
                 font-size: 1.8rem;
             }
             
-            .header-center {
-                gap: 15px;
+            /* Modal Content */
+            .modal-content {
+                padding: 15px;
             }
             
-            .profile-cover-upload {
-                top: 75px;
-                right: 10px;
-                padding: 8px 15px;
-                font-size: 0.8rem;
+            /* Full Screen Feed Optimizations */
+            .floating-menu {
+                top: 15px;
+                left: 15px;
             }
             
-            .header-tab {
-                font-size: 1rem;
+            .menu-trigger {
+                width: 45px;
+                height: 45px;
+                font-size: 1.3rem;
             }
             
-            .header-right {
-                width: 64px;
-                height: 64px;
-                font-size: 2.1rem;
-                border: 1px solid rgba(255,255,255,0.1);
+            .gesture-hint {
+                bottom: 15px;
+                font-size: 0.75rem;
+                padding: 6px 12px;
             }
             
             .post-actions {
@@ -1571,22 +1676,6 @@
             
             .ai-score-badge .score-value {
                 font-size: 0.99rem;
-            }
-            
-            .modal-content {
-                padding: 15px;
-            }
-            
-            .bottom-nav {
-                padding: 8px 0;
-            }
-            
-            .nav-icon {
-                font-size: 1.3rem;
-            }
-            
-            .nav-label {
-                font-size: 0.65rem;
             }
         }
         
@@ -2587,6 +2676,33 @@
     <!-- Main Feed (TikTok Style) -->
     <div class="feed-container" id="feedContainer" style="display: none;">
         
+        <!-- Floating Menu for Full Screen Navigation -->
+        <div class="floating-menu" id="floatingMenu">
+            <div class="menu-trigger" onclick="toggleFloatingMenu()">⚡</div>
+            <div class="menu-items" id="menuItems">
+                <div class="menu-item" onclick="showProfile()">
+                    <span>👤</span> Profile
+                </div>
+                <div class="menu-item" onclick="showRanking()">
+                    <span>🏆</span> Ranking
+                </div>
+                <div class="menu-item" onclick="showDiscover()">
+                    <span>🔥</span> Discover
+                </div>
+                <div class="menu-item" onclick="openCamera()">
+                    <span>➕</span> Create
+                </div>
+                <div class="menu-item" onclick="showSearch()">
+                    <span>🔍</span> Search
+                </div>
+            </div>
+        </div>
+        
+        <!-- Gesture Hint -->
+        <div class="gesture-hint" id="gestureHint">
+            Tap top-left ⚡ for menu • Swipe up/down for posts
+        </div>
+        
         <!-- Default Static Post -->
         <div class="feed-post">
             <div class="post-media">
@@ -2891,7 +3007,7 @@
             <div class="floating-actions">
                 <div class="floating-btn" onclick="showRanking()">🏆</div>
                 <div class="floating-btn" onclick="shareProfile()">📤</div>
-                <div class="floating-btn" onclick="showAchievements()">🏆</div>
+                <div class="floating-btn" onclick="showAchievements()">🎖️</div>
                 <div class="floating-btn" onclick="showQRCode()">📱</div>
             </div>
             
@@ -3589,11 +3705,21 @@
                     }
                 }
                 
-                // Show app
+                // Show app - Full screen feed only
                 document.getElementById('loginScreen').style.display = 'none';
                 document.getElementById('feedContainer').style.display = 'block';
-                document.querySelector('.feed-header').style.display = 'flex';
-                document.getElementById('bottomNav').style.display = 'flex';
+                // Hide header and bottom nav for full screen experience
+                document.querySelector('.feed-header').style.display = 'none';
+                document.getElementById('bottomNav').style.display = 'none';
+                
+                // Show floating menu and gesture hint
+                document.getElementById('floatingMenu').classList.add('show');
+                
+                // Show gesture hint for 4 seconds
+                setTimeout(() => {
+                    const hint = document.getElementById('gestureHint');
+                    if (hint) hint.style.display = 'none';
+                }, 4000);
                 
                 // Update profile
                 updateProfile();
@@ -4959,32 +5085,99 @@
             document.getElementById(modalId).style.display = 'none';
         }
         
-        // Handle swipe gestures (optional)
-        let startY = 0;
-        let endY = 0;
+        // Toggle floating menu
+        function toggleFloatingMenu() {
+            const menuItems = document.getElementById('menuItems');
+            if (menuItems.classList.contains('show')) {
+                menuItems.classList.remove('show');
+            } else {
+                menuItems.classList.add('show');
+                
+                // Auto-hide after 5 seconds
+                setTimeout(() => {
+                    menuItems.classList.remove('show');
+                }, 5000);
+            }
+        }
+        
+        // Close floating menu when clicking outside
+        document.addEventListener('click', (e) => {
+            const floatingMenu = document.getElementById('floatingMenu');
+            const menuItems = document.getElementById('menuItems');
+            
+            if (floatingMenu && !floatingMenu.contains(e.target)) {
+                menuItems.classList.remove('show');
+            }
+        });
+        
+        // Enhanced swipe gestures for full screen experience
+        let touchStartY = 0;
+        let touchEndY = 0;
+        let touchStartX = 0;
+        let touchEndX = 0;
+        let isVerticalSwipe = false;
         
         document.addEventListener('touchstart', (e) => {
-            startY = e.touches[0].clientY;
+            touchStartY = e.touches[0].clientY;
+            touchStartX = e.touches[0].clientX;
+            isVerticalSwipe = false;
+        });
+        
+        document.addEventListener('touchmove', (e) => {
+            const diffY = Math.abs(e.touches[0].clientY - touchStartY);
+            const diffX = Math.abs(e.touches[0].clientX - touchStartX);
+            
+            // Determine if this is a vertical swipe
+            if (diffY > diffX && diffY > 30) {
+                isVerticalSwipe = true;
+            }
         });
         
         document.addEventListener('touchend', (e) => {
-            endY = e.changedTouches[0].clientY;
-            handleSwipe();
+            touchEndY = e.changedTouches[0].clientY;
+            touchEndX = e.changedTouches[0].clientX;
+            
+            if (isVerticalSwipe) {
+                handleVerticalSwipe();
+            } else {
+                handleHorizontalSwipe();
+            }
         });
         
-        function handleSwipe() {
-            const diff = startY - endY;
+        function handleVerticalSwipe() {
+            const diffY = touchStartY - touchEndY;
             
-            if (Math.abs(diff) > 50) {
+            if (Math.abs(diffY) > 50) {
                 // Swipe threshold
-                if (diff > 0) {
+                if (diffY > 0) {
                     // Swipe up - next video
                     console.log('Next video');
+                    showToast('Next post');
                 } else {
                     // Swipe down - previous video
                     console.log('Previous video');
+                    showToast('Previous post');
                 }
             }
+        }
+        
+        function handleHorizontalSwipe() {
+            const diffX = touchStartX - touchEndX;
+            
+            if (Math.abs(diffX) > 100) {
+                // Horizontal swipe threshold
+                if (diffX > 0) {
+                    // Swipe left - show profile or menu
+                    showProfile();
+                } else {
+                    // Swipe right - show camera/create
+                    openCamera();
+                }
+            }
+        }
+        
+        function handleSwipe() {
+            // Legacy function - now handled by new gesture system
         }
         
         // New profile functions - Updated contact functions
@@ -5120,6 +5313,7 @@
         window.showSearch = showSearch;
         window.showRanking = showRanking;
         window.switchRankingTab = switchRankingTab;
+        window.toggleFloatingMenu = toggleFloatingMenu;
         window.toggleLike = toggleLike;
         window.showToast = showToast;
         window.selectDedication = selectDedication;
