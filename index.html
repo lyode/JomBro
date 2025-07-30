@@ -12,9 +12,43 @@
     <!-- Favicon -->
     <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🎮</text></svg>">
     
-    <!-- Google Fonts for thin font support -->
+    <!-- Performance Optimization: Preconnect to external domains -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="preconnect" href="https://www.gstatic.com">
+    <link rel="preconnect" href="https://firebasestorage.googleapis.com">
+    
+    <!-- PWA meta tags -->
+    <link rel="manifest" href="manifest.json">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-title" content="JomBro">
+    <link rel="apple-touch-icon" href="icon-192.png">
+    
+    <!-- Social sharing meta tags (Open Graph) -->
+    <meta property="og:title" content="JomBro - Challenge & Reward Platform">
+    <meta property="og:description" content="Complete fun challenges with friends, earn rewards, and level up! Join the JomBro community today.">
+    <meta property="og:image" content="https://yourdomain.com/preview.jpg">
+    <meta property="og:url" content="https://yourdomain.com">
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" content="JomBro">
+    
+    <!-- Twitter Card meta tags -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="JomBro - Challenge & Reward Platform">
+    <meta name="twitter:description" content="Complete fun challenges with friends, earn rewards, and level up!">
+    <meta name="twitter:image" content="https://yourdomain.com/preview.jpg">
+    
+    <!-- Additional SEO meta tags -->
+    <meta name="keywords" content="challenges, social game, rewards, tokens, level up, fun challenges, JomBro">
+    <meta name="author" content="JomBro Team">
+    <meta name="robots" content="index, follow">
+    <link rel="canonical" href="https://yourdomain.com">
+    
+    <!-- Performance hints -->
+    <link rel="dns-prefetch" href="https://www.gstatic.com">
+    <link rel="dns-prefetch" href="https://firebasestorage.googleapis.com">
+    
+    <!-- Google Fonts with display swap for better performance -->
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@100;200;300;400;500;600;700&display=swap" rel="stylesheet">
     
     <!-- Firebase SDK -->
@@ -3782,8 +3816,18 @@
         function setupPWA() {
             // Register service worker
             if ('serviceWorker' in navigator) {
-                navigator.serviceWorker.register('/sw.js').catch(() => {
-                    console.log('Service worker registration failed');
+                window.addEventListener('load', () => {
+                    navigator.serviceWorker.register('/sw.js')
+                        .then(registration => {
+                            console.log('ServiceWorker registration successful:', registration.scope);
+                            // Check for updates periodically
+                            setInterval(() => {
+                                registration.update();
+                            }, 60000); // Check every minute
+                        })
+                        .catch(err => {
+                            console.log('ServiceWorker registration failed:', err);
+                        });
                 });
             }
             
