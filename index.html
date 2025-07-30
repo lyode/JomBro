@@ -1116,17 +1116,22 @@
         /* AI Challenge Container */
         .ai-challenge-container {
             position: fixed;
-            bottom: 100px;
+            top: 0;
             left: 0;
-            right: 0;
-            padding: 20px;
-            background: rgba(0, 0, 0, 0.9);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            max-height: 50vh;
-            overflow-y: auto;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
             z-index: 500;
             display: none;
+            align-items: flex-end;
+            justify-content: center;
+        }
+        
+        .ai-challenge-container > div {
+            width: 100%;
+            max-width: 480px;
+            max-height: 70vh;
+            overflow-y: auto;
             animation: slideUp 0.3s ease;
         }
         
@@ -2810,13 +2815,16 @@
     </div>
     
     <!-- AI Challenge Selection -->
-    <div class="ai-challenge-container" id="aiChallengeContainer">
-        <div class="ai-challenge-header">
-            <div class="ai-challenge-timer" id="challengeTimer">New challenges in: 10:00</div>
-            <h3>🤖 AI Generated Challenges</h3>
-        </div>
-        <div class="ai-challenges-grid" id="aiChallengesGrid">
-            <!-- AI challenges will be loaded here -->
+    <div class="ai-challenge-container" id="aiChallengeContainer" onclick="if(event.target === this) this.style.display='none'">
+        <div style="background: rgba(0, 0, 0, 0.95); border-radius: 20px 20px 0 0; padding: 20px; position: relative;">
+            <button class="close-btn" style="position: absolute; top: 10px; right: 10px; background: rgba(255,255,255,0.1); width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; border: 1px solid rgba(255,255,255,0.2);" onclick="document.getElementById('aiChallengeContainer').style.display='none'">×</button>
+            <div class="ai-challenge-header">
+                <div class="ai-challenge-timer" id="challengeTimer">New challenges in: 10:00</div>
+                <h3>🤖 AI Generated Challenges</h3>
+            </div>
+            <div class="ai-challenges-grid" id="aiChallengesGrid">
+                <!-- AI challenges will be loaded here -->
+            </div>
         </div>
     </div>
     
@@ -3547,6 +3555,13 @@
             const file = event.target.files[0];
             if (!file) return;
             
+            // Check if a challenge is selected
+            if (!selectedChallenge) {
+                showErrorModal('No Challenge Selected', 'Please select a challenge first before uploading media.');
+                event.target.value = ''; // Clear the input
+                return;
+            }
+            
             const isVideo = file.type.startsWith('video/');
             const isImage = file.type.startsWith('image/');
             
@@ -3724,11 +3739,17 @@
             currentGalleryFile = currentUploadFile;
             currentUploadFile = null;
             
-            // Hide file preview and show AI challenges
+            // Hide file preview
             document.getElementById('fileUploadPreview').style.display = 'none';
-            showAIChallenges();
             
-            showSuccessOverlay(`${currentGalleryFile.type === 'image' ? 'Image' : 'Video'} ready to use!`);
+            // Post the challenge directly
+            showSuccessOverlay(`${currentGalleryFile.type === 'image' ? 'Image' : 'Video'} ready!`);
+            
+            // Calculate AI score and create post
+            setTimeout(() => {
+                const score = calculateAIScore();
+                createPostFromGallery(score);
+            }, 1000);
         }
         
         // Load user posts from localStorage
@@ -4483,9 +4504,23 @@
         
         // Select trending challenge
         function selectTrendingChallenge(title) {
+            // Create a challenge object from the trending challenge
+            selectedChallenge = {
+                title: title,
+                description: 'Complete this trending challenge!',
+                category: 'trending',
+                reward: 200,
+                difficulty: 3,
+                dedication: 'open-public'
+            };
+            
             showToast(`Selected: ${title}`);
             closeModal('discoverModal');
-            openCamera();
+            
+            // Open gallery to capture/upload media
+            setTimeout(() => {
+                document.getElementById('galleryInput').click();
+            }, 500);
         }
         
         // Show Inbox
@@ -4557,9 +4592,23 @@
         
         // Accept/Decline challenge
         function acceptChallenge() {
+            // Create a challenge object for the accepted challenge
+            selectedChallenge = {
+                title: 'Accepted Challenge',
+                description: 'Complete the challenge sent by your friend!',
+                category: 'social',
+                reward: 150,
+                difficulty: 3,
+                dedication: 'people-i-know'
+            };
+            
             showToast('Challenge accepted! 💪');
             closeModal('inboxModal');
-            openCamera();
+            
+            // Open gallery to capture/upload media
+            setTimeout(() => {
+                document.getElementById('galleryInput').click();
+            }, 500);
         }
         
         function declineChallenge() {
@@ -4589,10 +4638,11 @@
             showModal('achievementsModal');
         }
         
-        // Open camera (now uses phone's native camera)
+        // Open camera - FIXED: Show challenges first
         function openCamera() {
-            // Directly open file picker for camera/gallery
-            document.getElementById('galleryInput').click();
+            // First show AI challenges for selection
+            showAIChallenges();
+            updateChallengeCountdown();
         }
         
         // Show AI challenges
@@ -4606,7 +4656,7 @@
                 aiChallenges = generateAIChallenges();
             }
             
-            container.style.display = 'block';
+            container.style.display = 'flex';
             grid.innerHTML = '';
             
             // Display AI challenges with better error handling
@@ -4647,7 +4697,7 @@
                 </div>
             `;
             regularBtn.onclick = () => {
-                closeModal('aiChallengeContainer');
+                document.getElementById('aiChallengeContainer').style.display = 'none';
                 showModal('createModal');
             };
             grid.appendChild(regularBtn);
@@ -4655,7 +4705,7 @@
         
         // Select AI challenge
         function selectAIChallenge(element, challenge) {
-            console.log('Selecting challenge:', challenge); // Debug log
+            console.log('Selecting challenge:', challenge);
             
             document.querySelectorAll('.ai-challenge-card').forEach(card => {
                 card.classList.remove('selected');
@@ -4664,6 +4714,11 @@
             selectedChallenge = challenge;
             
             showToast(`Selected: ${challenge.title}`);
+            
+            // After selecting challenge, open camera/gallery
+            setTimeout(() => {
+                document.getElementById('galleryInput').click();
+            }, 500);
         }
         
         // Update countdown timer
@@ -5334,6 +5389,9 @@
             showToast(`Challenge created for ${dedicationText}! -50 tokens`);
             closeModal('createModal');
             
+            // Store the created challenge as selected
+            selectedChallenge = challenge;
+            
             // Reset form
             e.target.reset();
             document.getElementById('challengeDedication').value = 'open-public';
@@ -5346,6 +5404,11 @@
                 }
             });
             document.querySelector('[onclick*="open-public"]').classList.add('active');
+            
+            // Now open gallery to record/upload media
+            setTimeout(() => {
+                document.getElementById('galleryInput').click();
+            }, 500);
         }
         
         // Fixed: Post challenge button
