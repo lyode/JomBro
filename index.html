@@ -2831,56 +2831,7 @@
     
     <!-- Main Feed (TikTok Style) -->
     <div class="feed-container" id="feedContainer" style="display: none;">
-        
-        <!-- Default Static Post -->
-        <div class="feed-post">
-            <div class="post-media">
-                <img class="post-image" src="https://picsum.photos/400/800?random=1" alt="Challenge">
-                <div class="frame-wrapper frame-gradient-border"></div>
-            </div>
-            
-            <div class="gradient-overlay-top"></div>
-            <div class="gradient-overlay-bottom"></div>
-            
-            <div class="ai-score-badge">
-                <span class="ai-icon">🤖</span>
-                <span class="score-value">92%</span>
-                <div class="score-stars">⭐⭐⭐⭐⭐</div>
-            </div>
-            
-            <div class="post-actions">
-                <div class="action-item">
-                    <div class="user-avatar">😎<div class="follow-btn">+</div></div>
-                </div>
-                <div class="action-item">
-                    <div class="action-icon">❤️</div>
-                    <div class="action-count">234</div>
-                </div>
-                <div class="action-item">
-                    <div class="action-icon">💬</div>
-                    <div class="action-count">45</div>
-                </div>
-                <div class="action-item">
-                    <div class="action-icon">↗️</div>
-                    <div class="action-count">Share</div>
-                </div>
-                <div class="action-item">
-                    <div class="action-icon">⋮</div>
-                </div>
-            </div>
-            
-            <div class="post-info">
-                <div class="post-user">@alex_gamer</div>
-                <div class="challenge-badge">
-                    🎯 20 Pushup Challenge • 🪙 100 • 👥 People I Know
-                </div>
-                <div class="post-caption">Just crushed the pushup challenge! 💪 Challenge dedicated to my gym buddies!</div>
-                <div class="post-music">
-                    <span class="music-icon">🎵</span>
-                    <span>Original sound - alex_gamer</span>
-                </div>
-            </div>
-        </div>
+        <!-- Posts will be dynamically loaded here -->
     </div>
     
     <!-- Enhanced File Upload Preview -->
@@ -4805,6 +4756,11 @@
                 
                 document.getElementById('cameraVideo').srcObject = videoStream;
                 
+                // Ensure AI challenges are generated
+                if (!aiChallenges || aiChallenges.length === 0) {
+                    aiChallenges = generateAIChallenges();
+                }
+                
                 // Show AI challenges
                 showAIChallenges();
                 
@@ -4813,8 +4769,9 @@
                 
             } catch (error) {
                 console.error('Camera error:', error);
-                showToast('Camera access denied');
-                closeCamera();
+                // Still show interface even if camera fails
+                showAIChallenges();
+                showToast('📸 Camera not available, but you can still upload from gallery!');
             }
         }
         
@@ -4823,10 +4780,16 @@
             const container = document.getElementById('aiChallengeContainer');
             const grid = document.getElementById('aiChallengesGrid');
             
+            // Generate challenges if none exist
+            if (!aiChallenges || aiChallenges.length === 0) {
+                console.log('Generating new AI challenges...');
+                aiChallenges = generateAIChallenges();
+            }
+            
             container.style.display = 'block';
             grid.innerHTML = '';
             
-            // Display 3 AI challenges
+            // Display AI challenges with better error handling
             aiChallenges.forEach((challenge, index) => {
                 const card = document.createElement('div');
                 card.className = 'ai-challenge-card';
@@ -4836,24 +4799,52 @@
                     <p style="font-size: 0.9rem; opacity: 0.9; margin: 5px 0;">${challenge.description}</p>
                     <div class="challenge-meta">
                         <div class="challenge-difficulty">
-                            ${'⭐'.repeat(challenge.difficulty)}
+                            ${'⭐'.repeat(challenge.difficulty || 1)}
                         </div>
-                        <div class="challenge-reward">🪙 ${challenge.reward}</div>
+                        <div class="challenge-reward">🪙 ${challenge.reward || 100}</div>
                     </div>
                 `;
                 
-                card.onclick = () => selectAIChallenge(card, challenge);
+                card.onclick = () => {
+                    console.log('Challenge card clicked:', challenge);
+                    selectAIChallenge(card, challenge);
+                };
+                
                 grid.appendChild(card);
             });
+            
+            // Add regular challenges option
+            const regularBtn = document.createElement('div');
+            regularBtn.className = 'ai-challenge-card';
+            regularBtn.style.background = 'rgba(155, 89, 182, 0.2)';
+            regularBtn.innerHTML = `
+                <div class="ai-badge" style="background: linear-gradient(45deg, #9b59b6, #8e44ad);">📝 Custom</div>
+                <h4 class="challenge-title">Create Your Own</h4>
+                <p style="font-size: 0.9rem; opacity: 0.9; margin: 5px 0;">Design a custom challenge</p>
+                <div class="challenge-meta">
+                    <div class="challenge-difficulty">⭐⭐⭐</div>
+                    <div class="challenge-reward">🪙 50-500</div>
+                </div>
+            `;
+            regularBtn.onclick = () => {
+                closeCamera();
+                showModal('createModal');
+            };
+            grid.appendChild(regularBtn);
         }
         
         // Select AI challenge
         function selectAIChallenge(element, challenge) {
+            console.log('Selecting challenge:', challenge); // Debug log
+            
             document.querySelectorAll('.ai-challenge-card').forEach(card => {
                 card.classList.remove('selected');
             });
             element.classList.add('selected');
             selectedChallenge = challenge;
+            
+            // Store selected challenge in case of view switches
+            window.currentSelectedChallenge = challenge;
             
             showToast(`Selected: ${challenge.title}`);
         }
@@ -4901,6 +4892,8 @@
             }
             
             currentGalleryFile = null;
+            selectedChallenge = null;
+            window.currentSelectedChallenge = null;
         }
         
         // Load challenge options
@@ -4998,7 +4991,10 @@
         
         // Show gallery preview
         function showGalleryPreview() {
-            if (!currentGalleryFile) return;
+            if (!currentGalleryFile) {
+                console.error('No gallery file selected');
+                return;
+            }
             
             const preview = document.getElementById('galleryUploadPreview');
             const previewImage = document.getElementById('previewImage');
@@ -5019,9 +5015,24 @@
             
             preview.style.display = 'flex';
             
-            // Show challenge selector if not already selected
-            if (!selectedChallenge) {
-                showAIChallenges();
+            // Restore selected challenge if it was stored
+            if (window.currentSelectedChallenge && !selectedChallenge) {
+                selectedChallenge = window.currentSelectedChallenge;
+            }
+            
+            // Always show challenge selector
+            showAIChallenges();
+            
+            // Re-select the challenge visually if one was selected
+            if (selectedChallenge) {
+                setTimeout(() => {
+                    const cards = document.querySelectorAll('.ai-challenge-card');
+                    cards.forEach((card, index) => {
+                        if (aiChallenges[index] && aiChallenges[index].id === selectedChallenge.id) {
+                            card.classList.add('selected');
+                        }
+                    });
+                }, 100);
             }
         }
         
@@ -5043,15 +5054,24 @@
         
         // Confirm gallery upload
         function confirmGalleryUpload() {
+            console.log('Confirming gallery upload...'); // Debug log
+            console.log('Selected challenge:', selectedChallenge); // Debug log
+            console.log('Current gallery file:', currentGalleryFile); // Debug log
+            
             if (!selectedChallenge) {
-                showToast('Please select a challenge first');
+                showToast('⚠️ Please select a challenge first!');
+                // Highlight the challenge section
+                document.getElementById('aiChallengeContainer').scrollIntoView({ behavior: 'smooth' });
                 return;
             }
             
             if (!currentGalleryFile) {
-                showToast('No media selected');
+                showToast('❌ No media selected');
                 return;
             }
+            
+            // Show processing
+            showToast('Processing your submission...');
             
             // Calculate AI score for uploaded content
             const score = calculateAIScore();
@@ -5062,61 +5082,90 @@
         
         // Create post from gallery upload
         function createPostFromGallery(score) {
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                const newPost = {
-                    id: 'userpost_' + Date.now(),
-                    user: { 
-                        name: userData.name, 
-                        avatar: userData.avatar,
-                        avatarImage: userData.avatarImage 
-                    },
-                    challenge: selectedChallenge,
-                    caption: `Just completed: ${selectedChallenge.title} with ${score}% AI score! 🔥 ${
-                        selectedChallenge.dedication === 'people-i-know' ? 'Challenge for friends!' : 
-                        selectedChallenge.dedication === 'people-i-dont-know' ? 'Challenge for strangers!' : 
-                        'Open challenge for everyone!'
-                    }`,
-                    likes: 0,
-                    comments: 0,
-                    mediaType: currentGalleryFile.type === 'video' ? 'video' : 'image',
-                    mediaUrl: e.target.result,
-                    aiScore: score,
-                    isMyPost: true,
-                    timestamp: Date.now()
+            try {
+                console.log('Creating post with score:', score); // Debug log
+                
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const newPost = {
+                        id: 'userpost_' + Date.now(),
+                        user: { 
+                            name: userData.name || 'player', 
+                            avatar: userData.avatar || '🎮',
+                            avatarImage: userData.avatarImage || ''
+                        },
+                        challenge: selectedChallenge,
+                        caption: `Just completed: ${selectedChallenge.title} with ${score}% AI score! 🔥 ${
+                            selectedChallenge.dedication === 'people-i-know' ? 'Challenge for friends!' : 
+                            selectedChallenge.dedication === 'people-i-dont-know' ? 'Challenge for strangers!' : 
+                            'Open challenge for everyone!'
+                        }`,
+                        likes: 0,
+                        comments: 0,
+                        mediaType: currentGalleryFile.type === 'video' ? 'video' : 'image',
+                        mediaUrl: e.target.result,
+                        aiScore: score,
+                        isMyPost: true,
+                        timestamp: Date.now()
+                    };
+                    
+                    console.log('New post created:', newPost); // Debug log
+                    
+                    // Add to user posts
+                    userPosts.unshift(newPost);
+                    saveUserPosts();
+                    
+                    // Calculate reward
+                    const baseReward = selectedChallenge.reward || 100;
+                    const actualReward = Math.floor(baseReward * (score / 100));
+                    
+                    // Award tokens
+                    userData.tokens = (userData.tokens || 0) + actualReward;
+                    userData.completedChallenges = (userData.completedChallenges || 0) + 1;
+                    
+                    // Level up every 5 challenges
+                    if (userData.completedChallenges % 5 === 0) {
+                        userData.level = (userData.level || 1) + 1;
+                        showToast(`🎉 LEVEL UP! You're now level ${userData.level}!`);
+                    }
+                    
+                    updateProfile();
+                    saveProfileData();
+                    
+                    // Clear selected challenge
+                    selectedChallenge = null;
+                    window.currentSelectedChallenge = null;
+                    
+                    // Close everything
+                    cancelGalleryUpload();
+                    closeCamera();
+                    
+                    // Show success with animation
+                    showSuccessOverlay(`Challenge completed! +${actualReward} tokens 🪙`);
+                    
+                    setTimeout(() => {
+                        showToast(`Score: ${score}% | Earned: ${actualReward} tokens`);
+                    }, 2000);
+                    
+                    // Reload feed to show new post
+                    setTimeout(() => {
+                        loadFeed();
+                        // Scroll to top to see the new post
+                        document.getElementById('feedContainer').scrollTop = 0;
+                    }, 2500);
                 };
                 
-                // Add to user posts
-                userPosts.unshift(newPost);
-                saveUserPosts();
+                reader.onerror = function() {
+                    console.error('Error reading file');
+                    showToast('❌ Error processing file. Please try again.');
+                };
                 
-                // Calculate reward
-                const baseReward = selectedChallenge.reward;
-                const actualReward = Math.floor(baseReward * (score / 100));
+                reader.readAsDataURL(currentGalleryFile.file);
                 
-                // Award tokens
-                userData.tokens += actualReward;
-                userData.completedChallenges++;
-                
-                // Level up every 5 challenges
-                if (userData.completedChallenges % 5 === 0) {
-                    userData.level++;
-                    showToast(`🎉 LEVEL UP! You're now level ${userData.level}!`);
-                }
-                
-                updateProfile();
-                saveProfileData();
-                
-                // Close everything
-                cancelGalleryUpload();
-                closeCamera();
-                
-                showToast(`Challenge completed! +${actualReward} tokens (${score}% score) 🪙`);
-                
-                // Reload feed to show new post
-                loadFeed();
-            };
-            reader.readAsDataURL(currentGalleryFile.file);
+            } catch (error) {
+                console.error('Error creating post:', error);
+                showToast('❌ Error creating post. Please try again.');
+            }
         }
         
         // Toggle recording
@@ -6179,6 +6228,8 @@
         window.closeVideoModal = closeVideoModal;
         window.closeErrorModal = closeErrorModal;
         window.showImageFullscreen = showImageFullscreen;
+        window.selectAIChallenge = selectAIChallenge;
+        window.showAIChallenges = showAIChallenges;
         
         // Close video modal on escape key
         document.addEventListener('keydown', function(e) {
@@ -6193,6 +6244,15 @@
                 clearInterval(challengeTimer);
             }
         });
+        
+        // Debug mode
+        window.debugMode = false;
+        window.toggleDebug = function() {
+            window.debugMode = !window.debugMode;
+            showToast(window.debugMode ? '🐛 Debug mode ON' : '🐛 Debug mode OFF');
+        };
+        
+        console.log('JomBro app loaded successfully! 🚀');
     </script>
 </body>
 </html>
