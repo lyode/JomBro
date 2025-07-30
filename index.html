@@ -1113,116 +1113,92 @@
             z-index: 1;
         }
         
-        /* Camera/Upload Interface */
-        .camera-interface {
+        /* AI Challenge Container */
+        .ai-challenge-container {
             position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: #000;
-            z-index: 500;
-            display: none;
-        }
-        
-        .camera-view {
-            width: 100%;
-            height: 100%;
-            position: relative;
-        }
-        
-        .camera-video {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-        
-        .camera-controls {
-            position: absolute;
-            bottom: 30px;
-            left: 0;
-            right: 0;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            gap: 30px;
-            padding-bottom: env(safe-area-inset-bottom);
-        }
-        
-        .camera-btn {
-            width: 60px;
-            height: 60px;
-            border-radius: 50%;
-            border: none;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.5rem;
-            background: rgba(255, 255, 255, 0.2);
-            color: white;
-        }
-        
-        .record-btn {
-            width: 80px;
-            height: 80px;
-            background: #e91e63;
-            border: 4px solid white;
-        }
-        
-        .record-btn.recording {
-            animation: pulse 1s infinite;
-        }
-        
-        @keyframes pulse {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.1); }
-            100% { transform: scale(1); }
-        }
-        
-        @keyframes pulse2 {
-            0%, 100% { opacity: 1; transform: scale(1); }
-            50% { opacity: 0.8; transform: scale(0.95); }
-        }
-        
-        .camera-close {
-            position: absolute;
-            top: 20px;
-            left: 20px;
-            background: rgba(0, 0, 0, 0.5);
-        }
-        
-        /* Challenge Selector */
-        .challenge-selector {
-            position: absolute;
-            bottom: 150px;
+            bottom: 100px;
             left: 0;
             right: 0;
             padding: 20px;
+            background: rgba(0, 0, 0, 0.9);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            max-height: 50vh;
+            overflow-y: auto;
+            z-index: 500;
+            display: none;
+            animation: slideUp 0.3s ease;
         }
         
-        .challenge-options {
+        @keyframes slideUp {
+            from { transform: translateY(100%); }
+            to { transform: translateY(0); }
+        }
+        
+        .ai-challenge-header {
+            text-align: center;
+            margin-bottom: 15px;
+            color: white;
+        }
+        
+        .ai-challenge-timer {
+            display: inline-block;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            margin-bottom: 10px;
+        }
+        
+        .ai-challenges-grid {
             display: flex;
+            flex-direction: column;
             gap: 10px;
-            overflow-x: auto;
-            padding: 10px 0;
         }
         
-        .challenge-option {
+        .ai-challenge-card {
             background: rgba(255, 255, 255, 0.1);
             backdrop-filter: blur(10px);
-            padding: 10px 20px;
-            border-radius: 20px;
-            white-space: nowrap;
+            border-radius: 15px;
+            padding: 15px;
             cursor: pointer;
             transition: all 0.3s ease;
             border: 2px solid transparent;
+            position: relative;
         }
         
-        .challenge-option.selected {
+        .ai-challenge-card.selected {
             background: rgba(155, 89, 182, 0.3);
             border-color: #9b59b6;
+            transform: scale(1.02);
+        }
+        
+        .ai-challenge-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
+        }
+        
+        .ai-badge {
+            position: absolute;
+            top: -10px;
+            right: 10px;
+            background: linear-gradient(45deg, #4a90e2, #5c7cfa);
+            color: white;
+            padding: 3px 10px;
+            border-radius: 10px;
+            font-size: 0.7rem;
+            font-weight: bold;
+        }
+        
+        .challenge-difficulty {
+            display: flex;
+            gap: 2px;
+            margin-top: 5px;
+        }
+        
+        .difficulty-star {
+            color: #ffd700;
+            font-size: 0.8rem;
         }
         
         /* Modal */
@@ -1939,135 +1915,9 @@
             }
         }
         
-        .ai-score-overlay {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            background: rgba(0, 0, 0, 0.9);
-            backdrop-filter: blur(10px);
-            padding: 30px;
-            border-radius: 20px;
-            text-align: center;
-            z-index: 100;
-            display: none;
-        }
-        
-        .ai-score-title {
-            font-size: 1.5rem;
-            margin-bottom: 20px;
-            color: #4a90e2;
-        }
-        
-        .ai-score-circle {
-            width: 150px;
-            height: 150px;
-            border-radius: 50%;
-            background: conic-gradient(
-                from 0deg,
-                #4caf50 0deg,
-                #4caf50 var(--score),
-                rgba(255, 255, 255, 0.1) var(--score)
-            );
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin: 0 auto 20px;
-            position: relative;
-        }
-        
-        .ai-score-circle::before {
-            content: '';
-            position: absolute;
-            width: 120px;
-            height: 120px;
-            background: #000;
-            border-radius: 50%;
-        }
-        
-        .ai-score-value {
-            font-size: 3rem;
-            font-weight: bold;
-            color: white;
-            position: relative;
-            z-index: 1;
-        }
-        
-        .ai-score-feedback {
-            font-size: 1.1rem;
-            margin-bottom: 10px;
-        }
-        
-        .ai-score-details {
-            font-size: 0.9rem;
-            opacity: 0.8;
-            margin-bottom: 20px;
-        }
-        
-        /* Timer Display */
-        .timer-display {
-            position: absolute;
-            top: 80px;
-            right: 20px;
-            background: rgba(0, 0, 0, 0.5);
-            padding: 10px 20px;
-            border-radius: 20px;
-            font-size: 1.2rem;
-            font-weight: 600;
-            color: white;
-            z-index: 50;
-        }
-        
-        /* Gallery Upload Preview */
-        .gallery-upload-preview {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: #000;
-            display: none;
-            align-items: center;
-            justify-content: center;
-            z-index: 10;
-        }
-        
-        .preview-media {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-        
-        .preview-controls {
-            position: absolute;
-            bottom: 120px;
-            left: 0;
-            right: 0;
-            display: flex;
-            justify-content: center;
-            gap: 20px;
-            z-index: 20;
-        }
-        
-        .preview-btn {
-            padding: 15px 30px;
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            border-radius: 25px;
-            color: white;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            font-weight: 600;
-        }
-        
-        .preview-btn:hover {
-            background: rgba(255, 255, 255, 0.2);
-        }
-        
-        .preview-btn.primary {
-            background: linear-gradient(45deg, #9b59b6, #e91e63);
-            border-color: transparent;
+        @keyframes pulse2 {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.8; transform: scale(0.95); }
         }
         
         /* Edit Profile Modal */
@@ -2276,79 +2126,18 @@
         }
         
         /* AI Challenge Cards */
-        .ai-challenge-container {
-            position: absolute;
-            bottom: 150px;
-            left: 0;
-            right: 0;
-            padding: 20px;
-            display: none;
-        }
-        
-        .ai-challenge-header {
-            text-align: center;
-            margin-bottom: 15px;
-            color: white;
-        }
-        
-        .ai-challenge-timer {
-            display: inline-block;
-            background: rgba(255, 255, 255, 0.1);
-            padding: 5px 15px;
-            border-radius: 20px;
-            font-size: 0.9rem;
-            margin-bottom: 10px;
-        }
-        
-        .ai-challenges-grid {
+        .challenge-meta {
             display: flex;
-            flex-direction: column;
-            gap: 10px;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 10px;
         }
         
-        .ai-challenge-card {
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(10px);
+        .challenge-reward {
+            background: rgba(255, 215, 0, 0.2);
+            padding: 5px 10px;
             border-radius: 15px;
-            padding: 15px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            border: 2px solid transparent;
-            position: relative;
-        }
-        
-        .ai-challenge-card.selected {
-            background: rgba(155, 89, 182, 0.3);
-            border-color: #9b59b6;
-            transform: scale(1.02);
-        }
-        
-        .ai-challenge-card:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
-        }
-        
-        .ai-badge {
-            position: absolute;
-            top: -10px;
-            right: 10px;
-            background: linear-gradient(45deg, #4a90e2, #5c7cfa);
-            color: white;
-            padding: 3px 10px;
-            border-radius: 10px;
-            font-size: 0.7rem;
-            font-weight: bold;
-        }
-        
-        .challenge-difficulty {
-            display: flex;
-            gap: 2px;
-            margin-top: 5px;
-        }
-        
-        .difficulty-star {
-            color: #ffd700;
-            font-size: 0.8rem;
+            font-size: 0.9rem;
         }
         
         .empty-state {
@@ -2421,20 +2210,6 @@
         .challenge-title {
             font-weight: 600;
             margin-bottom: 5px;
-        }
-        
-        .challenge-meta {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-top: 10px;
-        }
-        
-        .challenge-reward {
-            background: rgba(255, 215, 0, 0.2);
-            padding: 5px 10px;
-            border-radius: 15px;
-            font-size: 0.9rem;
         }
         
         /* Form fields styling */
@@ -2804,6 +2579,116 @@
             max-height: 400px;
             overflow-y: auto;
         }
+
+        /* Friends List Modal */
+        #friendsModal .modal-content {
+            background: #1a1a1a;
+            padding: 20px;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+
+        .friends-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .friend-item {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .friend-item:hover {
+            background: rgba(155, 89, 182, 0.2);
+            transform: translateX(5px);
+        }
+
+        .friend-item.selected {
+            background: rgba(155, 89, 182, 0.3);
+            border: 1px solid rgba(155, 89, 182, 0.5);
+        }
+
+        .friend-avatar {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: linear-gradient(45deg, #f093fb, #f5576c);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+        }
+
+        .friend-info {
+            flex: 1;
+        }
+
+        .friend-name {
+            font-weight: 600;
+            font-size: 1rem;
+            margin-bottom: 3px;
+        }
+
+        .friend-status {
+            font-size: 0.8rem;
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        .friend-checkbox {
+            width: 24px;
+            height: 24px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+        }
+
+        .friend-item.selected .friend-checkbox {
+            background: linear-gradient(45deg, #9b59b6, #e91e63);
+            border-color: transparent;
+        }
+
+        .friend-item.selected .friend-checkbox::after {
+            content: '✓';
+            color: white;
+            font-weight: bold;
+        }
+
+        .select-friends-btn {
+            margin-top: 20px;
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(45deg, #9b59b6, #e91e63);
+            border: none;
+            border-radius: 25px;
+            color: white;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .select-friends-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(155, 89, 182, 0.4);
+        }
+
+        .selected-count {
+            text-align: center;
+            margin-top: 10px;
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 0.9rem;
+        }
     </style>
 </head>
 <body>
@@ -2924,62 +2809,14 @@
         </button>
     </div>
     
-    <!-- Camera/Upload Interface -->
-    <div class="camera-interface" id="cameraInterface">
-        <div class="camera-view">
-            <video class="camera-video" id="cameraVideo" autoplay muted playsinline></video>
-            <button class="camera-btn camera-close" onclick="closeCamera()">✕</button>
-            
-            <!-- Gallery Upload Preview -->
-            <div class="gallery-upload-preview" id="galleryUploadPreview">
-                <img class="preview-media" id="previewImage" style="display: none;" alt="Preview">
-                <video class="preview-media" id="previewVideo" style="display: none;" controls muted></video>
-                
-                <div class="preview-controls">
-                    <button class="preview-btn" onclick="cancelGalleryUpload()">Cancel</button>
-                    <button class="preview-btn primary" onclick="confirmGalleryUpload()">Post Challenge</button>
-                </div>
-            </div>
-            
-            <!-- AI Challenges Display -->
-            <div class="ai-challenge-container" id="aiChallengeContainer">
-                <div class="ai-challenge-header">
-                    <div class="ai-challenge-timer" id="challengeTimer">New challenges in: 10:00</div>
-                    <h3>🤖 AI Generated Challenges</h3>
-                </div>
-                <div class="ai-challenges-grid" id="aiChallengesGrid">
-                    <!-- AI challenges will be loaded here -->
-                </div>
-            </div>
-            
-            <!-- Regular Challenge Selector -->
-            <div class="challenge-selector" id="regularChallengeSelector" style="display: none;">
-                <p style="text-align: center; margin-bottom: 10px;">Or Choose From:</p>
-                <div class="challenge-options" id="challengeOptions">
-                    <!-- Challenge options will be loaded here -->
-                </div>
-            </div>
-            
-            <div class="timer-display" id="timerDisplay" style="display: none;">00:00</div>
-            
-            <!-- AI Score Overlay -->
-            <div class="ai-score-overlay" id="aiScoreOverlay">
-                <h3 class="ai-score-title">🤖 AI Score</h3>
-                <div class="ai-score-circle" id="scoreCircle">
-                    <div class="ai-score-value" id="scoreValue">0%</div>
-                </div>
-                <div class="ai-score-feedback" id="scoreFeedback">Calculating...</div>
-                <div class="ai-score-details" id="scoreDetails">AI is analyzing your performance</div>
-                <button class="submit-btn" onclick="acceptScore()">Accept & Post</button>
-            </div>
-            
-            <div class="camera-controls">
-                <button class="camera-btn" onclick="flipCamera()">🔄</button>
-                <button class="camera-btn record-btn" id="recordBtn" onclick="toggleRecording()">
-                    <span id="recordIcon">⏺️</span>
-                </button>
-                <button class="camera-btn" onclick="openGallery()">🖼️</button>
-            </div>
+    <!-- AI Challenge Selection -->
+    <div class="ai-challenge-container" id="aiChallengeContainer">
+        <div class="ai-challenge-header">
+            <div class="ai-challenge-timer" id="challengeTimer">New challenges in: 10:00</div>
+            <h3>🤖 AI Generated Challenges</h3>
+        </div>
+        <div class="ai-challenges-grid" id="aiChallengesGrid">
+            <!-- AI challenges will be loaded here -->
         </div>
     </div>
     
@@ -3511,11 +3348,31 @@
             </div>
         </div>
     </div>
+
+    <!-- Friends Selection Modal -->
+    <div class="modal" id="friendsModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">Select Friends</h3>
+                <button class="close-btn" onclick="closeModal('friendsModal')">×</button>
+            </div>
+            
+            <div class="selected-count" id="selectedCount">0 friends selected</div>
+            
+            <div class="friends-list" id="friendsList">
+                <!-- Friends will be loaded here -->
+            </div>
+            
+            <button class="select-friends-btn" onclick="confirmFriendSelection()">
+                Confirm Selection
+            </button>
+        </div>
+    </div>
     
     <!-- Hidden file inputs for gallery upload -->
-    <input type="file" id="galleryImageInput" class="file-input" accept="image/*" onchange="handleGalleryUpload(event)">
-    <input type="file" id="galleryVideoInput" class="file-input" accept="video/*" onchange="handleGalleryUpload(event)">
-    <input type="file" id="galleryBothInput" class="file-input" accept="image/*,video/*" onchange="handleGalleryUpload(event)">
+    <input type="file" id="galleryImageInput" class="file-input" accept="image/*" capture="environment" onchange="handleGalleryUpload(event)">
+    <input type="file" id="galleryVideoInput" class="file-input" accept="video/*" capture="environment" onchange="handleGalleryUpload(event)">
+    <input type="file" id="galleryBothInput" class="file-input" accept="image/*,video/*" capture="environment" onchange="handleGalleryUpload(event)">
     
     <script>
         // Firebase config
@@ -3534,15 +3391,15 @@
         let userData = null;
         let feedPosts = [];
         let currentPostIndex = 0;
-        let isRecording = false;
         let selectedChallenge = null;
-        let videoStream = null;
         let aiChallenges = [];
         let usedChallenges = new Set();
         let challengeTimer = null;
         let userPosts = [];
         let currentGalleryFile = null;
         let currentUploadFile = null;
+        let selectedFriends = new Set();
+        let dedicationType = 'open-public';
         
         // Smart File Processing Settings
         const FILE_CONSTRAINTS = {
@@ -3874,11 +3731,13 @@
             currentGalleryFile = currentUploadFile;
             currentUploadFile = null;
             
-            // Hide file preview and show gallery preview
+            // Hide file preview
             document.getElementById('fileUploadPreview').style.display = 'none';
-            showGalleryPreview();
             
-            showSuccessOverlay(`${currentGalleryFile.type === 'image' ? 'Image' : 'Video'} ready to use!`);
+            // Show AI challenges for selection
+            showAIChallenges();
+            
+            showSuccessOverlay(`${currentGalleryFile.type === 'image' ? 'Image' : 'Video'} ready! Now select a challenge.`);
         }
         
         // Load user posts from localStorage
@@ -4112,8 +3971,8 @@
                         showToast('🤖 New AI challenges available!');
                         
                         // Update UI if camera is open
-                        if (document.getElementById('cameraInterface').style.display === 'block') {
-                            loadChallengeOptions();
+                        if (document.getElementById('aiChallengeContainer').style.display === 'block') {
+                            showAIChallenges();
                         }
                     } catch (error) {
                         console.error('Challenge timer error:', error);
@@ -4744,35 +4603,18 @@
             showModal('achievementsModal');
         }
         
-        // Open camera
-        async function openCamera() {
-            document.getElementById('cameraInterface').style.display = 'block';
-            
-            try {
-                videoStream = await navigator.mediaDevices.getUserMedia({ 
-                    video: { facingMode: 'user' }, 
-                    audio: true 
-                });
-                
-                document.getElementById('cameraVideo').srcObject = videoStream;
-                
-                // Ensure AI challenges are generated
-                if (!aiChallenges || aiChallenges.length === 0) {
-                    aiChallenges = generateAIChallenges();
-                }
-                
-                // Show AI challenges
-                showAIChallenges();
-                
-                // Start challenge countdown timer
-                updateChallengeCountdown();
-                
-            } catch (error) {
-                console.error('Camera error:', error);
-                // Still show interface even if camera fails
-                showAIChallenges();
-                showToast('📸 Camera not available, but you can still upload from gallery!');
+        // Open camera (using phone's native camera)
+        function openCamera() {
+            // Generate fresh AI challenges
+            if (!aiChallenges || aiChallenges.length === 0) {
+                aiChallenges = generateAIChallenges();
             }
+            
+            // Show AI challenges
+            showAIChallenges();
+            
+            // Start challenge countdown timer
+            updateChallengeCountdown();
         }
         
         // Show AI challenges
@@ -4827,10 +4669,31 @@
                 </div>
             `;
             regularBtn.onclick = () => {
-                closeCamera();
                 showModal('createModal');
             };
             grid.appendChild(regularBtn);
+            
+            // Add capture media option
+            const captureBtn = document.createElement('div');
+            captureBtn.className = 'ai-challenge-card';
+            captureBtn.style.background = 'rgba(46, 204, 113, 0.2)';
+            captureBtn.innerHTML = `
+                <div class="ai-badge" style="background: linear-gradient(45deg, #27ae60, #2ecc71);">📸 Quick Post</div>
+                <h4 class="challenge-title">Record Challenge</h4>
+                <p style="font-size: 0.9rem; opacity: 0.9; margin: 5px 0;">Open camera to record or upload from gallery</p>
+                <div class="challenge-meta">
+                    <div class="challenge-difficulty">⭐</div>
+                    <div class="challenge-reward">Ready</div>
+                </div>
+            `;
+            captureBtn.onclick = () => {
+                if (selectedChallenge) {
+                    openGallery();
+                } else {
+                    showToast('⚠️ Please select a challenge first!');
+                }
+            };
+            grid.appendChild(captureBtn);
         }
         
         // Select AI challenge
@@ -4875,66 +4738,6 @@
             
             updateTimer();
             setInterval(updateTimer, 1000);
-        }
-        
-        // Close camera
-        function closeCamera() {
-            document.getElementById('cameraInterface').style.display = 'none';
-            document.getElementById('galleryUploadPreview').style.display = 'none';
-            
-            if (videoStream) {
-                videoStream.getTracks().forEach(track => track.stop());
-                videoStream = null;
-            }
-            
-            if (isRecording) {
-                stopRecording();
-            }
-            
-            currentGalleryFile = null;
-            selectedChallenge = null;
-            window.currentSelectedChallenge = null;
-        }
-        
-        // Load challenge options
-        function loadChallengeOptions() {
-            const options = document.getElementById('challengeOptions');
-            options.innerHTML = '';
-            
-            // Add create new option
-            const createOption = document.createElement('div');
-            createOption.className = 'challenge-option';
-            createOption.textContent = '➕ Create New';
-            createOption.onclick = () => {
-                closeCamera();
-                showModal('createModal');
-            };
-            options.appendChild(createOption);
-            
-            // Add existing challenges
-            const challenges = [
-                'Pushup Challenge',
-                'Dance Challenge',
-                'Cooking Challenge',
-                'Prank Challenge'
-            ];
-            
-            challenges.forEach(challenge => {
-                const option = document.createElement('div');
-                option.className = 'challenge-option';
-                option.textContent = challenge;
-                option.onclick = () => selectChallenge(option, challenge);
-                options.appendChild(option);
-            });
-        }
-        
-        // Select challenge
-        function selectChallenge(element, challenge) {
-            document.querySelectorAll('.challenge-option').forEach(opt => {
-                opt.classList.remove('selected');
-            });
-            element.classList.add('selected');
-            selectedChallenge = challenge;
         }
         
         // Open gallery - Enhanced with options
@@ -4989,101 +4792,18 @@
             };
         }
         
-        // Show gallery preview
-        function showGalleryPreview() {
-            if (!currentGalleryFile) {
-                console.error('No gallery file selected');
-                return;
-            }
-            
-            const preview = document.getElementById('galleryUploadPreview');
-            const previewImage = document.getElementById('previewImage');
-            const previewVideo = document.getElementById('previewVideo');
-            
-            // Hide camera video
-            document.getElementById('cameraVideo').style.display = 'none';
-            
-            if (currentGalleryFile.type === 'video') {
-                previewVideo.src = currentGalleryFile.url;
-                previewVideo.style.display = 'block';
-                previewImage.style.display = 'none';
-            } else {
-                previewImage.src = currentGalleryFile.url;
-                previewImage.style.display = 'block';
-                previewVideo.style.display = 'none';
-            }
-            
-            preview.style.display = 'flex';
-            
-            // Restore selected challenge if it was stored
-            if (window.currentSelectedChallenge && !selectedChallenge) {
-                selectedChallenge = window.currentSelectedChallenge;
-            }
-            
-            // Always show challenge selector
-            showAIChallenges();
-            
-            // Re-select the challenge visually if one was selected
-            if (selectedChallenge) {
-                setTimeout(() => {
-                    const cards = document.querySelectorAll('.ai-challenge-card');
-                    cards.forEach((card, index) => {
-                        if (aiChallenges[index] && aiChallenges[index].id === selectedChallenge.id) {
-                            card.classList.add('selected');
-                        }
-                    });
-                }, 100);
-            }
-        }
-        
-        // Cancel gallery upload
-        function cancelGalleryUpload() {
-            if (currentGalleryFile) {
-                URL.revokeObjectURL(currentGalleryFile.url);
-                currentGalleryFile = null;
-            }
-            
-            document.getElementById('galleryUploadPreview').style.display = 'none';
-            document.getElementById('cameraVideo').style.display = 'block';
-            
-            // Clear file inputs
-            document.getElementById('galleryImageInput').value = '';
-            document.getElementById('galleryVideoInput').value = '';
-            document.getElementById('galleryBothInput').value = '';
-        }
-        
-        // Confirm gallery upload
-        function confirmGalleryUpload() {
-            console.log('Confirming gallery upload...'); // Debug log
-            console.log('Selected challenge:', selectedChallenge); // Debug log
-            console.log('Current gallery file:', currentGalleryFile); // Debug log
-            
+        // Create post from gallery upload
+        async function createPostFromGallery(file) {
             if (!selectedChallenge) {
                 showToast('⚠️ Please select a challenge first!');
-                // Highlight the challenge section
-                document.getElementById('aiChallengeContainer').scrollIntoView({ behavior: 'smooth' });
                 return;
             }
             
-            if (!currentGalleryFile) {
-                showToast('❌ No media selected');
-                return;
-            }
+            showUploadProgress('Creating your post...');
             
-            // Show processing
-            showToast('Processing your submission...');
-            
-            // Calculate AI score for uploaded content
-            const score = calculateAIScore();
-            
-            // Create the post from gallery upload
-            createPostFromGallery(score);
-        }
-        
-        // Create post from gallery upload
-        function createPostFromGallery(score) {
             try {
-                console.log('Creating post with score:', score); // Debug log
+                // Calculate AI score
+                const score = calculateAIScore();
                 
                 const reader = new FileReader();
                 reader.onload = function(e) {
@@ -5108,8 +4828,6 @@
                         isMyPost: true,
                         timestamp: Date.now()
                     };
-                    
-                    console.log('New post created:', newPost); // Debug log
                     
                     // Add to user posts
                     userPosts.unshift(newPost);
@@ -5136,9 +4854,9 @@
                     selectedChallenge = null;
                     window.currentSelectedChallenge = null;
                     
-                    // Close everything
-                    cancelGalleryUpload();
-                    closeCamera();
+                    // Hide progress and close challenge container
+                    hideUploadProgress();
+                    document.getElementById('aiChallengeContainer').style.display = 'none';
                     
                     // Show success with animation
                     showSuccessOverlay(`Challenge completed! +${actualReward} tokens 🪙`);
@@ -5155,192 +4873,19 @@
                     }, 2500);
                 };
                 
-                reader.onerror = function() {
-                    console.error('Error reading file');
-                    showToast('❌ Error processing file. Please try again.');
-                };
-                
                 reader.readAsDataURL(currentGalleryFile.file);
                 
             } catch (error) {
                 console.error('Error creating post:', error);
+                hideUploadProgress();
                 showToast('❌ Error creating post. Please try again.');
             }
-        }
-        
-        // Toggle recording
-        function toggleRecording() {
-            if (isRecording) {
-                stopRecording();
-            } else {
-                startRecording();
-            }
-        }
-        
-        // Start recording
-        function startRecording() {
-            if (!selectedChallenge) {
-                showToast('Please select a challenge first');
-                return;
-            }
-            
-            isRecording = true;
-            document.getElementById('recordBtn').classList.add('recording');
-            document.getElementById('recordIcon').textContent = '⏹️';
-            
-            // Show timer
-            document.getElementById('timerDisplay').style.display = 'block';
-            startRecordingTimer();
-            
-            showToast(`Recording: ${selectedChallenge.title}`);
-            
-            // Auto stop after 15 seconds
-            setTimeout(() => {
-                if (isRecording) {
-                    stopRecording();
-                }
-            }, 15000);
-        }
-        
-        // Stop recording
-        function stopRecording() {
-            isRecording = false;
-            document.getElementById('recordBtn').classList.remove('recording');
-            document.getElementById('recordIcon').textContent = '⏺️';
-            document.getElementById('timerDisplay').style.display = 'none';
-            
-            // Stop timer
-            if (recordingTimer) {
-                clearInterval(recordingTimer);
-            }
-            
-            // Show AI scoring
-            showAIScoring();
-        }
-        
-        // Start recording timer
-        let recordingTimer = null;
-        let recordingSeconds = 0;
-        
-        function startRecordingTimer() {
-            recordingSeconds = 0;
-            recordingTimer = setInterval(() => {
-                recordingSeconds++;
-                const minutes = Math.floor(recordingSeconds / 60);
-                const seconds = recordingSeconds % 60;
-                document.getElementById('timerDisplay').textContent = 
-                    `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
-            }, 1000);
-        }
-        
-        // Show AI scoring
-        function showAIScoring() {
-            const overlay = document.getElementById('aiScoreOverlay');
-            overlay.style.display = 'block';
-            
-            // Animate scoring
-            let currentScore = 0;
-            const targetScore = calculateAIScore();
-            const scoreCircle = document.getElementById('scoreCircle');
-            const scoreValue = document.getElementById('scoreValue');
-            const scoreFeedback = document.getElementById('scoreFeedback');
-            const scoreDetails = document.getElementById('scoreDetails');
-            
-            // Animate score
-            const scoreAnimation = setInterval(() => {
-                currentScore += 2;
-                if (currentScore >= targetScore) {
-                    currentScore = targetScore;
-                    clearInterval(scoreAnimation);
-                    
-                    // Show feedback
-                    if (targetScore >= 90) {
-                        scoreFeedback.textContent = '🔥 Perfect! Outstanding performance!';
-                        scoreDetails.textContent = 'You nailed every aspect of the challenge!';
-                    } else if (targetScore >= 75) {
-                        scoreFeedback.textContent = '✨ Great job! Well done!';
-                        scoreDetails.textContent = 'You completed the challenge successfully!';
-                    } else if (targetScore >= 60) {
-                        scoreFeedback.textContent = '👍 Good effort! Keep it up!';
-                        scoreDetails.textContent = 'You met the basic requirements!';
-                    } else {
-                        scoreFeedback.textContent = '💪 Nice try! Practice makes perfect!';
-                        scoreDetails.textContent = 'Try again for a better score!';
-                    }
-                }
-                
-                scoreValue.textContent = currentScore + '%';
-                scoreCircle.style.setProperty('--score', `${currentScore * 3.6}deg`);
-            }, 20);
-        }
-        
-        // Accept score and post
-        window.acceptScore = function() {
-            const score = parseInt(document.getElementById('scoreValue').textContent);
-            
-            // Calculate reward based on score
-            const baseReward = selectedChallenge.reward;
-            const actualReward = Math.floor(baseReward * (score / 100));
-            
-            // Award tokens
-            userData.tokens += actualReward;
-            userData.completedChallenges++;
-            
-            // Level up every 5 challenges
-            if (userData.completedChallenges % 5 === 0) {
-                userData.level++;
-                showToast(`🎉 LEVEL UP! You're now level ${userData.level}!`);
-            }
-            
-            updateProfile();
-            saveProfileData();
-            
-            // Close everything
-            document.getElementById('aiScoreOverlay').style.display = 'none';
-            closeCamera();
-            
-            showToast(`Challenge completed! +${actualReward} tokens (${score}% score) 🪙`);
-            
-            // Add to feed (in real app, this would upload the video)
-            addToFeed(selectedChallenge, score);
-        }
-        
-        // Add completed challenge to feed
-        function addToFeed(challenge, score) {
-            const newPost = {
-                id: 'userpost_' + Date.now(),
-                user: { 
-                    name: userData.name, 
-                    avatar: userData.avatar,
-                    avatarImage: userData.avatarImage 
-                },
-                challenge: challenge,
-                caption: `Just completed: ${challenge.title} with ${score}% AI score! 🔥 ${
-                    challenge.dedication === 'people-i-know' ? 'Challenge for friends!' : 
-                    challenge.dedication === 'people-i-dont-know' ? 'Challenge for strangers!' : 
-                    'Open challenge for everyone!'
-                }`,
-                likes: 0,
-                comments: 0,
-                mediaType: 'image',
-                mediaUrl: 'https://picsum.photos/400/800?random=' + Date.now(),
-                aiScore: score,
-                isMyPost: true,
-                timestamp: Date.now()
-            };
-            
-            // Add to user posts
-            userPosts.unshift(newPost);
-            saveUserPosts();
-            
-            // Reload feed
-            loadFeed();
         }
         
         // Select dedication option
         function selectDedication(button, value) {
             // Remove active class from all buttons
-            document.querySelectorAll('.dedication-btn').forEach(btn => {
+            button.parentElement.querySelectorAll('.dedication-btn').forEach(btn => {
                 btn.classList.remove('active');
             });
             
@@ -5349,11 +4894,71 @@
             
             // Update hidden input
             document.getElementById('challengeDedication').value = value;
+            dedicationType = value;
+            
+            // If selecting "People I Know", show friends list
+            if (value === 'people-i-know') {
+                showFriendsModal();
+            }
         }
-        
-        // Flip camera
-        function flipCamera() {
-            showToast('Switching camera...');
+
+        // Show friends modal
+        function showFriendsModal() {
+            // Load sample friends
+            const friends = [
+                { id: '1', name: 'Alex Thompson', avatar: '😎', status: 'Level 15' },
+                { id: '2', name: 'Sarah Chen', avatar: '💃', status: 'Level 12' },
+                { id: '3', name: 'Mike Johnson', avatar: '🏃', status: 'Level 18' },
+                { id: '4', name: 'Emma Davis', avatar: '🎨', status: 'Level 9' },
+                { id: '5', name: 'Ryan Lee', avatar: '🎮', status: 'Level 22' },
+                { id: '6', name: 'Lisa Wang', avatar: '🌟', status: 'Level 14' },
+                { id: '7', name: 'David Kim', avatar: '🎯', status: 'Level 16' },
+                { id: '8', name: 'Sophie Martin', avatar: '🎵', status: 'Level 11' }
+            ];
+            
+            const friendsList = document.getElementById('friendsList');
+            friendsList.innerHTML = friends.map(friend => `
+                <div class="friend-item" onclick="toggleFriend('${friend.id}', this)">
+                    <div class="friend-avatar">${friend.avatar}</div>
+                    <div class="friend-info">
+                        <div class="friend-name">${friend.name}</div>
+                        <div class="friend-status">${friend.status}</div>
+                    </div>
+                    <div class="friend-checkbox"></div>
+                </div>
+            `).join('');
+            
+            updateSelectedCount();
+            showModal('friendsModal');
+        }
+
+        // Toggle friend selection
+        function toggleFriend(friendId, element) {
+            element.classList.toggle('selected');
+            
+            if (selectedFriends.has(friendId)) {
+                selectedFriends.delete(friendId);
+            } else {
+                selectedFriends.add(friendId);
+            }
+            
+            updateSelectedCount();
+        }
+
+        // Update selected friends count
+        function updateSelectedCount() {
+            document.getElementById('selectedCount').textContent = `${selectedFriends.size} friends selected`;
+        }
+
+        // Confirm friend selection
+        function confirmFriendSelection() {
+            if (selectedFriends.size === 0) {
+                showToast('Please select at least one friend');
+                return;
+            }
+            
+            showToast(`Challenge will be sent to ${selectedFriends.size} friends`);
+            closeModal('friendsModal');
         }
         
         // Show search
@@ -5633,47 +5238,61 @@
             showModal('editProfileModal');
         }
         
-        // Save profile
+        // Save profile - FIXED version
         function saveProfile() {
-            // Basic info
-            userData.name = document.getElementById('editUsername').value.trim() || userData.name;
-            userData.bio = document.getElementById('editBio').value.trim() || 'Gaming Enthusiast | Challenge Master';
-            userData.location = document.getElementById('editLocation').value.trim() || 'Malaysia';
+            console.log('Saving profile...'); // Debug log
             
-            // Business info
-            userData.businessName = document.getElementById('editBusinessName').value.trim();
-            userData.industry = document.getElementById('editIndustry').value.trim();
-            userData.field = document.getElementById('editField').value.trim();
-            userData.nature = document.getElementById('editNature').value.trim();
-            userData.companyName = document.getElementById('editCompanyName').value.trim();
-            userData.companyLink = document.getElementById('editCompanyLink').value.trim();
-            
-            // Personal touch
-            userData.happyMoment = document.getElementById('editHappyMoment').value.trim();
-            userData.slogan = document.getElementById('editSlogan').value.trim();
-            
-            // Social links
-            userData.facebook = document.getElementById('editFacebook').value.trim();
-            userData.instagram = document.getElementById('editInstagram').value.trim();
-            userData.tiktok = document.getElementById('editTiktok').value.trim();
-            userData.website = document.getElementById('editWebsite').value.trim();
-            
-            // Contact
-            userData.whatsapp = document.getElementById('editWhatsapp').value.trim();
-            userData.wechat = document.getElementById('editWechat').value.trim();
-            userData.line = document.getElementById('editLine').value.trim();
-            userData.email = document.getElementById('editEmail').value.trim();
-            
-            // E-commerce
-            userData.myecommerce1 = document.getElementById('editMyEcommerce1').value.trim();
-            userData.myecommerce2 = document.getElementById('editMyEcommerce2').value.trim();
-            
-            updateProfile();
-            saveProfileData();
-            
-            closeModal('editProfileModal');
-            showModal('profileModal');
-            showToast('Profile updated! ✨');
+            try {
+                // Basic info
+                userData.name = document.getElementById('editUsername').value.trim() || userData.name;
+                userData.bio = document.getElementById('editBio').value.trim() || 'Gaming Enthusiast | Challenge Master';
+                userData.location = document.getElementById('editLocation').value.trim() || 'Malaysia';
+                
+                // Business info
+                userData.businessName = document.getElementById('editBusinessName').value.trim();
+                userData.industry = document.getElementById('editIndustry').value.trim();
+                userData.field = document.getElementById('editField').value.trim();
+                userData.nature = document.getElementById('editNature').value.trim();
+                userData.companyName = document.getElementById('editCompanyName').value.trim();
+                userData.companyLink = document.getElementById('editCompanyLink').value.trim();
+                
+                // Personal touch
+                userData.happyMoment = document.getElementById('editHappyMoment').value.trim();
+                userData.slogan = document.getElementById('editSlogan').value.trim();
+                
+                // Social links
+                userData.facebook = document.getElementById('editFacebook').value.trim();
+                userData.instagram = document.getElementById('editInstagram').value.trim();
+                userData.tiktok = document.getElementById('editTiktok').value.trim();
+                userData.website = document.getElementById('editWebsite').value.trim();
+                
+                // Contact
+                userData.whatsapp = document.getElementById('editWhatsapp').value.trim();
+                userData.wechat = document.getElementById('editWechat').value.trim();
+                userData.line = document.getElementById('editLine').value.trim();
+                userData.email = document.getElementById('editEmail').value.trim();
+                
+                // E-commerce
+                userData.myecommerce1 = document.getElementById('editMyEcommerce1').value.trim();
+                userData.myecommerce2 = document.getElementById('editMyEcommerce2').value.trim();
+                
+                // Save to localStorage
+                saveProfileData();
+                
+                // Update profile display
+                updateProfile();
+                
+                // Close edit modal and reopen profile modal
+                closeModal('editProfileModal');
+                showModal('profileModal');
+                
+                showToast('Profile updated! ✨');
+                
+                console.log('Profile saved successfully!'); // Debug log
+            } catch (error) {
+                console.error('Error saving profile:', error);
+                showToast('Error saving profile. Please try again.');
+            }
         }
         
         // Upload profile image
@@ -5893,7 +5512,10 @@
             document.querySelectorAll('.dedication-btn').forEach(btn => {
                 btn.classList.remove('active');
             });
-            document.querySelector('[onclick*="open-public"]').classList.add('active');
+            const openPublicBtn = document.querySelector('.dedication-btn[onclick*="open-public"]');
+            if (openPublicBtn) {
+                openPublicBtn.classList.add('active');
+            }
         }
         
         // Show comments
@@ -6179,16 +5801,10 @@
         window.switchNav = switchNav;
         window.openCamera = openCamera;
         window.showProfile = showProfile;
-        window.closeCamera = closeCamera;
-        window.flipCamera = flipCamera;
-        window.toggleRecording = toggleRecording;
         window.openGallery = openGallery;
         window.handleGalleryUpload = handleGalleryUpload;
-        window.cancelGalleryUpload = cancelGalleryUpload;
-        window.confirmGalleryUpload = confirmGalleryUpload;
         window.cancelFileUpload = cancelFileUpload;
         window.confirmFileUpload = confirmFileUpload;
-        window.acceptScore = acceptScore;
         window.closeModal = closeModal;
         window.showModal = showModal;
         window.editProfile = editProfile;
@@ -6230,6 +5846,34 @@
         window.showImageFullscreen = showImageFullscreen;
         window.selectAIChallenge = selectAIChallenge;
         window.showAIChallenges = showAIChallenges;
+        window.toggleFriend = toggleFriend;
+        window.confirmFriendSelection = confirmFriendSelection;
+        window.createPostFromGallery = createPostFromGallery;
+        
+        // Handle gallery upload - Fixed version
+        window.handleGalleryUpload = async function(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            
+            // Assign to currentGalleryFile for later use
+            currentGalleryFile = {
+                file: file,
+                type: file.type.startsWith('video/') ? 'video' : 'image',
+                url: URL.createObjectURL(file)
+            };
+            
+            // Process based on type
+            if (file.type.startsWith('video/')) {
+                await processVideoFile(file, 0);
+            } else {
+                await processImageFile(file);
+            }
+            
+            // After processing, create post directly
+            if (currentGalleryFile) {
+                await createPostFromGallery(currentGalleryFile.file);
+            }
+        };
         
         // Close video modal on escape key
         document.addEventListener('keydown', function(e) {
