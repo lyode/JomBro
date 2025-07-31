@@ -3570,754 +3570,25 @@
                 storageBucket: "jombro-9d129.firebasestorage.app",
                 messagingSenderId: "390572076435",
                 appId: "1:390572076435:web:781f9f62b84542eb834c66"
-            
-            // Initialize App
-            async init() {
-                try {
-                    performance.mark('app-init-start');
-                    
-                    // Initialize Firebase
-                    await this.initFirebase();
-                    
-                    // Load saved data
-                    this.loadSavedData();
-                    
-                    // Check first time user
-                    this.checkFirstTimeUser();
-                    
-                    // Setup PWA
-                    this.setupPWA();
-                    
-                    // Setup event listeners
-                    this.setupEventListeners();
-                    
-                    // Initialize features
-                    await this.initializeFeatures();
-                    
-                    // Setup push notifications
-                    this.setupPushNotifications();
-                    
-                    // Start background sync
-                    this.startBackgroundSync();
-                    
-                    performance.mark('app-init-end');
-                    performance.measure('app-init', 'app-init-start', 'app-init-end');
-                    
-                    console.log('JomBro initialized successfully! 🚀');
-                    
-                } catch (error) {
-                    console.error('App initialization error:', error);
-                    this.showToast('Error initializing app. Some features may be limited.', 5000, 'error');
-                    this.initializeFeatures();
-                }
             },
             
-            // Initialize Firebase
-            async initFirebase() {
-                try {
-                    firebase.initializeApp(this.firebaseConfig);
-                    this.auth = firebase.auth();
-                    this.db = firebase.firestore();
-                    this.storage = firebase.storage();
-                    this.messaging = firebase.messaging();
-                    
-                    console.log('Firebase initialized! 🔥');
-                    
-                    // Enable offline persistence
-                    await this.db.enablePersistence().catch(err => {
-                        if (err.code === 'failed-precondition') {
-                            console.log('Multiple tabs open, persistence disabled');
-                        } else if (err.code === 'unimplemented') {
-                            console.log('Browser doesn\'t support persistence');
-                        }
-                    });
-                    
-                    // Setup auth listener
-                    this.auth.onAuthStateChanged((user) => {
-                        if (user) {
-                            this.handleAuthSuccess(user);
-                        }
-                    });
-                    
-                } catch (error) {
-                    console.warn('Firebase initialization failed, running in offline mode:', error);
-                    this.auth = null;
-                    this.db = null;
-                    this.storage = null;
-                    this.messaging = null;
-                }
-            },
-            
-            // Initialize Features
-            async initializeFeatures() {
-                // Load saved data
-                this.loadUserPosts();
-                this.loadUserSettings();
-                this.loadRecentSearches();
-                
-                // Setup features
-                this.setupSwipeGestures();
-                this.generateAIChallenges();
-                this.generateDailyChallenge();
-                this.loadSampleData();
-                this.loadShopItems();
-                this.preloadAssets();
-                
-                // Initialize real-time features if online
-                if (navigator.onLine && this.db) {
-                    this.setupRealtimeListeners();
-                }
-            },
-            
-            // Setup PWA
-            setupPWA() {
-                if ('serviceWorker' in navigator) {
-                    navigator.serviceWorker.register('sw.js').catch(() => {
-                        console.log('External SW registration failed, creating inline SW');
-                        this.createInlineServiceWorker();
-                    });
-                    
-                    navigator.serviceWorker.addEventListener('controllerchange', () => {
-                        this.showToast('App updated! Refresh for new features 🔄');
-                    });
-                }
-                
-                window.addEventListener('beforeinstallprompt', (e) => {
-                    e.preventDefault();
-                    this.state.deferredPrompt = e;
-                    setTimeout(() => this.showInstallPrompt(), 30000);
-                });
-                
-                window.addEventListener('appinstalled', () => {
-                    console.log('JomBro installed! 🎉');
-                    this.showToast('JomBro installed successfully! 🎉');
-                    this.trackEvent('app_installed');
-                });
-            },
-            
-            // Create Inline Service Worker
-            createInlineServiceWorker() {
-                const swCode = `
-                    const CACHE_NAME = 'jombro-v2';
-                    const urlsToCache = [
-                        '/',
-                        'https://fonts.googleapis.com/css2?family=Montserrat:wght@100;200;300;400;500;600;700&display=swap'
-                    ];
-                    
-                    self.addEventListener('install', event => {
-                        event.waitUntil(
-                            caches.open(CACHE_NAME)
-                                .then(cache => cache.addAll(urlsToCache))
-                                .then(() => self.skipWaiting())
-                        );
-                    });
-                    
-                    self.addEventListener('activate', event => {
-                        event.waitUntil(
-                            caches.keys().then(cacheNames => {
-                                return Promise.all(
-                                    cacheNames.map(cacheName => {
-                                        if (cacheName !== CACHE_NAME) {
-                                            return caches.delete(cacheName);
-                                        }
-                                    })
-                                );
-                            }).then(() => self.clients.claim())
-                        );
-                    });
-                    
-                    self.addEventListener('fetch', event => {
-                        event.respondWith(
-                            caches.match(event.request)
-                                .then(response => {
-                                    if (response) {
-                                        return response;
-                                    }
-                                    return fetch(event.request).then(response => {
-                                        if (!response || response.status !== 200 || response.type !== 'basic') {
-                                            return response;
-                                        }
-                                        const responseToCache = response.clone();
-                                        caches.open(CACHE_NAME).then(cache => {
-                                            cache.put(event.request, responseToCache);
-                                        });
-                                        return response;
-                                    });
-                                })
-                        );
-                    });
-                    
-                    self.addEventListener('push', event => {
-                        const options = {
-                            body: event.data ? event.data.text() : 'New notification',
-                            icon: '/icon-192.png',
-                            badge: '/badge-72.png',
-                            vibrate: [100, 50, 100],
-                            data: {
-                                dateOfArrival: Date.now(),
-                                primaryKey: 1
-                            }
-                        };
-                        
-                        event.waitUntil(
-                            self.registration.showNotification('JomBro', options)
-                        );
-                    });
-                `;
-                
-                const blob = new Blob([swCode], { type: 'application/javascript' });
-                const swUrl = URL.createObjectURL(blob);
-                navigator.serviceWorker.register(swUrl);
-            },
-            
-            // Setup Event Listeners
-            setupEventListeners() {
-                // Navigation
-                window.addEventListener('popstate', this.handleBackButton.bind(this));
-                
-                // Network
-                window.addEventListener('online', () => {
-                    this.showToast('Back online! 🌐');
-                    this.syncOfflineData();
-                });
-                window.addEventListener('offline', () => this.showToast('Offline mode 📵'));
-                
-                // Visibility
-                document.addEventListener('visibilitychange', this.handleVisibilityChange.bind(this));
-                
-                // Keyboard
-                document.addEventListener('keydown', this.handleKeyboard.bind(this));
-                
-                // Haptic feedback
-                if ('vibrate' in navigator) {
-                    document.addEventListener('click', (e) => {
-                        if (e.target.matches('button, .nav-item, .action-icon, .camera-btn')) {
-                            navigator.vibrate(10);
-                        }
-                    });
-                }
-                
-                // Orientation
-                window.addEventListener('orientationchange', this.handleOrientationChange.bind(this));
-                
-                // Resize
-                window.addEventListener('resize', this.debounce(() => {
-                    this.handleResize();
-                }, 250));
-                
-                // Touch events
-                this.setupTouchEvents();
-                
-                // Intersection Observer
-                this.setupIntersectionObserver();
-                
-                // Performance Observer
-                this.setupPerformanceObserver();
-                
-                // Media Session API
-                this.setupMediaSession();
-                
-                // Share Target API
-                this.setupShareTarget();
-            },
-            
-            // Setup Touch Events
-            setupTouchEvents() {
-                let touchStartX = 0;
-                let touchStartY = 0;
-                let touchEndX = 0;
-                let touchEndY = 0;
-                
-                const handleTouchStart = (e) => {
-                    touchStartX = e.touches[0].clientX;
-                    touchStartY = e.touches[0].clientY;
-                };
-                
-                const handleTouchMove = (e) => {
-                    if (e.target.closest('.modal')) {
-                        e.stopPropagation();
-                    }
-                };
-                
-                const handleTouchEnd = (e) => {
-                    touchEndX = e.changedTouches[0].clientX;
-                    touchEndY = e.changedTouches[0].clientY;
-                    this.handleSwipe(touchStartX - touchEndX, touchStartY - touchEndY);
-                };
-                
-                document.addEventListener('touchstart', handleTouchStart, { passive: true });
-                document.addEventListener('touchmove', handleTouchMove, { passive: false });
-                document.addEventListener('touchend', handleTouchEnd, { passive: true });
-            },
-            
-            // Setup Swipe Gestures
-            setupSwipeGestures() {
-                const feedContainer = document.getElementById('feedContainer');
-                if (!feedContainer) return;
-                
-                let touchStartY = 0;
-                let touchEndY = 0;
-                
-                feedContainer.addEventListener('touchstart', (e) => {
-                    touchStartY = e.touches[0].clientY;
-                }, { passive: true });
-                
-                feedContainer.addEventListener('touchend', (e) => {
-                    touchEndY = e.changedTouches[0].clientY;
-                    const swipeDistance = touchStartY - touchEndY;
-                    
-                    if (Math.abs(swipeDistance) > 50) {
-                        if (swipeDistance > 0) {
-                            this.nextPost();
-                        } else {
-                            this.previousPost();
-                        }
-                    }
-                }, { passive: true });
-            },
-            
-            // Handle Swipe
-            handleSwipe(swipeX, swipeY) {
-                const threshold = 50;
-                const ratio = Math.abs(swipeX) / Math.abs(swipeY);
-                const feedContainer = document.getElementById('feedContainer');
-                
-                if (feedContainer && feedContainer.style.display !== 'none' && ratio < 0.5) {
-                    if (Math.abs(swipeY) > threshold) {
-                        if (swipeY > 0) {
-                            this.nextPost();
-                        } else {
-                            this.previousPost();
-                        }
-                    }
-                }
-            },
-            
-            // Setup Intersection Observer
-            setupIntersectionObserver() {
-                const options = {
-                    root: null,
-                    rootMargin: '0px',
-                    threshold: [0.5, 0.75]
-                };
-                
-                this.postObserver = new IntersectionObserver((entries) => {
-                    entries.forEach(entry => {
-                        if (entry.isIntersecting && entry.intersectionRatio >= 0.75) {
-                            const index = parseInt(entry.target.getAttribute('data-index'));
-                            this.state.currentPostIndex = index;
-                            
-                            const video = entry.target.querySelector('.post-video');
-                            if (video && video.paused) {
-                                video.play().catch(err => console.log('Autoplay prevented:', err));
-                            }
-                            
-                            this.updateViewCount(index);
-                            this.updateMediaSession(index);
-                        } else {
-                            const video = entry.target.querySelector('.post-video');
-                            if (video && !video.paused) {
-                                video.pause();
-                            }
-                        }
-                    });
-                }, options);
-            },
-            
-            // Setup Performance Observer
-            setupPerformanceObserver() {
-                if ('PerformanceObserver' in window) {
-                    try {
-                        const observer = new PerformanceObserver((list) => {
-                            for (const entry of list.getEntries()) {
-                                if (entry.duration > 50) {
-                                    console.warn('Long task detected:', entry);
-                                }
-                            }
-                        });
-                        observer.observe({ entryTypes: ['longtask'] });
-                    } catch (e) {
-                        // Not supported
-                    }
-                }
-            },
-            
-            // Setup Media Session API
-            setupMediaSession() {
-                if ('mediaSession' in navigator) {
-                    navigator.mediaSession.setActionHandler('play', () => {
-                        const video = document.querySelector(`.feed-post:nth-child(${this.state.currentPostIndex + 1}) video`);
-                        if (video) video.play();
-                    });
-                    
-                    navigator.mediaSession.setActionHandler('pause', () => {
-                        const video = document.querySelector(`.feed-post:nth-child(${this.state.currentPostIndex + 1}) video`);
-                        if (video) video.pause();
-                    });
-                    
-                    navigator.mediaSession.setActionHandler('previoustrack', () => {
-                        this.previousPost();
-                    });
-                    
-                    navigator.mediaSession.setActionHandler('nexttrack', () => {
-                        this.nextPost();
-                    });
-                }
-            },
-            
-            // Update Media Session
-            updateMediaSession(index) {
-                if ('mediaSession' in navigator && this.state.feedPosts[index]) {
-                    const post = this.state.feedPosts[index];
-                    navigator.mediaSession.metadata = new MediaMetadata({
-                        title: post.challenge.title,
-                        artist: post.user.name,
-                        album: 'JomBro Challenge',
-                        artwork: [
-                            { src: post.mediaUrl, sizes: '512x512', type: 'image/png' }
-                        ]
-                    });
-                }
-            },
-            
-            // Setup Share Target API
-            setupShareTarget() {
-                // Handle shared files
-                if (window.location.search.includes('share-target')) {
-                    const params = new URLSearchParams(window.location.search);
-                    const sharedText = params.get('text');
-                    const sharedUrl = params.get('url');
-                    
-                    if (sharedText || sharedUrl) {
-                        this.handleSharedContent(sharedText, sharedUrl);
-                    }
-                }
-            },
-            
-            // Setup Push Notifications
-            async setupPushNotifications() {
-                if (!this.messaging || !('Notification' in window)) return;
-                
-                if (Notification.permission === 'default') {
-                    const permission = await Notification.requestPermission();
-                    if (permission === 'granted') {
-                        this.subscribeToPushNotifications();
-                    }
-                } else if (Notification.permission === 'granted') {
-                    this.subscribeToPushNotifications();
-                }
-            },
-            
-            // Subscribe to Push Notifications
-            async subscribeToPushNotifications() {
-                try {
-                    const currentToken = await this.messaging.getToken({
-                        vapidKey: 'YOUR_VAPID_KEY'
-                    });
-                    
-                    if (currentToken) {
-                        console.log('FCM Token:', currentToken);
-                        this.saveTokenToServer(currentToken);
-                    }
-                    
-                    this.messaging.onMessage((payload) => {
-                        console.log('Message received:', payload);
-                        this.showNotification(payload);
-                    });
-                } catch (error) {
-                    console.error('Unable to get FCM token:', error);
-                }
-            },
-            
-            // Start Background Sync
-            startBackgroundSync() {
-                if ('serviceWorker' in navigator && 'SyncManager' in window) {
-                    navigator.serviceWorker.ready.then(registration => {
-                        return registration.sync.register('sync-posts');
-                    }).catch(err => {
-                        console.log('Background sync registration failed:', err);
-                    });
-                }
-                
-                // Periodic sync every 30 minutes
-                setInterval(() => {
-                    if (navigator.onLine) {
-                        this.syncOfflineData();
-                    }
-                }, 30 * 60 * 1000);
-            },
-            
-            // Setup Realtime Listeners
-            setupRealtimeListeners() {
-                if (!this.db || !this.state.currentUser) return;
-                
-                // Listen for new notifications
-                this.db.collection('notifications')
-                    .where('userId', '==', this.state.currentUser.uid)
-                    .orderBy('timestamp', 'desc')
-                    .limit(50)
-                    .onSnapshot((snapshot) => {
-                        const notifications = [];
-                        snapshot.forEach(doc => {
-                            notifications.push({ id: doc.id, ...doc.data() });
-                        });
-                        this.state.notifications = notifications;
-                        this.updateNotificationBadge();
-                    });
-                
-                // Listen for new messages
-                this.db.collection('conversations')
-                    .where('participants', 'array-contains', this.state.currentUser.uid)
-                    .orderBy('lastMessageTime', 'desc')
-                    .onSnapshot((snapshot) => {
-                        const conversations = [];
-                        snapshot.forEach(doc => {
-                            conversations.push({ id: doc.id, ...doc.data() });
-                        });
-                        this.state.conversations = conversations;
-                        this.updateChatList();
-                    });
-            },
-            
-            // Check First Time User
-            checkFirstTimeUser() {
-                const hasVisited = localStorage.getItem('hasVisitedJomBro');
-                const lastVisit = localStorage.getItem('lastVisitJomBro');
-                const now = Date.now();
-                
-                if (!hasVisited) {
-                    this.state.isFirstTime = true;
-                    localStorage.setItem('hasVisitedJomBro', 'true');
-                    localStorage.setItem('lastVisitJomBro', now.toString());
-                } else {
-                    this.state.isFirstTime = false;
-                    if (lastVisit && now - parseInt(lastVisit) > 30 * 24 * 60 * 60 * 1000) {
-                        this.showToast('Welcome back! Check out new challenges 🎮');
-                    }
-                    localStorage.setItem('lastVisitJomBro', now.toString());
-                }
-            },
-            
-            // Load Saved Data
-            loadSavedData() {
-                try {
-                    const savedUser = localStorage.getItem('currentUser');
-                    if (savedUser) {
-                        this.state.currentUser = JSON.parse(savedUser);
-                    }
-                    
-                    const savedProfile = localStorage.getItem('userProfile');
-                    if (savedProfile) {
-                        this.state.userData = JSON.parse(savedProfile);
-                    }
-                    
-                    const completedChallenges = localStorage.getItem('completedChallenges');
-                    if (completedChallenges) {
-                        this.state.completedChallenges = new Set(JSON.parse(completedChallenges));
-                    }
-                } catch (error) {
-                    console.error('Error loading saved data:', error);
-                }
-            },
-            
-            // Save Data
-            saveData() {
-                try {
-                    if (this.state.currentUser) {
-                        localStorage.setItem('currentUser', JSON.stringify(this.state.currentUser));
-                    }
-                    if (this.state.userData) {
-                        localStorage.setItem('userProfile', JSON.stringify(this.state.userData));
-                    }
-                    
-                    localStorage.setItem('completedChallenges', JSON.stringify(Array.from(this.state.completedChallenges)));
-                } catch (error) {
-                    if (error.name === 'QuotaExceededError') {
-                        console.warn('Storage quota exceeded, clearing old data');
-                        this.clearOldData();
-                    }
-                }
-            },
-            
-            // Load User Posts
-            loadUserPosts() {
-                try {
-                    const savedPosts = localStorage.getItem('userPosts');
-                    if (savedPosts) {
-                        this.state.userPosts = JSON.parse(savedPosts);
-                    }
-                } catch (error) {
-                    console.error('Error loading user posts:', error);
-                    this.state.userPosts = [];
-                }
-            },
-            
-            // Save User Posts
-            saveUserPosts() {
-                try {
-                    localStorage.setItem('userPosts', JSON.stringify(this.state.userPosts));
-                } catch (error) {
-                    console.error('Error saving user posts:', error);
-                }
-            },
-            
-            // Load User Settings
-            loadUserSettings() {
-                try {
-                    const savedSettings = localStorage.getItem('userSettings');
-                    if (savedSettings) {
-                        this.state.userSettings = { ...this.state.userSettings, ...JSON.parse(savedSettings) };
-                        this.applyTheme(this.state.userSettings.theme);
-                    }
-                } catch (error) {
-                    console.error('Error loading settings:', error);
-                }
-            },
-            
-            // Save User Settings
-            saveUserSettings() {
-                try {
-                    localStorage.setItem('userSettings', JSON.stringify(this.state.userSettings));
-                } catch (error) {
-                    console.error('Error saving settings:', error);
-                }
-            },
-            
-            // Load Recent Searches
-            loadRecentSearches() {
-                try {
-                    const searches = localStorage.getItem('recentSearches');
-                    if (searches) {
-                        this.state.recentSearches = JSON.parse(searches);
-                    }
-                } catch (error) {
-                    console.error('Error loading recent searches:', error);
-                }
-            },
-            
-            // Save Recent Search
-            saveRecentSearch(query) {
-                if (!query) return;
-                
-                this.state.recentSearches = this.state.recentSearches.filter(s => s !== query);
-                this.state.recentSearches.unshift(query);
-                this.state.recentSearches = this.state.recentSearches.slice(0, 10);
-                
-                localStorage.setItem('recentSearches', JSON.stringify(this.state.recentSearches));
-            },
-            
-            // AI Challenge Templates
-            aiChallengeTemplates: {
-                fitness: [
-                    { title: "20 Push-ups Challenge", description: "Complete 20 push-ups with proper form", reward: 100, difficulty: "Easy", timeLimit: 60 },
-                    { title: "1 Minute Plank", description: "Hold a plank position for 60 seconds", reward: 150, difficulty: "Medium", timeLimit: 70 },
-                    { title: "50 Jumping Jacks", description: "Do 50 jumping jacks non-stop", reward: 80, difficulty: "Easy", timeLimit: 90 },
-                    { title: "Wall Sit Challenge", description: "Hold wall sit for 45 seconds", reward: 120, difficulty: "Medium", timeLimit: 60 },
-                    { title: "Burpee Challenge", description: "Complete 15 burpees", reward: 200, difficulty: "Hard", timeLimit: 120 },
-                    { title: "Mountain Climbers", description: "30 seconds of mountain climbers", reward: 130, difficulty: "Medium", timeLimit: 40 },
-                    { title: "Squat Challenge", description: "25 squats with proper form", reward: 110, difficulty: "Easy", timeLimit: 90 },
-                    { title: "Lunges Marathon", description: "20 alternating lunges", reward: 90, difficulty: "Easy", timeLimit: 60 }
-                ],
-                creative: [
-                    { title: "Dance Battle", description: "Show your best 30-second dance moves", reward: 150, difficulty: "Medium", timeLimit: 40 },
-                    { title: "Beatbox Challenge", description: "Create a 20-second beatbox rhythm", reward: 120, difficulty: "Medium", timeLimit: 30 },
-                    { title: "Drawing Speed Run", description: "Draw JomBro logo in 30 seconds", reward: 100, difficulty: "Easy", timeLimit: 40 },
-                    { title: "Origami Challenge", description: "Make a paper crane in under 2 minutes", reward: 180, difficulty: "Hard", timeLimit: 120 },
-                    { title: "Freestyle Rap", description: "Rap about JomBro for 30 seconds", reward: 200, difficulty: "Hard", timeLimit: 40 },
-                    { title: "Sing Along", description: "Sing your favorite song chorus", reward: 130, difficulty: "Medium", timeLimit: 60 },
-                    { title: "Magic Trick", description: "Perform a simple magic trick", reward: 160, difficulty: "Medium", timeLimit: 90 },
-                    { title: "Voice Impressions", description: "Do 3 celebrity impressions", reward: 140, difficulty: "Medium", timeLimit: 60 }
-                ],
-                social: [
-                    { title: "Compliment Spree", description: "Give 5 genuine compliments to strangers", reward: 150, difficulty: "Medium", timeLimit: 180 },
-                    { title: "Random Act of Kindness", description: "Do something nice for someone", reward: 200, difficulty: "Hard", timeLimit: 300 },
-                    { title: "Teach Something", description: "Teach a skill in 60 seconds", reward: 180, difficulty: "Hard", timeLimit: 70 },
-                    { title: "Make Someone Laugh", description: "Tell jokes until someone laughs", reward: 100, difficulty: "Easy", timeLimit: 120 },
-                    { title: "High Five Marathon", description: "Get 10 high fives from different people", reward: 120, difficulty: "Medium", timeLimit: 300 },
-                    { title: "Spread Positivity", description: "Leave 3 positive messages", reward: 140, difficulty: "Medium", timeLimit: 180 },
-                    { title: "Team Challenge", description: "Complete a task with a friend", reward: 170, difficulty: "Medium", timeLimit: 120 },
-                    { title: "Interview Someone", description: "Ask 5 interesting questions", reward: 130, difficulty: "Medium", timeLimit: 180 }
-                ],
-                food: [
-                    { title: "Spicy Challenge", description: "Eat something super spicy without water", reward: 150, difficulty: "Hard", timeLimit: 120 },
-                    { title: "Blindfold Taste Test", description: "Guess 5 foods while blindfolded", reward: 130, difficulty: "Medium", timeLimit: 180 },
-                    { title: "Speed Eating", description: "Finish a meal in under 5 minutes", reward: 100, difficulty: "Easy", timeLimit: 300 },
-                    { title: "Cook Without Recipe", description: "Create a dish without any instructions", reward: 200, difficulty: "Hard", timeLimit: 600 },
-                    { title: "Chopstick Master", description: "Eat an entire meal with chopsticks", reward: 80, difficulty: "Easy", timeLimit: 600 },
-                    { title: "Food Art", description: "Create art with your food", reward: 160, difficulty: "Medium", timeLimit: 300 },
-                    { title: "Mystery Ingredient", description: "Cook with a random ingredient", reward: 180, difficulty: "Hard", timeLimit: 600 },
-                    { title: "No Hands Challenge", description: "Eat a snack without using hands", reward: 120, difficulty: "Medium", timeLimit: 180 }
-                ],
-                gaming: [
-                    { title: "No Death Run", description: "Complete a game level without dying", reward: 180, difficulty: "Hard", timeLimit: 600 },
-                    { title: "Speedrun Challenge", description: "Beat your best time in any game", reward: 150, difficulty: "Medium", timeLimit: 600 },
-                    { title: "Blindfold Gaming", description: "Play a game blindfolded for 2 minutes", reward: 200, difficulty: "Hard", timeLimit: 120 },
-                    { title: "One Hand Gaming", description: "Win a match using only one hand", reward: 160, difficulty: "Hard", timeLimit: 600 },
-                    { title: "Retro Game Master", description: "High score on any classic game", reward: 140, difficulty: "Medium", timeLimit: 600 },
-                    { title: "Rage Quit Challenge", description: "Play without rage quitting", reward: 170, difficulty: "Hard", timeLimit: 600 },
-                    { title: "Tutorial Speedrun", description: "Complete tutorial in record time", reward: 90, difficulty: "Easy", timeLimit: 300 },
-                    { title: "Backwards Controls", description: "Play with inverted controls", reward: 190, difficulty: "Hard", timeLimit: 300 }
-                ]
-            },
-            
-            // Shop Items
-            shopItemsData: {
-                avatars: [
-                    { id: 'avatar_1', name: 'Golden Crown', icon: '👑', price: 5000, type: 'avatar' },
-                    { id: 'avatar_2', name: 'Rainbow Unicorn', icon: '🦄', price: 3000, type: 'avatar' },
-                    { id: 'avatar_3', name: 'Fire Dragon', icon: '🐉', price: 4000, type: 'avatar' },
-                    { id: 'avatar_4', name: 'Space Astronaut', icon: '👨‍🚀', price: 3500, type: 'avatar' },
-                    { id: 'avatar_5', name: 'Ninja Master', icon: '🥷', price: 2500, type: 'avatar' }
-                ],
-                frames: [
-                    { id: 'frame_1', name: 'Gold Frame', icon: '🖼️', price: 2000, type: 'frame', color: '#FFD700' },
-                    { id: 'frame_2', name: 'Neon Frame', icon: '🖼️', price: 1500, type: 'frame', color: '#FF00FF' },
-                    { id: 'frame_3', name: 'Ice Frame', icon: '🖼️', price: 1800, type: 'frame', color: '#00FFFF' },
-                    { id: 'frame_4', name: 'Fire Frame', icon: '🖼️', price: 2500, type: 'frame', color: '#FF4500' }
-                ],
-                effects: [
-                    { id: 'effect_1', name: 'Sparkle Effect', icon: '✨', price: 1000, type: 'effect' },
-                    { id: 'effect_2', name: 'Rainbow Trail', icon: '🌈', price: 1500, type: 'effect' },
-                    { id: 'effect_3', name: 'Smoke Effect', icon: '💨', price: 800, type: 'effect' },
-                    { id: 'effect_4', name: 'Lightning Bolt', icon: '⚡', price: 1200, type: 'effect' }
-                ],
-                vouchers: [
-                    { id: 'voucher_1', name: 'Starbucks RM10', icon: '☕', price: 1000, type: 'voucher' },
-                    { id: 'voucher_2', name: 'Grab RM15', icon: '🚗', price: 1500, type: 'voucher' },
-                    { id: 'voucher_3', name: 'Shopee RM20', icon: '🛍️', price: 2000, type: 'voucher' },
-                    { id: 'voucher_4', name: 'Cinema Ticket', icon: '🎬', price: 2500, type: 'voucher' }
-                ]
-            },
-            
-            // Utility Functions
-            debounce(func, wait) {
-                let timeout;
-                return function executedFunction(...args) {
-                    const later = () => {
-                        clearTimeout(timeout);
-                        func(...args);
-                    };
-                    clearTimeout(timeout);
-                    timeout = setTimeout(later, wait);
-                };
-            },
-            
-            throttle(func, limit) {
-                let inThrottle;
-                return function(...args) {
-                    if (!inThrottle) {
-                        func.apply(this, args);
-                        inThrottle = true;
-                        setTimeout(() => inThrottle = false, limit);
-                    }
-                };
-            },
-            
-            // Complete App State
+            // App State
             state: {
                 // User
                 currentUser: null,
-                userData: null,
+                userData: {
+                    username: '',
+                    bio: '',
+                    avatar: '👤',
+                    cover: null,
+                    coins: 1000,
+                    level: 1,
+                    xp: 0,
+                    followers: 0,
+                    following: 0,
+                    posts: 0,
+                    badges: []
+                },
                 userPosts: [],
                 userSettings: {
                     theme: 'dark',
@@ -4432,3 +3703,2434 @@
                     shares: 0,
                     watchTime: 0
                 }
+            },
+            
+            // Initialize App
+            async init() {
+                try {
+                    // Initialize Firebase
+                    await this.initFirebase();
+                    
+                    // Load saved data
+                    this.loadSavedData();
+                    
+                    // Setup event listeners
+                    this.setupEventListeners();
+                    
+                    // Initialize features
+                    await this.initializeFeatures();
+                    
+                    console.log('JomBro initialized! 🚀');
+                    
+                } catch (error) {
+                    console.error('App initialization error:', error);
+                    this.showToast('Starting in offline mode', 3000);
+                    this.initializeFeatures();
+                }
+            },
+            
+            // Initialize Firebase
+            async initFirebase() {
+                try {
+                    firebase.initializeApp(this.firebaseConfig);
+                    this.auth = firebase.auth();
+                    this.db = firebase.firestore();
+                    this.storage = firebase.storage();
+                    
+                    // Enable offline persistence
+                    await this.db.enablePersistence().catch(err => {
+                        console.log('Persistence failed:', err.code);
+                    });
+                    
+                    // Setup auth listener
+                    this.auth.onAuthStateChanged((user) => {
+                        if (user) {
+                            this.handleAuthSuccess(user);
+                        }
+                    });
+                    
+                } catch (error) {
+                    console.warn('Firebase initialization failed:', error);
+                    this.auth = null;
+                    this.db = null;
+                    this.storage = null;
+                }
+            },
+            
+            // Initialize Features
+            async initializeFeatures() {
+                this.setupSwipeGestures();
+                this.generateAIChallenges();
+                this.generateDailyChallenge();
+                this.loadSampleData();
+                this.loadShopItems();
+                this.preloadAssets();
+            },
+            
+            // Quick Start
+            quickStart() {
+                const username = 'Player' + Math.floor(Math.random() * 10000);
+                this.state.currentUser = {
+                    uid: 'guest_' + Date.now(),
+                    displayName: username,
+                    email: null,
+                    isGuest: true
+                };
+                
+                this.state.userData.username = username;
+                this.saveData();
+                this.enterApp();
+                
+                if (this.state.isFirstTime) {
+                    this.showTutorial();
+                }
+            },
+            
+            // Login Methods
+            async loginWithGoogle() {
+                if (!this.auth) {
+                    this.showToast('Google login unavailable in offline mode', 3000);
+                    return;
+                }
+                
+                try {
+                    const provider = new firebase.auth.GoogleAuthProvider();
+                    const result = await this.auth.signInWithPopup(provider);
+                    this.handleAuthSuccess(result.user);
+                } catch (error) {
+                    console.error('Google login error:', error);
+                    this.showToast('Login failed. Please try again.', 3000);
+                }
+            },
+            
+            async loginWithFacebook() {
+                if (!this.auth) {
+                    this.showToast('Facebook login unavailable in offline mode', 3000);
+                    return;
+                }
+                
+                try {
+                    const provider = new firebase.auth.FacebookAuthProvider();
+                    const result = await this.auth.signInWithPopup(provider);
+                    this.handleAuthSuccess(result.user);
+                } catch (error) {
+                    console.error('Facebook login error:', error);
+                    this.showToast('Login failed. Please try again.', 3000);
+                }
+            },
+            
+            loginWithPhone() {
+                this.showModal('phoneLoginModal');
+            },
+            
+            // Handle Auth Success
+            handleAuthSuccess(user) {
+                this.state.currentUser = user;
+                this.state.userData.username = user.displayName || 'Player' + Math.floor(Math.random() * 10000);
+                
+                if (user.photoURL) {
+                    this.state.userData.avatar = user.photoURL;
+                }
+                
+                this.saveData();
+                this.enterApp();
+                
+                if (this.state.isFirstTime) {
+                    this.showTutorial();
+                }
+            },
+            
+            // Enter App
+            enterApp() {
+                document.getElementById('loginScreen').style.display = 'none';
+                document.querySelector('.feed-header').style.display = 'flex';
+                document.getElementById('feedContainer').style.display = 'block';
+                document.getElementById('bottomNav').style.display = 'flex';
+                
+                this.loadFeed();
+                this.updateUI();
+            },
+            
+            // Setup Event Listeners
+            setupEventListeners() {
+                // Navigation
+                window.addEventListener('popstate', this.handleBackButton.bind(this));
+                
+                // Network
+                window.addEventListener('online', () => {
+                    this.showToast('Back online! 🌐');
+                    this.syncOfflineData();
+                });
+                window.addEventListener('offline', () => this.showToast('Offline mode 📵'));
+                
+                // Visibility
+                document.addEventListener('visibilitychange', this.handleVisibilityChange.bind(this));
+                
+                // Keyboard
+                document.addEventListener('keydown', this.handleKeyboard.bind(this));
+                
+                // Touch events
+                this.setupTouchEvents();
+                
+                // Intersection Observer
+                this.setupIntersectionObserver();
+            },
+            
+            // Setup Touch Events
+            setupTouchEvents() {
+                let touchStartX = 0;
+                let touchStartY = 0;
+                
+                document.addEventListener('touchstart', (e) => {
+                    touchStartX = e.touches[0].clientX;
+                    touchStartY = e.touches[0].clientY;
+                }, { passive: true });
+                
+                document.addEventListener('touchend', (e) => {
+                    const touchEndX = e.changedTouches[0].clientX;
+                    const touchEndY = e.changedTouches[0].clientY;
+                    this.handleSwipe(touchStartX - touchEndX, touchStartY - touchEndY);
+                }, { passive: true });
+            },
+            
+            // Setup Swipe Gestures
+            setupSwipeGestures() {
+                const feedContainer = document.getElementById('feedContainer');
+                if (!feedContainer) return;
+                
+                let touchStartY = 0;
+                
+                feedContainer.addEventListener('touchstart', (e) => {
+                    touchStartY = e.touches[0].clientY;
+                }, { passive: true });
+                
+                feedContainer.addEventListener('touchend', (e) => {
+                    const touchEndY = e.changedTouches[0].clientY;
+                    const swipeDistance = touchStartY - touchEndY;
+                    
+                    if (Math.abs(swipeDistance) > 50) {
+                        if (swipeDistance > 0) {
+                            this.nextPost();
+                        } else {
+                            this.previousPost();
+                        }
+                    }
+                }, { passive: true });
+            },
+            
+            // Handle Swipe
+            handleSwipe(swipeX, swipeY) {
+                const threshold = 50;
+                const ratio = Math.abs(swipeX) / Math.abs(swipeY);
+                const feedContainer = document.getElementById('feedContainer');
+                
+                if (feedContainer && feedContainer.style.display !== 'none' && ratio < 0.5) {
+                    if (Math.abs(swipeY) > threshold) {
+                        if (swipeY > 0) {
+                            this.nextPost();
+                        } else {
+                            this.previousPost();
+                        }
+                    }
+                }
+            },
+            
+            // Setup Intersection Observer
+            setupIntersectionObserver() {
+                const options = {
+                    root: null,
+                    rootMargin: '0px',
+                    threshold: [0.5, 0.75]
+                };
+                
+                this.postObserver = new IntersectionObserver((entries) => {
+                    entries.forEach(entry => {
+                        if (entry.isIntersecting && entry.intersectionRatio >= 0.75) {
+                            const index = parseInt(entry.target.getAttribute('data-index'));
+                            this.state.currentPostIndex = index;
+                            
+                            const video = entry.target.querySelector('.post-video');
+                            if (video && video.paused) {
+                                video.play().catch(err => console.log('Autoplay prevented:', err));
+                            }
+                            
+                            this.updateViewCount(index);
+                        } else {
+                            const video = entry.target.querySelector('.post-video');
+                            if (video && !video.paused) {
+                                video.pause();
+                            }
+                        }
+                    });
+                }, options);
+            },
+            
+            // Generate AI Challenges
+            generateAIChallenges() {
+                const categories = Object.keys(this.aiChallengeTemplates);
+                this.state.aiChallenges = [];
+                
+                // Generate 20 random challenges
+                for (let i = 0; i < 20; i++) {
+                    const category = categories[Math.floor(Math.random() * categories.length)];
+                    const challenges = this.aiChallengeTemplates[category];
+                    const challenge = challenges[Math.floor(Math.random() * challenges.length)];
+                    
+                    this.state.aiChallenges.push({
+                        id: 'ai_' + Date.now() + '_' + i,
+                        ...challenge,
+                        category: category,
+                        participants: Math.floor(Math.random() * 5000) + 100,
+                        completions: Math.floor(Math.random() * 1000) + 50
+                    });
+                }
+            },
+            
+            // Generate Daily Challenge
+            generateDailyChallenge() {
+                const categories = Object.keys(this.aiChallengeTemplates);
+                const category = categories[Math.floor(Math.random() * categories.length)];
+                const challenges = this.aiChallengeTemplates[category];
+                const challenge = challenges[Math.floor(Math.random() * challenges.length)];
+                
+                this.state.dailyChallenge = {
+                    id: 'daily_' + new Date().toISOString().split('T')[0],
+                    ...challenge,
+                    category: category,
+                    reward: challenge.reward * 2, // Double rewards for daily
+                    participants: Math.floor(Math.random() * 10000) + 1000,
+                    completions: Math.floor(Math.random() * 5000) + 500,
+                    expiresIn: this.getTimeUntilMidnight()
+                };
+            },
+            
+            // Get Time Until Midnight
+            getTimeUntilMidnight() {
+                const now = new Date();
+                const midnight = new Date(now);
+                midnight.setHours(24, 0, 0, 0);
+                return midnight - now;
+            },
+            
+            // Load Sample Data
+            loadSampleData() {
+                // Sample posts
+                const samplePosts = [
+                    {
+                        id: 'post_1',
+                        user: {
+                            id: 'user_1',
+                            name: 'Sarah Chen',
+                            username: '@sarahc',
+                            avatar: '👩',
+                            verified: true
+                        },
+                        mediaUrl: 'https://picsum.photos/400/800?random=1',
+                        mediaType: 'image',
+                        caption: 'Just completed the plank challenge! 💪',
+                        challenge: this.state.aiChallenges[0] || { title: 'Plank Challenge', category: 'fitness' },
+                        likes: 1234,
+                        comments: 89,
+                        shares: 45,
+                        views: 5678,
+                        timestamp: Date.now() - 3600000,
+                        isLiked: false
+                    },
+                    {
+                        id: 'post_2',
+                        user: {
+                            id: 'user_2',
+                            name: 'Mike Johnson',
+                            username: '@mikej',
+                            avatar: '👨',
+                            verified: false
+                        },
+                        mediaUrl: 'https://picsum.photos/400/800?random=2',
+                        mediaType: 'image',
+                        caption: 'Dance battle mode activated! 🕺',
+                        challenge: this.state.aiChallenges[1] || { title: 'Dance Battle', category: 'creative' },
+                        likes: 2345,
+                        comments: 156,
+                        shares: 78,
+                        views: 8901,
+                        timestamp: Date.now() - 7200000,
+                        isLiked: false
+                    },
+                    {
+                        id: 'post_3',
+                        user: {
+                            id: 'user_3',
+                            name: 'Emma Wilson',
+                            username: '@emmaw',
+                            avatar: '👱‍♀️',
+                            verified: true
+                        },
+                        mediaUrl: 'https://picsum.photos/400/800?random=3',
+                        mediaType: 'image',
+                        caption: 'Cooking challenge complete! Check out this amazing dish 🍳',
+                        challenge: this.state.aiChallenges[2] || { title: 'Cooking Challenge', category: 'food' },
+                        likes: 3456,
+                        comments: 234,
+                        shares: 123,
+                        views: 12345,
+                        timestamp: Date.now() - 10800000,
+                        isLiked: true
+                    }
+                ];
+                
+                this.state.feedPosts = samplePosts;
+                
+                // Sample notifications
+                this.state.notifications = [
+                    {
+                        id: 'notif_1',
+                        type: 'like',
+                        user: 'Sarah Chen',
+                        content: 'liked your video',
+                        timestamp: Date.now() - 1800000,
+                        read: false
+                    },
+                    {
+                        id: 'notif_2',
+                        type: 'follow',
+                        user: 'Mike Johnson',
+                        content: 'started following you',
+                        timestamp: Date.now() - 3600000,
+                        read: false
+                    },
+                    {
+                        id: 'notif_3',
+                        type: 'comment',
+                        user: 'Emma Wilson',
+                        content: 'commented: "Great job!"',
+                        timestamp: Date.now() - 7200000,
+                        read: true
+                    }
+                ];
+                
+                this.updateNotificationBadge();
+                
+                // Sample conversations
+                this.state.conversations = [
+                    {
+                        id: 'conv_1',
+                        user: {
+                            name: 'Sarah Chen',
+                            avatar: '👩',
+                            isOnline: true
+                        },
+                        lastMessage: 'Hey! Want to collab?',
+                        timestamp: Date.now() - 1800000,
+                        unread: 2
+                    },
+                    {
+                        id: 'conv_2',
+                        user: {
+                            name: 'Mike Johnson',
+                            avatar: '👨',
+                            isOnline: false
+                        },
+                        lastMessage: 'That challenge was awesome!',
+                        timestamp: Date.now() - 3600000,
+                        unread: 0
+                    }
+                ];
+                
+                // Sample leaderboard
+                this.state.leaderboard.global = [
+                    { rank: 1, user: 'ChallengeKing', avatar: '👑', score: 9876, completions: 234 },
+                    { rank: 2, user: 'ProGamer123', avatar: '🎮', score: 8765, completions: 198 },
+                    { rank: 3, user: 'FitnessFanatic', avatar: '💪', score: 7654, completions: 176 },
+                    { rank: 4, user: 'CreativeQueen', avatar: '👸', score: 6543, completions: 154 },
+                    { rank: 5, user: 'You', avatar: '😎', score: 5432, completions: 132 }
+                ];
+            },
+            
+            // Load Shop Items
+            loadShopItems() {
+                this.state.shopItems = [
+                    ...this.shopItemsData.avatars,
+                    ...this.shopItemsData.frames,
+                    ...this.shopItemsData.effects,
+                    ...this.shopItemsData.vouchers
+                ];
+            },
+            
+            // Preload Assets
+            preloadAssets() {
+                // Preload critical images
+                const images = [
+                    'https://fonts.googleapis.com/css2?family=Montserrat:wght@100;200;300;400;500;600;700&display=swap'
+                ];
+                
+                images.forEach(src => {
+                    const img = new Image();
+                    img.src = src;
+                });
+            },
+            
+            // Load Feed
+            loadFeed() {
+                const feedContainer = document.getElementById('feedContainer');
+                feedContainer.innerHTML = '';
+                
+                this.state.feedPosts.forEach((post, index) => {
+                    const postElement = this.createPostElement(post, index);
+                    feedContainer.appendChild(postElement);
+                    
+                    if (this.postObserver) {
+                        this.postObserver.observe(postElement);
+                    }
+                });
+                
+                // Auto-play first video
+                setTimeout(() => {
+                    const firstVideo = feedContainer.querySelector('.post-video');
+                    if (firstVideo) {
+                        firstVideo.play().catch(err => console.log('Autoplay prevented:', err));
+                    }
+                }, 100);
+            },
+            
+            // Create Post Element
+            createPostElement(post, index) {
+                const postDiv = document.createElement('div');
+                postDiv.className = 'feed-post';
+                postDiv.setAttribute('data-index', index);
+                
+                postDiv.innerHTML = `
+                    <div class="post-media">
+                        ${post.mediaType === 'video' ? 
+                            `<video class="post-video" src="${post.mediaUrl}" loop playsinline muted></video>` :
+                            `<img class="post-image" src="${post.mediaUrl}" alt="${post.caption}" onload="this.classList.add('loaded')">`
+                        }
+                    </div>
+                    
+                    ${post.isLive ? '<div class="live-badge">LIVE</div>' : ''}
+                    
+                    <div class="gradient-overlay-top"></div>
+                    <div class="gradient-overlay-bottom"></div>
+                    
+                    <div class="post-actions">
+                        <div class="action-item" onclick="App.toggleLike(${index})">
+                            <div class="user-avatar">
+                                ${post.user.avatar}
+                                <div class="follow-btn" onclick="event.stopPropagation(); App.toggleFollow('${post.user.id}')">+</div>
+                            </div>
+                        </div>
+                        
+                        <div class="action-item" onclick="App.toggleLike(${index})">
+                            <div class="action-icon ${post.isLiked ? 'liked' : ''}">❤️</div>
+                            <span class="action-count">${this.formatCount(post.likes)}</span>
+                        </div>
+                        
+                        <div class="action-item" onclick="App.showComments(${index})">
+                            <div class="action-icon">💬</div>
+                            <span class="action-count">${this.formatCount(post.comments)}</span>
+                        </div>
+                        
+                        <div class="action-item" onclick="App.sharePost(${index})">
+                            <div class="action-icon">📤</div>
+                            <span class="action-count">${this.formatCount(post.shares)}</span>
+                        </div>
+                    </div>
+                    
+                    <div class="post-info">
+                        <div class="post-user">
+                            ${post.user.name} ${post.user.verified ? '<span class="verified-badge">✓</span>' : ''}
+                        </div>
+                        ${post.challenge ? `
+                            <div class="challenge-badge">
+                                🏆 ${post.challenge.title}
+                            </div>
+                        ` : ''}
+                        <div class="post-caption">${post.caption}</div>
+                        <div class="post-music">
+                            <span class="music-icon">🎵</span>
+                            <span>Original Sound - ${post.user.name}</span>
+                        </div>
+                    </div>
+                `;
+                
+                return postDiv;
+            },
+            
+            // Format Count
+            formatCount(count) {
+                if (count >= 1000000) {
+                    return (count / 1000000).toFixed(1) + 'M';
+                } else if (count >= 1000) {
+                    return (count / 1000).toFixed(1) + 'K';
+                }
+                return count.toString();
+            },
+            
+            // Navigation
+            nextPost() {
+                const feedContainer = document.getElementById('feedContainer');
+                const posts = feedContainer.querySelectorAll('.feed-post');
+                
+                if (this.state.currentPostIndex < posts.length - 1) {
+                    this.state.currentPostIndex++;
+                    posts[this.state.currentPostIndex].scrollIntoView({ behavior: 'smooth' });
+                }
+            },
+            
+            previousPost() {
+                const feedContainer = document.getElementById('feedContainer');
+                const posts = feedContainer.querySelectorAll('.feed-post');
+                
+                if (this.state.currentPostIndex > 0) {
+                    this.state.currentPostIndex--;
+                    posts[this.state.currentPostIndex].scrollIntoView({ behavior: 'smooth' });
+                }
+            },
+            
+            // Like/Unlike Post
+            toggleLike(index) {
+                const post = this.state.feedPosts[index];
+                post.isLiked = !post.isLiked;
+                post.likes += post.isLiked ? 1 : -1;
+                
+                const likeIcon = document.querySelectorAll('.feed-post')[index].querySelector('.action-icon');
+                if (post.isLiked) {
+                    likeIcon.classList.add('liked');
+                } else {
+                    likeIcon.classList.remove('liked');
+                }
+                
+                const likeCount = document.querySelectorAll('.feed-post')[index].querySelectorAll('.action-count')[0];
+                likeCount.textContent = this.formatCount(post.likes);
+                
+                this.showToast(post.isLiked ? 'Liked! ❤️' : 'Unliked 💔', 1000);
+            },
+            
+            // Show Comments
+            showComments(index) {
+                const post = this.state.feedPosts[index];
+                this.loadComments(post.id);
+                this.showModal('commentsModal');
+            },
+            
+            // Load Comments
+            loadComments(postId) {
+                // Simulate loading comments
+                const comments = [
+                    {
+                        id: 'comment_1',
+                        user: 'User1',
+                        avatar: '😀',
+                        text: 'Amazing challenge! 🔥',
+                        timestamp: Date.now() - 3600000
+                    },
+                    {
+                        id: 'comment_2',
+                        user: 'User2',
+                        avatar: '😎',
+                        text: 'I need to try this!',
+                        timestamp: Date.now() - 7200000
+                    },
+                    {
+                        id: 'comment_3',
+                        user: 'User3',
+                        avatar: '🤩',
+                        text: 'You killed it! 💪',
+                        timestamp: Date.now() - 10800000
+                    }
+                ];
+                
+                const commentsList = document.getElementById('commentsList');
+                commentsList.innerHTML = comments.map(comment => `
+                    <div class="comment-item">
+                        <div class="comment-avatar">${comment.avatar}</div>
+                        <div class="comment-content">
+                            <div class="comment-header">
+                                <span class="comment-author">${comment.user}</span>
+                                <span class="comment-time">${this.getTimeAgo(comment.timestamp)}</span>
+                            </div>
+                            <div class="comment-text">${comment.text}</div>
+                        </div>
+                    </div>
+                `).join('');
+            },
+            
+            // Post Comment
+            postComment() {
+                const input = document.getElementById('commentInput');
+                const text = input.value.trim();
+                
+                if (!text) return;
+                
+                // Add comment to UI
+                const comment = {
+                    id: 'comment_' + Date.now(),
+                    user: this.state.userData.username,
+                    avatar: this.state.userData.avatar,
+                    text: text,
+                    timestamp: Date.now()
+                };
+                
+                const commentHTML = `
+                    <div class="comment-item">
+                        <div class="comment-avatar">${comment.avatar}</div>
+                        <div class="comment-content">
+                            <div class="comment-header">
+                                <span class="comment-author">${comment.user}</span>
+                                <span class="comment-time">now</span>
+                            </div>
+                            <div class="comment-text">${comment.text}</div>
+                        </div>
+                    </div>
+                `;
+                
+                document.getElementById('commentsList').insertAdjacentHTML('afterbegin', commentHTML);
+                input.value = '';
+                
+                this.showToast('Comment posted! 💬', 1500);
+            },
+            
+            // Share Post
+            sharePost(index) {
+                const post = this.state.feedPosts[index];
+                
+                if (navigator.share) {
+                    navigator.share({
+                        title: 'Check out this JomBro challenge!',
+                        text: post.caption,
+                        url: window.location.href
+                    }).then(() => {
+                        post.shares++;
+                        this.updatePostStats(index);
+                        this.showToast('Shared! 📤', 1500);
+                    }).catch(err => console.log('Share cancelled'));
+                } else {
+                    // Fallback
+                    navigator.clipboard.writeText(window.location.href);
+                    this.showToast('Link copied! 📋', 1500);
+                }
+            },
+            
+            // Update Post Stats
+            updatePostStats(index) {
+                const post = this.state.feedPosts[index];
+                const postElement = document.querySelectorAll('.feed-post')[index];
+                
+                const counts = postElement.querySelectorAll('.action-count');
+                counts[0].textContent = this.formatCount(post.likes);
+                counts[1].textContent = this.formatCount(post.comments);
+                counts[2].textContent = this.formatCount(post.shares);
+            },
+            
+            // Follow/Unfollow User
+            toggleFollow(userId) {
+                const isFollowing = this.state.following.includes(userId);
+                
+                if (isFollowing) {
+                    this.state.following = this.state.following.filter(id => id !== userId);
+                    this.showToast('Unfollowed', 1500);
+                } else {
+                    this.state.following.push(userId);
+                    this.showToast('Following! 👥', 1500);
+                }
+            },
+            
+            // Switch Feed
+            switchFeed(type) {
+                this.state.feedType = type;
+                
+                // Update header tabs
+                document.querySelectorAll('.header-tab').forEach(tab => {
+                    tab.classList.remove('active');
+                });
+                event.target.classList.add('active');
+                
+                // Load appropriate feed
+                if (type === 'live') {
+                    this.loadLiveFeed();
+                } else {
+                    this.loadFeed();
+                }
+                
+                this.showToast(`Switched to ${type} 📺`, 1000);
+            },
+            
+            // Load Live Feed
+            loadLiveFeed() {
+                // Simulate live streams
+                const liveStreams = [
+                    {
+                        id: 'live_1',
+                        user: {
+                            id: 'user_live_1',
+                            name: 'Gaming Pro',
+                            username: '@gamingpro',
+                            avatar: '🎮',
+                            verified: true
+                        },
+                        title: 'Epic Gaming Session!',
+                        viewers: 2345,
+                        thumbnail: 'https://picsum.photos/400/800?random=10',
+                        isLive: true
+                    }
+                ];
+                
+                const feedContainer = document.getElementById('feedContainer');
+                feedContainer.innerHTML = liveStreams.map(stream => `
+                    <div class="feed-post">
+                        <div class="post-media">
+                            <img class="post-image loaded" src="${stream.thumbnail}" alt="${stream.title}">
+                        </div>
+                        <div class="live-badge">LIVE</div>
+                        <div class="gradient-overlay-top"></div>
+                        <div class="gradient-overlay-bottom"></div>
+                        <div class="post-info">
+                            <div class="post-user">${stream.user.name} ${stream.user.verified ? '<span class="verified-badge">✓</span>' : ''}</div>
+                            <div class="post-caption">${stream.title}</div>
+                            <div class="post-music">👁️ ${this.formatCount(stream.viewers)} watching</div>
+                        </div>
+                    </div>
+                `).join('');
+            },
+            
+            // Switch Navigation
+            switchNav(page, element) {
+                // Update active state
+                document.querySelectorAll('.nav-item').forEach(item => {
+                    item.classList.remove('active');
+                });
+                element.classList.add('active');
+                
+                // Hide all containers
+                document.getElementById('feedContainer').style.display = 'none';
+                document.getElementById('discoverContainer').style.display = 'none';
+                
+                // Show appropriate content
+                switch(page) {
+                    case 'home':
+                        document.getElementById('feedContainer').style.display = 'block';
+                        break;
+                    case 'discover':
+                        document.getElementById('discoverContainer').style.display = 'block';
+                        this.loadDiscoverPage();
+                        break;
+                    case 'inbox':
+                        this.showInbox();
+                        break;
+                }
+            },
+            
+            // Load Discover Page
+            loadDiscoverPage() {
+                const discoverContainer = document.getElementById('discoverContainer');
+                
+                discoverContainer.innerHTML = `
+                    <div class="trending-section">
+                        <h2 class="section-title">🔥 Trending Challenges</h2>
+                        <div class="trending-grid">
+                            ${this.state.aiChallenges.slice(0, 6).map((challenge, index) => `
+                                <div class="trending-card" onclick="App.selectChallenge(${index})">
+                                    <img class="trending-media" src="https://picsum.photos/200/200?random=${index + 20}" alt="${challenge.title}">
+                                    <div class="trending-info">
+                                        <div class="trending-title">${challenge.title}</div>
+                                        <div class="trending-stats">
+                                            <span>👥 ${this.formatCount(challenge.participants)}</span>
+                                            <span>🏆 ${challenge.reward} coins</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                    
+                    <div class="trending-section">
+                        <h2 class="section-title">⭐ Daily Challenge</h2>
+                        ${this.state.dailyChallenge ? `
+                            <div class="challenge-card" onclick="App.selectDailyChallenge()">
+                                <div class="challenge-header">
+                                    <div>
+                                        <div class="challenge-title">${this.state.dailyChallenge.title}</div>
+                                        <div class="challenge-category">🎯 ${this.state.dailyChallenge.category}</div>
+                                    </div>
+                                    <div class="challenge-reward">🪙 ${this.state.dailyChallenge.reward}</div>
+                                </div>
+                                <div class="challenge-description">${this.state.dailyChallenge.description}</div>
+                                <div class="challenge-meta">
+                                    <span>⏱️ ${Math.floor(this.state.dailyChallenge.expiresIn / 3600000)}h left</span>
+                                    <span>👥 ${this.formatCount(this.state.dailyChallenge.participants)} joined</span>
+                                </div>
+                            </div>
+                        ` : ''}
+                    </div>
+                    
+                    <div class="trending-section">
+                        <h2 class="section-title">🏆 Leaderboard</h2>
+                        <button class="submit-btn" onclick="App.showLeaderboard()">View Full Leaderboard</button>
+                    </div>
+                    
+                    <div class="trending-section">
+                        <h2 class="section-title">🎁 Rewards Shop</h2>
+                        <button class="submit-btn" onclick="App.showShop()">Open Shop</button>
+                    </div>
+                `;
+            },
+            
+            // Show Profile
+            showProfile() {
+                const profileContent = document.getElementById('profileContent');
+                
+                profileContent.innerHTML = `
+                    <div class="profile-header">
+                        <div class="profile-cover">
+                            ${this.state.userData.cover ? 
+                                `<img class="profile-cover-img" src="${this.state.userData.cover}" alt="Cover">` :
+                                `<div class="profile-cover-default">🌆</div>`
+                            }
+                            <button class="profile-cover-upload" onclick="document.getElementById('coverInput').click()">
+                                📷 Edit Cover
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="profile-info-section">
+                        <div class="profile-avatar-section">
+                            <div class="profile-avatar-large" onclick="document.getElementById('avatarInput').click()">
+                                ${this.state.userData.avatar}
+                                <div class="profile-avatar-edit">✏️</div>
+                            </div>
+                        </div>
+                        
+                        <div class="profile-name-section">
+                            <h2 class="profile-username">${this.state.userData.username}</h2>
+                            <p class="profile-bio">${this.state.userData.bio || 'No bio yet. Add one!'}</p>
+                        </div>
+                        
+                        <div class="profile-stats">
+                            <div class="stat-item">
+                                <div class="stat-value">${this.formatCount(this.state.userData.followers)}</div>
+                                <div class="stat-label">Followers</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-value">${this.formatCount(this.state.userData.following)}</div>
+                                <div class="stat-label">Following</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-value">${this.formatCount(this.state.userData.posts)}</div>
+                                <div class="stat-label">Posts</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-value">${this.formatCount(this.state.userData.coins)}</div>
+                                <div class="stat-label">Coins</div>
+                            </div>
+                        </div>
+                        
+                        <div class="profile-actions">
+                            <button class="profile-btn primary" onclick="App.editProfile()">Edit Profile</button>
+                            <button class="profile-btn" onclick="App.showSettings()">Settings</button>
+                        </div>
+                        
+                        <div class="profile-tabs">
+                            <button class="profile-tab active" onclick="App.switchProfileTab('posts', this)">Posts</button>
+                            <button class="profile-tab" onclick="App.switchProfileTab('badges', this)">Badges</button>
+                            <button class="profile-tab" onclick="App.switchProfileTab('liked', this)">Liked</button>
+                        </div>
+                        
+                        <div id="profileTabContent">
+                            <div class="posts-grid">
+                                ${this.state.userPosts.length > 0 ? 
+                                    this.state.userPosts.map(post => `
+                                        <div class="grid-post">
+                                            <img src="${post.thumbnail}" alt="${post.caption}">
+                                            <div class="grid-post-overlay">
+                                                <span>❤️ ${this.formatCount(post.likes)}</span>
+                                                <span>💬 ${this.formatCount(post.comments)}</span>
+                                            </div>
+                                        </div>
+                                    `).join('') :
+                                    '<p style="text-align: center; padding: 40px; opacity: 0.6;">No posts yet. Start creating!</p>'
+                                }
+                            </div>
+                        </div>
+                    </div>
+                `;
+                
+                this.showModal('profileModal');
+            },
+            
+            // Edit Profile
+            editProfile() {
+                const editForm = document.getElementById('editProfileForm');
+                
+                editForm.innerHTML = `
+                    <div class="form-group">
+                        <label class="form-label">Username</label>
+                        <input type="text" class="form-input" id="editUsername" value="${this.state.userData.username}">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Bio</label>
+                        <textarea class="form-textarea" id="editBio" rows="3" placeholder="Tell us about yourself...">${this.state.userData.bio || ''}</textarea>
+                    </div>
+                    <button class="submit-btn" onclick="App.saveProfile()">Save Changes</button>
+                `;
+                
+                this.showModal('editProfileModal');
+            },
+            
+            // Save Profile
+            saveProfile() {
+                const username = document.getElementById('editUsername').value.trim();
+                const bio = document.getElementById('editBio').value.trim();
+                
+                if (!username) {
+                    this.showToast('Username is required!', 2000);
+                    return;
+                }
+                
+                this.state.userData.username = username;
+                this.state.userData.bio = bio;
+                
+                this.saveData();
+                this.closeModal('editProfileModal');
+                this.showProfile();
+                this.showToast('Profile updated! ✨', 2000);
+            },
+            
+            // Switch Profile Tab
+            switchProfileTab(tab, element) {
+                // Update active state
+                document.querySelectorAll('.profile-tab').forEach(t => t.classList.remove('active'));
+                element.classList.add('active');
+                
+                const content = document.getElementById('profileTabContent');
+                
+                switch(tab) {
+                    case 'posts':
+                        content.innerHTML = `
+                            <div class="posts-grid">
+                                ${this.state.userPosts.length > 0 ? 
+                                    this.state.userPosts.map(post => `
+                                        <div class="grid-post">
+                                            <img src="${post.thumbnail}" alt="${post.caption}">
+                                            <div class="grid-post-overlay">
+                                                <span>❤️ ${this.formatCount(post.likes)}</span>
+                                                <span>💬 ${this.formatCount(post.comments)}</span>
+                                            </div>
+                                        </div>
+                                    `).join('') :
+                                    '<p style="text-align: center; padding: 40px; opacity: 0.6;">No posts yet. Start creating!</p>'
+                                }
+                            </div>
+                        `;
+                        break;
+                        
+                    case 'badges':
+                        content.innerHTML = `
+                            <div class="badges-grid">
+                                <div class="badge-item unlocked">
+                                    <div class="badge-icon">🌟</div>
+                                    <div class="badge-name">Starter</div>
+                                    <div class="badge-description">Welcome to JomBro!</div>
+                                </div>
+                                <div class="badge-item unlocked">
+                                    <div class="badge-icon">🔥</div>
+                                    <div class="badge-name">First Challenge</div>
+                                    <div class="badge-description">Complete your first challenge</div>
+                                </div>
+                                <div class="badge-item locked">
+                                    <div class="badge-icon">🏆</div>
+                                    <div class="badge-name">Champion</div>
+                                    <div class="badge-description">Win 10 challenges</div>
+                                </div>
+                                <div class="badge-item locked">
+                                    <div class="badge-icon">💎</div>
+                                    <div class="badge-name">Elite</div>
+                                    <div class="badge-description">Reach level 50</div>
+                                </div>
+                            </div>
+                        `;
+                        break;
+                        
+                    case 'liked':
+                        content.innerHTML = `
+                            <div class="posts-grid">
+                                <p style="text-align: center; padding: 40px; opacity: 0.6;">Your liked videos will appear here</p>
+                            </div>
+                        `;
+                        break;
+                }
+            },
+            
+            // Show Settings
+            showSettings() {
+                const settingsContent = document.getElementById('settingsContent');
+                
+                settingsContent.innerHTML = `
+                    <div class="settings-section">
+                        <h3 class="settings-title">Account</h3>
+                        <div class="settings-item">
+                            <div class="settings-label">
+                                <span>🔔</span>
+                                <span>Push Notifications</span>
+                            </div>
+                            <div class="toggle-switch ${this.state.userSettings.notifications ? 'active' : ''}" onclick="App.toggleSetting('notifications', this)"></div>
+                        </div>
+                        <div class="settings-item">
+                            <div class="settings-label">
+                                <span>🎥</span>
+                                <span>Autoplay Videos</span>
+                            </div>
+                            <div class="toggle-switch ${this.state.userSettings.autoplay ? 'active' : ''}" onclick="App.toggleSetting('autoplay', this)"></div>
+                        </div>
+                        <div class="settings-item">
+                            <div class="settings-label">
+                                <span>🌙</span>
+                                <span>Dark Mode</span>
+                            </div>
+                            <div class="toggle-switch ${this.state.userSettings.theme === 'dark' ? 'active' : ''}" onclick="App.toggleTheme(this)"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="settings-section">
+                        <h3 class="settings-title">Privacy</h3>
+                        <div class="settings-item" onclick="App.showPrivacySettings()">
+                            <div class="settings-label">
+                                <span>🔒</span>
+                                <span>Privacy Settings</span>
+                            </div>
+                            <span>→</span>
+                        </div>
+                        <div class="settings-item" onclick="App.showBlockedUsers()">
+                            <div class="settings-label">
+                                <span>🚫</span>
+                                <span>Blocked Users</span>
+                            </div>
+                            <span>→</span>
+                        </div>
+                    </div>
+                    
+                    <div class="settings-section">
+                        <h3 class="settings-title">Support</h3>
+                        <div class="settings-item" onclick="App.showHelp()">
+                            <div class="settings-label">
+                                <span>❓</span>
+                                <span>Help & Support</span>
+                            </div>
+                            <span>→</span>
+                        </div>
+                        <div class="settings-item" onclick="App.showAbout()">
+                            <div class="settings-label">
+                                <span>ℹ️</span>
+                                <span>About JomBro</span>
+                            </div>
+                            <span>→</span>
+                        </div>
+                    </div>
+                    
+                    <button class="submit-btn" style="background: #ff4444; margin-top: 20px;" onclick="App.logout()">Logout</button>
+                `;
+                
+                this.showModal('settingsModal');
+            },
+            
+            // Toggle Setting
+            toggleSetting(setting, element) {
+                this.state.userSettings[setting] = !this.state.userSettings[setting];
+                element.classList.toggle('active');
+                this.saveUserSettings();
+                this.showToast(`${setting} ${this.state.userSettings[setting] ? 'enabled' : 'disabled'}`, 1500);
+            },
+            
+            // Toggle Theme
+            toggleTheme(element) {
+                const newTheme = this.state.userSettings.theme === 'dark' ? 'light' : 'dark';
+                this.state.userSettings.theme = newTheme;
+                this.applyTheme(newTheme);
+                element.classList.toggle('active');
+                this.saveUserSettings();
+                this.showToast(`${newTheme === 'dark' ? '🌙 Dark' : '☀️ Light'} mode enabled`, 1500);
+            },
+            
+            // Apply Theme
+            applyTheme(theme) {
+                document.body.setAttribute('data-theme', theme);
+            },
+            
+            // Camera Functions
+            async openCamera() {
+                // First show challenge selection
+                this.loadChallenges();
+                this.showModal('challengeModal');
+            },
+            
+            // Load Challenges
+            loadChallenges() {
+                const challengeList = document.getElementById('challengeList');
+                
+                const allChallenges = [
+                    this.state.dailyChallenge,
+                    ...this.state.aiChallenges
+                ].filter(Boolean);
+                
+                challengeList.innerHTML = allChallenges.map((challenge, index) => `
+                    <div class="challenge-card" onclick="App.selectChallengeAndRecord(${index})">
+                        <div class="challenge-header">
+                            <div>
+                                <div class="challenge-title">${challenge.title}</div>
+                                <div class="challenge-category">${this.getCategoryIcon(challenge.category)} ${challenge.category}</div>
+                            </div>
+                            <div class="challenge-reward">🪙 ${challenge.reward}</div>
+                        </div>
+                        <div class="challenge-description">${challenge.description}</div>
+                        <div class="challenge-meta">
+                            <span>⏱️ ${challenge.timeLimit}s</span>
+                            <span>👥 ${this.formatCount(challenge.participants)} joined</span>
+                            <span>🏅 ${challenge.difficulty}</span>
+                        </div>
+                    </div>
+                `).join('');
+            },
+            
+            // Get Category Icon
+            getCategoryIcon(category) {
+                const icons = {
+                    fitness: '💪',
+                    creative: '🎨',
+                    social: '👥',
+                    food: '🍔',
+                    gaming: '🎮'
+                };
+                return icons[category] || '🏆';
+            },
+            
+            // Select Challenge and Record
+            selectChallengeAndRecord(index) {
+                const allChallenges = [
+                    this.state.dailyChallenge,
+                    ...this.state.aiChallenges
+                ].filter(Boolean);
+                
+                this.state.selectedChallenge = allChallenges[index];
+                this.closeModal('challengeModal');
+                this.startCamera();
+            },
+            
+            // Start Camera
+            async startCamera() {
+                this.showModal('cameraModal');
+                
+                try {
+                    const constraints = {
+                        video: {
+                            facingMode: this.state.currentCamera,
+                            width: { ideal: 1280 },
+                            height: { ideal: 720 }
+                        },
+                        audio: true
+                    };
+                    
+                    this.state.currentStream = await navigator.mediaDevices.getUserMedia(constraints);
+                    const video = document.getElementById('cameraVideo');
+                    video.srcObject = this.state.currentStream;
+                    
+                } catch (error) {
+                    console.error('Camera access error:', error);
+                    this.showToast('Camera access denied', 3000);
+                    this.closeModal('cameraModal');
+                }
+            },
+            
+            // Close Camera
+            closeCamera() {
+                if (this.state.currentStream) {
+                    this.state.currentStream.getTracks().forEach(track => track.stop());
+                    this.state.currentStream = null;
+                }
+                
+                if (this.state.isRecording) {
+                    this.stopRecording();
+                }
+                
+                this.closeModal('cameraModal');
+            },
+            
+            // Flip Camera
+            async flipCamera() {
+                this.state.currentCamera = this.state.currentCamera === 'user' ? 'environment' : 'user';
+                
+                if (this.state.currentStream) {
+                    this.state.currentStream.getTracks().forEach(track => track.stop());
+                }
+                
+                await this.startCamera();
+            },
+            
+            // Toggle Recording
+            toggleRecording() {
+                if (this.state.isRecording) {
+                    this.stopRecording();
+                } else {
+                    this.startRecording();
+                }
+            },
+            
+            // Start Recording
+            startRecording() {
+                const video = document.getElementById('cameraVideo');
+                const recordBtn = document.getElementById('recordBtn');
+                
+                this.state.recordedChunks = [];
+                
+                const options = {
+                    mimeType: 'video/webm;codecs=vp9',
+                    videoBitsPerSecond: 2500000
+                };
+                
+                try {
+                    this.state.mediaRecorder = new MediaRecorder(this.state.currentStream, options);
+                    
+                    this.state.mediaRecorder.ondataavailable = (event) => {
+                        if (event.data && event.data.size > 0) {
+                            this.state.recordedChunks.push(event.data);
+                        }
+                    };
+                    
+                    this.state.mediaRecorder.onstop = () => {
+                        this.handleRecordingComplete();
+                    };
+                    
+                    this.state.mediaRecorder.start();
+                    this.state.isRecording = true;
+                    this.state.recordingStartTime = Date.now();
+                    
+                    recordBtn.classList.add('recording');
+                    document.getElementById('recordTimer').style.display = 'block';
+                    
+                    this.updateRecordingTimer();
+                    
+                } catch (error) {
+                    console.error('Recording error:', error);
+                    this.showToast('Recording failed', 3000);
+                }
+            },
+            
+            // Stop Recording
+            stopRecording() {
+                if (this.state.mediaRecorder && this.state.isRecording) {
+                    this.state.mediaRecorder.stop();
+                    this.state.isRecording = false;
+                    
+                    const recordBtn = document.getElementById('recordBtn');
+                    recordBtn.classList.remove('recording');
+                    document.getElementById('recordTimer').style.display = 'none';
+                    
+                    if (this.state.recordingTimer) {
+                        clearInterval(this.state.recordingTimer);
+                    }
+                }
+            },
+            
+            // Update Recording Timer
+            updateRecordingTimer() {
+                this.state.recordingTimer = setInterval(() => {
+                    if (!this.state.isRecording) {
+                        clearInterval(this.state.recordingTimer);
+                        return;
+                    }
+                    
+                    const elapsed = Date.now() - this.state.recordingStartTime;
+                    const seconds = Math.floor(elapsed / 1000);
+                    const minutes = Math.floor(seconds / 60);
+                    const displaySeconds = seconds % 60;
+                    
+                    document.getElementById('recordTimer').textContent = 
+                        `${minutes.toString().padStart(2, '0')}:${displaySeconds.toString().padStart(2, '0')}`;
+                    
+                    // Auto-stop at 60 seconds
+                    if (seconds >= 60) {
+                        this.stopRecording();
+                    }
+                }, 100);
+            },
+            
+            // Handle Recording Complete
+            handleRecordingComplete() {
+                const blob = new Blob(this.state.recordedChunks, { type: 'video/webm' });
+                const url = URL.createObjectURL(blob);
+                
+                // Show recorded video
+                const cameraVideo = document.getElementById('cameraVideo');
+                const recordedVideo = document.getElementById('recordedVideo');
+                
+                cameraVideo.style.display = 'none';
+                recordedVideo.style.display = 'block';
+                recordedVideo.src = url;
+                recordedVideo.play();
+                
+                // Stop camera stream
+                if (this.state.currentStream) {
+                    this.state.currentStream.getTracks().forEach(track => track.stop());
+                }
+                
+                // Show upload modal
+                setTimeout(() => {
+                    this.closeModal('cameraModal');
+                    this.showPostUpload(blob);
+                }, 1000);
+            },
+            
+            // Show Post Upload
+            showPostUpload(videoBlob) {
+                this.state.currentUploadFile = videoBlob;
+                
+                // Show selected challenge
+                if (this.state.selectedChallenge) {
+                    const challengeCard = document.getElementById('selectedChallengeCard');
+                    challengeCard.innerHTML = `
+                        <div class="challenge-header">
+                            <div>
+                                <div class="challenge-title">${this.state.selectedChallenge.title}</div>
+                                <div class="challenge-category">${this.getCategoryIcon(this.state.selectedChallenge.category)} ${this.state.selectedChallenge.category}</div>
+                            </div>
+                            <div class="challenge-reward">🪙 ${this.state.selectedChallenge.reward}</div>
+                        </div>
+                        <div class="challenge-description">${this.state.selectedChallenge.description}</div>
+                    `;
+                }
+                
+                this.showModal('postUploadModal');
+            },
+            
+            // Upload Post
+            async uploadPost() {
+                const caption = document.getElementById('postCaption').value.trim();
+                const privacy = document.getElementById('postPrivacy').value;
+                
+                if (!caption) {
+                    this.showToast('Please add a caption!', 2000);
+                    return;
+                }
+                
+                this.showLoading('Uploading your challenge...');
+                
+                // Simulate upload
+                setTimeout(() => {
+                    // Add to user posts
+                    const newPost = {
+                        id: 'post_' + Date.now(),
+                        caption: caption,
+                        challenge: this.state.selectedChallenge,
+                        privacy: privacy,
+                        thumbnail: 'https://picsum.photos/400/800?random=' + Date.now(),
+                        likes: 0,
+                        comments: 0,
+                        shares: 0,
+                        timestamp: Date.now()
+                    };
+                    
+                    this.state.userPosts.unshift(newPost);
+                    this.state.userData.posts++;
+                    
+                    // Award coins for completing challenge
+                    if (this.state.selectedChallenge) {
+                        this.state.userData.coins += this.state.selectedChallenge.reward;
+                        this.state.completedChallenges.add(this.state.selectedChallenge.id);
+                    }
+                    
+                    this.saveData();
+                    this.hideLoading();
+                    this.closeModal('postUploadModal');
+                    
+                    this.showToast('Challenge completed! 🎉 +' + this.state.selectedChallenge.reward + ' coins', 3000);
+                    
+                    // Reset
+                    this.state.selectedChallenge = null;
+                    this.state.currentUploadFile = null;
+                    
+                }, 2000);
+            },
+            
+            // Gallery Upload
+            handleGalleryUpload(event) {
+                const file = event.target.files[0];
+                if (!file) return;
+                
+                if (file.type.startsWith('video/') || file.type.startsWith('image/')) {
+                    this.showPostUpload(file);
+                } else {
+                    this.showToast('Please select a video or image', 2000);
+                }
+            },
+            
+            // Avatar Upload
+            handleAvatarUpload(event) {
+                const file = event.target.files[0];
+                if (!file || !file.type.startsWith('image/')) return;
+                
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    this.state.userData.avatar = `<img src="${e.target.result}" alt="Avatar" style="width: 100%; height: 100%; object-fit: cover;">`;
+                    this.saveData();
+                    this.showProfile();
+                    this.showToast('Avatar updated! 📸', 2000);
+                };
+                reader.readAsDataURL(file);
+            },
+            
+            // Cover Upload
+            handleCoverUpload(event) {
+                const file = event.target.files[0];
+                if (!file || !file.type.startsWith('image/')) return;
+                
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    this.state.userData.cover = e.target.result;
+                    this.saveData();
+                    this.showProfile();
+                    this.showToast('Cover updated! 🖼️', 2000);
+                };
+                reader.readAsDataURL(file);
+            },
+            
+            // Show Search
+            showSearch() {
+                this.showModal('searchModal');
+                document.getElementById('searchInput').focus();
+            },
+            
+            // Perform Search
+            performSearch() {
+                const query = document.getElementById('searchInput').value.toLowerCase().trim();
+                
+                if (!query) {
+                    document.getElementById('searchResults').innerHTML = `
+                        <div class="search-section">
+                            <h3>Recent Searches</h3>
+                            ${this.state.recentSearches.map(search => `
+                                <div class="search-result-item" onclick="App.searchFor('${search}')">
+                                    <div class="search-avatar">🔍</div>
+                                    <div class="search-info">
+                                        <div class="search-name">${search}</div>
+                                    </div>
+                                </div>
+                            `).join('')}
+                        </div>
+                    `;
+                    return;
+                }
+                
+                // Save recent search
+                this.saveRecentSearch(query);
+                
+                // Simulate search results
+                const results = {
+                    users: [
+                        { name: 'John Doe', username: '@johndoe', avatar: '👨' },
+                        { name: 'Jane Smith', username: '@janesmith', avatar: '👩' }
+                    ],
+                    challenges: this.state.aiChallenges.filter(c => 
+                        c.title.toLowerCase().includes(query) || 
+                        c.category.toLowerCase().includes(query)
+                    )
+                };
+                
+                document.getElementById('searchResults').innerHTML = `
+                    ${results.users.length > 0 ? `
+                        <div class="search-section">
+                            <h3>Users</h3>
+                            ${results.users.map(user => `
+                                <div class="search-result-item">
+                                    <div class="search-avatar">${user.avatar}</div>
+                                    <div class="search-info">
+                                        <div class="search-name">${user.name}</div>
+                                        <div class="search-username">${user.username}</div>
+                                    </div>
+                                </div>
+                            `).join('')}
+                        </div>
+                    ` : ''}
+                    
+                    ${results.challenges.length > 0 ? `
+                        <div class="search-section">
+                            <h3>Challenges</h3>
+                            ${results.challenges.map(challenge => `
+                                <div class="search-result-item" onclick="App.selectChallenge(${this.state.aiChallenges.indexOf(challenge)})">
+                                    <div class="search-avatar">🏆</div>
+                                    <div class="search-info">
+                                        <div class="search-name">${challenge.title}</div>
+                                        <div class="search-username">${challenge.category} • ${challenge.reward} coins</div>
+                                    </div>
+                                </div>
+                            `).join('')}
+                        </div>
+                    ` : ''}
+                    
+                    ${results.users.length === 0 && results.challenges.length === 0 ? `
+                        <p style="text-align: center; padding: 40px; opacity: 0.6;">No results found for "${query}"</p>
+                    ` : ''}
+                `;
+            },
+            
+            // Search For
+            searchFor(query) {
+                document.getElementById('searchInput').value = query;
+                this.performSearch();
+            },
+            
+            // Show Notifications
+            showNotifications() {
+                const notificationsList = document.getElementById('notificationsList');
+                
+                notificationsList.innerHTML = this.state.notifications.length > 0 ?
+                    this.state.notifications.map(notif => `
+                        <div class="notification-item ${notif.read ? '' : 'unread'}">
+                            <div class="notification-icon">
+                                ${this.getNotificationIcon(notif.type)}
+                            </div>
+                            <div class="notification-content">
+                                <div class="notification-text">
+                                    <strong>${notif.user}</strong> ${notif.content}
+                                </div>
+                                <div class="notification-time">${this.getTimeAgo(notif.timestamp)}</div>
+                            </div>
+                        </div>
+                    `).join('') :
+                    '<p style="text-align: center; padding: 40px; opacity: 0.6;">No notifications yet</p>';
+                
+                // Mark all as read
+                this.state.notifications.forEach(notif => notif.read = true);
+                this.state.unreadNotifications = 0;
+                this.updateNotificationBadge();
+                
+                this.showModal('notificationsModal');
+            },
+            
+            // Get Notification Icon
+            getNotificationIcon(type) {
+                const icons = {
+                    like: '❤️',
+                    comment: '💬',
+                    follow: '👥',
+                    mention: '@',
+                    challenge: '🏆'
+                };
+                return icons[type] || '🔔';
+            },
+            
+            // Update Notification Badge
+            updateNotificationBadge() {
+                const badge = document.getElementById('notificationBadge');
+                const unread = this.state.notifications.filter(n => !n.read).length;
+                
+                if (unread > 0) {
+                    badge.textContent = unread > 99 ? '99+' : unread;
+                    badge.style.display = 'block';
+                } else {
+                    badge.style.display = 'none';
+                }
+            },
+            
+            // Show Inbox
+            showInbox() {
+                const chatList = document.getElementById('chatList');
+                
+                chatList.innerHTML = this.state.conversations.length > 0 ?
+                    this.state.conversations.map(conv => `
+                        <div class="chat-item" onclick="App.openChat('${conv.id}')">
+                            <div class="chat-avatar">
+                                ${conv.user.avatar}
+                                ${conv.user.isOnline ? '<div class="online-indicator"></div>' : ''}
+                            </div>
+                            <div class="chat-info">
+                                <div class="chat-name">${conv.user.name}</div>
+                                <div class="chat-preview">${conv.lastMessage}</div>
+                            </div>
+                            <div class="chat-meta">
+                                <div class="chat-time">${this.getTimeAgo(conv.timestamp)}</div>
+                                ${conv.unread > 0 ? `<div class="unread-badge">${conv.unread}</div>` : ''}
+                            </div>
+                        </div>
+                    `).join('') :
+                    '<p style="text-align: center; padding: 40px; opacity: 0.6;">No conversations yet</p>';
+                
+                this.showModal('inboxModal');
+            },
+            
+            // Open Chat
+            openChat(conversationId) {
+                const conversation = this.state.conversations.find(c => c.id === conversationId);
+                if (!conversation) return;
+                
+                this.state.currentChat = conversation;
+                
+                document.getElementById('chatUserName').textContent = conversation.user.name;
+                document.getElementById('chatUserStatus').textContent = conversation.user.isOnline ? 'Online' : 'Offline';
+                
+                // Load messages
+                this.loadChatMessages();
+                
+                // Mark as read
+                conversation.unread = 0;
+                
+                document.getElementById('chatWindow').style.display = 'flex';
+                this.closeModal('inboxModal');
+            },
+            
+            // Load Chat Messages
+            loadChatMessages() {
+                const messagesContainer = document.getElementById('chatMessages');
+                
+                // Simulate messages
+                const messages = [
+                    {
+                        id: 'msg_1',
+                        text: 'Hey! Want to collab?',
+                        sent: false,
+                        timestamp: Date.now() - 3600000
+                    },
+                    {
+                        id: 'msg_2',
+                        text: 'Sure! What challenge?',
+                        sent: true,
+                        timestamp: Date.now() - 3000000
+                    },
+                    {
+                        id: 'msg_3',
+                        text: 'How about the dance battle?',
+                        sent: false,
+                        timestamp: Date.now() - 2400000
+                    }
+                ];
+                
+                messagesContainer.innerHTML = messages.map(msg => `
+                    <div class="message ${msg.sent ? 'sent' : 'received'}">
+                        ${msg.text}
+                        <div class="message-time">${this.getTimeAgo(msg.timestamp)}</div>
+                    </div>
+                `).join('');
+                
+                messagesContainer.scrollTop = messagesContainer.scrollHeight;
+            },
+            
+            // Send Message
+            sendMessage() {
+                const input = document.getElementById('chatInput');
+                const text = input.value.trim();
+                
+                if (!text) return;
+                
+                const message = {
+                    id: 'msg_' + Date.now(),
+                    text: text,
+                    sent: true,
+                    timestamp: Date.now()
+                };
+                
+                const messageHTML = `
+                    <div class="message sent">
+                        ${text}
+                        <div class="message-time">now</div>
+                    </div>
+                `;
+                
+                document.getElementById('chatMessages').insertAdjacentHTML('beforeend', messageHTML);
+                input.value = '';
+                
+                const messagesContainer = document.getElementById('chatMessages');
+                messagesContainer.scrollTop = messagesContainer.scrollHeight;
+                
+                // Simulate reply
+                setTimeout(() => {
+                    const replyHTML = `
+                        <div class="message received">
+                            Sounds great! Let's do it!
+                            <div class="message-time">now</div>
+                        </div>
+                    `;
+                    document.getElementById('chatMessages').insertAdjacentHTML('beforeend', replyHTML);
+                    messagesContainer.scrollTop = messagesContainer.scrollHeight;
+                }, 2000);
+            },
+            
+            // Close Chat
+            closeChat() {
+                document.getElementById('chatWindow').style.display = 'none';
+                this.state.currentChat = null;
+            },
+            
+            // Show Leaderboard
+            showLeaderboard() {
+                this.loadLeaderboard('global');
+                this.showModal('leaderboardModal');
+            },
+            
+            // Switch Leaderboard
+            switchLeaderboard(type, element) {
+                // Update active state
+                document.querySelectorAll('.leaderboard-tab').forEach(tab => {
+                    tab.classList.remove('active');
+                });
+                element.classList.add('active');
+                
+                this.loadLeaderboard(type);
+            },
+            
+            // Load Leaderboard
+            loadLeaderboard(type) {
+                const leaderboardList = document.getElementById('leaderboardList');
+                const data = this.state.leaderboard[type] || this.state.leaderboard.global;
+                
+                leaderboardList.innerHTML = data.map((user, index) => `
+                    <div class="leaderboard-item">
+                        <div class="leaderboard-rank ${index < 3 ? ['gold', 'silver', 'bronze'][index] : ''}">
+                            ${user.rank}
+                        </div>
+                        <div class="leaderboard-avatar">${user.avatar}</div>
+                        <div class="leaderboard-info">
+                            <div class="leaderboard-name">${user.user}</div>
+                            <div class="leaderboard-stats">${user.completions} challenges completed</div>
+                        </div>
+                        <div class="leaderboard-score">
+                            ${this.formatCount(user.score)}
+                        </div>
+                    </div>
+                `).join('');
+            },
+            
+            // Show Shop
+            showShop() {
+                this.updateShopBalance();
+                this.loadShopItems('all');
+                this.showModal('shopModal');
+            },
+            
+            // Update Shop Balance
+            updateShopBalance() {
+                document.getElementById('shopBalance').textContent = `🪙 ${this.formatCount(this.state.userData.coins)}`;
+            },
+            
+            // Switch Shop Category
+            switchShopCategory(category, element) {
+                // Update active state
+                document.querySelectorAll('.shop-category').forEach(cat => {
+                    cat.classList.remove('active');
+                });
+                element.classList.add('active');
+                
+                this.loadShopItems(category);
+            },
+            
+            // Load Shop Items
+            loadShopItems(category) {
+                const shopItemsContainer = document.getElementById('shopItems');
+                
+                let items = this.state.shopItems;
+                if (category !== 'all') {
+                    items = items.filter(item => item.type === category);
+                }
+                
+                shopItemsContainer.innerHTML = items.map(item => `
+                    <div class="shop-item" onclick="App.purchaseItem('${item.id}')">
+                        <div class="shop-item-icon">${item.icon}</div>
+                        <div class="shop-item-name">${item.name}</div>
+                        <div class="shop-item-price">🪙 ${item.price}</div>
+                    </div>
+                `).join('');
+            },
+            
+            // Purchase Item
+            purchaseItem(itemId) {
+                const item = this.state.shopItems.find(i => i.id === itemId);
+                if (!item) return;
+                
+                if (this.state.userData.coins < item.price) {
+                    this.showToast('Not enough coins! Complete more challenges 💪', 2000);
+                    return;
+                }
+                
+                // Deduct coins
+                this.state.userData.coins -= item.price;
+                this.state.purchasedItems.push(itemId);
+                
+                this.saveData();
+                this.updateShopBalance();
+                
+                this.showToast(`Purchased ${item.name}! 🎉`, 2000);
+                
+                // Apply item if it's an avatar
+                if (item.type === 'avatar') {
+                    this.state.userData.avatar = item.icon;
+                    this.saveData();
+                }
+            },
+            
+            // Show Create Options
+            showCreateOptions() {
+                this.showModal('createOptionsModal');
+            },
+            
+            // Go Live
+            async goLive() {
+                this.closeModal('createOptionsModal');
+                this.showModal('liveSetupModal');
+                
+                try {
+                    const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+                    document.getElementById('livePreview').srcObject = stream;
+                    this.state.liveStream = stream;
+                } catch (error) {
+                    console.error('Camera access error:', error);
+                    this.showToast('Camera access denied', 3000);
+                    this.closeModal('liveSetupModal');
+                }
+            },
+            
+            // Start Live
+            startLive() {
+                const title = document.getElementById('liveTitle').value.trim();
+                const category = document.getElementById('liveCategory').value;
+                
+                if (!title) {
+                    this.showToast('Please add a title!', 2000);
+                    return;
+                }
+                
+                this.state.isLive = true;
+                this.closeModal('liveSetupModal');
+                
+                this.showToast('You are now LIVE! 🔴', 3000);
+                
+                // Simulate viewers joining
+                setInterval(() => {
+                    if (this.state.isLive) {
+                        this.state.liveViewers += Math.floor(Math.random() * 10);
+                    }
+                }, 5000);
+            },
+            
+            // Show Collab
+            showCollab() {
+                this.closeModal('createOptionsModal');
+                this.showModal('collabModal');
+            },
+            
+            // Start Duet
+            startDuet() {
+                this.closeModal('collabModal');
+                this.showToast('Select a video to duet with', 2000);
+                // Would implement video selection
+            },
+            
+            // Start React
+            startReact() {
+                this.closeModal('collabModal');
+                this.showToast('Select a video to react to', 2000);
+                // Would implement video selection
+            },
+            
+            // Start Stitch
+            startStitch() {
+                this.closeModal('collabModal');
+                this.showToast('Select a video to stitch', 2000);
+                // Would implement video selection
+            },
+            
+            // Show Friend Tag
+            showFriendTag() {
+                const friendList = document.getElementById('friendList');
+                
+                // Simulate friends list
+                const friends = [
+                    { id: 'friend_1', name: 'Sarah Chen', avatar: '👩' },
+                    { id: 'friend_2', name: 'Mike Johnson', avatar: '👨' },
+                    { id: 'friend_3', name: 'Emma Wilson', avatar: '👱‍♀️' }
+                ];
+                
+                friendList.innerHTML = friends.map(friend => `
+                    <div class="friend-item ${this.state.selectedFriends.has(friend.id) ? 'selected' : ''}" 
+                         onclick="App.toggleFriendSelection('${friend.id}')">
+                        <div class="friend-checkbox">
+                            ${this.state.selectedFriends.has(friend.id) ? '✓' : ''}
+                        </div>
+                        <div class="search-avatar">${friend.avatar}</div>
+                        <div class="search-info">
+                            <div class="search-name">${friend.name}</div>
+                        </div>
+                    </div>
+                `).join('');
+                
+                this.showModal('friendTagModal');
+            },
+            
+            // Toggle Friend Selection
+            toggleFriendSelection(friendId) {
+                if (this.state.selectedFriends.has(friendId)) {
+                    this.state.selectedFriends.delete(friendId);
+                } else {
+                    this.state.selectedFriends.add(friendId);
+                }
+                
+                // Update UI
+                const friendItem = event.currentTarget;
+                friendItem.classList.toggle('selected');
+                
+                const checkbox = friendItem.querySelector('.friend-checkbox');
+                checkbox.textContent = this.state.selectedFriends.has(friendId) ? '✓' : '';
+            },
+            
+            // Confirm Friend Tags
+            confirmFriendTags() {
+                const count = this.state.selectedFriends.size;
+                document.getElementById('taggedFriendsText').textContent = 
+                    count > 0 ? `${count} friends tagged` : 'Select friends to tag...';
+                
+                this.closeModal('friendTagModal');
+                this.showToast(`Tagged ${count} friends! 👥`, 1500);
+            },
+            
+            // Select Challenge
+            selectChallenge(index) {
+                this.state.selectedChallenge = this.state.aiChallenges[index];
+                this.closeModal('searchModal');
+                this.openCamera();
+            },
+            
+            // Select Daily Challenge
+            selectDailyChallenge() {
+                this.state.selectedChallenge = this.state.dailyChallenge;
+                this.openCamera();
+            },
+            
+            // Show Help
+            showHelp() {
+                this.showModal('helpModal');
+            },
+            
+            // Show About
+            showAbout() {
+                this.showToast('JomBro v1.0 - Made with ❤️ in Malaysia', 3000);
+            },
+            
+            // Logout
+            logout() {
+                if (confirm('Are you sure you want to logout?')) {
+                    // Clear user data
+                    this.state.currentUser = null;
+                    localStorage.removeItem('currentUser');
+                    
+                    // Reload app
+                    location.reload();
+                }
+            },
+            
+            // Show Tutorial
+            showTutorial() {
+                const tutorials = [
+                    {
+                        icon: '🎮',
+                        title: 'Welcome to JomBro!',
+                        text: 'Complete fun challenges, earn rewards, and have a great time!'
+                    },
+                    {
+                        icon: '📹',
+                        title: 'Record Challenges',
+                        text: 'Press the + button to record yourself completing challenges'
+                    },
+                    {
+                        icon: '🏆',
+                        title: 'Earn Rewards',
+                        text: 'Complete challenges to earn coins and unlock cool items!'
+                    },
+                    {
+                        icon: '👥',
+                        title: 'Connect with Friends',
+                        text: 'Follow friends, collaborate, and compete on the leaderboard!'
+                    }
+                ];
+                
+                let currentStep = 0;
+                
+                const showStep = () => {
+                    if (currentStep >= tutorials.length) {
+                        document.body.removeChild(document.querySelector('.tutorial-overlay'));
+                        this.state.isFirstTime = false;
+                        localStorage.setItem('hasVisitedJomBro', 'true');
+                        return;
+                    }
+                    
+                    const tutorial = tutorials[currentStep];
+                    const overlay = document.querySelector('.tutorial-overlay') || document.createElement('div');
+                    overlay.className = 'tutorial-overlay';
+                    
+                    overlay.innerHTML = `
+                        <div class="tutorial-content">
+                            <div class="tutorial-icon">${tutorial.icon}</div>
+                            <h2 class="tutorial-title">${tutorial.title}</h2>
+                            <p class="tutorial-text">${tutorial.text}</p>
+                            <div class="tutorial-dots">
+                                ${tutorials.map((_, i) => `
+                                    <div class="tutorial-dot ${i === currentStep ? 'active' : ''}"></div>
+                                `).join('')}
+                            </div>
+                            <button class="tutorial-btn" onclick="App.nextTutorial()">
+                                ${currentStep === tutorials.length - 1 ? "Let's Go!" : 'Next'}
+                            </button>
+                        </div>
+                    `;
+                    
+                    if (!document.querySelector('.tutorial-overlay')) {
+                        document.body.appendChild(overlay);
+                    }
+                };
+                
+                window.App.nextTutorial = () => {
+                    currentStep++;
+                    showStep();
+                };
+                
+                showStep();
+            },
+            
+            // Modal Functions
+            showModal(modalId) {
+                const modal = document.getElementById(modalId);
+                modal.classList.add('show');
+                this.state.isModalOpen = true;
+                this.state.activeModal = modalId;
+            },
+            
+            closeModal(modalId) {
+                const modal = document.getElementById(modalId);
+                modal.classList.remove('show');
+                this.state.isModalOpen = false;
+                this.state.activeModal = null;
+            },
+            
+            // Show/Hide Loading
+            showLoading(message = 'Loading...') {
+                const spinner = document.getElementById('loadingSpinner');
+                spinner.style.display = 'block';
+                
+                if (message) {
+                    const msgElement = spinner.querySelector('.loading-message') || document.createElement('div');
+                    msgElement.className = 'loading-message';
+                    msgElement.textContent = message;
+                    if (!spinner.contains(msgElement)) {
+                        spinner.appendChild(msgElement);
+                    }
+                }
+            },
+            
+            hideLoading() {
+                document.getElementById('loadingSpinner').style.display = 'none';
+            },
+            
+            // Show Toast
+            showToast(message, duration = 2000, type = 'info') {
+                const existingToast = document.querySelector('.toast');
+                if (existingToast) {
+                    existingToast.remove();
+                }
+                
+                const toast = document.createElement('div');
+                toast.className = 'toast';
+                toast.innerHTML = `
+                    ${message}
+                    <button class="toast-close" onclick="this.parentElement.remove()">×</button>
+                `;
+                
+                document.body.appendChild(toast);
+                
+                setTimeout(() => {
+                    if (document.body.contains(toast)) {
+                        toast.remove();
+                    }
+                }, duration);
+            },
+            
+            // Time Formatting
+            getTimeAgo(timestamp) {
+                const seconds = Math.floor((Date.now() - timestamp) / 1000);
+                
+                if (seconds < 60) return 'now';
+                if (seconds < 3600) return Math.floor(seconds / 60) + 'm';
+                if (seconds < 86400) return Math.floor(seconds / 3600) + 'h';
+                if (seconds < 604800) return Math.floor(seconds / 86400) + 'd';
+                
+                return new Date(timestamp).toLocaleDateString();
+            },
+            
+            // Update View Count
+            updateViewCount(index) {
+                if (!this.state.viewedPosts.has(index)) {
+                    this.state.viewedPosts.add(index);
+                    if (this.state.feedPosts[index]) {
+                        this.state.feedPosts[index].views++;
+                    }
+                }
+            },
+            
+            // Handle Back Button
+            handleBackButton(event) {
+                if (this.state.isModalOpen && this.state.activeModal) {
+                    event.preventDefault();
+                    this.closeModal(this.state.activeModal);
+                } else if (document.getElementById('chatWindow').style.display !== 'none') {
+                    event.preventDefault();
+                    this.closeChat();
+                }
+            },
+            
+            // Handle Visibility Change
+            handleVisibilityChange() {
+                if (document.hidden) {
+                    // Pause all videos
+                    document.querySelectorAll('video').forEach(video => {
+                        if (!video.paused) {
+                            video.pause();
+                        }
+                    });
+                }
+            },
+            
+            // Handle Keyboard
+            handleKeyboard(event) {
+                // Space to pause/play
+                if (event.code === 'Space' && !this.state.isModalOpen) {
+                    event.preventDefault();
+                    const currentPost = document.querySelectorAll('.feed-post')[this.state.currentPostIndex];
+                    const video = currentPost?.querySelector('.post-video');
+                    if (video) {
+                        if (video.paused) {
+                            video.play();
+                        } else {
+                            video.pause();
+                        }
+                    }
+                }
+                
+                // Arrow keys for navigation
+                if (!this.state.isModalOpen) {
+                    if (event.code === 'ArrowDown') {
+                        event.preventDefault();
+                        this.nextPost();
+                    } else if (event.code === 'ArrowUp') {
+                        event.preventDefault();
+                        this.previousPost();
+                    }
+                }
+            },
+            
+            // Handle Resize
+            handleResize() {
+                // Update UI based on new dimensions
+                if (window.innerWidth > 480) {
+                    document.body.style.maxWidth = '480px';
+                }
+            },
+            
+            // Handle Orientation Change
+            handleOrientationChange() {
+                // Adjust UI for orientation
+                this.showToast(`Rotated to ${window.orientation === 0 ? 'portrait' : 'landscape'}`, 1000);
+            },
+            
+            // Save Data
+            saveData() {
+                try {
+                    if (this.state.currentUser) {
+                        localStorage.setItem('currentUser', JSON.stringify(this.state.currentUser));
+                    }
+                    if (this.state.userData) {
+                        localStorage.setItem('userProfile', JSON.stringify(this.state.userData));
+                    }
+                    localStorage.setItem('completedChallenges', JSON.stringify(Array.from(this.state.completedChallenges)));
+                    this.saveUserPosts();
+                } catch (error) {
+                    console.error('Error saving data:', error);
+                }
+            },
+            
+            // Load Saved Data
+            loadSavedData() {
+                try {
+                    const savedUser = localStorage.getItem('currentUser');
+                    if (savedUser) {
+                        this.state.currentUser = JSON.parse(savedUser);
+                    }
+                    
+                    const savedProfile = localStorage.getItem('userProfile');
+                    if (savedProfile) {
+                        this.state.userData = { ...this.state.userData, ...JSON.parse(savedProfile) };
+                    }
+                    
+                    const completedChallenges = localStorage.getItem('completedChallenges');
+                    if (completedChallenges) {
+                        this.state.completedChallenges = new Set(JSON.parse(completedChallenges));
+                    }
+                    
+                    this.loadUserPosts();
+                    this.loadUserSettings();
+                    this.loadRecentSearches();
+                } catch (error) {
+                    console.error('Error loading saved data:', error);
+                }
+            },
+            
+            // Save User Posts
+            saveUserPosts() {
+                try {
+                    localStorage.setItem('userPosts', JSON.stringify(this.state.userPosts));
+                } catch (error) {
+                    console.error('Error saving user posts:', error);
+                }
+            },
+            
+            // Load User Posts
+            loadUserPosts() {
+                try {
+                    const savedPosts = localStorage.getItem('userPosts');
+                    if (savedPosts) {
+                        this.state.userPosts = JSON.parse(savedPosts);
+                    }
+                } catch (error) {
+                    console.error('Error loading user posts:', error);
+                    this.state.userPosts = [];
+                }
+            },
+            
+            // Save User Settings
+            saveUserSettings() {
+                try {
+                    localStorage.setItem('userSettings', JSON.stringify(this.state.userSettings));
+                } catch (error) {
+                    console.error('Error saving settings:', error);
+                }
+            },
+            
+            // Load User Settings
+            loadUserSettings() {
+                try {
+                    const savedSettings = localStorage.getItem('userSettings');
+                    if (savedSettings) {
+                        this.state.userSettings = { ...this.state.userSettings, ...JSON.parse(savedSettings) };
+                        this.applyTheme(this.state.userSettings.theme);
+                    }
+                } catch (error) {
+                    console.error('Error loading settings:', error);
+                }
+            },
+            
+            // Save Recent Search
+            saveRecentSearch(query) {
+                if (!query) return;
+                
+                this.state.recentSearches = this.state.recentSearches.filter(s => s !== query);
+                this.state.recentSearches.unshift(query);
+                this.state.recentSearches = this.state.recentSearches.slice(0, 10);
+                
+                localStorage.setItem('recentSearches', JSON.stringify(this.state.recentSearches));
+            },
+            
+            // Load Recent Searches
+            loadRecentSearches() {
+                try {
+                    const searches = localStorage.getItem('recentSearches');
+                    if (searches) {
+                        this.state.recentSearches = JSON.parse(searches);
+                    }
+                } catch (error) {
+                    console.error('Error loading recent searches:', error);
+                }
+            },
+            
+            // Sync Offline Data
+            syncOfflineData() {
+                if (!navigator.onLine || !this.db) return;
+                
+                // Sync user data, posts, etc.
+                console.log('Syncing offline data...');
+            },
+            
+            // Update UI
+            updateUI() {
+                // Update various UI elements based on current state
+                this.updateNotificationBadge();
+                this.updateShopBalance();
+            },
+            
+            // AI Challenge Templates
+            aiChallengeTemplates: {
+                fitness: [
+                    { title: "20 Push-ups Challenge", description: "Complete 20 push-ups with proper form", reward: 100, difficulty: "Easy", timeLimit: 60 },
+                    { title: "1 Minute Plank", description: "Hold a plank position for 60 seconds", reward: 150, difficulty: "Medium", timeLimit: 70 },
+                    { title: "50 Jumping Jacks", description: "Do 50 jumping jacks non-stop", reward: 80, difficulty: "Easy", timeLimit: 90 },
+                    { title: "Wall Sit Challenge", description: "Hold wall sit for 45 seconds", reward: 120, difficulty: "Medium", timeLimit: 60 },
+                    { title: "Burpee Challenge", description: "Complete 15 burpees", reward: 200, difficulty: "Hard", timeLimit: 120 }
+                ],
+                creative: [
+                    { title: "Dance Battle", description: "Show your best 30-second dance moves", reward: 150, difficulty: "Medium", timeLimit: 40 },
+                    { title: "Beatbox Challenge", description: "Create a 20-second beatbox rhythm", reward: 120, difficulty: "Medium", timeLimit: 30 },
+                    { title: "Drawing Speed Run", description: "Draw JomBro logo in 30 seconds", reward: 100, difficulty: "Easy", timeLimit: 40 },
+                    { title: "Origami Challenge", description: "Make a paper crane in under 2 minutes", reward: 180, difficulty: "Hard", timeLimit: 120 },
+                    { title: "Freestyle Rap", description: "Rap about JomBro for 30 seconds", reward: 200, difficulty: "Hard", timeLimit: 40 }
+                ],
+                social: [
+                    { title: "Compliment Spree", description: "Give 5 genuine compliments to strangers", reward: 150, difficulty: "Medium", timeLimit: 180 },
+                    { title: "Random Act of Kindness", description: "Do something nice for someone", reward: 200, difficulty: "Hard", timeLimit: 300 },
+                    { title: "Teach Something", description: "Teach a skill in 60 seconds", reward: 180, difficulty: "Hard", timeLimit: 70 },
+                    { title: "Make Someone Laugh", description: "Tell jokes until someone laughs", reward: 100, difficulty: "Easy", timeLimit: 120 }
+                ],
+                food: [
+                    { title: "Spicy Challenge", description: "Eat something super spicy without water", reward: 150, difficulty: "Hard", timeLimit: 120 },
+                    { title: "Blindfold Taste Test", description: "Guess 5 foods while blindfolded", reward: 130, difficulty: "Medium", timeLimit: 180 },
+                    { title: "Speed Eating", description: "Finish a meal in under 5 minutes", reward: 100, difficulty: "Easy", timeLimit: 300 },
+                    { title: "Cook Without Recipe", description: "Create a dish without any instructions", reward: 200, difficulty: "Hard", timeLimit: 600 }
+                ],
+                gaming: [
+                    { title: "No Death Run", description: "Complete a game level without dying", reward: 180, difficulty: "Hard", timeLimit: 600 },
+                    { title: "Speedrun Challenge", description: "Beat your best time in any game", reward: 150, difficulty: "Medium", timeLimit: 600 },
+                    { title: "Blindfold Gaming", description: "Play a game blindfolded for 2 minutes", reward: 200, difficulty: "Hard", timeLimit: 120 },
+                    { title: "One Hand Gaming", description: "Win a match using only one hand", reward: 160, difficulty: "Hard", timeLimit: 600 }
+                ]
+            },
+            
+            // Shop Items Data
+            shopItemsData: {
+                avatars: [
+                    { id: 'avatar_1', name: 'Golden Crown', icon: '👑', price: 5000, type: 'avatar' },
+                    { id: 'avatar_2', name: 'Rainbow Unicorn', icon: '🦄', price: 3000, type: 'avatar' },
+                    { id: 'avatar_3', name: 'Fire Dragon', icon: '🐉', price: 4000, type: 'avatar' },
+                    { id: 'avatar_4', name: 'Space Astronaut', icon: '👨‍🚀', price: 3500, type: 'avatar' },
+                    { id: 'avatar_5', name: 'Ninja Master', icon: '🥷', price: 2500, type: 'avatar' }
+                ],
+                frames: [
+                    { id: 'frame_1', name: 'Gold Frame', icon: '🖼️', price: 2000, type: 'frame', color: '#FFD700' },
+                    { id: 'frame_2', name: 'Neon Frame', icon: '🖼️', price: 1500, type: 'frame', color: '#FF00FF' },
+                    { id: 'frame_3', name: 'Ice Frame', icon: '🖼️', price: 1800, type: 'frame', color: '#00FFFF' }
+                ],
+                effects: [
+                    { id: 'effect_1', name: 'Sparkle Effect', icon: '✨', price: 1000, type: 'effect' },
+                    { id: 'effect_2', name: 'Rainbow Trail', icon: '🌈', price: 1500, type: 'effect' },
+                    { id: 'effect_3', name: 'Smoke Effect', icon: '💨', price: 800, type: 'effect' }
+                ],
+                vouchers: [
+                    { id: 'voucher_1', name: 'Starbucks RM10', icon: '☕', price: 1000, type: 'voucher' },
+                    { id: 'voucher_2', name: 'Grab RM15', icon: '🚗', price: 1500, type: 'voucher' },
+                    { id: 'voucher_3', name: 'Shopee RM20', icon: '🛍️', price: 2000, type: 'voucher' }
+                ]
+            }
+        };
+        
+        // Initialize app when DOM is loaded
+        document.addEventListener('DOMContentLoaded', () => {
+            App.init();
+        });
+        
+        // Prevent pull-to-refresh
+        document.addEventListener('touchmove', (e) => {
+            if (e.touches[0].clientY > 0) {
+                e.preventDefault();
+            }
+        }, { passive: false });
+    </script>
+</body>
+</html>
